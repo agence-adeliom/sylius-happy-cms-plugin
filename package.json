@@ -33,7 +33,7 @@
     "file-loader": "^6.2.0",
     "postcss-loader": "^6.2.1",
     "fuse.js": "^6.4.6",
-    "idb-keyval": "^5.0.6",
+    "idb-keyval": "^6.2.1",
     "keycode": "^2.2.0",
     "lottie-web": "^5.7.11",
     "music-metadata-browser": "^2.2.6",
