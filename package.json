@@ -26,7 +26,7 @@
   },
   "devDependencies": {
     "annyang": "^2.6.1",
-    "axios": "^0.21.2",
+    "axios": "^0.28.0",
     "cropperjs": "^1.5.12",
     "dropzone": "^5.9.2",
     "@symfony/webpack-encore": "^2.0",
