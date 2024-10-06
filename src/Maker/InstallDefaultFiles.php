@@ -47,11 +47,11 @@ final class InstallDefaultFiles extends AbstractMaker
             'parameters:',
         ];
         $this->generatePage($happyCMSDefaultPackageParameters, $io, $generator);
-        $this->generateConfig($happyCMSDefaultPackageParameters, $io, $generator);
-        $this->generateFolder($happyCMSDefaultPackageParameters, $io, $generator);
-        $this->generateMedia($happyCMSDefaultPackageParameters, $io, $generator);
-        $this->generateMenu($happyCMSDefaultPackageParameters, $io, $generator);
-        $this->generateBlock($happyCMSDefaultPackageParameters, $io, $generator);
+        //$this->generateConfig($happyCMSDefaultPackageParameters, $io, $generator);
+        //$this->generateFolder($happyCMSDefaultPackageParameters, $io, $generator);
+        //$this->generateMedia($happyCMSDefaultPackageParameters, $io, $generator);
+        //$this->generateMenu($happyCMSDefaultPackageParameters, $io, $generator);
+        //$this->generateBlock($happyCMSDefaultPackageParameters, $io, $generator);
 
         $io->newLine();
         $io->success('Success!');
@@ -71,7 +71,7 @@ final class InstallDefaultFiles extends AbstractMaker
     {
         $scope = 'page';
         $files = [
-            ['prefix' => 'Entity', 'suffix' => '', 'addRepo' => true],
+            ['prefix' => 'Entity', 'suffix' => '', 'addRepo' => true, 'addTrans' => true],
             ['prefix' => 'Entity', 'suffix' => 'Translation'],
             ['prefix' => 'Repository', 'suffix' => 'Repository'],
             ['prefix' => 'Admin', 'suffix' => 'Admin'],
@@ -93,7 +93,7 @@ final class InstallDefaultFiles extends AbstractMaker
     {
         $scope = 'config';
         $files = [
-            ['prefix' => 'Entity', 'suffix' => '', 'addRepo' => true],
+            ['prefix' => 'Entity', 'suffix' => '', 'addRepo' => true, 'addTrans' => true],
             ['prefix' => 'Entity', 'suffix' => 'Translation'],
             ['prefix' => 'Repository', 'suffix' => 'Repository'],
             ['prefix' => 'Admin', 'suffix' => 'Admin'],
@@ -169,7 +169,7 @@ final class InstallDefaultFiles extends AbstractMaker
 
         $entityName = 'menuItem';
         $files = [
-            ['prefix' => 'Entity', 'suffix' => '', 'entityName' => $entityName, 'addRepo' => true],
+            ['prefix' => 'Entity', 'suffix' => '', 'entityName' => $entityName, 'addRepo' => true, 'addTrans' => true],
             ['prefix' => 'Entity', 'suffix' => 'Translation', 'entityName' => $entityName],
             ['prefix' => 'Repository', 'suffix' => 'Repository', 'entityName' => $entityName],
             ['prefix' => 'Admin', 'suffix' => 'Admin', 'entityName' => $entityName],
@@ -192,7 +192,7 @@ final class InstallDefaultFiles extends AbstractMaker
     {
         $scope = 'sharedBlock';
         $files = [
-            ['prefix' => 'Entity', 'suffix' => '', 'entityName' => 'sharedBlock', 'addRepo' => true],
+            ['prefix' => 'Entity', 'suffix' => '', 'entityName' => 'sharedBlock', 'addRepo' => true, 'addTrans' => true],
             ['prefix' => 'Entity', 'suffix' => 'Translation', 'entityName' => 'sharedBlock'],
             ['prefix' => 'Repository', 'suffix' => 'Repository', 'entityName' => 'sharedBlock'],
             ['prefix' => 'Admin', 'suffix' => 'Admin', 'entityName' => 'sharedBlock'],
@@ -236,6 +236,7 @@ final class InstallDefaultFiles extends AbstractMaker
                             'classNameDetail' => $classNameDetail,
                             'scope' => ucfirst($scope),
                             'addRepo' => $data['addRepo'] ?? false,
+                            'addTrans' => $data['addTrans'] ?? false,
                         ],
                     );
                     $generator->writeChanges();

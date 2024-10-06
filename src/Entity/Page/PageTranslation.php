@@ -22,8 +22,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[MappedSuperclass]
-#[ORM\Entity]
-#[ORM\Table(name: 'sylius_happy_cms__page_translation')]
 class PageTranslation extends AbstractTranslation implements PageTranslationInterface
 {
     use EntityIdTrait;
@@ -31,11 +29,6 @@ class PageTranslation extends AbstractTranslation implements PageTranslationInte
     use EntitySeoTrait {
         EntitySeoTrait::__construct as private SEOConstruct;
     }
-
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    protected ?int $id = null;
 
     /** @var array<int, mixed>|null $content */
     #[Groups('main')]

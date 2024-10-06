@@ -24,8 +24,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\MappedSuperclass(repositoryClass: PageRepository::class)]
 #[Serializer\ExclusionPolicy('ALL')]
-#[ORM\Entity]
-#[ORM\Table(name: 'sylius_happy_cms__page')]
 class Page implements PageInterface
 {
     use EntityIdTrait;

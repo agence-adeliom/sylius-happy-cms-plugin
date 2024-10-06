@@ -5,7 +5,7 @@ use Symfony\Bundle\MakerBundle\Util\ClassNameDetails;
 
 if (
     isset($classNameDetail) && $classNameDetail instanceof ClassNameDetails &&
-    isset($scope, $addRepo)
+    isset($scope, $addRepo, $addTrans)
 ) {
     ?>
 <?= "<?php\n" ?>
@@ -22,6 +22,7 @@ use <?= str_replace('Entity', 'Repository', Str::getNamespace($classNameDetail->
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Sylius\Component\Resource\Model\TranslationInterface;
 
 #[Serializer\ExclusionPolicy('ALL')]
 <?php if ($addRepo === true) { ?>
@@ -31,5 +32,11 @@ use JMS\Serializer\Annotation as Serializer;
 <?php } ?>
 #[ORM\Table(name: 'sylius_happy_cms__<?= Str::asSnakeCase($classNameDetail->getShortName()) ?>')]
 class <?= $classNameDetail->getShortName() ?> extends Base<?= $classNameDetail->getShortName() ?> {
+<?php if ($addRepo === true) { ?>
+    protected function createTranslation(): TranslationInterface
+    {
+        return new <?= $classNameDetail->getShortName() ?>Translation();
+    }
+<?php } ?>
 }
 <?php } ?>

@@ -4,18 +4,15 @@ doctrine:
       adeliom_happy_cms_flexible_content_type: Adeliom\SyliusHappyCMSPlugin\Doctrine\FlexibleContentType
       happy_cms_media_type: Adeliom\SyliusHappyCMSPlugin\Doctrine\MediaType
   orm:
-    entity_managers:
-      default:
-        mappings:
-          SyliusHappyCMSPlugin:
-            is_bundle: true
-            type: attribute
-            dir: 'src/Entity'
-            prefix: 'Adeliom\SyliusHappyCMSPlugin'
-            alias: Adeliom\SyliusHappyCMSPlugin
-#          SyliusHappyCMSPluginPage:
-#            is_bundle: true
-#            type: attribute
-#            dir: 'src/Entity/Page'
-#            prefix: 'Adeliom\SyliusHappyCMSPlugin'
-#            alias: Adeliom\SyliusHappyCMSPlugin
+
+    mappings:
+      SyliusHappyCMSPlugin:
+        is_bundle: true
+        type: xml
+        dir: 'src/Resources/config/doctrine/mapping'
+    resolve_target_entities:
+      Adeliom\SyliusHappyCMSPlugin\Entity\Page\PageInterface: "%sylius_happy_cms.page.model%"
+      Adeliom\SyliusHappyCMSPlugin\Entity\Page\PageTranslationInterface: "%sylius_happy_cms.page.model_translation%"
+      Adeliom\SyliusHappyCMSPlugin\Entity\Seo•\SeoInterface: "%sylius_happy_cms.seo.model%"
+      Adeliom\SyliusHappyCMSPlugin\Repository\Page\PageRepositoryInterface: "%sylius_happy_cms.page.repository%"
+

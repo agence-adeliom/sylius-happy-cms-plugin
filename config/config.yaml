@@ -45,3 +45,5 @@ parameters:
   sylius_happy_cms.shared_block.controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
   sylius_happy_cms.shared_block.controller_translation: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
   sylius_happy_cms.shared_block.shared_block_admin: Adeliom\SyliusHappyCMSPlugin\Admin\SharedBlock\SharedBlockAdmin
+
+  sylius_happy_cms.seo.model: Adeliom\SyliusHappyCMSPlugin\Entity\Seo\Seo

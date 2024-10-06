@@ -10,7 +10,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Embeddable]
-class Seo implements \Stringable
+class Seo implements SeoInterface, \Stringable
 {
     #[ORM\Column]
     public string $title;

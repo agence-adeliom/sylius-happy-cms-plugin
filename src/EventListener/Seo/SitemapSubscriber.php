@@ -6,7 +6,7 @@ namespace Adeliom\SyliusHappyCMSPlugin\EventListener\Seo;
 
 use Adeliom\SyliusHappyCMSPlugin\Event\Seo\AfterSitemapEntities;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
-use Adeliom\SyliusHappyCMSPlugin\Services\Seo\Sitemap\SeoInterface;
+use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\SeoInterface;
 use Adeliom\SyliusHappyCMSPlugin\Services\Seo\Sitemap\SitemapDumperInterface;
 use Presta\SitemapBundle\Event\SitemapPopulateEvent;
 use Presta\SitemapBundle\Sitemap\Url\GoogleMultilangUrlDecorator;

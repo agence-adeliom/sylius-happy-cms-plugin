@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\Services\Seo\Sitemap;
 
 use Adeliom\SyliusHappyCMSPlugin\Entity\Page\PageInterface;
-use Adeliom\SyliusHappyCMSPlugin\Repository\Page\PageRepository;
+use Doctrine\ORM\EntityManagerInterface;
 
 class PagesSitemapDumper extends AbstractSitemapDumper
 {
     public function __construct(
-        private readonly PageRepository $pageRepository,
+        private readonly EntityManagerInterface $manager,
     ) {
     }
 
@@ -24,6 +24,6 @@ class PagesSitemapDumper extends AbstractSitemapDumper
      */
     public function getEntities(): array
     {
-        return $this->pageRepository->findAll();
+        return $this->manager->getRepository(PageInterface::class)->findAll();
     }
 }
