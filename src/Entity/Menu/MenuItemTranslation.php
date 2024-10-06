@@ -11,8 +11,6 @@ use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Doctrine\ORM\Mapping\MappedSuperclass;
 use Sylius\Component\Resource\Model\AbstractTranslation;
 
-#[ORM\Entity]
-#[ORM\Table(name: 'sylius_happy_cms__menu_item_translation')]
 #[HasLifecycleCallbacks]
 #[MappedSuperclass]
 class MenuItemTranslation extends AbstractTranslation implements MenuItemTranslationInterface

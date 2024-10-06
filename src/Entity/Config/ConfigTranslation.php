@@ -14,8 +14,6 @@ use Sylius\Component\Resource\Model\AbstractTranslation;
 
 #[HasLifecycleCallbacks]
 #[MappedSuperclass]
-#[ORM\Entity]
-#[ORM\Table(name: 'sylius_happy_cms__config_translation')]
 class ConfigTranslation extends AbstractTranslation implements ConfigTranslationInterface, \Stringable
 {
     use EntityIdTrait;

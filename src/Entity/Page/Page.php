@@ -43,7 +43,7 @@ class Page implements PageInterface
 
     /** @var Collection<int, OrmRoute> */
     #[ORM\ManyToMany(targetEntity: OrmRoute::class, cascade: ['persist', 'remove'])]
-    #[ORM\JoinTable('happy_cms_page__page_route')]
+    #[ORM\JoinTable('sylius_happy_cms_page__page_route')]
     protected Collection $routes;
 
     #[Assert\Type(PageInterface::class)]
@@ -79,7 +79,7 @@ class Page implements PageInterface
         $this->children = new ArrayCollection();
     }
 
-    protected function createTranslation(): TranslationInterface
+    protected function createTranslation(): PageTranslationInterface
     {
         return new PageTranslation();
     }

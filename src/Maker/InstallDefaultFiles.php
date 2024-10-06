@@ -47,11 +47,11 @@ final class InstallDefaultFiles extends AbstractMaker
             'parameters:',
         ];
         $this->generatePage($happyCMSDefaultPackageParameters, $io, $generator);
-        //$this->generateConfig($happyCMSDefaultPackageParameters, $io, $generator);
-        //$this->generateFolder($happyCMSDefaultPackageParameters, $io, $generator);
-        //$this->generateMedia($happyCMSDefaultPackageParameters, $io, $generator);
-        //$this->generateMenu($happyCMSDefaultPackageParameters, $io, $generator);
-        //$this->generateBlock($happyCMSDefaultPackageParameters, $io, $generator);
+        $this->generateConfig($happyCMSDefaultPackageParameters, $io, $generator);
+        $this->generateFolder($happyCMSDefaultPackageParameters, $io, $generator);
+        $this->generateMedia($happyCMSDefaultPackageParameters, $io, $generator);
+        $this->generateMenu($happyCMSDefaultPackageParameters, $io, $generator);
+        $this->generateBlock($happyCMSDefaultPackageParameters, $io, $generator);
 
         $io->newLine();
         $io->success('Success!');

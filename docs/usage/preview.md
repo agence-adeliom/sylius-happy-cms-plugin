@@ -11,8 +11,7 @@ The example below only give access to the preview of a page to the EDITOR role.
 
 namespace App\Entity\HappyCMS\Page;
 
-use Adeliom\SyliusHappyCMSPlugin\Attribute as CMS;
-use Adeliom\SyliusHappyCMSPlugin\Entity\Page\Page as BasePage;
+use Adeliom\SyliusHappyCMSPlugin\Attribute as CMS;use Adeliom\SyliusHappyCMSPlugin\Entity\Page as BasePage;
 
 // .... #[ORM\Entity ... 
 #[CMS\ContentPreview(['EDITOR'])]
