@@ -4,16 +4,31 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Maker;
 
+use Adeliom\SyliusEasyCrudPlugin\Services\CrudMakerService;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
+use Symfony\Bundle\MakerBundle\Util\ClassNameDetails;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Yaml\Yaml;
 
 final class InstallDefaultFiles extends AbstractMaker
 {
+    public const YAML_ROUTES_FILE = 'config/routes.yaml';
+
+    public const YAML_RESOURCE_FILE = 'config/packages/sylius_resource.yaml';
+
+    public const YAML_SERVICES_FILE = 'config/services.yaml';
+
+    public function __construct(
+        protected ParameterBagInterface $parameterBag,
+    )
+    {}
+
     public const TPL_FILES = [
         'entity' => __DIR__ . '/../../Resources/skeleton/default/entity.tpl.php',
         'translation' => __DIR__ . '/../../Resources/skeleton/cms/translation.tpl.php',
@@ -46,28 +61,33 @@ final class InstallDefaultFiles extends AbstractMaker
         $happyCMSDefaultPackageParameters = [
             'parameters:',
         ];
-        $this->generatePage($happyCMSDefaultPackageParameters, $io, $generator);
-        $this->generateConfig($happyCMSDefaultPackageParameters, $io, $generator);
-        $this->generateFolder($happyCMSDefaultPackageParameters, $io, $generator);
-        $this->generateMedia($happyCMSDefaultPackageParameters, $io, $generator);
-        $this->generateMenu($happyCMSDefaultPackageParameters, $io, $generator);
-        $this->generateBlock($happyCMSDefaultPackageParameters, $io, $generator);
+        $happyCMSDefaultRoutes = '';
+        $happyCMSDefaultResources = [];
+        $this->generatePage($happyCMSDefaultPackageParameters, $happyCMSDefaultRoutes, $happyCMSDefaultResources, $io, $generator);
+        $this->generateConfig($happyCMSDefaultPackageParameters, $happyCMSDefaultRoutes, $happyCMSDefaultResources, $io, $generator);
+        $this->generateFolder($happyCMSDefaultPackageParameters, $happyCMSDefaultRoutes, $happyCMSDefaultResources, $io, $generator);
+        $this->generateMedia($happyCMSDefaultPackageParameters, $happyCMSDefaultRoutes, $happyCMSDefaultResources, $io, $generator);
+        $this->generateMenu($happyCMSDefaultPackageParameters, $happyCMSDefaultRoutes, $happyCMSDefaultResources, $io, $generator);
+        $this->generateBlock($happyCMSDefaultPackageParameters, $happyCMSDefaultRoutes, $happyCMSDefaultResources, $io, $generator);
+
+        $io->writeln($happyCMSDefaultPackageParameters);
 
         $io->newLine();
         $io->success('Success!');
         $io->newLine();
-        $choice = $io->confirm('Do you want to get to configuration lines to add into config/parameters.yaml file ?');
+
+        //$choice = $io->confirm('Do you want to get to configuration lines to add into config/parameters.yaml file ?');
 
         // Add
-        if ($choice) {
-            $io->writeln($happyCMSDefaultPackageParameters);
-        }
+        //if ($choice) {
+            //$io->writeln($happyCMSDefaultPackageParameters);
+        //}
     }
 
     /**
      * @param string[] $happyCMSDefaultPackageParameters
      */
-    private function generatePage(array &$happyCMSDefaultPackageParameters, ConsoleStyle $io, Generator $generator): void
+    private function generatePage(array &$happyCMSDefaultPackageParameters, string &$happyCMSDefaultRoutes, array &$happyCMSDefaultResources, ConsoleStyle $io, Generator $generator): void
     {
         $scope = 'page';
         $files = [
@@ -77,6 +97,8 @@ final class InstallDefaultFiles extends AbstractMaker
             ['prefix' => 'Admin', 'suffix' => 'Admin'],
         ];
         $this->generateScope($scope, $files, $io, $generator);
+
+        $this->generateRoute($scope, $io);
 
         $happyCMSDefaultPackageParameters = array_merge($happyCMSDefaultPackageParameters, [
             '   sylius_happy_cms.page.model: App\Entity\HappyCMS\\' . ucfirst($scope) . '\\' . ucfirst($scope),
@@ -89,7 +111,7 @@ final class InstallDefaultFiles extends AbstractMaker
     /**
      * @param string[] $happyCMSDefaultPackageParameters
      */
-    private function generateConfig(array &$happyCMSDefaultPackageParameters, ConsoleStyle $io, Generator $generator): void
+    private function generateConfig(array &$happyCMSDefaultPackageParameters, string &$happyCMSDefaultRoutes, array &$happyCMSDefaultResources, ConsoleStyle $io, Generator $generator): void
     {
         $scope = 'config';
         $files = [
@@ -99,6 +121,8 @@ final class InstallDefaultFiles extends AbstractMaker
             ['prefix' => 'Admin', 'suffix' => 'Admin'],
         ];
         $this->generateScope($scope, $files, $io, $generator);
+
+        $this->generateRoute($scope, $io);
 
         $happyCMSDefaultPackageParameters = array_merge($happyCMSDefaultPackageParameters, [
             '',
@@ -112,7 +136,7 @@ final class InstallDefaultFiles extends AbstractMaker
     /**
      * @param string[] $happyCMSDefaultPackageParameters
      */
-    private function generateFolder(array &$happyCMSDefaultPackageParameters, ConsoleStyle $io, Generator $generator): void
+    private function generateFolder(array &$happyCMSDefaultPackageParameters, string &$happyCMSDefaultRoutes, array &$happyCMSDefaultResources, ConsoleStyle $io, Generator $generator): void
     {
         $scope = 'media';
         $entityName = 'folder';
@@ -132,7 +156,7 @@ final class InstallDefaultFiles extends AbstractMaker
     /**
      * @param string[] $happyCMSDefaultPackageParameters
      */
-    private function generateMedia(array &$happyCMSDefaultPackageParameters, ConsoleStyle $io, Generator $generator): void
+    private function generateMedia(array &$happyCMSDefaultPackageParameters, string &$happyCMSDefaultRoutes, array &$happyCMSDefaultResources, ConsoleStyle $io, Generator $generator): void
     {
         $scope = 'media';
         $files = [
@@ -150,7 +174,7 @@ final class InstallDefaultFiles extends AbstractMaker
     /**
      * @param string[] $happyCMSDefaultPackageParameters
      */
-    private function generateMenu(array &$happyCMSDefaultPackageParameters, ConsoleStyle $io, Generator $generator): void
+    private function generateMenu(array &$happyCMSDefaultPackageParameters, string &$happyCMSDefaultRoutes, array &$happyCMSDefaultResources, ConsoleStyle $io, Generator $generator): void
     {
         $scope = 'menu';
         $files = [
@@ -159,6 +183,9 @@ final class InstallDefaultFiles extends AbstractMaker
             ['prefix' => 'Admin', 'suffix' => 'Admin', 'entityName' => 'menu'],
         ];
         $this->generateScope($scope, $files, $io, $generator);
+
+        $this->generateRoute($scope, $io);
+        $this->generateRoute($scope.'_item', $io);
 
         $happyCMSDefaultPackageParameters = array_merge($happyCMSDefaultPackageParameters, [
             '',
@@ -188,7 +215,7 @@ final class InstallDefaultFiles extends AbstractMaker
     /**
      * @param string[] $happyCMSDefaultPackageParameters
      */
-    private function generateBlock(array &$happyCMSDefaultPackageParameters, ConsoleStyle $io, Generator $generator): void
+    private function generateBlock(array &$happyCMSDefaultPackageParameters, string &$happyCMSDefaultRoutes, array &$happyCMSDefaultResources, ConsoleStyle $io, Generator $generator): void
     {
         $scope = 'sharedBlock';
         $files = [
@@ -198,6 +225,8 @@ final class InstallDefaultFiles extends AbstractMaker
             ['prefix' => 'Admin', 'suffix' => 'Admin', 'entityName' => 'sharedBlock'],
         ];
         $this->generateScope($scope, $files, $io, $generator);
+
+        $this->generateRoute('shared_block', $io);
 
         $happyCMSDefaultPackageParameters = array_merge($happyCMSDefaultPackageParameters, [
             '',
@@ -264,4 +293,68 @@ final class InstallDefaultFiles extends AbstractMaker
             '       page_admin: App\Admin\HappyCMS\\' . ucfirst($scope) . '\\' . ucfirst($scope) . 'Admin',
         ]);
     }
+
+    public function generateRoute(string$scope, ConsoleStyle $io): string
+    {
+        try {
+            $yaml = [
+                'sylius_happy_cms_'.$scope.'_admin' => [
+                    'resource' =>
+                        "alias: sylius_happy_cms.".$scope."\n"
+                        . "section: admin\n"
+                        . "templates: \"@SyliusEasyCrudPlugin\\\\crud\"\n"
+                        . "redirect: update\n"
+                        . "grid: sylius_happy_cms_".$scope."_admin\n"
+                        . "form:\n"
+                        . "    type: \"%sylius_happy_cms.".$scope.".".$scope."_admin%\"\n"
+                        . "    options:\n"
+                        . "        context: \$context\n"
+                        . "vars:\n"
+                        . "    all:\n"
+                        . "        icon: 'file'\n"
+                        . "        subheader: sylius_happy_cms.".$scope.".admin.ui.subheader\n"
+                        . "        breadcrumb: sylius_happy_cms.".$scope.".admin.ui.index\n"
+                        . "        templates:\n"
+                        . "            form: \"@SyliusEasyCrudPlugin\\\\crud\\\\form\\\\_form.html.twig\"\n"
+                        . "    index:\n"
+                        . "        header: sylius_happy_cms.".$scope.".admin.ui.index\n"
+                        . "    create:\n"
+                        . "        header: sylius_happy_cms.".$scope.".admin.ui.create\n"
+                        . "    update:\n"
+                        . "        header: sylius_happy_cms.".$scope.".admin.ui.update\n"
+                        . "        redirect:\n"
+                        . "            route: update\n"
+                        . "            parameters:\n"
+                        . "                context: \$context\n"
+                        . "                id: \$id\n"
+                        . "        route:\n"
+                        . "            parameters:\n"
+                        . "                context: \$context\n"
+                        . "                id: \$id\n"
+                    ,
+                    'type' => 'sylius.resource',
+                    'prefix' => 'admin',
+                ],
+            ];
+
+            file_put_contents(
+                self::YAML_ROUTES_FILE,
+                Yaml::dump($yaml, 2, 4, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK),
+                \FILE_APPEND,
+            );
+
+            $io->comment(sprintf(
+                             '%s: %s',
+                             '<fg=yellow>updated</>',
+                             self::YAML_ROUTES_FILE,
+                         ));
+
+            return self::YAML_ROUTES_FILE;
+        } catch (\Exception $e) {
+            return $e->getCode() . ' : ' . $e->getMessage();
+        }
+
+
+    }
+
 }

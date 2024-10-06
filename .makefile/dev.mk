@@ -93,7 +93,7 @@ platform:
 		(cd ${APP_DIR} && sed -i'' -e 's|            "App\\": "src/",|            "App\\": "src/",\n            "Adeliom\\${PLUGIN_NAMESPACE}\\": "${PLUGIN_DIR}/src/"|g' composer.json); \
 		(cd ${APP_DIR} && sed -i'' -e 's|"App\\\\": "src/"|"Adeliom\\\\${PLUGIN_NAMESPACE}\\\\": "${PLUGIN_DIR}/src/",\n            "App\\\\": "src/"|g' composer.json); \
 		(cd ${APP_DIR} && sed -i'' -e 's|type: annotation|type: attribute|g' config/packages/doctrine.yaml); \
-		(cd ${APP_DIR} && sed -i'' -e 's|- { resource: "../parameters.yaml" }|- { resource: "@${PLUGIN_NAMESPACE}/config/config.yaml" }\n    - { resource: "@${CRUD_PLUGIN_NAMESPACE}/config/config.yaml" }\n    - { resource: "../parameters.yaml" }|g' config/packages/_sylius.yaml); \
+		(cd ${APP_DIR} && sed -i'' -e 's|- { resource: "../parameters.yaml" }|- { resource: "../parameters.yaml" }\n    - { resource: "@${PLUGIN_NAMESPACE}/config/config.yaml" }\n    - { resource: "@${CRUD_PLUGIN_NAMESPACE}/config/config.yaml" }|g' config/packages/_sylius.yaml); \
 		(cd ${APP_DIR} && rm -rf config/packages/doctrine.yaml-e); \
 		(cd ${APP_DIR} && rm -rf config/packages/_sylius.yaml-e); \
 		(cd ${APP_DIR} && rm -rf config/routes.yaml-e); \

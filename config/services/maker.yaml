@@ -20,6 +20,8 @@ services:
   adeliom.sylius.cms.maker.happy_cms_init_default_files:
     class: Adeliom\SyliusHappyCMSPlugin\Maker\InstallDefaultFiles
     public: false
+    arguments:
+      - '@parameter_bag'
     tags:
       - { name: maker.command }
 

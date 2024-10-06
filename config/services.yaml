@@ -10,11 +10,6 @@ services:
     autowire: true
     autoconfigure: true
 
-  adeliom.sylius.cms.plugin.listener.admin.menu_builder:
-    class: Adeliom\SyliusHappyCMSPlugin\Menu\AdminMenuListener
-    tags:
-      - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addAdminMenuItems }
-
   Adeliom\SyliusHappyCMSPlugin\ContextProvider\CreateSharedBlockContextProvider:
     arguments:
       - '@adeliom.sylius.cms.shared_block.block_collection'

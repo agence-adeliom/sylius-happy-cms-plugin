@@ -10,7 +10,7 @@ Encore
     .enableVersioning(Encore.isProduction())
     .disableSingleRuntimeChunk()
     .enableSassLoader()
-    .enableVueLoader()
+    .enableVueLoader(() => {}, { runtimeCompilerBuild: false })
     .enablePostCssLoader()
 
     .copyFiles({
