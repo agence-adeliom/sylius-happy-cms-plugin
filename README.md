@@ -26,8 +26,8 @@ imports:
 Then, into `config/bundles.php` add :
 
 ```php
-Adeliom\SyliusHappyCMSPlugin\SyliusHappyCMSPlugin::class => ['all' => true],
 Adeliom\SyliusEasyCrudPlugin\SyliusEasyCrudPlugin::class => ['all' => true],
+Adeliom\SyliusHappyCMSPlugin\SyliusHappyCMSPlugin::class => ['all' => true],
 ```
 
 Then, into `config/packages/_sylius.yaml` add :
@@ -56,39 +56,43 @@ This command also provide all variables you need to override. Don't forget to do
 
 4. Override default parameters
 
-Into `config/parameters.yaml` add :
-
+Into `config/packages/sylius_happy_cms.yaml` add :
 
 ```yaml
-parameters:
-    sylius_happy_cms.page.model: App\Entity\HappyCMS\Page\Page
-    sylius_happy_cms.page.model_translation: App\Entity\HappyCMS\Page\PageTranslation
-    sylius_happy_cms.page.repository: App\Repository\HappyCMS\Page\PageRepository
-    sylius_happy_cms.page.page_admin: App\Admin\HappyCMS\Page\PageAdmin
+sylius_happy_cms:
+  page:
+    page_model: App\Entity\HappyCMS\Page\Page
+    page_repository: App\Repository\HappyCMS\Page\PageRepository
+    page_admin: App\Admin\HappyCMS\Page\PageAdmin
 
-    sylius_happy_cms.config.model: App\Entity\HappyCMS\Config\Config
-    sylius_happy_cms.config.model_translation: App\Entity\HappyCMS\Config\ConfigTranslation
-    sylius_happy_cms.config.repository: App\Repository\HappyCMS\Config\ConfigRepository
-    sylius_happy_cms.config.config_admin: App\Admin\HappyCMS\Config\ConfigAdmin
+  seo:
+    title:
+      suffix: ACME
 
-    sylius_happy_cms.folder.model: App\Entity\HappyCMS\Media\Folder
-    sylius_happy_cms.folder.repository: App\Repository\HappyCMS\Media\FolderRepository
-    sylius_happy_cms.media.model: App\Entity\HappyCMS\Media\Media
-    sylius_happy_cms.media.repository: App\Repository\HappyCMS\Media\MediaRepository
+  config:
+    config_model: App\Entity\HappyCMS\Config\Config
+    config_repository: App\Repository\HappyCMS\Config\ConfigRepository
+    config_admin: App\Admin\HappyCMS\Config\ConfigAdmin
 
-    sylius_happy_cms.menu.model: App\Entity\HappyCMS\Menu\Menu
-    sylius_happy_cms.menu.repository: App\Repository\HappyCMS\Menu\MenuRepository
-    sylius_happy_cms.menu.menu_admin: App\Admin\HappyCMS\Menu\MenuAdmin
+  menu:
+    menu:
+      menu_model: App\Entity\HappyCMS\Menu\Menu
+      menu_repository: App\Repository\HappyCMS\Menu\MenuRepository
+      menu_admin:  App\Admin\HappyCMS\Menu\MenuAdmin
+    menu_item:
+      menu_item_model: App\Entity\HappyCMS\Menu\MenuItem
+      menu_item_repository: App\Repository\HappyCMS\Menu\MenuItemRepository
+      menu_item_admin:  App\Admin\HappyCMS\Menu\MenuItemAdmin
 
-    sylius_happy_cms.menu_item.model: App\Entity\HappyCMS\Menu\MenuItem
-    sylius_happy_cms.menu_item.model_translation: App\Entity\HappyCMS\Menu\MenuItemTranslation
-    sylius_happy_cms.menu_item.repository: App\Repository\HappyCMS\Menu\MenuItemRepository
-    sylius_happy_cms.menu_item.menu_admin: App\Admin\HappyCMS\Menu\MenuItemAdmin
+  media:
+    storage_name: uploads.storage
+    base_url: '/media/download'
+    media_entity: App\Entity\HappyCMS\Media\Media
+    folder_entity: App\Entity\HappyCMS\Media\Folder
 
-    sylius_happy_cms.shared_block.model: App\Entity\HappyCMS\SharedBlock\SharedBlock
-    sylius_happy_cms.shared_block.model_translation: App\Entity\HappyCMS\SharedBlock\SharedBlockTranslation
-    sylius_happy_cms.shared_block.repository: App\Repository\HappyCMS\SharedBlock\SharedBlockRepository
-    sylius_happy_cms.shared_block.menu_admin: App\Admin\HappyCMS\SharedBlock\SharedBlockAdmin
+  shared_block:
+    shared_block_model: App\Entity\HappyCMS\SharedBlock\SharedBlock
+    shared_block_repository: App\Repository\HappyCMS\SharedBlock\SharedBlockRepository
 ```
 
 5. Déclare sylius_resources
@@ -101,69 +105,70 @@ sylius_resource:
     sylius_happy_cms.page:
       driver: doctrine/orm
       classes:
-        model: "%sylius_happy_cms.page.model%"
-        controller: "%sylius_happy_cms.page.controller%"
-        repository: "%sylius_happy_cms.page.repository%"
-        form: "%sylius_happy_cms.page.page_admin%"
+        model: App\Entity\HappyCMS\Page\Page
+        controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+        repository: App\Repository\HappyCMS\Page\PageRepository
+        form: App\Admin\HappyCMS\Page\PageAdmin
       translation:
         classes:
-          model: "%sylius_happy_cms.page.model_translation%"
-          controller: "%sylius_happy_cms.page.controller_translation%"
-          form: "%sylius_happy_cms.page.page_admin%"
+          model: App\Entity\HappyCMS\Page\PageTranslation
+          controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+          form: App\Admin\HappyCMS\Page\PageAdmin
     sylius_happy_cms.config:
       driver: doctrine/orm
       classes:
-        model: "%sylius_happy_cms.config.model%"
-        controller: "%sylius_happy_cms.config.controller%"
-        repository: "%sylius_happy_cms.config.repository%"
-        form: "%sylius_happy_cms.config.config_admin%"
+        model: App\Entity\HappyCMS\Config\Config
+        controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+        repository: App\Repository\HappyCMS\Config\ConfigRepository
+        form: App\Admin\HappyCMS\Config\ConfigAdmin
       translation:
         classes:
-          model: "%sylius_happy_cms.config.model_translation%"
-          controller: "%sylius_happy_cms.config.controller_translation%"
-          form: "%sylius_happy_cms.config.config_admin%"
+          model: App\Entity\HappyCMS\Config\ConfigTranslation
+          controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+          form: App\Admin\HappyCMS\Config\ConfigAdmin
     sylius_happy_cms.menu:
       driver: doctrine/orm
       classes:
-        model: "%sylius_happy_cms.menu.model%"
-        controller: "%sylius_happy_cms.menu.controller%"
-        repository: "%sylius_happy_cms.menu.repository%"
-        form: "%sylius_happy_cms.menu.menu_admin%"
+        model: App\Entity\HappyCMS\Menu\Menu
+        controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+        repository: App\Repository\HappyCMS\Menu\MenuRepository
+        form: App\Admin\HappyCMS\Menu\MenuAdmin
     sylius_happy_cms.menu_item:
       driver: doctrine/orm
       classes:
-        model: "%sylius_happy_cms.menu_item.model%"
-        controller: "%sylius_happy_cms.menu_item.controller%"
-        repository: "%sylius_happy_cms.menu_item.repository%"
-        form: "%sylius_happy_cms.menu_item.menu_item_admin%"
+        model: App\Entity\HappyCMS\Menu\MenuItem
+        controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+        repository: App\Repository\HappyCMS\Menu\MenuItemRepository
+        form: App\Admin\HappyCMS\Menu\MenuItemAdmin
       translation:
         classes:
-          model: "%sylius_happy_cms.menu_item.model_translation%"
-          controller: "%sylius_happy_cms.menu_item.controller_translation%"
-          form: "%sylius_happy_cms.menu_item.menu_item_admin%"
+          model: App\Entity\HappyCMS\Menu\MenuItemTranslation
+          controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+          form: App\Admin\HappyCMS\Menu\MenuItemAdmin
     sylius_happy_cms.shared_block:
       driver: doctrine/orm
       classes:
-        model: "%sylius_happy_cms.shared_block.model%"
-        controller: "%sylius_happy_cms.shared_block.controller%"
-        repository: "%sylius_happy_cms.shared_block.repository%"
-        form: "%sylius_happy_cms.shared_block.shared_block_admin%"
+        model: App\Entity\HappyCMS\SharedBlock\SharedBlock
+        controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+        repository: App\Repository\HappyCMS\SharedBlock\SharedBlockRepository
+        form: App\Admin\HappyCMS\SharedBlock\SharedBlockAdmin
       translation:
         classes:
-          model: "%sylius_happy_cms.shared_block.model_translation%"
-          controller: "%sylius_happy_cms.shared_block.controller_translation%"
-          form: "%sylius_happy_cms.shared_block.shared_block_admin%"
+          model: App\Entity\HappyCMS\SharedBlock\SharedBlockTranslation
+          controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+          form: App\Admin\HappyCMS\SharedBlock\SharedBlockAdmin
     sylius_happy_cms.media:
       driver: doctrine/orm
       classes:
-        model: "%sylius_happy_cms.media.model%"
-        repository: "%sylius_happy_cms.media.repository%"
+        model: App\Entity\HappyCMS\Media\Media
+        repository: App\Repository\HappyCMS\Media\MediaRepository
     sylius_happy_cms.media_folder:
       driver: doctrine/orm
       classes:
-        model: "%sylius_happy_cms.folder.model%"
-        repository: "%sylius_happy_cms.folder.repository%"
+        model: App\Entity\HappyCMS\Media\Folder
+        repository: App\Repository\HappyCMS\Media\FolderRepository
 ```
+
 
 4. Update database :
 

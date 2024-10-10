@@ -1,50 +1,47 @@
 services:
     happy_cms_menu.menu.repository:
-        class: '%sylius_happy_cms.menu.repository%'
+        class: Adeliom\SyliusHappyCMSPlugin\Repository\Menu\MenuItemRepository
         arguments:
             - '@doctrine'
-            - '%sylius_happy_cms.menu.model%'
+            - Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuInterface
         calls:
             - [ 'setConfig', [ '%sylius_happy_cms.menu.cache%' ] ]
         tags: [ doctrine.repository_service ]
 
     happy_cms_menu.menu_item.repository:
-        class: '%sylius_happy_cms.menu_item.repository%'
+        class: Adeliom\SyliusHappyCMSPlugin\Repository\Menu\MenuItemRepositoryInterface
         arguments:
             - '@doctrine'
-            - '%sylius_happy_cms.menu_item.model%'
+            - Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuItemInterface
         calls:
             - [ 'setConfig', [ '%sylius_happy_cms.menu.cache%' ] ]
         tags: [ doctrine.repository_service ]
 
     Adeliom\SyliusHappyCMSPlugin\EventListener\Menu\MenuCreationListener:
         arguments:
-            - '%sylius_happy_cms.menu.model%'
-            - '%sylius_happy_cms.menu_item.model%'
             - '@sylius.locale_provider'
             - '@translator'
         tags:
             - # these are the options required to define the entity listener
                 name: 'doctrine.orm.entity_listener'
                 event: 'prePersist'
-                entity: '%sylius_happy_cms.menu.model%'
+                entity: Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuInterface
                 lazy: true
 
     Adeliom\SyliusHappyCMSPlugin\Twig\Menu\MenuExtension:
         public: true
+        autowire: true
         arguments:
             - '@twig'
             - '@doctrine.orm.entity_manager'
-            - '%sylius_happy_cms.menu.model%'
-            - '%sylius_happy_cms.menu_item.model%'
         tags:
             - { name: twig.extension }
 
     Adeliom\SyliusHappyCMSPlugin\Controller\MenuItem\MenuItemController:
         public: true
+        autowire: true
         arguments:
             - '@doctrine.orm.entity_manager'
-            - '%sylius_happy_cms.menu_item.model%'
             - '@twig'
             - '@router'
         tags:

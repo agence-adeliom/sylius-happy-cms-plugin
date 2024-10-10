@@ -2,6 +2,7 @@
 
 use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Bundle\MakerBundle\Util\ClassNameDetails;
+use function Symfony\Component\String\u;
 
 if (
     isset($classNameDetail) && $classNameDetail instanceof ClassNameDetails &&
@@ -19,6 +20,17 @@ use Adeliom\SyliusHappyCMSPlugin\Admin\<?= $scope ?>\<?= $classNameDetail->getSh
     $classNameDetail->getShortName() ?>;
 
 class <?= $classNameDetail->getShortName() ?> extends Base<?= $classNameDetail->getShortName() ?><?php echo "\n"; ?>{
+
+    public static function getSubscribedServices(): array
+    {
+        return [];
+    }
+
+    public static function getName(): string
+    {
+        return 'sylius_happy_cms_<?= u(str_replace('Admin', '', $classNameDetail->getShortName()))->snake() ?>_admin';
+    }
+
     public static function getEntityFqcn(): string
     {
         return <?= str_replace('Admin', '', $classNameDetail->getShortName()) ?>::class;

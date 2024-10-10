@@ -13,21 +13,35 @@ use Doctrine\ORM\Event\PreRemoveEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Column;
-use Doctrine\ORM\Mapping\MappedSuperclass;
 use Doctrine\ORM\Mapping\PrePersist;
 use Doctrine\ORM\Mapping\PreRemove;
 use Doctrine\ORM\Mapping\PreUpdate;
+use JMS\Serializer\Annotation as Serializer;
 use Sylius\Component\Resource\Model\AbstractTranslation;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[MappedSuperclass]
+#[ORM\MappedSuperclass]
 class PageTranslation extends AbstractTranslation implements PageTranslationInterface
 {
     use EntityIdTrait;
     use EntityNameSlugTrait;
     use EntitySeoTrait {
         EntitySeoTrait::__construct as private SEOConstruct;
+    }
+
+    #[Groups('Default')]
+    #[ORM\Id]
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::INTEGER, options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
+    #[Serializer\Expose]
+    #[Serializer\Type('integer')]
+    #[Serializer\Groups(['Detailed', 'Default', 'Autocomplete'])]
+    protected ?int $id = null;
+
+    public function getId(): ?int
+    {
+        return $this->id;
     }
 
     /** @var array<int, mixed>|null $content */

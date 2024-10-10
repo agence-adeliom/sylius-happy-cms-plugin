@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Twig\Menu;
 
+use Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuInterface;
+use Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuItemInterface;
 use Adeliom\SyliusHappyCMSPlugin\Exceptions\Menu\MenuNotFoundException;
 use Adeliom\SyliusHappyCMSPlugin\Exceptions\Menu\TemplateNotFoundException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,8 +25,6 @@ class MenuExtension extends AbstractExtension
     public function __construct(
         private readonly Environment $twig,
         private readonly EntityManagerInterface $em,
-        private readonly string $menuClass,
-        private readonly string $menuItemClass,
     ) {
     }
 
@@ -52,11 +52,7 @@ class MenuExtension extends AbstractExtension
      */
     public function renderMenu(Environment $env, array $context, string $code, array $extra = []): Markup
     {
-        if (!class_exists($this->menuClass) || !class_exists($this->menuItemClass)) {
-            throw new MenuNotFoundException($code);
-        }
-
-        $repo = $this->em->getRepository($this->menuClass);
+        $repo = $this->em->getRepository(MenuInterface::class);
         if (!method_exists($repo, 'findOneByCode')) {
             throw new MenuNotFoundException($code);
         }
@@ -77,7 +73,7 @@ class MenuExtension extends AbstractExtension
             throw new TemplateNotFoundException($template);
         }
 
-        $rootItem = $this->em->getRepository($this->menuItemClass)->findOneBy([
+        $rootItem = $this->em->getRepository(MenuItemInterface::class)->findOneBy([
             'menu' => $menu,
             'parent' => null,
         ]);

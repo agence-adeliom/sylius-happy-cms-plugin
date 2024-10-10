@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\Admin\Menu;
 
 use Adeliom\SyliusEasyCrudPlugin\Admin\AbstractAdmin;
-use Adeliom\SyliusEasyCrudPlugin\Admin\AdminInterface;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\EnumField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TabField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TranslationField;
@@ -23,7 +22,6 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Event\PostSubmitEvent;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 abstract class AbstractMenuItemAdmin extends AbstractAdmin implements MenuItemAdminInterface
 {

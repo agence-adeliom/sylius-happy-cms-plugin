@@ -6,11 +6,9 @@ namespace Adeliom\SyliusHappyCMSPlugin\Entity\SharedBlock;
 
 use Adeliom\SyliusEasyCrudPlugin\Traits\EntityIdTrait;
 use Adeliom\SyliusEasyCrudPlugin\Traits\EntityNameTrait;
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Doctrine\ORM\Mapping\MappedSuperclass;
 use Sylius\Component\Resource\Model\AbstractTranslation;
-use Sylius\Component\Resource\Model\ResourceInterface;
 
 #[HasLifecycleCallbacks]
 #[MappedSuperclass]

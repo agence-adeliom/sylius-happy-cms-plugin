@@ -17,7 +17,6 @@ use Doctrine\ORM\Event\PreRemoveEventArgs;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Sylius\Component\Resource\Model\TranslatableTrait;
-use Sylius\Component\Resource\Model\TranslationInterface;
 use Symfony\Cmf\Bundle\RoutingBundle\Doctrine\Orm\Route as OrmRoute;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;

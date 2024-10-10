@@ -12,6 +12,7 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action\Action;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Actions;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\Field;
+use Adeliom\SyliusHappyCMSPlugin\Entity\SharedBlock\SharedBlockInterface;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -38,7 +39,7 @@ abstract class AbstractSharedBlockAdmin extends AbstractAdmin implements Service
 
     public function configureFields(string $pageName, ?string $context = null): iterable
     {
-        /** @var \Adeliom\SyliusHappyCMSPlugin\Entity\SharedBlock\SharedBlock|null $block */
+        /** @var SharedBlockInterface|null $block */
         $block = $this->getResource();
         yield TabField::new('configuration', 'sylius_happy_cms.shared_block.admin.tab.configuration');
 

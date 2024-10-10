@@ -1,225 +1,43 @@
-#sylius_happy_cms_page_admin:
-#  resource: |
-#    alias: sylius_happy_cms.page
-#    section: admin
-#    templates: "@SyliusEasyCrudPlugin\\crud"
-#    redirect: update
-#    grid: sylius_happy_cms_page_admin
-#    form:
-#        type: "%sylius_happy_cms.page.page_admin%"
-#        options:
-#            context: $context
-#    vars:
-#        all:
-#            icon: 'file'
-#            subheader: sylius_happy_cms.page.admin.ui.subheader
-#            breadcrumb: sylius_happy_cms.page.admin.ui.index
-#            templates:
-#                form: "@SyliusEasyCrudPlugin\\crud\\form\\_form.html.twig"
-#        index:
-#            header: sylius_happy_cms.page.admin.ui.index
-#        create:
-#            header: sylius_happy_cms.page.admin.ui.create
-#        update:
-#            header: sylius_happy_cms.page.admin.ui.update
-#            redirect:
-#                route: update
-#                parameters:
-#                    context: $context
-#                    id: $id
-#            route:
-#                parameters:
-#                    context: $context
-#                    id: $id
-#  type: sylius.resource
-#  prefix: admin
-#
-#sylius_happy_cms_config_admin:
-#  resource: |
-#    alias: sylius_happy_cms.config
-#    section: admin
-#    templates: "@SyliusEasyCrudPlugin\\crud"
-#    redirect: update
-#    grid: sylius_happy_cms_config_admin
-#    form:
-#        type: "%sylius_happy_cms.config.config_admin%"
-#        options:
-#            context: $context
-#    vars:
-#        all:
-#            icon: 'cog'
-#            subheader: sylius_happy_cms.config.admin.ui.subheader
-#            breadcrumb: sylius_happy_cms.config.admin.ui.index
-#            templates:
-#                form: "@SyliusEasyCrudPlugin\\crud\\form\\_form.html.twig"
-#        index:
-#            header: sylius_happy_cms.config.admin.ui.index
-#        create:
-#            header: sylius_happy_cms.config.admin.ui.create
-#        update:
-#            header: sylius_happy_cms.config.admin.ui.update
-#            redirect:
-#                route: update
-#                parameters:
-#                    context: $context
-#                    id: $id
-#            route:
-#                parameters:
-#                    context: $context
-#                    id: $id
-#  type: sylius.resource
-#  prefix: admin
-#
-#sylius_happy_cms_menu_admin:
-#  resource: |
-#    alias: sylius_happy_cms.menu
-#    section: admin
-#    templates: "@SyliusEasyCrudPlugin\\crud"
-#    redirect: update
-#    grid: sylius_happy_cms_menu_admin
-#    form:
-#        type: "%sylius_happy_cms.menu.menu_admin%"
-#        options:
-#            context: $context
-#    vars:
-#        all:
-#            icon: 'bars'
-#            subheader: sylius_happy_cms.menu.admin.ui.subheader
-#            breadcrumb: sylius_happy_cms.menu.admin.ui.index
-#            templates:
-#                form: "@SyliusEasyCrudPlugin\\crud\\form\\_form.html.twig"
-#        index:
-#            header: sylius_happy_cms.menu.admin.ui.index
-#        create:
-#            header: sylius_happy_cms.menu.admin.ui.create
-#        update:
-#            header: sylius_happy_cms.menu.admin.ui.update
-#            redirect:
-#                route: update
-#                parameters:
-#                    context: $context
-#                    id: $id
-#            route:
-#                parameters:
-#                    context: $context
-#                    id: $id
-#  type: sylius.resource
-#  prefix: admin
-#
-#sylius_happy_cms_menu_item_admin:
-#  resource: |
-#    alias: sylius_happy_cms.menu_item
-#    except: ['index']
-#    section: admin
-#    templates: "@SyliusHappyCMSPlugin\\menu_item\\crud"
-#    redirect: update
-#    grid: sylius_happy_cms_menu_item_admin
-#    form:
-#        type: "%sylius_happy_cms.menu_item.menu_item_admin%"
-#        options:
-#            context: $context
-#    vars:
-#        all:
-#            icon: 'bars'
-#            subheader: sylius_happy_cms.menu_item.admin.ui.subheader
-#            breadcrumb: sylius_happy_cms.menu.admin.ui.index
-#            templates:
-#                form: "@SyliusEasyCrudPlugin\\crud\\form\\_form.html.twig"
-#        create:
-#            header: sylius_happy_cms.menu_item.admin.ui.create
-#        update:
-#            header: sylius_happy_cms.menu_item.admin.ui.update
-#            templates:
-#                form: "@SyliusEasyCrudPlugin\\crud\\form\\_form.html.twig"
-#                breadcrumb: "@SyliusEasyCrudPlugin\\crud\\Update\\MenuItem\\_breadcrumb.html.twig"
-#            redirect:
-#                route: update
-#                parameters:
-#                    context: $context
-#                    id: $id
-#            route:
-#                parameters:
-#                    context: $context
-#                    id: $id
-#  type: sylius.resource
-#  prefix: admin
-#
-#sylius_happy_cms_shared_block_admin:
-#  resource: |
-#    alias: sylius_happy_cms.shared_block
-#    section: admin
-#    templates: "@SyliusEasyCrudPlugin\\crud"
-#    redirect: update
-#    grid: sylius_happy_cms_shared_block_admin
-#    form:
-#        type: "%sylius_happy_cms.shared_block.shared_block_admin%"
-#        options:
-#            context: $context
-#    vars:
-#        all:
-#            icon: 'box'
-#            subheader: sylius_happy_cms.shared_block.admin.ui.subheader
-#            breadcrumb: sylius_happy_cms.shared_block.admin.ui.index
-#            templates:
-#                form: "@SyliusEasyCrudPlugin\\crud\\form\\_form.html.twig"
-#        index:
-#            header: sylius_happy_cms.shared_block.admin.ui.index
-#        create:
-#            header: sylius_happy_cms.shared_block.admin.ui.create
-#        update:
-#            header: sylius_happy_cms.shared_block.admin.ui.update
-#            redirect:
-#                route: update
-#                parameters:
-#                    context: $context
-#                    id: $id
-#            route:
-#                parameters:
-#                    context: $context
-#                    id: $id
-#  type: sylius.resource
-#  prefix: admin
-#
-#sylius_happy_cms_admin_shared_block_select:
-#  controller: Adeliom\SyliusHappyCMSPlugin\Controller\SharedBlock\SharedBlockController::select
-#  path: /admin/shared-blocks/select
-#  methods: ['GET']
-#
-#sylius_happy_cms_admin_menu_item_index:
-#  path: /admin/menu-items/
-#  methods: [ GET ]
-#  defaults:
-#    _controller: Adeliom\SyliusHappyCMSPlugin\Controller\MenuItem\MenuItemController::indexAction
-#    route: sylius_happy_cms_admin_menu_index
-#    permanent: true
-#
-#sylius_happy_cms_admin_partial_menu_item_tree:
-#  path: /tree
-#  methods: [ GET ]
-#  defaults:
-#    _controller: Adeliom\SyliusHappyCMSPlugin\Controller\MenuItem\MenuItemController::treeAction
-#    _sylius:
-#      template: $template
-#      menu: $menu
-#      vars: $vars
-#      permission: true
-#
-#sylius_happy_cms_admin_menu_item_update_move_up:
-#  path: /admin/menu-items/{id}/move-up
-#  methods: [ PUT ]
-#  defaults:
-#    _controller: Adeliom\SyliusHappyCMSPlugin\Controller\MenuItem\MenuItemController::moveUpAction
-#    _format: json
-#    _sylius:
-#      permission: true
-#
-#sylius_happy_cms_admin_menu_item_update_move_down:
-#  path: /admin/menu-items/{id}/move-down
-#  methods: [ PUT ]
-#  defaults:
-#    _controller: Adeliom\SyliusHappyCMSPlugin\Controller\MenuItem\MenuItemController::moveDownAction
-#    _format: json
-#    _sylius:
-#      permission: true
-#
-#
+sylius_happy_cms_admin_shared_block_select:
+  controller: Adeliom\SyliusHappyCMSPlugin\Controller\SharedBlock\SharedBlockController::select
+  path: /admin/shared-blocks/select
+  methods: ['GET']
+
+sylius_happy_cms_admin_menu_item_index:
+  path: /admin/menu-items/
+  methods: [ GET ]
+  defaults:
+    _controller: Adeliom\SyliusHappyCMSPlugin\Controller\MenuItem\MenuItemController::indexAction
+    route: sylius_happy_cms_admin_menu_index
+    permanent: true
+
+sylius_happy_cms_admin_partial_menu_item_tree:
+  path: /tree
+  methods: [ GET ]
+  defaults:
+    _controller: Adeliom\SyliusHappyCMSPlugin\Controller\MenuItem\MenuItemController::treeAction
+    _sylius:
+      template: $template
+      menu: $menu
+      vars: $vars
+      permission: true
+
+sylius_happy_cms_admin_menu_item_update_move_up:
+  path: /admin/menu-items/{id}/move-up
+  methods: [ PUT ]
+  defaults:
+    _controller: Adeliom\SyliusHappyCMSPlugin\Controller\MenuItem\MenuItemController::moveUpAction
+    _format: json
+    _sylius:
+      permission: true
+
+sylius_happy_cms_admin_menu_item_update_move_down:
+  path: /admin/menu-items/{id}/move-down
+  methods: [ PUT ]
+  defaults:
+    _controller: Adeliom\SyliusHappyCMSPlugin\Controller\MenuItem\MenuItemController::moveDownAction
+    _format: json
+    _sylius:
+      permission: true
+
+

@@ -7,7 +7,6 @@ namespace Adeliom\SyliusHappyCMSPlugin\Entity\Config;
 use Adeliom\SyliusEasyCrudPlugin\Traits\EntityIdTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Sylius\Component\Resource\Model\TranslatableInterface;
 use Sylius\Component\Resource\Model\TranslatableTrait;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 

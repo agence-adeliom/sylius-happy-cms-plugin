@@ -1,6 +1,5 @@
 <?php declare(strict_types=1);
 
-
 use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Bundle\MakerBundle\Util\ClassNameDetails;
 

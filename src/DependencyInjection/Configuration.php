@@ -213,12 +213,12 @@ class Configuration implements ConfigurationInterface
                                     ->validate()
                                         ->ifString()
                                         ->then(static function ($value) {
-                                        if (!class_exists($value) || !is_a($value, MenuAdminInterface::class, true)) {
-                                            throw new InvalidConfigurationException(sprintf('Menu admin must be a valid class extending %s. "%s" given.', MenuAdminInterface::class, $value));
-                                        }
+                                            if (!class_exists($value) || !is_a($value, MenuAdminInterface::class, true)) {
+                                                throw new InvalidConfigurationException(sprintf('Menu admin must be a valid class extending %s. "%s" given.', MenuAdminInterface::class, $value));
+                                            }
 
-                                        return $value;
-                                    })
+                                            return $value;
+                                        })
                                     ->end()
                                 ->end()
                             ->end()

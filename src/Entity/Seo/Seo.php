@@ -30,7 +30,6 @@ class Seo implements SeoInterface, \Stringable
     #[ORM\Column(nullable: true)]
     public ?string $key;
 
-    /** @var bool */
     #[ORM\Column(type: Types::BOOLEAN)]
     public ?bool $sitemap = true;
 

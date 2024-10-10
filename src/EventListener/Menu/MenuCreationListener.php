@@ -14,8 +14,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class MenuCreationListener
 {
     public function __construct(
-        protected string $menuClass,
-        protected string $menuItemClass,
         protected LocaleProviderInterface $localeProvider,
         protected TranslatorInterface $translator,
     ) {
@@ -25,28 +23,29 @@ class MenuCreationListener
     // the entity instance and the lifecycle event
     public function prePersist(MenuInterface $menu): void
     {
-        /**
-         * @var MenuItemInterface $rootItem
-         */
-        $rootItem = new $this->menuItemClass();
-        $rootItem->setMenu($menu);
-        $rootItem->setPublishState(ThreeStateStatusEnum::PUBLISHED()->getValue());
-        $rootItem->setPosition(0);
-
-        $menu->addItem($rootItem);
-
-        foreach ($this->localeProvider->getAvailableLocalesCodes() as $locale) {
-            if (class_exists($this->menuItemClass) && method_exists($this->menuItemClass, 'getTranslationClass')) {
-                $menuItemTranslationClass = $this->menuItemClass::getTranslationClass();
-                $translation = new $menuItemTranslationClass();
-                if ($translation instanceof MenuItemTranslationInterface) {
-                    $translation->setLocale($locale);
-                    $translation->setName(
-                        $this->translator->trans('sylius_happy_cms.menu_item.admin.data.menu_item_root', locale: $locale),
-                    );
-                    $rootItem->addTranslation($translation);
-                }
-            }
-        }
+        // TODO : adjust to create menu item
+        ///**
+        // * @var MenuItemInterface $rootItem
+        // */
+        //$rootItem = new $this->menuItemClass();
+        //$rootItem->setMenu($menu);
+        //$rootItem->setPublishState(ThreeStateStatusEnum::PUBLISHED()->getValue());
+        //$rootItem->setPosition(0);
+        //
+        //$menu->addItem($rootItem);
+        //
+        //foreach ($this->localeProvider->getAvailableLocalesCodes() as $locale) {
+        //    if (class_exists($this->menuItemClass) && method_exists($this->menuItemClass, 'getTranslationClass')) {
+        //        $menuItemTranslationClass = $this->menuItemClass::getTranslationClass();
+        //        $translation = new $menuItemTranslationClass();
+        //        if ($translation instanceof MenuItemTranslationInterface) {
+        //            $translation->setLocale($locale);
+        //            $translation->setName(
+        //                $this->translator->trans('sylius_happy_cms.menu_item.admin.data.menu_item_root', locale: $locale),
+        //            );
+        //            $rootItem->addTranslation($translation);
+        //        }
+        //    }
+        //}
     }
 }
