@@ -89,14 +89,19 @@ platform:
 		(cd ${APP_DIR} && sed -i'' -e 's|APP_DEBUG: 0|APP_DEBUG: 1|g' compose.override.yml); \
 		(cd ${APP_DIR} && sed -i'' -e 's|- "80:80"|- "$(DOCKER_PHP_PORT):80"\n        depends_on:\n            - php|g' compose.override.yml); \
 		(cd ${APP_DIR} && sed -i'' -e 's|            - public-media:/srv/sylius/public/media:ro,nocopy|            - public-media:/srv/sylius/public/media:ro,nocopy\n            - ../../:/srv/sylius/${PLUGIN_DIR}:rw|g' compose.override.yml); \
+		(cd ${APP_DIR} && sed -i'' -e "s|];|    Adeliom\\\${CRUD_PLUGIN_NAMESPACE}\\\${CRUD_PLUGIN_NAMESPACE}::class => ['all' => true],\n    Adeliom\\\${CRUD_PLUGIN_NAMESPACE}\\\${CRUD_PLUGIN_NAMESPACE}::class => ['all' => true],\n];|g" config/bundles.php); \
 		(cd ${APP_DIR} && sed -i'' -e "s|];|    Adeliom\\\${PLUGIN_NAMESPACE}\\\${PLUGIN_NAMESPACE}::class => ['all' => true],\n    Adeliom\\\${CRUD_PLUGIN_NAMESPACE}\\\${CRUD_PLUGIN_NAMESPACE}::class => ['all' => true],\n];|g" config/bundles.php); \
 		(cd ${APP_DIR} && sed -i'' -e 's|            "App\\": "src/",|            "App\\": "src/",\n            "Adeliom\\${PLUGIN_NAMESPACE}\\": "${PLUGIN_DIR}/src/"|g' composer.json); \
 		(cd ${APP_DIR} && sed -i'' -e 's|"App\\\\": "src/"|"Adeliom\\\\${PLUGIN_NAMESPACE}\\\\": "${PLUGIN_DIR}/src/",\n            "App\\\\": "src/"|g' composer.json); \
 		(cd ${APP_DIR} && sed -i'' -e 's|type: annotation|type: attribute|g' config/packages/doctrine.yaml); \
 		(cd ${APP_DIR} && sed -i'' -e 's|- { resource: "../parameters.yaml" }|- { resource: "../parameters.yaml" }\n    - { resource: "@${PLUGIN_NAMESPACE}/config/config.yaml" }\n    - { resource: "@${CRUD_PLUGIN_NAMESPACE}/config/config.yaml" }|g' config/packages/_sylius.yaml); \
+		(cd ${APP_DIR} && echo -e 'sylius_easy_crud:\n  resource: "@SyliusEasyCrudPlugin/config/routes.yaml"' config/routes.yaml); \
+		(cd ${APP_DIR} && echo -e 'sylius_happy_cms:\n  resource: "@SyliusHappyCMSPlugin/config/routes.yaml"' config/routes.yaml); \
+		(cd ${APP_DIR} && echo -e '  adeliom.sylius.cms.plugin.listener.admin.menu_builder:\n    class: Adeliom\SyliusHappyCMSPlugin\Menu\AdminMenuListener\n    tags:\n      - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addAdminMenuItems }' config/services.yaml); \
 		(cd ${APP_DIR} && rm -rf config/packages/doctrine.yaml-e); \
 		(cd ${APP_DIR} && rm -rf config/packages/_sylius.yaml-e); \
 		(cd ${APP_DIR} && rm -rf config/routes.yaml-e); \
+		(cd ${APP_DIR} && rm -rf config/services.yaml-e); \
 		(cd ${APP_DIR} && rm -rf compose.override.yml-e); \
 		(cd ${APP_DIR} && rm -rf config/bundles.php-e); \
 		(cd ${APP_DIR} && rm -rf composer.json-e); \
