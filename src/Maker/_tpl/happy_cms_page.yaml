@@ -1,0 +1,9 @@
+
+page:
+  page_model: App\Entity\HappyCMS\Page\Page
+  page_repository: App\Repository\HappyCMS\Page\PageRepository
+  page_admin: App\Admin\HappyCMS\Page\PageAdmin
+
+seo:
+  title:
+    suffix: ACME

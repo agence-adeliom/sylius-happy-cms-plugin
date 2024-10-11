@@ -8,6 +8,7 @@ use Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuItem;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuItemInterface;
 use Adeliom\SyliusHappyCMSPlugin\Repository\Menu\MenuItemRepositoryInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ObjectRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,12 +23,15 @@ use Webmozart\Assert\Assert;
 
 class MenuItemController
 {
+    /** @var ObjectRepository<MenuItemRepositoryInterface> */
+    private ObjectRepository $menuItemRepository;
+
     public function __construct(
         private EntityManagerInterface $entityManager,
         private Environment $twig,
         private RouterInterface $router,
-        private MenuItemRepositoryInterface $menuItemRepository,
     ) {
+        $this->menuItemRepository = $this->entityManager->getRepository(MenuItemInterface::class);
     }
 
     public function indexAction(Request $request): Response

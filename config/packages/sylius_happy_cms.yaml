@@ -21,7 +21,7 @@ sylius_happy_cms:
     menu_item:
       menu_item_model: Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuItem
       menu_item_repository: Adeliom\SyliusHappyCMSPlugin\Repository\Menu\MenuItemRepository
-      menu_item_admin:  Adeliom\SyliusHappyCMSPlugin\Admin\Menu\MenuAdmin
+      menu_item_admin:  Adeliom\SyliusHappyCMSPlugin\Admin\Menu\MenuItemAdmin
   media:
     storage_name: uploads.storage
     base_url: '/media/download'

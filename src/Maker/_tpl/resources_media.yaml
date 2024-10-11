@@ -1,0 +1,12 @@
+
+sylius_happy_cms.media:
+  driver: doctrine/orm
+  classes:
+    model: App\Entity\HappyCMS\Media\Media
+    repository: App\Repository\HappyCMS\Media\MediaRepository
+
+sylius_happy_cms.media_folder:
+  driver: doctrine/orm
+  classes:
+    model: App\Entity\HappyCMS\Media\Folder
+    repository: App\Repository\HappyCMS\Media\FolderRepository

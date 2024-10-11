@@ -39,6 +39,11 @@ class <?= $classNameDetail->getShortName() ?> extends Base<?= $classNameDetail->
     {
         return new <?= $classNameDetail->getShortName() ?>Translation();
     }
+
+    public static function getTranslationClass(): string
+    {
+        return <?= $classNameDetail->getShortName() ?>Translation::class;
+    }
 <?php } ?>
 }
 <?php } ?>

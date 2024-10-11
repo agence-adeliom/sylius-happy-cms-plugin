@@ -1,0 +1,5 @@
+
+shared_block:
+  shared_block_model: App\Entity\HappyCMS\SharedBlock\SharedBlock
+  shared_block_repository: App\Repository\HappyCMS\SharedBlock\SharedBlockRepository
+  shared_block_admin: App\Admin\HappyCMS\SharedBlock\SharedBlockAdmin

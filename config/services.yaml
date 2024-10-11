@@ -12,11 +12,11 @@ services:
 
   Adeliom\SyliusHappyCMSPlugin\ContextProvider\CreateSharedBlockContextProvider:
     arguments:
-      - '@adeliom.sylius.cms.shared_block.block_collection'
+      - '@sylius.happy_cms.shared_block.block_collection'
     tags:
       - { name: sylius.ui.template_event.context_provider }
 
-  adeliom.sylius.cms.plugin.listener.entity_route_indexer:
+  sylius.happy_cms.plugin.listener.entity_route_indexer:
     class: Adeliom\SyliusHappyCMSPlugin\EventListener\EntityRouteIndexer
     arguments:
       - '@cmf_routing.orm_content_repository'
@@ -30,7 +30,7 @@ services:
           priority: 500
           connection: 'default'
 
-  adeliom.sylius.cms.plugin.controller.render:
+  sylius.happy_cms.plugin.controller.render:
     class: Adeliom\SyliusHappyCMSPlugin\Controller\Routing\RenderController
     arguments:
       - "@router"

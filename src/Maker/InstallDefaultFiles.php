@@ -12,6 +12,7 @@ use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use function Symfony\Component\String\u;
 use Symfony\Component\Yaml\Yaml;
 
 final class InstallDefaultFiles extends AbstractMaker
@@ -19,6 +20,8 @@ final class InstallDefaultFiles extends AbstractMaker
     public const YAML_ROUTES_FILE = 'config/routes.yaml';
 
     public const YAML_RESOURCE_FILE = 'config/packages/sylius_resource.yaml';
+
+    public const YAML_HAPPY_CMS_FILE = 'config/packages/sylius_happy_cms.yaml';
 
     public const YAML_SERVICES_FILE = 'config/services.yaml';
 
@@ -58,12 +61,32 @@ final class InstallDefaultFiles extends AbstractMaker
     {
         $happyCMSDefaultRoutes = '';
         $happyCMSDefaultResources = [];
+        $io->text('====');
         $this->generatePage($happyCMSDefaultRoutes, $happyCMSDefaultResources, $io, $generator);
+
+        $io->newLine();
+        $io->text('====');
         $this->generateConfig($happyCMSDefaultRoutes, $happyCMSDefaultResources, $io, $generator);
+
+        $io->newLine();
+        $io->text('====');
         $this->generateFolder($happyCMSDefaultRoutes, $happyCMSDefaultResources, $io, $generator);
+
+        $io->newLine();
+        $io->text('====');
         $this->generateMedia($happyCMSDefaultRoutes, $happyCMSDefaultResources, $io, $generator);
+
+        $io->newLine();
+        $io->text('====');
         $this->generateMenu($happyCMSDefaultRoutes, $happyCMSDefaultResources, $io, $generator);
+
+        $io->newLine();
+        $io->text('====');
         $this->generateBlock($happyCMSDefaultRoutes, $happyCMSDefaultResources, $io, $generator);
+
+        $io->newLine();
+        $io->text('====');
+        $this->addServicesResource('services', $io);
 
         $io->newLine();
         $io->success('Success!');
@@ -89,6 +112,10 @@ final class InstallDefaultFiles extends AbstractMaker
         $this->generateScope($scope, $files, $io, $generator);
 
         $this->generateRoute($scope, $io);
+
+        $this->generateSyliusResource($scope, $io);
+
+        $this->generateHappyCMSConfig($scope, $io);
     }
 
     private function generateConfig(string &$happyCMSDefaultRoutes, array &$happyCMSDefaultResources, ConsoleStyle $io, Generator $generator): void
@@ -103,6 +130,10 @@ final class InstallDefaultFiles extends AbstractMaker
         $this->generateScope($scope, $files, $io, $generator);
 
         $this->generateRoute($scope, $io);
+
+        $this->generateSyliusResource($scope, $io);
+
+        $this->generateHappyCMSConfig($scope, $io);
     }
 
     private function generateFolder(string &$happyCMSDefaultRoutes, array &$happyCMSDefaultResources, ConsoleStyle $io, Generator $generator): void
@@ -124,6 +155,10 @@ final class InstallDefaultFiles extends AbstractMaker
             ['prefix' => 'Repository', 'suffix' => 'Repository'],
         ];
         $this->generateScope($scope, $files, $io, $generator);
+
+        $this->generateSyliusResource($scope, $io);
+
+        $this->generateHappyCMSConfig($scope, $io);
     }
 
     private function generateMenu(string &$happyCMSDefaultRoutes, array &$happyCMSDefaultResources, ConsoleStyle $io, Generator $generator): void
@@ -137,7 +172,10 @@ final class InstallDefaultFiles extends AbstractMaker
         $this->generateScope($scope, $files, $io, $generator);
 
         $this->generateRoute($scope, $io);
-        $this->generateRoute($scope . '_item', $io);
+
+        $this->generateSyliusResource($scope, $io);
+
+        $this->generateHappyCMSConfig($scope, $io);
 
         $entityName = 'menuItem';
         $files = [
@@ -147,6 +185,8 @@ final class InstallDefaultFiles extends AbstractMaker
             ['prefix' => 'Admin', 'suffix' => 'Admin', 'entityName' => $entityName],
         ];
         $this->generateScope($scope, $files, $io, $generator);
+
+        $this->generateRoute($scope . '_item', $io);
     }
 
     private function generateBlock(string &$happyCMSDefaultRoutes, array &$happyCMSDefaultResources, ConsoleStyle $io, Generator $generator): void
@@ -161,6 +201,10 @@ final class InstallDefaultFiles extends AbstractMaker
         $this->generateScope($scope, $files, $io, $generator);
 
         $this->generateRoute('shared_block', $io);
+
+        $this->generateSyliusResource('shared_block', $io);
+
+        $this->generateHappyCMSConfig('shared_block', $io);
     }
 
     /**
@@ -202,11 +246,6 @@ final class InstallDefaultFiles extends AbstractMaker
         }
     }
 
-    public function configureDependencies(DependencyBuilder $dependencies): void
-    {
-        // No dependencies needed
-    }
-
     public function generateRoute(string $scope, ConsoleStyle $io): string
     {
         try {
@@ -218,7 +257,8 @@ final class InstallDefaultFiles extends AbstractMaker
                         . "redirect: update\n"
                         . 'grid: sylius_happy_cms_' . $scope . "_admin\n"
                         . "form:\n"
-                        . '    type: App\\\\Entity\\\\HappyCMS\\\\' . ucfirst($scope) . '\\\\' . ucfirst($scope) . "\n"
+                        . '    type: App\\Admin\\HappyCMS\\' . ucfirst($scope) . '\\' . ucfirst(u($scope)->camel()
+                                                                                                                                      ->toString()) . "Admin\n"
                         . "    options:\n"
                         . "        context: \$context\n"
                         . "vars:\n"
@@ -248,21 +288,161 @@ final class InstallDefaultFiles extends AbstractMaker
                 ],
             ];
 
+            if (file_exists(self::YAML_ROUTES_FILE)) {
+                $route = 'sylius_happy_cms_' . $scope . '_admin';
+                $existingContent = file_get_contents(self::YAML_ROUTES_FILE);
+                if (str_contains($existingContent, $route)) {
+                    $io->comment(sprintf(
+                        '%s: %s',
+                        '<fg=yellow>warning</>',
+                        self::YAML_ROUTES_FILE . ' already modified (' . $scope . ')',
+                    ));
+
+                    return self::YAML_ROUTES_FILE;
+                }
+            }
+
             file_put_contents(
                 self::YAML_ROUTES_FILE,
-                Yaml::dump($yaml, 2, 4, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK),
+                "\n" . Yaml::dump($yaml, 2, 4, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK),
                 \FILE_APPEND,
             );
 
             $io->comment(sprintf(
                 '%s: %s',
-                '<fg=yellow>updated</>',
+                '<fg=green>updated</>',
                 self::YAML_ROUTES_FILE,
             ));
 
             return self::YAML_ROUTES_FILE;
         } catch (\Exception $e) {
+            $io->error($e->getCode() . ' : ' . $e->getMessage());
+
             return $e->getCode() . ' : ' . $e->getMessage();
         }
+    }
+
+    public function generateSyliusResource(string $scope, ConsoleStyle $io): string
+    {
+        try {
+            $content = file_get_contents(__DIR__ . '/_tpl/resources_' . $scope . '.yaml');
+
+            if (file_exists(self::YAML_RESOURCE_FILE)) {
+                $existingContent = file_get_contents(self::YAML_RESOURCE_FILE);
+                if (str_contains($existingContent, 'sylius_happy_cms.' . $scope)) {
+                    $io->comment(sprintf(
+                        '%s: %s',
+                        '<fg=yellow>warning</>',
+                        self::YAML_RESOURCE_FILE . ' already modified (' . $scope . ')',
+                    ));
+
+                    return self::YAML_RESOURCE_FILE;
+                }
+            }
+
+            file_put_contents(
+                self::YAML_RESOURCE_FILE,
+                "\n" . str_replace("\n", "\n    ", $content),
+                \FILE_APPEND,
+            );
+
+            $io->comment(sprintf(
+                '%s: %s',
+                '<fg=green>updated</>',
+                self::YAML_RESOURCE_FILE,
+            ));
+
+            return self::YAML_RESOURCE_FILE;
+        } catch (\Exception $e) {
+            $io->error($e->getCode() . ' : ' . $e->getMessage());
+
+            return $e->getCode() . ' : ' . $e->getMessage();
+        }
+    }
+
+    public function generateHappyCMSConfig(string $scope, ConsoleStyle $io): string
+    {
+        try {
+            $content = file_get_contents(__DIR__ . '/_tpl/happy_cms_' . $scope . '.yaml');
+
+            if (!file_exists(self::YAML_HAPPY_CMS_FILE)) {
+                $content = 'sylius_happy_cms:' . $content;
+            } else {
+                $existingContent = file_get_contents(self::YAML_HAPPY_CMS_FILE);
+                if (!str_contains($existingContent, 'sylius_happy_cms:')) {
+                    $content = 'sylius_happy_cms:' . $content;
+                }
+                if (str_contains($existingContent, $scope . ':')) {
+                    $io->comment(sprintf(
+                        '%s: %s',
+                        '<fg=yellow>warning</>',
+                        self::YAML_HAPPY_CMS_FILE . ' already modified (' . $scope . ')',
+                    ));
+
+                    return self::YAML_HAPPY_CMS_FILE;
+                }
+            }
+
+            file_put_contents(
+                self::YAML_HAPPY_CMS_FILE,
+                "\n" . str_replace("\n", "\n  ", $content),
+                \FILE_APPEND,
+            );
+
+            $io->comment(sprintf(
+                '%s: %s',
+                '<fg=green>updated</>',
+                self::YAML_HAPPY_CMS_FILE,
+            ));
+
+            return self::YAML_HAPPY_CMS_FILE;
+        } catch (\Exception $e) {
+            $io->error($e->getCode() . ' : ' . $e->getMessage());
+
+            return $e->getCode() . ' : ' . $e->getMessage();
+        }
+    }
+
+    public function addServicesResource(string $scope, ConsoleStyle $io): string
+    {
+        try {
+            $content = file_get_contents(__DIR__ . '/_tpl/services.yaml');
+
+            if (file_exists(self::YAML_SERVICES_FILE)) {
+                $existingContent = file_get_contents(self::YAML_SERVICES_FILE);
+                if (preg_match('#' . trim(substr($content, 0, 50)) . '#uis', $existingContent)) {
+                    $io->comment(sprintf(
+                        '%s: %s',
+                        '<fg=yellow>warning</>',
+                        self::YAML_SERVICES_FILE . ' already modified (' . $scope . ')',
+                    ));
+
+                    return self::YAML_SERVICES_FILE;
+                }
+            }
+
+            file_put_contents(
+                self::YAML_SERVICES_FILE,
+                "\n" . str_replace("\n", "\n    ", $content),
+                \FILE_APPEND,
+            );
+
+            $io->comment(sprintf(
+                '%s: %s',
+                '<fg=green>updated</>',
+                self::YAML_SERVICES_FILE,
+            ));
+
+            return self::YAML_SERVICES_FILE;
+        } catch (\Exception $e) {
+            $io->error($e->getCode() . ' : ' . $e->getMessage());
+
+            return $e->getCode() . ' : ' . $e->getMessage();
+        }
+    }
+
+    public function configureDependencies(DependencyBuilder $dependencies)
+    {
+        // TODO: Implement configureDependencies() method.
     }
 }

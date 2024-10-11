@@ -1,0 +1,5 @@
+
+config:
+  config_model: App\Entity\HappyCMS\Config\Config
+  config_repository: App\Repository\HappyCMS\Config\ConfigRepository
+  config_admin: App\Admin\HappyCMS\Config\ConfigAdmin

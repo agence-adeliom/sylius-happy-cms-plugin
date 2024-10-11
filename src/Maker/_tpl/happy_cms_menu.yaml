@@ -1,0 +1,10 @@
+
+menu:
+  menu:
+    menu_model: App\Entity\HappyCMS\Menu\Menu
+    menu_repository: App\Repository\HappyCMS\Menu\MenuRepository
+    menu_admin:  App\Admin\HappyCMS\Menu\MenuAdmin
+  menu_item:
+    menu_item_model: App\Entity\HappyCMS\Menu\MenuItem
+    menu_item_repository: App\Repository\HappyCMS\Menu\MenuItemRepository
+    menu_item_admin:  App\Admin\HappyCMS\Menu\MenuItemAdmin

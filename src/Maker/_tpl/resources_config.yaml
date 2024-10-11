@@ -1,0 +1,13 @@
+
+sylius_happy_cms.config:
+  driver: doctrine/orm
+  classes:
+    model: App\Entity\HappyCMS\Config\Config
+    controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+    repository: App\Repository\HappyCMS\Config\ConfigRepository
+    form: App\Admin\HappyCMS\Config\ConfigAdmin
+  translation:
+    classes:
+      model: App\Entity\HappyCMS\Config\ConfigTranslation
+      controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+      form: App\Admin\HappyCMS\Config\ConfigAdmin

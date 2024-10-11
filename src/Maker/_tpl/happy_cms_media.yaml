@@ -1,0 +1,6 @@
+
+media:
+  storage_name: uploads.storage
+  base_url: '/media/download'
+  media_entity: App\Entity\HappyCMS\Media\Media
+  folder_entity: App\Entity\HappyCMS\Media\Folder

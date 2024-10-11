@@ -1,0 +1,13 @@
+
+sylius_happy_cms.page:
+  driver: doctrine/orm
+  classes:
+    model: App\Entity\HappyCMS\Page\Page
+    controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+    repository: App\Repository\HappyCMS\Page\PageRepository
+    form: App\Admin\HappyCMS\Page\PageAdmin
+  translation:
+    classes:
+      model: App\Entity\HappyCMS\Page\PageTranslation
+      controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+      form: App\Admin\HappyCMS\Page\PageAdmin

@@ -95,9 +95,8 @@ platform:
 		(cd ${APP_DIR} && sed -i'' -e 's|"App\\\\": "src/"|"Adeliom\\\\${PLUGIN_NAMESPACE}\\\\": "${PLUGIN_DIR}/src/",\n            "App\\\\": "src/"|g' composer.json); \
 		(cd ${APP_DIR} && sed -i'' -e 's|type: annotation|type: attribute|g' config/packages/doctrine.yaml); \
 		(cd ${APP_DIR} && sed -i'' -e 's|- { resource: "../parameters.yaml" }|- { resource: "../parameters.yaml" }\n    - { resource: "@${PLUGIN_NAMESPACE}/config/config.yaml" }\n    - { resource: "@${CRUD_PLUGIN_NAMESPACE}/config/config.yaml" }|g' config/packages/_sylius.yaml); \
-		(cd ${APP_DIR} && echo -e 'sylius_easy_crud:\n  resource: "@SyliusEasyCrudPlugin/config/routes.yaml"' config/routes.yaml); \
-		(cd ${APP_DIR} && echo -e 'sylius_happy_cms:\n  resource: "@SyliusHappyCMSPlugin/config/routes.yaml"' config/routes.yaml); \
-		(cd ${APP_DIR} && echo -e '  adeliom.sylius.cms.plugin.listener.admin.menu_builder:\n    class: Adeliom\SyliusHappyCMSPlugin\Menu\AdminMenuListener\n    tags:\n      - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addAdminMenuItems }' config/services.yaml); \
+		(cd ${APP_DIR} && sed -i'' -e 's|sylius_paypal_webhook:|\nsylius_easy_crud:\n  resource: "@SyliusEasyCrudPlugin/config/routes.yaml"\nsylius_paypal_webhook:|g' config/routes.yaml); \
+		(cd ${APP_DIR} && sed -i'' -e 's|sylius_paypal_webhook:|\nsylius_happy_cms:\n  resource: "@SyliusHappyCMSPlugin/config/routes.yaml"\nsylius_paypal_webhook:|g' config/routes.yaml); \
 		(cd ${APP_DIR} && rm -rf config/packages/doctrine.yaml-e); \
 		(cd ${APP_DIR} && rm -rf config/packages/_sylius.yaml-e); \
 		(cd ${APP_DIR} && rm -rf config/routes.yaml-e); \
@@ -121,7 +120,7 @@ platform:
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer global config allow-plugins.${PLUGIN_NAME} true)
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer dump-autoload)
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer require --no-interaction --with-all-dependencies --no-scripts ${PLUGIN_NAME}="*@dev")
-	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer require --dev symfony/maker-bundle)
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php composer require --dev symfony/maker-bundle --no-scripts)
 	${MAKE} platform_up
 	${MAKE} platform_assets
 
@@ -178,6 +177,7 @@ HELP += $(call help,bundle_install_test_files,			Build bundles assets in watch m
 bundle_install_test_files:
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php bin/console make:easy-crud:create-entity Post)
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php bin/console make:easy-crud:generate Post)
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php bin/console make:happy-cms:install)
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php bin/console cache:clear)
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php bin/console doc:mig:diff --allow-empty-diff -n)
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php bin/console doc:mig:mig -n)

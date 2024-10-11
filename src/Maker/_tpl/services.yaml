@@ -1,0 +1,5 @@
+
+adeliom.sylius.cms.plugin.listener.admin.menu_builder:
+  class: Adeliom\SyliusHappyCMSPlugin\Menu\AdminMenuListener
+  tags:
+    - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addAdminMenuItems }

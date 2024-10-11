@@ -18,7 +18,7 @@ final class MakeSharedBlock extends AbstractMaker
 {
     public static function getCommandName(): string
     {
-        return 'make:block:shared';
+        return 'make:happy-cms:block:shared';
     }
 
     public static function getCommandDescription(): string

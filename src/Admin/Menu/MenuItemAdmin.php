@@ -6,7 +6,7 @@ namespace Adeliom\SyliusHappyCMSPlugin\Admin\Menu;
 
 use Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuItem;
 
-class MenuItemAdmin extends AbstractMenuItemAdmin
+class MenuItemAdmin extends AbstractMenuItemAdmin implements MenuItemAdminInterface
 {
     public static function getName(): string
     {

@@ -1,6 +1,6 @@
 services:
 
-  adeliom.sylius.cms.maker.make_block:
+  sylius.happy_cms.maker.make_block:
     class: Adeliom\SyliusHappyCMSPlugin\Maker\Block\MakeBlock
     public: false
     arguments:
@@ -8,7 +8,7 @@ services:
     tags:
       - { name: maker.command }
 
-  adeliom.sylius.cms.maker.make_happy_cms:
+  sylius.happy_cms.maker.make_happy_cms:
     class: Adeliom\SyliusHappyCMSPlugin\Maker\CMS\MakeHappyCMS
     public: false
     arguments:
@@ -17,7 +17,7 @@ services:
     tags:
       - { name: maker.command }
 
-  adeliom.sylius.cms.maker.happy_cms_init_default_files:
+  sylius.happy_cms.maker.happy_cms_init_default_files:
     class: Adeliom\SyliusHappyCMSPlugin\Maker\InstallDefaultFiles
     public: false
     arguments:
@@ -25,7 +25,7 @@ services:
     tags:
       - { name: maker.command }
 
-  adeliom.sylius.cms.shared_block.maker.make_shared_block:
+  sylius.happy_cms.shared_block.maker.make_shared_block:
     class: Adeliom\SyliusHappyCMSPlugin\Maker\SharedBlock\MakeSharedBlock
     public: false
     arguments:

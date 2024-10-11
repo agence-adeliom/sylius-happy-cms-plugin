@@ -1,0 +1,13 @@
+
+sylius_happy_cms.shared_block:
+  driver: doctrine/orm
+  classes:
+    model: App\Entity\HappyCMS\SharedBlock\SharedBlock
+    controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+    repository: App\Repository\HappyCMS\SharedBlock\SharedBlockRepository
+    form: App\Admin\HappyCMS\SharedBlock\SharedBlockAdmin
+  translation:
+    classes:
+      model: App\Entity\HappyCMS\SharedBlock\SharedBlockTranslation
+      controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+      form: App\Admin\HappyCMS\SharedBlock\SharedBlockAdmin

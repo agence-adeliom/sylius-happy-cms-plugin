@@ -42,7 +42,7 @@ class Page implements PageInterface
 
     /** @var Collection<int, OrmRoute> */
     #[ORM\ManyToMany(targetEntity: OrmRoute::class, cascade: ['persist', 'remove'])]
-    #[ORM\JoinTable('sylius_happy_cms_page__page_route')]
+    #[ORM\JoinTable('sylius_happy_cms__page_route')]
     protected Collection $routes;
 
     #[Assert\Type(PageInterface::class)]

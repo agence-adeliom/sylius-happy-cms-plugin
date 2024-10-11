@@ -3,5 +3,10 @@ imports:
   - { resource: "./packages/doctrine.yaml" }
   - { resource: "./packages/sylius_ui.yaml" }
   - { resource: "./packages/sylius_happy_cms.yaml" }
-  - { resource: "./packages/sylius_resource.yaml" }
+#  - { resource: "./packages/sylius_resource.yaml" }
   - { resource: "./packages/flysystem.yaml" }
+
+#sylius_happy_cms:
+#  media:
+#    storage_name: uploads.storage
+#    base_url: '/media/download'

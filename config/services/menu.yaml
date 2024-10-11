@@ -21,11 +21,12 @@ services:
         arguments:
             - '@sylius.locale_provider'
             - '@translator'
+            - '@parameter_bag'
         tags:
             - # these are the options required to define the entity listener
                 name: 'doctrine.orm.entity_listener'
                 event: 'prePersist'
-                entity: Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuInterface
+                entity: Adeliom\SyliusHappyCMSPlugin\Entity\Menu\Menu
                 lazy: true
 
     Adeliom\SyliusHappyCMSPlugin\Twig\Menu\MenuExtension:

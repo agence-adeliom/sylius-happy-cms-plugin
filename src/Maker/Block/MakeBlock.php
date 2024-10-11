@@ -18,7 +18,7 @@ final class MakeBlock extends AbstractMaker
 {
     public static function getCommandName(): string
     {
-        return 'make:block';
+        return 'make:happy-cms:block';
     }
 
     public static function getCommandDescription(): string

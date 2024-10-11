@@ -2,7 +2,7 @@
 
 Enhance your Sylius with CMS features with this plugin. 
 
-Keep in mind : Happy People make Happy Internet.
+Happy People make a Happy Internet.
 
 ## Installation
 
@@ -55,10 +55,15 @@ Actualy we don't have Symfony recipes, so we created a command to generate files
 ```bash
 php bin/console make:happy-cms:install
 ```
+This command will :
+- Create all entities, repositories and admin class
+- update config/routes.yaml by adding route properly declared
+- update config/packages/sylius_resource.yaml by adding sylius routes properly declared
+- update config/packages/sylius_happy_cms.yaml by adding new files properly declared
 
-This command also provide all variables you need to override. Don't forget to do that!
+If something goes wrong, you can do those actions manually :
 
-3. Override default parameters
+2. bis: Override default parameters
 
 Into `config/packages/sylius_happy_cms.yaml` add :
 
@@ -100,7 +105,7 @@ sylius_happy_cms:
     shared_block_admin: App\Admin\HappyCMS\SharedBlock\SharedBlockAdmin
 ```
 
-4. Déclare sylius_resources
+2. bis Déclare sylius_resources
 
 Into `config/packages/sylius_resources.yaml` add :
 
@@ -108,17 +113,17 @@ Into `config/packages/sylius_resources.yaml` add :
 sylius_resource:
   resources:
     sylius_happy_cms.page:
-    driver: doctrine/orm
-    classes:
-      model: App\Entity\HappyCMS\Page\Page
-      controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
-      repository: App\Repository\HappyCMS\Page\PageRepository
-      form: App\Admin\HappyCMS\Page\PageAdmin
-    translation:
-      classes:
-        model: App\Entity\HappyCMS\Page\PageTranslation
-        controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
-        form: App\Admin\HappyCMS\Page\PageAdmin
+        driver: doctrine/orm
+        classes:
+          model: App\Entity\HappyCMS\Page\Page
+          controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+          repository: App\Repository\HappyCMS\Page\PageRepository
+          form: App\Admin\HappyCMS\Page\PageAdmin
+        translation:
+          classes:
+            model: App\Entity\HappyCMS\Page\PageTranslation
+            controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+            form: App\Admin\HappyCMS\Page\PageAdmin
     sylius_happy_cms.config:
       driver: doctrine/orm
       classes:
@@ -174,15 +179,14 @@ sylius_resource:
         repository: App\Repository\HappyCMS\Media\FolderRepository
 ```
 
+2. bis Déclare routes
 
-5. Update database :
+Into `config/routes.yaml` add :
 
-```bash
-php bin/console doc:mig:diff
-php bin/console doc:mig:mig
+```yaml
+
 ```
-
-6. Add CMS menu in Sylius
+2. bis Add CMS menu in Sylius BO
 
 into `config/services.yaml` add :
 
@@ -195,11 +199,42 @@ services:
 
 ```
 
+3. Update database :
+
+```bash
+php bin/console doc:mig:diff
+php bin/console doc:mig:mig
+php bin/console cache:clear
+```
+
+## Going further
+
+1. Generate flex or shared blocks
+```bash
+php bin/console make:happy-cms:block
+php bin/console make:happy-cms:block:shared
+```
+
+2. Generate route based models
+
+With this command you will be able to generate a new Sylius resource (Symfony Entity) with generated files and configuration.
+Entity, Repository, Admin CRUD, Front-end routes and controllers, CMS features
+
+Example : 
+- Generate a Blog
+- Generate a Faq
+- Generate a Brand model
+
+In a second.
+
+TODO :
+```bash
+php bin/console make:happy-cms:generate-routable-model
+```
+
 ## Documentation
 
 - TODO
-- [Discover all fields](./docs/discover_fields.md) you can use to build your CRUD (grid, form, show, action, fitters)
-- Learn how create your [own fields](./docs/create_your_own_fields.md)
 - You want to [help and contribute](./docs/contribution.md)
 
 ## License

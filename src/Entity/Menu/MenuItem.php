@@ -51,7 +51,7 @@ class MenuItem implements MenuItemInterface
     protected ?int $root = null;
 
     #[ORM\ManyToOne(targetEntity: MenuInterface::class, inversedBy: 'items')]
-    protected ?MenuInterface $menu;
+    protected ?MenuInterface $menu = null;
 
     #[ORM\Column(name: 'class_attribute', type: Types::STRING, length: 255, nullable: true)]
     protected ?string $classAttribute = null;
