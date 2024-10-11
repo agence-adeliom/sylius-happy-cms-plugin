@@ -1,0 +1,34 @@
+sylius_happy_cms:
+  page:
+    page_model: Adeliom\SyliusHappyCMSPlugin\Entity\Page\Page
+    page_repository: Adeliom\SyliusHappyCMSPlugin\Repository\Page\PageRepository
+    page_admin: Adeliom\SyliusHappyCMSPlugin\Admin\Page\PageAdmin
+
+  seo:
+    title:
+      suffix: ACME
+
+  config:
+    config_model: Adeliom\SyliusHappyCMSPlugin\Entity\Config\Config
+    config_repository: Adeliom\SyliusHappyCMSPlugin\Repository\Config\ConfigRepository
+    config_admin: Adeliom\SyliusHappyCMSPlugin\Admin\Config\ConfigAdmin
+
+  menu:
+    menu:
+      menu_model: Adeliom\SyliusHappyCMSPlugin\Entity\Menu\Menu
+      menu_repository: Adeliom\SyliusHappyCMSPlugin\Repository\Menu\MenuRepository
+      menu_admin:  Adeliom\SyliusHappyCMSPlugin\Admin\Menu\MenuAdmin
+    menu_item:
+      menu_item_model: Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuItem
+      menu_item_repository: Adeliom\SyliusHappyCMSPlugin\Repository\Menu\MenuItemRepository
+      menu_item_admin:  Adeliom\SyliusHappyCMSPlugin\Admin\Menu\MenuAdmin
+  media:
+    storage_name: uploads.storage
+    base_url: '/media/download'
+    media_entity: Adeliom\SyliusHappyCMSPlugin\Entity\Media\Media
+    folder_entity: Adeliom\SyliusHappyCMSPlugin\Entity\Media\Folder
+
+  shared_block:
+    shared_block_model: Adeliom\SyliusHappyCMSPlugin\Entity\SharedBlock\SharedBlock
+    shared_block_repository: Adeliom\SyliusHappyCMSPlugin\Repository\SharedBlock\SharedBlockRepository
+    shared_block_admin: Adeliom\SyliusHappyCMSPlugin\Admin\SharedBlock\SharedBlockAdmin

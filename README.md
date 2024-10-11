@@ -8,19 +8,19 @@ Keep in mind : Happy People make Happy Internet.
 
 Actually we don't have Symfony flex configured, so you have to do some installation step manually :
 
-1. Add into `config/packages/sylius_resource.yaml` :
-
-```
-imports:
-    - { resource: "@SyliusHappyCMSPlugin/config/packages/sylius_resource.yaml" }
-```
-
-
-2. Add into `config/packages/doctrine.yaml` :
+1. Add into `config/packages/doctrine.yaml` :
 
 ```
 imports:
     - { resource: "@SyliusHappyCMSPlugin/config/packages/doctrine.yaml" }
+    
+doctrine:
+    orm:  
+        entity_managers:
+            default:
+                mappings:
+                    App:
+                        type: attribute
 ```
 
 Then, into `config/bundles.php` add :
@@ -34,6 +34,7 @@ Then, into `config/packages/_sylius.yaml` add :
 
 ```yaml
 imports:
+  - { resource: "@SyliusEasyCrudPlugin/config/config.yaml" }
   - { resource: "@SyliusHappyCMSPlugin/config/config.yaml" }
 ```
 
@@ -41,10 +42,13 @@ Then, into `config/routes.yaml` add :
 
 ```yaml
 sylius_easy_crud:
+  resource: "@SyliusEasyCrudPlugin/config/routes.yaml"
+  
+sylius_happy_cms:
   resource: "@SyliusHappyCMSPlugin/config/routes.yaml"
 ```
 
-3. Generate default file in your project (entities, repositories and admin classes) :
+2. Generate default file in your project (entities, repositories and admin classes) :
 
 Actualy we don't have Symfony recipes, so we created a command to generate files automatically.
 
@@ -54,7 +58,7 @@ php bin/console make:happy-cms:install
 
 This command also provide all variables you need to override. Don't forget to do that!
 
-4. Override default parameters
+3. Override default parameters
 
 Into `config/packages/sylius_happy_cms.yaml` add :
 
@@ -93,9 +97,10 @@ sylius_happy_cms:
   shared_block:
     shared_block_model: App\Entity\HappyCMS\SharedBlock\SharedBlock
     shared_block_repository: App\Repository\HappyCMS\SharedBlock\SharedBlockRepository
+    shared_block_admin: App\Admin\HappyCMS\SharedBlock\SharedBlockAdmin
 ```
 
-5. Déclare sylius_resources
+4. Déclare sylius_resources
 
 Into `config/packages/sylius_resources.yaml` add :
 
@@ -103,17 +108,17 @@ Into `config/packages/sylius_resources.yaml` add :
 sylius_resource:
   resources:
     sylius_happy_cms.page:
-      driver: doctrine/orm
+    driver: doctrine/orm
+    classes:
+      model: App\Entity\HappyCMS\Page\Page
+      controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+      repository: App\Repository\HappyCMS\Page\PageRepository
+      form: App\Admin\HappyCMS\Page\PageAdmin
+    translation:
       classes:
-        model: App\Entity\HappyCMS\Page\Page
+        model: App\Entity\HappyCMS\Page\PageTranslation
         controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
-        repository: App\Repository\HappyCMS\Page\PageRepository
         form: App\Admin\HappyCMS\Page\PageAdmin
-      translation:
-        classes:
-          model: App\Entity\HappyCMS\Page\PageTranslation
-          controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
-          form: App\Admin\HappyCMS\Page\PageAdmin
     sylius_happy_cms.config:
       driver: doctrine/orm
       classes:
@@ -170,14 +175,14 @@ sylius_resource:
 ```
 
 
-4. Update database :
+5. Update database :
 
 ```bash
 php bin/console doc:mig:diff
 php bin/console doc:mig:mig
 ```
 
-5. Add CMS menu in Sylius
+6. Add CMS menu in Sylius
 
 into `config/services.yaml` add :
 

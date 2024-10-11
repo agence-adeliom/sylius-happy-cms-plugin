@@ -12,6 +12,8 @@ use Adeliom\SyliusHappyCMSPlugin\Admin\Menu\MenuItemAdmin;
 use Adeliom\SyliusHappyCMSPlugin\Admin\Menu\MenuItemAdminInterface;
 use Adeliom\SyliusHappyCMSPlugin\Admin\Page\PageAdmin;
 use Adeliom\SyliusHappyCMSPlugin\Admin\Page\PageAdminInterface;
+use Adeliom\SyliusHappyCMSPlugin\Admin\SharedBlock\SharedBlockAdmin;
+use Adeliom\SyliusHappyCMSPlugin\Admin\SharedBlock\SharedBlockAdminInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Config\ConfigInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Media\Folder;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Media\FolderInterface;
@@ -405,7 +407,20 @@ class Configuration implements ConfigurationInterface
                                 ->ifString()
                                 ->then(static function ($value) {
                                     if (!class_exists($value) || !is_a($value, SharedBlockRepositoryInterface::class, true)) {
-                                        throw new InvalidConfigurationException(sprintf('Block repository must be a valid class extending %s. "%s" given.', SharedBlockRepositoryInterface::class, $value));
+                                        throw new InvalidConfigurationException(sprintf('Shared block repository must be a valid class extending %s. "%s" given.', SharedBlockRepositoryInterface::class, $value));
+                                    }
+
+                                    return $value;
+                                })
+                            ->end()
+                        ->end()
+                        ->scalarNode('shared_block_admin')
+                            ->defaultValue(SharedBlockAdmin::class)
+                            ->validate()
+                            ->ifString()
+                                ->then(static function ($value) {
+                                    if (!class_exists($value) || !is_a($value, SharedBlockAdminInterface::class, true)) {
+                                        throw new InvalidConfigurationException(sprintf('Shared block amin must be a valid class extending %s. "%s" given.', SharedBlockAdminInterface::class, $value));
                                     }
 
                                     return $value;

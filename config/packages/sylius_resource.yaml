@@ -1,0 +1,66 @@
+sylius_resource:
+  resources:
+
+    sylius_happy_cms.page:
+      driver: doctrine/orm
+      classes:
+        model: Adeliom\SyliusHappyCMSPlugin\Entity\Page\Page
+        controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+        repository: Adeliom\SyliusHappyCMSPlugin\Repository\Page\PageRepository
+        form: Adeliom\SyliusHappyCMSPlugin\Admin\Page\PageAdmin
+      translation:
+        classes:
+          model: Adeliom\SyliusHappyCMSPlugin\Entity\Page\PageTranslation
+          controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+          form: Adeliom\SyliusHappyCMSPlugin\Admin\Page\PageAdmin
+    sylius_happy_cms.config:
+      driver: doctrine/orm
+      classes:
+        model: Adeliom\SyliusHappyCMSPlugin\Entity\Config\Config
+        controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+        repository: Adeliom\SyliusHappyCMSPlugin\Repository\Config\ConfigRepository
+        form: Adeliom\SyliusHappyCMSPlugin\Admin\Config\ConfigAdmin
+      translation:
+        classes:
+          model: Adeliom\SyliusHappyCMSPlugin\Entity\Config\ConfigTranslation
+          controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+          form: Adeliom\SyliusHappyCMSPlugin\Admin\Config\ConfigAdmin
+    sylius_happy_cms.menu:
+      driver: doctrine/orm
+      classes:
+        model: Adeliom\SyliusHappyCMSPlugin\Entity\Menu\Menu
+        controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+        repository: Adeliom\SyliusHappyCMSPlugin\Repository\Menu\MenuRepository
+        form: Adeliom\SyliusHappyCMSPlugin\Admin\Menu\MenuAdmin
+    sylius_happy_cms.menu_item:
+      driver: doctrine/orm
+      classes:
+        model: Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuItem
+        controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+        repository: Adeliom\SyliusHappyCMSPlugin\Repository\Menu\MenuItemRepository
+        form: Adeliom\SyliusHappyCMSPlugin\Admin\Menu\MenuItemAdmin
+      translation:
+        classes:
+          model: Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuItemTranslation
+          controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+          form: Adeliom\SyliusHappyCMSPlugin\Admin\Menu\MenuItemAdmin
+    sylius_happy_cms.shared_block:
+      driver: doctrine/orm
+      classes:
+        model: Adeliom\SyliusHappyCMSPlugin\Entity\SharedBlock\SharedBlock
+        controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+        repository: Adeliom\SyliusHappyCMSPlugin\Repository\SharedBlock\SharedBlockRepository
+        form: Adeliom\SyliusHappyCMSPlugin\Admin\SharedBlock\SharedBlockAdmin
+      translation:
+        classes:
+          model: Adeliom\SyliusHappyCMSPlugin\Entity\SharedBlock\SharedBlockTranslation
+          controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+          form: Adeliom\SyliusHappyCMSPlugin\Admin\SharedBlock\SharedBlockAdmin
+    sylius_happy_cms.media:
+      classes:
+        model: Adeliom\SyliusHappyCMSPlugin\Entity\Media\Media
+        repository: Adeliom\SyliusHappyCMSPlugin\Repository\Media\MediaRepository
+    sylius_happy_cms.media_folder:
+      classes:
+        model: Adeliom\SyliusHappyCMSPlugin\Entity\Media\Folder
+        repository: Adeliom\SyliusHappyCMSPlugin\Repository\Media\FolderRepository
