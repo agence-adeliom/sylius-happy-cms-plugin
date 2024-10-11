@@ -122,7 +122,7 @@ trait EntityRouteTrait
      */
     public function getRouteSchemes(TranslationInterface $translation): array
     {
-        return ['https'];
+        return ['https', 'http'];
     }
 
     public function getRouteHost(TranslationInterface $translation): ?string

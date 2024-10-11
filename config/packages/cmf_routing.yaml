@@ -9,10 +9,6 @@ cmf_routing:
                 enabled: true
         locales:
             - en_US
-            - de_DE
-            - fr_FR
-            - es_ES
-            - pl_PL
         match_implicit_locale: false
         controllers_by_class:
             Symfony\Cmf\Component\Routing\RedirectRouteInterface: cmf_routing.redirect_controller:redirectAction
