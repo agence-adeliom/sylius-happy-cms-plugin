@@ -40,7 +40,7 @@
     "notie": "^4.3.1",
     "plyr": "^3.6.8",
     "tailwindcss": "^2.2.4",
-    "vue": "^2.6.14",
+    "vue": "^3.0.0",
     "vue-awesome": "^4.3.1",
     "vue-clipboard2": "^0.3.1",
     "vue-focuspoint-component": "^2.0.1",
