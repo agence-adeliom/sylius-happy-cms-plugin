@@ -44,7 +44,7 @@ class PageTranslation extends AbstractTranslation implements PageTranslationInte
         return $this->id;
     }
 
-    /** @var array<int, mixed>|null $content */
+    /** @var array<string, mixed>|null $content */
     #[Groups('main')]
     #[Column(name: 'content', type: Types::JSON, nullable: true)]
     #[Assert\Type('array')]
@@ -56,7 +56,7 @@ class PageTranslation extends AbstractTranslation implements PageTranslationInte
     }
 
     /**
-     * @return array<int, mixed>|null
+     * @return array<string, mixed>|null
      */
     public function getContent(): ?array
     {
@@ -64,7 +64,7 @@ class PageTranslation extends AbstractTranslation implements PageTranslationInte
     }
 
     /**
-     * @param array<int, mixed>|null $content
+     * @param array<string, mixed>|null $content
      */
     public function setContent(?array $content): void
     {

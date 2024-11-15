@@ -106,7 +106,7 @@ class Helper
     /**
      * @param array<string, array<string, mixed>> $stats
      */
-    private function stopTracing(int $id, array $stats): void
+    private function stopTracing(string $id, array $stats): void
     {
         $this->traces[$id] = $stats;
     }

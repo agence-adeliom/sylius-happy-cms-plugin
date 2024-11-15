@@ -46,7 +46,7 @@ final class MakeSharedBlock extends AbstractMaker
 
         $blockPath = $generator->generateClass(
             $blockClassNameDetails->getFullName(),
-            __DIR__ . '/../Resources/skeleton/block/Block.tpl.php',
+            __DIR__ . '/../../Resources/skeleton/block/Block.tpl.php',
             [
                 'template_name' => $templateName,
             ],
@@ -54,7 +54,7 @@ final class MakeSharedBlock extends AbstractMaker
 
         $generator->generateTemplate(
             $templateName,
-            __DIR__ . '/../Resources/skeleton/block/twig_template.tpl.php',
+            __DIR__ . '/../../Resources/skeleton/block/twig_template.tpl.php',
             [
                 'block_path' => $blockPath,
                 'root_directory' => $generator->getRootDirectory(),

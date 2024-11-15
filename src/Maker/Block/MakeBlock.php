@@ -28,10 +28,8 @@ final class MakeBlock extends AbstractMaker
 
     public function configureCommand(Command $command, InputConfiguration $inputConfig): void
     {
-        $helpContent = file_get_contents(__DIR__ . '/../Resources/help/MakeBlock.txt');
         $command
             ->addArgument('block-type', InputArgument::OPTIONAL, sprintf('Choose a name for your block type (e.g. <fg=yellow>%sType</>)', Str::asClassName(Str::getRandomTerm())))
-            ->setHelp($helpContent ?: '')
         ;
     }
 
@@ -46,7 +44,7 @@ final class MakeBlock extends AbstractMaker
 
         $blockPath = $generator->generateClass(
             $blockClassNameDetails->getFullName(),
-            __DIR__ . '/../Resources/skeleton/block/Block.tpl.php',
+            __DIR__ . '/../../Resources/skeleton/block/Block.tpl.php',
             [
                 'template_name' => $templateName,
             ],
@@ -54,7 +52,7 @@ final class MakeBlock extends AbstractMaker
 
         $generator->generateTemplate(
             $templateName,
-            __DIR__ . '/../Resources/skeleton/block/twig_template.tpl.php',
+            __DIR__ . '/../../Resources/skeleton/block/twig_template.tpl.php',
             [
                 'block_path' => $blockPath,
                 'root_directory' => $generator->getRootDirectory(),
