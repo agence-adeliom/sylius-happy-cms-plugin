@@ -125,7 +125,7 @@ class Seo implements SeoInterface, \Stringable
 
     public function __toString(): string
     {
-        return $this->title;
+        return $this->title ?? '';
     }
 
     /**
