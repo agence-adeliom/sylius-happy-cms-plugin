@@ -104,6 +104,9 @@ class Helper
     []): ?Markup
     {
         $block = null;
+        if (!isset($data['block'])) {
+            return null;
+        }
 
         $sharedBlock = $this->entityManager->getRepository(SharedBlockInterface::class)->find($data['block']);
         if ($sharedBlock instanceof SharedBlockInterface) {
