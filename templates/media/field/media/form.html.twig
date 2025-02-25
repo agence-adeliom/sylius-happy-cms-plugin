@@ -108,29 +108,17 @@
     </div>
 
     <script type="text/javascript">
+        Array.from(document.querySelectorAll(".happy-cms-media-widget[data-widget]")).forEach(w => {
+            if(w && !w.__vue__ && window.Vue){
+                new window.Vue({ el: w });
+            }
+        });
+
         window.addEventListener("DOMContentLoaded", function() {
             var vueElement = document.querySelector(".happy-cms-media-widget[data-widget='{{ form.vars.id }}']");
             if(vueElement && !vueElement.__vue__ && window.Vue){
                 new window.Vue({ el: vueElement });
             }
         });
-
-        var observer = new MutationObserver((mutationsList, observer) => {
-            for(var mutation of mutationsList) {
-                if (mutation.addedNodes.length) {
-                    mutation.addedNodes.forEach(node => {
-                        if (node.nodeType === Node.ELEMENT_NODE && node.hasAttribute('data-form-collection') && node.getAttribute('data-form-collection') === 'item') {
-                            if(!node.__vue__ && window.Vue){
-                                new window.Vue({ el: node });
-                            }
-                        }
-                    });
-                }
-            }
-        });
-
-        Array.from(document.querySelectorAll('form[action*="flexible_content"] [data-form-collection="list"]')).forEach(c => {
-            observer.observe(c, { childList: true, subtree: true });
-        })
     </script>
 {% endblock %}
