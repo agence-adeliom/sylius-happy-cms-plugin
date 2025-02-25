@@ -8,6 +8,7 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -19,6 +20,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 abstract class AbstractBlock extends AbstractType implements BlockTypeInterface
 {
     protected ?FormBuilderInterface $tempBuilder = null;
+
+    /**
+     * @var array
+     * If a form type has been already treated, we don't need to
+     * treat it again in the configureAdminFormThemes method
+     */
+    private array $treatedFormTypeThemes = [];
 
     public function __construct(
         protected EntityManagerInterface $entityManager,
@@ -53,18 +61,24 @@ abstract class AbstractBlock extends AbstractType implements BlockTypeInterface
      */
     abstract public function buildBlock(FormBuilderInterface $builder, array $options): void;
 
-    private function tempBuilder(): void
+    private function setRootBuilder(): void
     {
         if (null === $this->tempBuilder) {
-            $this->tempBuilder = $this->formFactory
-                ->createNamedBuilder(
-                    'fake_builder',
-                    static::class,
-                    null,
-                    [],
-                );
-            $this->buildBlock($this->tempBuilder, []);
+            $this->tempBuilder = $this->tempBuilder();
         }
+    }
+
+    private function tempBuilder(?string $class = null, ?string $name = null): FormBuilderInterface
+    {
+        $tempBuilder = $this->formFactory
+            ->createNamedBuilder(
+                $name ?? 'fake_builder',
+                $class ?? static::class,
+                null,
+                [],
+            );
+        $this->buildBlock($tempBuilder, []);
+        return $tempBuilder;
     }
 
     public function buildView(FormView $view, FormInterface $form, array $options): void
@@ -103,7 +117,8 @@ abstract class AbstractBlock extends AbstractType implements BlockTypeInterface
      */
     public function configureAdminAssets(): array
     {
-        $this->tempBuilder();
+        $this->setRootBuilder();
+
         /**
          * @var array{js: array<string|Asset>|null, css: array<string|Asset>|null, webpack: array<string|Asset>|null} $adminAssets
          */
@@ -132,19 +147,8 @@ abstract class AbstractBlock extends AbstractType implements BlockTypeInterface
      */
     public function configureAdminFormThemes(): array
     {
-        $this->tempBuilder();
-        $adminFormThemes = [];
-        foreach ($this->tempBuilder->getForm() as $child) {
-            $formTypeClass = get_class($child->getConfig()->getType()->getInnerType());
-            if (method_exists($formTypeClass, 'configureAdminFormThemes')) {
-                $formThemes = call_user_func([$formTypeClass, 'configureAdminFormThemes']);
-                if (is_array($formThemes)) {
-                    $adminFormThemes = array_merge($adminFormThemes, $formThemes);
-                }
-            }
-        }
-
-        return $adminFormThemes;
+        $this->setRootBuilder();
+        return $this->getAdminFormThemesRecursive($this->tempBuilder);
     }
 
     /**
@@ -168,5 +172,49 @@ abstract class AbstractBlock extends AbstractType implements BlockTypeInterface
     public function supports(string $objectClass, ?object $instance = null): bool
     {
         return true;
+    }
+
+    private function getAdminFormThemesRecursive(FormBuilderInterface $builder, array $adminFormThemes = []): array
+    {
+        if (!$builder->getCompound()) {
+            $formTypeClass = $builder->getType()->getInnerType()::class;
+            $this->treatedFormTypeThemes[$formTypeClass] = $formTypeClass;
+
+            return $this->getAdminFormThemes($formTypeClass, $adminFormThemes);
+        }
+
+        foreach ($builder->getForm() as $child) {
+            $formTypeClass = $child->getConfig()->getType()->getInnerType()::class;
+            $adminFormThemes = $this->getAdminFormThemes($formTypeClass, $adminFormThemes);
+            $this->treatedFormTypeThemes[$formTypeClass] = $formTypeClass;
+
+            $isCollection = is_subclass_of($formTypeClass, CollectionType::class);
+            if (! $isCollection) {
+                continue;
+            }
+
+            if ($isCollection) {
+                $innerType = $child->getConfig()->getOption('entry_type');
+                if (!in_array($innerType, array_keys($this->treatedFormTypeThemes)) || isset($this->treatedFormTypeThemes[$innerType]) && $this->treatedFormTypeThemes[$innerType] !== $formTypeClass) {
+                    $this->treatedFormTypeThemes[$innerType] = $formTypeClass;
+                    $tempBuilder = $this->tempBuilder($innerType, (string)(time() + usleep(100)));
+                    $adminFormThemes = $this->getAdminFormThemesRecursive($tempBuilder, $adminFormThemes);
+                }
+            }
+        }
+
+        return $adminFormThemes;
+    }
+
+    private function getAdminFormThemes(string $formTypeClass, array $adminFormThemes): array
+    {
+        if (method_exists($formTypeClass, 'configureAdminFormThemes')) {
+            $formThemes = call_user_func([$formTypeClass, 'configureAdminFormThemes']);
+            if (is_array($formThemes)) {
+                $adminFormThemes = array_merge($adminFormThemes, $formThemes);
+            }
+        }
+
+        return $adminFormThemes;
     }
 }
