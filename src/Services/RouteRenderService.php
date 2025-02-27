@@ -58,7 +58,7 @@ class RouteRenderService extends AbstractController
         $controller = $contentDocument->getRouteController();
         if (null !== $controller) {
             try {
-                $this->forward($controller, [
+                return $this->forward($controller, [
                     $contentDocument,
                     $request,
                 ]);
