@@ -2,7 +2,7 @@
 
 {% block title %}
     {%- set translation = resource.translation(app.request.locale)|default(false) -%}
-    {%- if translation and translation.seo is defined and translation.seo.title is defined %}
+    {%- if translation and translation.seo is defined and translation.seo.title is defined and translation.seo.title is not null  %}
         {{- seo_title(translation.seo.title) -}}
     {% else %}
         {{- seo_title(parent()) -}}
