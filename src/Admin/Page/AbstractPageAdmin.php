@@ -141,20 +141,4 @@ abstract class AbstractPageAdmin extends AbstractAdmin implements PageAdminInter
                 ->hideOnIndex();
         }
     }
-
-    public function buildForm(FormBuilderInterface $builder, array $options): void
-    {
-        parent::buildForm($builder, $options);
-
-        $builder->addEventListener(FormEvents::POST_SUBMIT, function (PostSubmitEvent $event) {
-            /** @var PageInterface $page */
-            $page = $event->getData();
-            $pagePositions = $page->getParent()->getChildren()
-                ->filter(fn (PageInterface $mi): bool => $mi !== $page)
-                ->map(fn (PageInterface $page): ?int => $page->getPosition())
-                ->toArray();
-            $newPosition = [] !== $pagePositions ? max($pagePositions) + 1 : 0;
-            $page->setPosition($newPosition ?? 0);
-        });
-    }
 }
