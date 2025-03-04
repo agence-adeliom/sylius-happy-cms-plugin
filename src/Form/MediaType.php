@@ -123,6 +123,9 @@ class MediaType extends AbstractType implements AdminFormTypeInterface
         return 'happy_cms_media';
     }
 
+    /**
+     * @return array<string, array<int,string|Asset>>
+     */
     public static function configureAdminAssets(): array
     {
         return [
