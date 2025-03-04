@@ -19,9 +19,9 @@ class MenuRepository extends EntityRepository implements MenuRepositoryInterface
 
     protected int $cacheTtl;
 
-    public function __construct(EntityManagerInterface $em, string $className)
+    public function __construct(EntityManagerInterface $em)
     {
-        $class = $this->manager->getClassMetadata(get_class($className));
+        $class = $em->getClassMetadata(MenuInterface::class);
         parent::__construct($em, $class);
     }
 

@@ -3,7 +3,6 @@ services:
         class: Adeliom\SyliusHappyCMSPlugin\Repository\Menu\MenuItemRepository
         arguments:
             - '@doctrine.orm.entity_manager'
-            - Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuInterface
         calls:
             - [ 'setConfig', [ '%sylius_happy_cms.menu.cache%' ] ]
         tags: [ doctrine.repository_service ]
@@ -12,7 +11,6 @@ services:
         class: Adeliom\SyliusHappyCMSPlugin\Repository\Menu\MenuItemRepositoryInterface
         arguments:
             - '@doctrine.orm.entity_manager'
-            - Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuItemInterface
         calls:
             - [ 'setConfig', [ '%sylius_happy_cms.menu.cache%' ] ]
         tags: [ doctrine.repository_service ]

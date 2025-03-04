@@ -25,9 +25,9 @@ class MenuItemRepository extends NestedTreeRepository implements MenuItemReposit
 
     protected int $cacheTtl;
 
-    public function __construct(EntityManagerInterface $em, string $className)
+    public function __construct(EntityManagerInterface $em)
     {
-        $class = $this->manager->getClassMetadata(get_class($className));
+        $class = $em->getClassMetadata(MenuItemInterface::class);
         parent::__construct($em, $class);
     }
 
