@@ -8,6 +8,7 @@ use Adeliom\SyliusEasyCrudPlugin\Enum\ThreeStateStatusEnum;
 use Adeliom\SyliusEasyCrudPlugin\Traits\TranslationRepositoryTrait;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Menu\Menu;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuItemInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
 use Sylius\Bundle\ResourceBundle\Doctrine\ORM\ResourceRepositoryTrait;
@@ -23,6 +24,12 @@ class MenuItemRepository extends NestedTreeRepository implements MenuItemReposit
     protected bool $cacheEnabled = false;
 
     protected int $cacheTtl;
+
+    public function __construct(EntityManagerInterface $em, string $className)
+    {
+        $class = $this->manager->getClassMetadata(get_class($className));
+        parent::__construct($em, $class);
+    }
 
     /**
      * @param array<string, mixed> $cacheConfig

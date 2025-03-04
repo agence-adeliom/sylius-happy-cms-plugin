@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\Repository\Menu;
 
 use Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\QueryBuilder;
 use Sylius\Bundle\ResourceBundle\Doctrine\ORM\EntityRepository;
@@ -17,6 +18,12 @@ class MenuRepository extends EntityRepository implements MenuRepositoryInterface
     protected bool $cacheEnabled = false;
 
     protected int $cacheTtl;
+
+    public function __construct(EntityManagerInterface $em, string $className)
+    {
+        $class = $this->manager->getClassMetadata(get_class($className));
+        parent::__construct($em, $class);
+    }
 
     /**
      * @param array<string, mixed> $cacheConfig
