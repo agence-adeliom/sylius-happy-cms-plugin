@@ -15,12 +15,14 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Event\PreRemoveEventArgs;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 use JMS\Serializer\Annotation as Serializer;
 use Sylius\Component\Resource\Model\TranslatableTrait;
 use Symfony\Cmf\Bundle\RoutingBundle\Doctrine\Orm\Route as OrmRoute;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[Gedmo\Tree(type: 'nested')]
 #[ORM\MappedSuperclass(repositoryClass: PageRepository::class)]
 #[Serializer\ExclusionPolicy('ALL')]
 class Page implements PageInterface
@@ -45,6 +47,26 @@ class Page implements PageInterface
     #[ORM\JoinTable('sylius_happy_cms__page_route')]
     protected Collection $routes;
 
+    #[ORM\Column(name: 'lft', type: Types::INTEGER)]
+    #[Gedmo\TreeLeft]
+    protected ?int $lft = null;
+
+    #[ORM\Column(name: 'lvl', type: Types::INTEGER)]
+    #[Gedmo\TreeLevel]
+    protected ?int $lvl = null;
+
+    #[ORM\Column(name: 'rgt', type: Types::INTEGER)]
+    #[Gedmo\TreeRight]
+    protected ?int $rgt = null;
+
+    #[ORM\Column(name: 'root', type: Types::INTEGER, nullable: true)]
+    #[Gedmo\TreeRoot]
+    protected ?int $root = null;
+
+    #[ORM\Column(name: 'position', type: Types::SMALLINT, nullable: true, options: ['unsigned' => true])]
+    protected ?int $position = null;
+
+    #[Gedmo\TreeParent]
     #[Assert\Type(PageInterface::class)]
     #[ORM\ManyToOne(inversedBy: 'children', targetEntity: PageInterface::class)]
     #[ORM\JoinColumn(name: 'parent_id', onDelete: 'SET NULL', referencedColumnName: 'id')]
@@ -52,6 +74,7 @@ class Page implements PageInterface
 
     /** @var Collection<int, PageInterface> */
     #[ORM\OneToMany(targetEntity: PageInterface::class, mappedBy: 'parent')]
+    #[ORM\OrderBy(['position' => 'ASC'])]
     protected Collection $children;
 
     #[ORM\Column(name: 'action', type: Types::STRING, nullable: true)]
@@ -98,6 +121,56 @@ class Page implements PageInterface
     public static function getTranslationClass(): string
     {
         return PageTranslation::class;
+    }
+
+    public function getLft(): ?int
+    {
+        return $this->lft;
+    }
+
+    public function setLft(mixed $lft): void
+    {
+        $this->lft = $lft;
+    }
+
+    public function getLvl(): ?int
+    {
+        return $this->lvl;
+    }
+
+    public function setLvl(mixed $lvl): void
+    {
+        $this->lvl = $lvl;
+    }
+
+    public function getRgt(): ?int
+    {
+        return $this->rgt;
+    }
+
+    public function setRgt(mixed $rgt): void
+    {
+        $this->rgt = $rgt;
+    }
+
+    public function getRoot(): ?int
+    {
+        return $this->root;
+    }
+
+    public function setRoot(?int $root): void
+    {
+        $this->root = $root;
+    }
+
+    public function getPosition(): ?int
+    {
+        return $this->position;
+    }
+
+    public function setPosition(int $position): void
+    {
+        $this->position = $position;
     }
 
     public function setParent(?PageInterface $parent = null): void

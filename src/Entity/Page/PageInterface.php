@@ -39,4 +39,16 @@ interface PageInterface extends ResourceInterface, TranslatableInterface, CmsRou
      * @return Collection<int, PageTranslationInterface>
      */
     public function getSeoTranslations(): Collection;
+
+    public function getLft(): ?int;
+
+    public function getRgt(): ?int;
+
+    public function getRoot(): ?int;
+
+    public function getLvl(): ?int;
+
+    public function getPosition(): ?int;
+
+    public function setPosition(int $position): void;
 }

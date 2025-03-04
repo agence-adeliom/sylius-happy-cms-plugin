@@ -1,0 +1,109 @@
+{% import '@SyliusUi/Macro/buttons.html.twig' as buttons %}
+{% import _self as tree %}
+
+{% macro render(pages, definition, grid) %}
+    {% import '@SyliusUi/Macro/buttons.html.twig' as buttons %}
+    {% import _self as tree %}
+
+    <ul>
+        {% for page in pages|filter(page => page.id is not null) %}
+            <li data-id="{{ page.id }}" {% if page.children is not empty %}data-sylius-js-tree-parent="{{ page.id }}"{% endif %}>
+                <div class="sylius-tree__item">
+                    <div class="sylius-tree__icon" {% if page.children is not empty %}data-sylius-js-tree-trigger="{{ page.id }}"{% endif %}>
+                        <i class="{{ page.children is not empty ? 'caret down' : 'angle left' }} icon"></i>
+                    </div>
+                    <div class="sylius-tree__title">
+                        <a href="{{ path('sylius_happy_cms_admin_page_update', {id: page.id}) }}"{% if not page.publishState is same as 'published' %} class="text gray"{% endif %}>
+                            {{ page }}
+                        </a>
+                    </div>
+                    <div class="sylius-tree__action">
+                        <form action="{{ path('sylius_happy_cms_admin_page_delete', {id: page.id}) }}" method="post">
+                            <div class="ui tiny basic icon top right pointing dropdown button sylius-tree__action__trigger">
+                                <i class="ellipsis horizontal icon"></i>
+                                <div class="menu item">
+
+                                    {% if definition.actionGroups.item is defined and definition.getEnabledActions('item')|length > 0 %}
+                                        <td {{ sylius_test_html_attribute('actions') }}>
+                                            <a class="item" href="{{ path('sylius_happy_cms_admin_page_create', {id: page.id}) }}">
+                                                <i class="plus icon blue"></i>{{ 'sylius.ui.create'|trans }}
+                                            </a>
+
+                                            <div class="divider"></div>
+
+                                            <div class="item sylius-page-move-up" data-url="{{ path('sylius_happy_cms_admin_page_update_move_up', {id: page.id}) }}">
+                                                <i class="arrow up icon grey"></i>{{ 'sylius.ui.move_up'|trans }}
+                                            </div>
+                                            <div class="item sylius-page-move-down" data-url="{{ path('sylius_happy_cms_admin_page_update_move_down', {id: page.id}) }}">
+                                                <i class="arrow down icon grey"></i>{{ 'sylius.ui.move_down'|trans }}
+                                            </div>
+
+                                            <div class="divider"></div>
+
+                                            {% for action in definition.getEnabledActions('item')|sort_by('position') %}
+                                                {% if action.name == 'show' %}
+                                                    <a class="item" href="{{ path('sylius_happy_cms_admin_page_create', {id: page.id}) }}">
+                                                        <i class="search icon grey"></i>{{ 'sylius.ui.show'|trans }}
+                                                    </a>
+                                                {% elseif action.name == 'update' %}
+                                                    <a class="item" href="{{ path('sylius_happy_cms_admin_page_update', {id: page.id}) }}">
+                                                        <i class="pencil icon grey"></i>{{ 'sylius.ui.edit'|trans }}
+                                                    </a>
+                                                {% elseif action.name == 'delete' %}
+                                                    <button class="item" type="submit" style="width: 100%;" data-requires-confirmation>
+                                                        <i class="icon trash red"></i>{{ 'sylius.ui.delete'|trans }}
+                                                    </button>
+                                                {% else %}
+                                                    {% set action_path = action.link.url|default(path(action.link.route|default(grid.requestConfiguration.getRouteName(action.name)), action.link.parameters|default({'id': page.id}))) %}
+                                                    <a class="item" href="{{ action_path }}">
+                                                        <i class="{{ action.icon }} icon grey"></i>{{ action.label|trans }}
+                                                    </a>
+                                                {% endif %}
+                                            {% endfor %}
+                                            {% if definition.actionGroups.subitem is defined and definition.getEnabledActions('subitem')|length > 0 %}
+                                                <div class="divider"></div>
+                                                    {% for action in definition.getEnabledActions('subitem')|sort_by('position') %}
+                                                        {% if action.options.links is defined and action.options.links|length %}
+                                                            <span class="item">
+                                                                <i class="{{ action.icon }} icon grey"></i>{{ action.label|trans }}
+                                                            </span>
+                                                            {% for sub_action in action.options.links %}
+                                                                {% set action_path = path(sub_action.route|default(''), {...sub_action.parameters, ...{'id': page.id}}) %}
+                                                                <a class="item" href="{{ action_path }}">
+                                                                    <i class="{{ sub_action.icon }} icon grey"></i>{{ sub_action.label|trans }}
+                                                                </a>
+                                                            {% endfor %}
+                                                        {% else %}
+                                                            {% set action_path = action.link.url|default(path(action.link.route|default(grid.requestConfiguration.getRouteName(action.name)), action.link.parameters|default({'id': page.id}))) %}
+                                                            <a class="item" href="{{ action_path }}">
+                                                                <i class="{{ action.icon }} icon grey"></i>{{ action.label|trans }}
+                                                            </a>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                            {% endif %}
+                                        </td>
+                                    {% endif %}
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <input type="hidden" name="_csrf_token" value="{{ csrf_token(page.id) }}" />
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                {{ tree.render(page.children, definition, grid) }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
+<div class="ui segment sylius-tree hidden" data-sylius-js-tree>
+    <a href="{{ path('sylius_happy_cms_admin_page_create') }}" class="ui fluid labeled icon primary button">
+        <i class="plus icon"></i>
+        {{ 'sylius.ui.create'|trans }}
+    </a>
+
+    <a href="#" class="sylius-tree__toggle-all" data-sylius-js-tree-trigger>
+        <i class="icon">&bull;</i>{{ 'sylius.ui.toggle_all'|trans }}
+    </a>
+    {{ tree.render(pages, definition, resources) }}
+</div>

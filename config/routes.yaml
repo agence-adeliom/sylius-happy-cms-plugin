@@ -40,4 +40,33 @@ sylius_happy_cms_admin_menu_item_update_move_down:
     _sylius:
       permission: true
 
+sylius_happy_cms_admin_page_tree:
+  path: /admin/pages/tree
+  methods: [ GET ]
+  defaults:
+    _controller: Adeliom\SyliusHappyCMSPlugin\Controller\Page\PageResourceController::treeAction
+    _sylius:
+      template: $template
+      menu: $menu
+      vars: $vars
+      permission: true
+
+sylius_happy_cms_admin_page_update_move_up:
+  path: /admin/pages/{id}/move-up
+  methods: [ PUT ]
+  defaults:
+    _controller: Adeliom\SyliusHappyCMSPlugin\Controller\Page\PageResourceController::moveUpAction
+    _format: json
+    _sylius:
+      permission: true
+
+sylius_happy_cms_admin_page_update_move_down:
+  path: /admin/pages/{id}/move-down
+  methods: [ PUT ]
+  defaults:
+    _controller: Adeliom\SyliusHappyCMSPlugin\Controller\Page\PageResourceController::moveDownAction
+    _format: json
+    _sylius:
+      permission: true
+
 

@@ -103,7 +103,9 @@ final class InstallDefaultFiles extends AbstractMaker
         ];
         $this->generateScope($scope, $files, $io, $generator);
 
-        $this->generateRoute($scope, $io);
+        $this->generateRoute($scope, $io, [
+            'default' => '@SyliusHappyCMSPlugin\\\\page\\\\crud',
+        ]);
 
         $this->generateSyliusResource($scope, $io);
 

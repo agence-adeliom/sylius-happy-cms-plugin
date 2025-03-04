@@ -59,7 +59,7 @@ abstract class AbstractMenuItemAdmin extends AbstractAdmin implements MenuItemAd
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         parent::buildForm($builder, $options);
-        // Si le menu n'est pas défini, récupérer le menu du menuItem parent
+
         $builder->addEventListener(FormEvents::POST_SUBMIT, function (PostSubmitEvent $event) {
             /** @var MenuItemInterface $menuItem */
             $menuItem = $event->getData();

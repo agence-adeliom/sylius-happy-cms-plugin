@@ -1,0 +1,11 @@
+<script type="text/javascript">
+    const pageMoveUp = (e) => {
+        fetch(e.target.dataset.url, {
+            method: 'PUT',
+        }).then(() => {
+            window.location.reload();
+        })
+    };
+
+    $('.sylius-page-move-up, .sylius-page-move-down').on('click', pageMoveUp);
+</script>

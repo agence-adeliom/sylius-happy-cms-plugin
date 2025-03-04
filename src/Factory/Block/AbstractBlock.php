@@ -78,6 +78,7 @@ abstract class AbstractBlock extends AbstractType implements BlockTypeInterface
                 [],
             );
         $this->buildBlock($tempBuilder, []);
+
         return $tempBuilder;
     }
 
@@ -148,6 +149,7 @@ abstract class AbstractBlock extends AbstractType implements BlockTypeInterface
     public function configureAdminFormThemes(): array
     {
         $this->setRootBuilder();
+
         return $this->getAdminFormThemesRecursive($this->tempBuilder);
     }
 
@@ -189,7 +191,7 @@ abstract class AbstractBlock extends AbstractType implements BlockTypeInterface
             $this->treatedFormTypeThemes[$formTypeClass] = $formTypeClass;
 
             $isCollection = is_subclass_of($formTypeClass, CollectionType::class);
-            if (! $isCollection) {
+            if (!$isCollection) {
                 continue;
             }
 
@@ -197,7 +199,7 @@ abstract class AbstractBlock extends AbstractType implements BlockTypeInterface
                 $innerType = $child->getConfig()->getOption('entry_type');
                 if (!in_array($innerType, array_keys($this->treatedFormTypeThemes)) || isset($this->treatedFormTypeThemes[$innerType]) && $this->treatedFormTypeThemes[$innerType] !== $formTypeClass) {
                     $this->treatedFormTypeThemes[$innerType] = $formTypeClass;
-                    $tempBuilder = $this->tempBuilder($innerType, (string)(time() + usleep(100)));
+                    $tempBuilder = $this->tempBuilder($innerType, (string) (time() + usleep(100)));
                     $adminFormThemes = $this->getAdminFormThemesRecursive($tempBuilder, $adminFormThemes);
                 }
             }

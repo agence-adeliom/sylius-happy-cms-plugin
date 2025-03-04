@@ -3,7 +3,7 @@ sylius_happy_cms.page:
   driver: doctrine/orm
   classes:
     model: App\Entity\HappyCMS\Page\Page
-    controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+    controller: Adeliom\SyliusHappyCMSPlugin\Controller\Page\PageResourceController
     repository: App\Repository\HappyCMS\Page\PageRepository
     form: App\Admin\HappyCMS\Page\PageAdmin
   translation:

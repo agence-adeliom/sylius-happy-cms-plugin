@@ -19,6 +19,11 @@ use Adeliom\SyliusEasyCrudPlugin\Enum\ColumnSizeEnum;
 use Adeliom\SyliusEasyCrudPlugin\Enum\ThreeStateStatusEnum;
 use Adeliom\SyliusHappyCMSPlugin\Admin\Field\FlexibleContentField;
 use Adeliom\SyliusHappyCMSPlugin\Admin\Field\SEOField;
+use Adeliom\SyliusHappyCMSPlugin\Entity\Page\PageInterface;
+use Sylius\Bundle\GridBundle\Builder\Filter\StringFilter;
+use Symfony\Component\Form\Event\PostSubmitEvent;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvents;
 
 abstract class AbstractPageAdmin extends AbstractAdmin implements PageAdminInterface
 {
@@ -35,6 +40,12 @@ abstract class AbstractPageAdmin extends AbstractAdmin implements PageAdminInter
     public static function getDefaultSortColumn(): string
     {
         return 'name';
+    }
+
+    public function configureFilters(): iterable
+    {
+        yield StringFilter::create('name', ['translations.name'])
+            ->setLabel('sylius_happy_cms.page.admin.field.name');
     }
 
     public function configureActions(string $pageName): Actions
@@ -67,6 +78,7 @@ abstract class AbstractPageAdmin extends AbstractAdmin implements PageAdminInter
 
             yield ResourceAutocompleteChoiceField::new('parent', 'sylius_happy_cms.page.admin.field.parent')
                 ->setMultiple(false)
+                ->setEmptyData('1')
                 ->setResource('sylius_happy_cms.page');
 
             yield Field::new('name', 'sylius_happy_cms.page.admin.field.name')
@@ -128,5 +140,21 @@ abstract class AbstractPageAdmin extends AbstractAdmin implements PageAdminInter
                 )
                 ->hideOnIndex();
         }
+    }
+
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        parent::buildForm($builder, $options);
+
+        $builder->addEventListener(FormEvents::POST_SUBMIT, function (PostSubmitEvent $event) {
+            /** @var PageInterface $page */
+            $page = $event->getData();
+            $pagePositions = $page->getParent()->getChildren()
+                ->filter(fn (PageInterface $mi): bool => $mi !== $page)
+                ->map(fn (PageInterface $page): ?int => $page->getPosition())
+                ->toArray();
+            $newPosition = [] !== $pagePositions ? max($pagePositions) + 1 : 0;
+            $page->setPosition($newPosition ?? 0);
+        });
     }
 }

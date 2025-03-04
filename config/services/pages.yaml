@@ -3,3 +3,10 @@ services:
     autowire: true
     autoconfigure: true
 
+  happy_cms.page.twig.extension:
+    class: Adeliom\SyliusHappyCMSPlugin\Twig\Page\PageExtension
+    public: true
+    arguments:
+      - '@doctrine.orm.entity_manager'
+    tags:
+      - { name: twig.extension }

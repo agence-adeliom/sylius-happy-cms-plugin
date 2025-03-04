@@ -157,6 +157,38 @@ class PageRepository extends EntityRepository implements PageRepositoryInterface
         return $this->getResult($qb->getQuery());
     }
 
+    public function findPreviousPage(PageInterface $page): ?PageInterface
+    {
+        return $this->createQueryBuilder('page')
+            ->andWhere('page.id != :id')
+            ->andWhere('page.lvl = :level')
+            ->andWhere('page.position < :position')
+            ->andWhere('page.position IS NOT NULL')
+            ->setParameter('id', $page->getId())
+            ->setParameter('level', $page->getLvl())
+            ->setParameter('position', $page->getPosition() ?? null)
+            ->orderBy('page.id', 'DESC')
+            ->getQuery()
+            ->setMaxResults(1)
+            ->getOneOrNullResult();
+    }
+
+    public function findNextPage(PageInterface $page): ?PageInterface
+    {
+        return $this->createQueryBuilder('page')
+            ->andWhere('page.id != :id')
+            ->andWhere('page.lvl = :level')
+            ->andWhere('page.position > :position')
+            ->andWhere('page.position IS NOT NULL')
+            ->setParameter('id', $page->getId())
+            ->setParameter('level', $page->getLvl())
+            ->setParameter('position', $page->getPosition() ?? null)
+            ->orderBy('page.id', 'ASC')
+            ->getQuery()
+            ->setMaxResults(1)
+            ->getOneOrNullResult();
+    }
+
     /**
      * Will search for pages to show in front depending on the arguments.
      * If slugs are defined, there's no problem in looking for nulled host or locale,

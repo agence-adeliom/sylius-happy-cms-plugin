@@ -1,9 +1,9 @@
-{% extends '@SyliusEasyCrudPlugin/crud/update.html.twig' %}
+{% extends '@SyliusEasyCrudPlugin/crud/index.html.twig' %}
 
 {% block content %}
     <div class="ui grid sticky-container">
         <div class="sixteen wide mobile sixteen wide tablet four wide computer column sticky-column">
-            {{ render(path('sylius_happy_cms_admin_menu_item_tree', {menu: resource.menu.id|default(null), template: '@SyliusHappyCMSPlugin/menu_item/_treeWithButtons.html.twig'})) }}
+            {% include '@SyliusHappyCMSPlugin/page/_treeWithButtons.html.twig' with {pages: happy_cms_tree_pages()} %}
         </div>
         <div class="sixteen wide mobile sixteen wide tablet twelve wide computer column">
             {{ parent() }}
@@ -14,5 +14,5 @@
 {% block javascripts %}
     {{ parent() }}
 
-    {{ include('@SyliusHappyCMSPlugin/menu_item/moveTree.html.twig') }}
+    {% include '@SyliusHappyCMSPlugin/page/moveTree.html.twig' %}
 {% endblock %}
