@@ -30,4 +30,9 @@ interface MenuItemRepositoryInterface extends
     public function findPreviousMenuItem(MenuItemInterface $menuItem): ?MenuItemInterface;
 
     public function findNextMenuItem(MenuItemInterface $menuItem): ?MenuItemInterface;
+
+    /**
+     * @param array<string, mixed> $cacheConfig
+     */
+    public function setConfig(array $cacheConfig): void;
 }
