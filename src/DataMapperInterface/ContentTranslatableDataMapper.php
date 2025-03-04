@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\DataMapperInterface;
 
 use Sylius\Component\Locale\Provider\LocaleProviderInterface;
-use Sylius\Component\Resource\Model\TranslatableInterface;
+use Sylius\Resource\Model\TranslatableInterface;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 

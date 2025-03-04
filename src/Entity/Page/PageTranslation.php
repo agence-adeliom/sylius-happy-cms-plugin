@@ -17,7 +17,7 @@ use Doctrine\ORM\Mapping\PrePersist;
 use Doctrine\ORM\Mapping\PreRemove;
 use Doctrine\ORM\Mapping\PreUpdate;
 use JMS\Serializer\Annotation as Serializer;
-use Sylius\Component\Resource\Model\AbstractTranslation;
+use Sylius\Resource\Model\AbstractTranslation;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 

@@ -9,7 +9,7 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldConfiguratorInterface;
 use Adeliom\SyliusHappyCMSPlugin\Admin\Field\SharedBlockField;
 use Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock\SharedBlockCollection;
 use Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock\SharedBlockTypeInterface;
-use Sylius\Component\Resource\Model\ResourceInterface;
+use Sylius\Resource\Model\ResourceInterface;
 
 /**
  * Inspired by EasyAdmin Symfony Bundle

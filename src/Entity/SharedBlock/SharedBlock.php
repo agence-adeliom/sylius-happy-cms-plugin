@@ -11,7 +11,7 @@ use Adeliom\SyliusEasyCrudPlugin\Traits\EntityTimestampableTrait;
 use Adeliom\SyliusHappyCMSPlugin\Repository\SharedBlock\SharedBlockRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Sylius\Component\Resource\Model\TranslatableTrait;
+use Sylius\Resource\Model\TranslatableTrait;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\HasLifecycleCallbacks]

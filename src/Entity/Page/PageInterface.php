@@ -6,8 +6,8 @@ namespace Adeliom\SyliusHappyCMSPlugin\Entity\Page;
 
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Doctrine\Common\Collections\Collection;
-use Sylius\Component\Resource\Model\ResourceInterface;
-use Sylius\Component\Resource\Model\TranslatableInterface;
+use Sylius\Resource\Model\ResourceInterface;
+use Sylius\Resource\Model\TranslatableInterface;
 
 interface PageInterface extends ResourceInterface, TranslatableInterface, CmsRoutableInterface
 {

@@ -9,7 +9,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Doctrine\ORM\Mapping\MappedSuperclass;
-use Sylius\Component\Resource\Model\AbstractTranslation;
+use Sylius\Resource\Model\AbstractTranslation;
 
 #[HasLifecycleCallbacks]
 #[MappedSuperclass]

@@ -10,7 +10,7 @@ use Adeliom\SyliusHappyCMSPlugin\Admin\Field\FlexibleContentField;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockCollection;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockTypeInterface;
 use Doctrine\ORM\PersistentCollection;
-use Sylius\Component\Resource\Model\ResourceInterface;
+use Sylius\Resource\Model\ResourceInterface;
 use Symfony\Component\Form\Extension\Core\Type\CountryType;
 use Symfony\Component\Form\Extension\Core\Type\CurrencyType;
 use Symfony\Component\Form\Extension\Core\Type\LanguageType;

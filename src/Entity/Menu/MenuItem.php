@@ -14,8 +14,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
-use Sylius\Component\Resource\Model\TranslatableTrait;
-use Sylius\Component\Resource\Model\TranslationInterface;
+use Sylius\Resource\Model\TranslatableTrait;
+use Sylius\Resource\Model\TranslationInterface;
 
 #[Gedmo\Tree(type: 'nested')]
 #[ORM\HasLifecycleCallbacks]

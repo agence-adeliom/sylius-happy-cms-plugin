@@ -8,7 +8,7 @@ use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\Event\PostPersistEventArgs;
 use Doctrine\ORM\Event\PostUpdateEventArgs;
-use Sylius\Component\Resource\Model\TranslationInterface;
+use Sylius\Resource\Model\TranslationInterface;
 use Symfony\Cmf\Bundle\RoutingBundle\Doctrine\Orm\ContentRepository;
 use Symfony\Cmf\Bundle\RoutingBundle\Doctrine\Orm\Route;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;

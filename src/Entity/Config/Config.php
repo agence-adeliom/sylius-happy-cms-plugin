@@ -8,7 +8,7 @@ use Adeliom\SyliusEasyCrudPlugin\Traits\EntityIdTrait;
 use Adeliom\SyliusHappyCMSPlugin\Repository\Config\ConfigRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Sylius\Component\Resource\Model\TranslatableTrait;
+use Sylius\Resource\Model\TranslatableTrait;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[UniqueEntity('key')]

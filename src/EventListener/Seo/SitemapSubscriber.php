@@ -12,7 +12,7 @@ use Presta\SitemapBundle\Event\SitemapPopulateEvent;
 use Presta\SitemapBundle\Sitemap\Url\GoogleMultilangUrlDecorator;
 use Presta\SitemapBundle\Sitemap\Url\UrlConcrete;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Sylius\Component\Resource\Model\AbstractTranslation;
+use Sylius\Resource\Model\AbstractTranslation;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 

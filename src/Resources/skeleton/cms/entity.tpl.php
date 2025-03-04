@@ -38,10 +38,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\DBAL\Types\Types;
 use JMS\Serializer\Annotation as Serializer;
  use Symfony\Component\Validator\Constraints as Assert;
-use Sylius\Component\Resource\Model\ResourceInterface;
-use Sylius\Component\Resource\Model\TranslatableInterface;
-use Sylius\Component\Resource\Model\TranslatableTrait;
-use Sylius\Component\Resource\Model\TranslationInterface;
+use Sylius\Resource\Model\ResourceInterface;
+use Sylius\Resource\Model\TranslatableInterface;
+use Sylius\Resource\Model\TranslatableTrait;
+use Sylius\Resource\Model\TranslationInterface;
 <?php if (true === $hasRouting) { ?>
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Adeliom\SyliusHappyCMSPlugin\Traits\EntityRouteTrait;
