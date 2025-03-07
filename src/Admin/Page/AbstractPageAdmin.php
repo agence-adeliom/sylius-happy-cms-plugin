@@ -113,6 +113,8 @@ abstract class AbstractPageAdmin extends AbstractAdmin implements PageAdminInter
 
             yield EnumField::new('publishState', 'sylius_happy_cms.page.admin.field.state')
                 ->setEnum(ThreeStateStatusEnum::class)
+                ->setRequired(false)
+                ->setFormTypeOption('placeholder', false)
                 ->hideOnIndex()
                 ->renderExpanded(true);
 

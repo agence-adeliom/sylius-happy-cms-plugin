@@ -174,6 +174,8 @@ final class <?= $classNameDetail->getShortName() ?>Admin extends AbstractAdmin i
 
             yield EnumField::new('publishState')
                 ->setEnum(ThreeStateStatusEnum::class)
+                ->setRequired(false)
+                ->setFormTypeOption('placeholder', false)
                 ->renderExpanded()
                 ->hideOnIndex();
 

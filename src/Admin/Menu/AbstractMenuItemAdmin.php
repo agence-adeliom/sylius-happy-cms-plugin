@@ -157,6 +157,7 @@ abstract class AbstractMenuItemAdmin extends AbstractAdmin implements MenuItemAd
         yield EnumField::new('publishState', 'sylius_happy_cms.menu_item.admin.field.state')
             ->setEnum(ThreeStateStatusEnum::class)
             ->hideOnIndex()
+            ->setRequired(false)
             ->setFormTypeOption('placeholder', false)
             ->renderExpanded();
 
