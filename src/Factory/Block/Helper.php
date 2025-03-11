@@ -105,9 +105,9 @@ class Helper
      * @throws RuntimeError
      * @throws SyntaxError
      */
-    public function renderBlock(array $data, bool $preview = false, array $extra = []): ?Markup
+    public function renderBlock(array $data, ?bool $preview = false, ?array $extra = []): ?Markup
     {
-        if ((int) ($data['block_published'] ?? null) === 0 && $preview === false) {
+        if ((int) ($data['block_published'] ?? null) === 0 && !$preview) {
             return null;
         }
 
@@ -156,7 +156,7 @@ class Helper
 
         return new Markup($this->twig->render($block->getFrontEndTemplatePath(), array_merge([
                                                                                                  'block' => $data,
-                                                                                                 'preview' => $preview,
+                                                                                                 'preview' => $preview ?: false,
                                                                                                  'blockType' => $blockType,
                                                                                                  'settings' => $blockData,
                                                                                              ], $extra)), 'UTF-8');

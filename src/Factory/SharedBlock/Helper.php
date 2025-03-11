@@ -100,7 +100,7 @@ class Helper
      * @throws SyntaxError
      * @throws RuntimeError
      */
-    public function renderBlock(Environment $env, array $context, array $data, bool $preview = false, array $extra =
+    public function renderBlock(Environment $env, array $context, array $data, ?bool $preview = false, ?array $extra =
     []): ?Markup
     {
         $block = null;
@@ -178,7 +178,7 @@ class Helper
         return new Markup($this->twig->render($blockType->getFrontEndTemplatePath(), array_merge([
                                                                                                      'block' => $block,
                                                                                                      'blockType' => $blockType,
-                                                                                                     'preview' => $preview,
+                                                                                                     'preview' => $preview ?: false,
                                                                                                      'settings' => $blockData,
                                                                                                  ], $extra)), 'UTF-8');
     }
