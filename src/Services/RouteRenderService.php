@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Services;
 
+use Adeliom\SyliusHappyCMSPlugin\Event\Route\RouteRenderServiceEvent;
 use Adeliom\SyliusHappyCMSPlugin\EventListener\EntityRouteIndexer;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Adeliom\SyliusHappyCMSPlugin\Security\ContentDocumentVoter;
@@ -15,6 +16,7 @@ use Sylius\Resource\Metadata\Metadata;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Cmf\Bundle\RoutingBundle\Doctrine\Orm\Route as OrmRoute;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
@@ -26,6 +28,7 @@ class RouteRenderService extends AbstractController
         protected RouterInterface $router,
         protected RequestConfigurationFactory $requestConfigurationFactory,
         protected Environment $twig,
+        protected EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -77,13 +80,14 @@ class RouteRenderService extends AbstractController
 
         $this->twig->addGlobal('resource', $contentDocument);
 
-        return $this->render($template, [
+        $event = $this->eventDispatcher->dispatch(new RouteRenderServiceEvent([
             'metadata' => $metadata,
             'configuration' => $configuration,
             'resource' => $contentDocument,
             'route' => $route,
             'preview' => $route->getOption(EntityRouteIndexer::OPTION_PREVIEW),
-        ]);
+        ]));
+        return $this->render($template, $event->getParameters());
     }
 
     /**
