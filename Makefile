@@ -8,7 +8,7 @@ SHELL=/bin/bash
 ### VERSIONS
 ### ¯¯¯
 
-SYLIUS_VERSION=1.13.0
+SYLIUS_VERSION=1.14.0
 SYMFONY_VERSION=6.4
 COMPOSE_PROJECT_NAME=sylius-happy-cms-plugin
 
@@ -24,8 +24,8 @@ CRUD_PLUGIN_ALIAS=sylius_easy_crud
 
 DOCKER_USER ?= "$(shell id -u):$(shell id -g)"
 ENV ?= "dev"
-DOCKER_PHP_PORT ?= 8050
-DOCKER_MYSQL_PORT ?= 63501
+DOCKER_PHP_PORT ?= 8052
+DOCKER_MYSQL_PORT ?= 6352
 
 ###
 ### DEV

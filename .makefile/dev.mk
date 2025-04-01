@@ -45,7 +45,7 @@ ${APP_DIR}:
 	(symfony composer create-project --no-interaction --prefer-dist --no-scripts --no-progress --no-install sylius/sylius-standard="${SYLIUS_VERSION}" ${APP_DIR})
 	cd ${APP_DIR} && chmod -R 777 public
 	echo "COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME}" >> ${APP_DIR}/.env
-	${MAKE} apply_dist
+	#${MAKE} apply_dist
 
 apply_dist:
 	ROOT_DIR=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST)))); \
