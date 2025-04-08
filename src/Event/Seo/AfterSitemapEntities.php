@@ -9,19 +9,19 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class AfterSitemapEntities extends Event
 {
-    /** @param array<CmsRoutableInterface> $entities */
+    /** @param array<mixed> $entities */
     public function __construct(
         private ?array $entities = [],
     ) {
     }
 
-    /** @return array<CmsRoutableInterface>|null  */
+    /** @return array<mixed>|null  */
     public function getEntities(): ?array
     {
         return $this->entities;
     }
 
-    /** @param array<CmsRoutableInterface> $entities */
+    /** @param array<mixed> $entities */
     public function setEntities(?array $entities): void
     {
         $this->entities = $entities;

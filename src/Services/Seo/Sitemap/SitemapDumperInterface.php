@@ -17,13 +17,13 @@ interface SitemapDumperInterface
 
     public static function getSitemapRoute(): string;
 
-    /** @return array{_route_object: RouteObjectInterface} */
-    public static function getSitemapRouteParams(CmsRoutableInterface $entity): array;
+    /** @return array<mixed> */
+    public static function getSitemapRouteParams(mixed $entity): array;
 
-    /** @return array<CmsRoutableInterface> */
+    /** @return array<mixed> */
     public function getEntities(): array;
 
-    public function getLastModifiedDate(CmsRoutableInterface $entity): ?\DateTimeInterface;
+    public function getLastModifiedDate(mixed $entity): ?\DateTimeInterface;
 
-    public function replaceUrl(string $url, CmsRoutableInterface $entity): ?string;
+    public function replaceUrl(string $url, mixed $entity): ?string;
 }

@@ -77,7 +77,7 @@ class SitemapSubscriber implements EventSubscriberInterface
     private function getUrl(
         UrlGeneratorInterface $urlGenerator,
         SitemapDumperInterface $sitemapDumpable,
-        CmsRoutableInterface $entity,
+        mixed $entity,
         CmsSeoInterface&AbstractTranslation $translation,
         ?callable $replaceUrl = null,
         ?int $page = null,
