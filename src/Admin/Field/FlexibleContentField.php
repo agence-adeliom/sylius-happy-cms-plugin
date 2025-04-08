@@ -122,7 +122,7 @@ class FlexibleContentField implements FieldInterface
     }
 
     /**
-     * @param array<int, BlockTypeInterface> $blocks
+     * @param array<int, class-string> $blocks
      */
     public function allowedBlocks(array $blocks): self
     {
