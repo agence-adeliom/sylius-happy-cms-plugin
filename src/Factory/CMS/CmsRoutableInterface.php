@@ -21,6 +21,11 @@ interface CmsRoutableInterface
 
     public function isOnline(): bool;
 
+    /**
+     * @return array{label: string, route: RouteObjectInterface}
+     */
+    public function getBreadcrumbItems(): array;
+
     public function previewIsAvailable(): bool;
 
     public function isStatePublished(): bool;

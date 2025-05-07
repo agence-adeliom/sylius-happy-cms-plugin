@@ -8,6 +8,7 @@ use Adeliom\SyliusHappyCMSPlugin\Event\Route\RouteRenderServiceEvent;
 use Adeliom\SyliusHappyCMSPlugin\EventListener\EntityRouteIndexer;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Adeliom\SyliusHappyCMSPlugin\Security\ContentDocumentVoter;
+use Adeliom\SyliusHappyCMSPlugin\Services\Seo\BreadcrumbCollection;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Sylius\Bundle\ResourceBundle\Controller\RequestConfiguration;
@@ -29,6 +30,7 @@ class RouteRenderService extends AbstractController
         protected RequestConfigurationFactory $requestConfigurationFactory,
         protected Environment $twig,
         protected EventDispatcherInterface $eventDispatcher,
+        protected BreadcrumbCollection $breadcrumb,
     ) {
     }
 
@@ -76,6 +78,14 @@ class RouteRenderService extends AbstractController
 
         if (!$contentDocument->isOnline()) {
             throw $this->createNotFoundException('Document is not published');
+        }
+
+        $breadcrumbItems = $contentDocument->getBreadcrumbItems();
+        foreach ($breadcrumbItems as $breadcrumbItem) {
+            $this->breadcrumb->addSimpleItem(
+                $breadcrumbItem['label'],
+                $breadcrumbItem['route']->getPath(),
+            );
         }
 
         $this->twig->addGlobal('resource', $contentDocument);

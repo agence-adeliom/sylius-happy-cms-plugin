@@ -40,6 +40,7 @@ services:
       - "@sylius.resource_controller.request_configuration_factory"
       - "@twig"
       - "@event_dispatcher"
+      - "@happy_cms_seo.breadcrumb"
     public: true
 
   sylius.happy_cms.plugin.controller.render:
