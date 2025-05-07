@@ -1,12 +1,13 @@
-{% set wysiwyg = settings.wysiwyg|default(null) %}
-{% if wysiwyg %}
-<section class="container">
-    <div class="my-10 lg:my-20">
-        {% if wysiwyg is not null %}
-            <div class="wysiwyg mt-4 mb-6">
-                {{ wysiwyg|raw }}
-            </div>
-        {% endif %}
-    </div>
-</section>
+{% set content = settings.content|default(null) %}
+
+{% if content %}
+    <section class="container">
+        <div class="my-10 lg:my-20">
+            {% if content is not null %}
+                <div class="wysiwyg mt-4 mb-6">
+                    {{ content|raw }}
+                </div>
+            {% endif %}
+        </div>
+    </section>
 {% endif %}
