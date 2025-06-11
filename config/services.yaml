@@ -20,6 +20,7 @@ services:
     class: Adeliom\SyliusHappyCMSPlugin\EventListener\EntityRouteIndexer
     arguments:
       - '@cmf_routing.orm_content_repository'
+      - '@doctrine.orm.entity_manager'
     tags:
       -   name: 'doctrine.event_listener'
           event: 'postPersist'
