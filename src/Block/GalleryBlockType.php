@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\Block;
 
 use Adeliom\SyliusEasyCrudPlugin\Form\SortableCollectionType;
-use Adeliom\SyliusEasyCrudPlugin\Form\TextEditorType;
+use Adeliom\SyliusHappyCMSPlugin\Form\TinymceBridgeType;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\AbstractBlock;
 use Adeliom\SyliusHappyCMSPlugin\Form\MediaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -20,7 +20,7 @@ class GalleryBlockType extends AbstractBlock
                 'required' => true,
                 'label' => 'sylius_happy_cms.blocks.gallery.fields.title',
             ])
-            ->add('wysiwyg', TextEditorType::class, [
+            ->add('wysiwyg', TinymceBridgeType::class, [
                 'required' => true,
                 'label' => 'sylius_happy_cms.blocks.gallery.fields.wysiwyg',
             ])

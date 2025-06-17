@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Block;
 
-use Adeliom\SyliusEasyCrudPlugin\Form\TextEditorType;
+use Adeliom\SyliusHappyCMSPlugin\Form\TinymceBridgeType;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\AbstractBlock;
 use Adeliom\SyliusHappyCMSPlugin\Form\MediaType;
 use Adeliom\SyliusHappyCMSPlugin\Form\Type\ButtonEmbeddableType;
@@ -33,7 +33,7 @@ class TextImageCtaBlockType extends AbstractBlock
                 'required' => true,
                 'label' => 'sylius_happy_cms.blocks.text_image.fields.title',
             ])
-            ->add('wysiwyg', TextEditorType::class, [
+            ->add('wysiwyg', TinymceBridgeType::class, [
                 'required' => true,
                 'label' => 'sylius_happy_cms.blocks.text_image.fields.wysiwyg',
             ])

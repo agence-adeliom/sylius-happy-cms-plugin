@@ -36,7 +36,8 @@
     "symfony/psr-http-message-bridge": "^2.0",
     "nyholm/psr7": "^1.4",
     "presta/sitemap-bundle": "^3.0",
-    "james-heinrich/getid3": "^1.9"
+    "james-heinrich/getid3": "^1.9",
+    "emileperron/tinymce-bundle": "^3.0"
   },
   "conflict": {
     "symfony/framework-bundle": "6.2.8",

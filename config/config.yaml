@@ -5,6 +5,7 @@ imports:
   - { resource: "./packages/sylius_happy_cms.yaml" }
 #  - { resource: "./packages/sylius_resource.yaml" }
   - { resource: "./packages/flysystem.yaml" }
+  - { resource: "./packages/tinymce.yaml" }
 
 #sylius_happy_cms:
 #  media:

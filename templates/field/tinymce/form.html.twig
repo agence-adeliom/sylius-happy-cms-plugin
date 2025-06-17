@@ -1,0 +1,28 @@
+{% block happy_cms_tinymce_widget %}
+    <tinymce-editor
+            id="{{ id }}"
+            name="{{ full_name }}"
+            {{ required ? "required" : "" }}
+            {% with { attr: tinymce_attributes(attr) } %}
+                {{ block('attributes') }}
+            {% endwith %}
+            src="/bundles/tinymce/ext/tinymce/tinymce.min.js"
+    >{{ value }}</tinymce-editor>
+    {% include '@Tinymce/partial/default_tinymce_config.html.twig' %}
+    <script src="/bundles/tinymce/ext/tinymce-webcomponent.js" type="module"></script>
+    <noscript>
+		<textarea id="{{ id }}-noscript"
+                  name="{{ full_name }}"
+			{{ required ? "required" : "" }}
+                {% with { attr: tinymce_attributes(attr) } %}
+                    {{ block('attributes') }}
+                {% endwith %}>{{ value }}</textarea>
+    </noscript>
+{% endblock %}
+
+{% block happy_cms_tinymce_row %}
+    <div class="field">
+        {{- form_label(form) -}}
+        {{- form_widget(form) -}}
+    </div>
+{% endblock %}
