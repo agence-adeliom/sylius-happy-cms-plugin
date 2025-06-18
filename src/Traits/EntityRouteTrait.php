@@ -237,14 +237,16 @@ trait EntityRouteTrait
             'label' => $this->getName(),
             'route' => $this->getOnlineRoute(),
         ];
-        
-        $parent = $this->getParent();
-        while ($parent !== null) {
-            $list[] = [
-                'label' => $parent->getName(),
-                'route' => $parent->getOnlineRoute(),
-            ];
-            $parent = $parent->getParent();
+
+        if (method_exists($this, 'getParent')) {
+            $parent = $this->getParent();
+            while ($parent !== null) {
+                $list[] = [
+                    'label' => $parent->getName(),
+                    'route' => $parent->getOnlineRoute(),
+                ];
+                $parent = $parent->getParent();
+            }
         }
         return array_reverse($list, true);
     }
