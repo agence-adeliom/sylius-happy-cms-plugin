@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\EventListener;
 
+use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\Route;
+use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\Event\PostPersistEventArgs;
 use Doctrine\ORM\Event\PostUpdateEventArgs;
 use Sylius\Resource\Model\TranslationInterface;
 use Symfony\Cmf\Bundle\RoutingBundle\Doctrine\Orm\ContentRepository;
-use Symfony\Cmf\Bundle\RoutingBundle\Doctrine\Orm\Route;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 
 #[AsDoctrineListener('postPersist')]
@@ -85,7 +86,7 @@ class EntityRouteIndexer
     private function removeRoutes(CmsRoutableInterface &$entity, string $routeNamePrefix = ''): void
     {
         $routesToRemove = $entity->getRoutes()->filter(
-            static fn (Route $route) => str_starts_with($route->getName(), $routeNamePrefix),
+            static fn (RouteInterface $route) => str_starts_with($route->getName(), $routeNamePrefix),
         );
 
         foreach ($routesToRemove as $route) {
@@ -103,10 +104,10 @@ class EntityRouteIndexer
 
             // Route exists ?
             $route = $entity->getRoutes()->filter(
-                static fn (Route $route) => $route->getName() === $routeName,
+                static fn (RouteInterface $route) => $route->getName() === $routeName,
             )->first();
 
-            if (!($route instanceof Route)) {
+            if (!($route instanceof RouteInterface)) {
                 $route = new Route();
                 $route->setName($routeName);
             }
@@ -123,8 +124,9 @@ class EntityRouteIndexer
                 $entity->getVariablePattern($translation, $routeNamePrefix === self::ROUTE_PREVIEW),
             );
             $route->setOption(self::OPTION_PREVIEW, $routeNamePrefix === self::ROUTE_PREVIEW);
-            $route->setOption(self::OPTION_LAST_MODIFICATION_TIMESTAMP,
-                              (new \DateTimeImmutable('now'))->getTimestamp()
+            $route->setOption(
+                self::OPTION_LAST_MODIFICATION_TIMESTAMP,
+                (new \DateTimeImmutable('now'))->getTimestamp(),
             );
             $route->setDefault(RouteObjectInterface::CONTENT_ID, $this->contentRepository->getContentId($entity));
             $entity->addRoute($route);

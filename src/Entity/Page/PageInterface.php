@@ -21,6 +21,8 @@ interface PageInterface extends ResourceInterface, TranslatableInterface, CmsRou
 
     public function getParent(): ?self;
 
+    public function getName(): ?string;
+
     public function setParent(?self $parent = null): void;
 
     /**

@@ -3,7 +3,8 @@ imports:
   - { resource: "./packages/doctrine.yaml" }
   - { resource: "./packages/sylius_ui.yaml" }
   - { resource: "./packages/sylius_happy_cms.yaml" }
-#  - { resource: "./packages/sylius_resource.yaml" }
+  - { resource: "./packages/sylius_resource.yaml" }
+  - { resource: "./packages/sylius_grid.yaml" }
   - { resource: "./packages/flysystem.yaml" }
   - { resource: "./packages/tinymce.yaml" }
 

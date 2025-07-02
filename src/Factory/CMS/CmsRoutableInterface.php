@@ -7,7 +7,7 @@ namespace Adeliom\SyliusHappyCMSPlugin\Factory\CMS;
 use Doctrine\Common\Collections\Collection;
 use Sylius\Component\Channel\Model\ChannelAwareInterface;
 use Sylius\Resource\Model\TranslationInterface;
-use Symfony\Cmf\Bundle\RoutingBundle\Doctrine\Orm\Route as OrmRoute;
+use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\Route as OrmRoute;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,7 +41,9 @@ interface CmsRoutableInterface extends ChannelAwareInterface
     public function isDatePublished(): bool;
 
     public function getRouteUnikName(): string;
+
     public function renderResponse(Request $request, Response $response, OrmRoute $route, bool $cacheEnabled): Response;
+
     public function isHttpCacheEnabled(string $env, OrmRoute $route): bool;
 
     /**

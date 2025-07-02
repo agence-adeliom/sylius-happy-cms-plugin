@@ -24,6 +24,7 @@ class TreeComponent
     public function __construct(
         protected readonly AllMenuItemsInterface $allMenuItems,
         protected readonly EntityManagerInterface $entityManager,
+        protected readonly MenuItemRepositoryInterface $menuItemRepository,
         protected readonly RequestStack $requestStack,
     ) {
     }
@@ -31,20 +32,18 @@ class TreeComponent
     /** @return array<array-key, mixed> */
     public function getTree(): array
     {
-        $id = (int) $this->requestStack->getCurrentRequest()->get('menu_id') ?? '0';
+        $id = $this->requestStack->getCurrentRequest()->get('menu_id') ?: '0';
 
-        return $this->buildTree($this->allMenuItems->getArrayResult($id));
+        return $this->buildTree($this->allMenuItems->getArrayResult((int) $id));
     }
 
     #[LiveAction]
     public function moveUp(#[LiveArg] int $menuItemId): void
     {
-        /** @var MenuItemRepositoryInterface $menuItemRepository */
-        $menuItemRepository = $this->entityManager->getRepository(MenuItemInterface::class);
-        $menuItemToBeMoved = $menuItemRepository->find($menuItemId);
+        $menuItemToBeMoved = $this->menuItemRepository->find($menuItemId);
 
         if ($menuItemToBeMoved->getPosition() > 0) {
-            $targetItem = $menuItemRepository->findPreviousMenuItem($menuItemToBeMoved);
+            $targetItem = $this->menuItemRepository->findPreviousMenuItem($menuItemToBeMoved);
 
             $oldPosition = $menuItemToBeMoved->getPosition();
             $oldLft = $menuItemToBeMoved->getLft();
@@ -70,11 +69,9 @@ class TreeComponent
     #[LiveAction]
     public function moveDown(#[LiveArg] int $menuItemId): void
     {
-        /** @var MenuItemRepositoryInterface $menuItemRepository */
-        $menuItemRepository = $this->entityManager->getRepository(MenuItemInterface::class);
-        $menuItemToBeMoved = $menuItemRepository->find($menuItemId);
+        $menuItemToBeMoved = $this->menuItemRepository->find($menuItemId);
 
-        $targetItem = $menuItemRepository->findNextMenuItem($menuItemToBeMoved);
+        $targetItem = $this->menuItemRepository->findNextMenuItem($menuItemToBeMoved);
 
         $oldPosition = $menuItemToBeMoved->getPosition();
         $oldLft = $menuItemToBeMoved->getLft();

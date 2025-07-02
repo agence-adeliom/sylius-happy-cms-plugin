@@ -33,9 +33,7 @@ class PageExtension extends AbstractExtension
     {
         $repository = $this->em->getRepository(PageInterface::class);
         $pages = [];
-        if (null !== $repository) {
-            $pages = $repository->findBy(['parent' => null], ['position' => 'ASC']);
-        }
+        $pages = $repository->findBy(['parent' => null], ['position' => 'ASC']);
 
         return $pages;
     }

@@ -1,3 +1,6 @@
+parameters:
+  cmf_routing.dynamic.persistence.orm.route_class: 'Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\Route'
+
 cmf_routing:
     chain:
         routers_by_id:

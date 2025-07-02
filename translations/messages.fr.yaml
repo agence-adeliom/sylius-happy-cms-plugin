@@ -7,6 +7,8 @@ sylius_happy_cms:
     menu_item: "Elément de menu"
     menu_items: "Eléments de menu"
     shared_blocks: "Blocs partagés"
+    routes: "Routes"
+    redirect_routes: "Redirections"
   home: Page d'accueil
   page:
     admin:
@@ -197,6 +199,8 @@ sylius_happy_cms:
       menus: Menus
       shared_blocks: Blocs partagés
       configurations: Configurations
+      routes: Routes
+      redirections: Redirections
   button_embeddable:
     label: Libellé
     link: Lien

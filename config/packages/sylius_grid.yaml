@@ -1,0 +1,17 @@
+sylius_grid:
+  grids:
+    sylius_happy_cms_route_admin:
+      driver:
+        name: doctrine/orm
+        options:
+          class: Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\Route
+      fields:
+        staticPrefix:
+          type: string
+          label: sylius.ui.first_name
+          sortable: ~
+    sylius_happy_cms_redirect_route_admin:
+      driver:
+        name: doctrine/orm
+        options:
+          class: Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RedirectRoute

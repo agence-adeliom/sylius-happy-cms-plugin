@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Traits;
 
+use Adeliom\SyliusHappyCMSPlugin\Entity\Page\PageInterface;
 use Adeliom\SyliusHappyCMSPlugin\EventListener\EntityRouteIndexer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Sylius\Component\Channel\Model\ChannelInterface;
 use Sylius\Resource\Model\TranslationInterface;
-use Symfony\Cmf\Bundle\RoutingBundle\Doctrine\Orm\Route as OrmRoute;
+use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\Route as OrmRoute;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -52,15 +53,9 @@ trait EntityRouteTrait
     private function getRoute(bool $preview = false): ?RouteObjectInterface
     {
         foreach ($this->routes as $route) {
-            /**
-             * @var OrmRoute $route
-             */
             if ($preview === $route->getOption(EntityRouteIndexer::OPTION_PREVIEW)) {
-                if ($route instanceof RouteObjectInterface) {
-                    $route->setContent($this);
-
-                    return $route;
-                }
+                $route->setContent($this);
+                return $route;
             }
         }
 
@@ -168,8 +163,7 @@ trait EntityRouteTrait
     //            enabled: true
     //            default_ttl: 0
     // To unvalide all route cache, you can use the command : happycms:cache:invalidate
-    public function renderResponse(Request $request, Response $response, OrmRoute $route, bool $cacheEnabled):
-    Response
+    public function renderResponse(Request $request, Response $response, OrmRoute $route, bool $cacheEnabled): Response
     {
         // If cache is disabled, we return the response as is
         if (!$cacheEnabled) {
@@ -197,7 +191,7 @@ trait EntityRouteTrait
             $response->setTtl(0);
             // Tell the client to revalidate the cache
             $response->setCache([
-                                    'must_revalidate' => true
+                                    'must_revalidate' => true,
                                 ]);
             // Put cache public
             $response->setPublic();
@@ -284,7 +278,7 @@ trait EntityRouteTrait
     }
 
     /**
-     * @return array{label: string, route: RouteObjectInterface}
+     * @return array{label: string, route: ?RouteObjectInterface}
      */
     public function getBreadcrumbItems(): array
     {
@@ -294,19 +288,31 @@ trait EntityRouteTrait
             'route' => $this->getOnlineRoute(),
         ];
 
-        if (method_exists($this, 'getParent')) {
+        try {
             $parent = $this->getParent();
             while ($parent !== null) {
                 $list[] = [
                     'label' => $parent->getName(),
                     'route' => $parent->getOnlineRoute(),
                 ];
-                if (method_exists($parent, 'getParent')) {
-                    $parent = $parent->getParent();
-                }
+                $parent = $parent->getParent();
             }
+        } catch (\Exception $e) {
+            // If getParent no exists or throws an exception, we just ignore it
         }
 
-        return array_reverse($list, true);
+        /** @var array{label: string, route: ?RouteObjectInterface} $reservedList */
+        $reservedList = array_reverse($list, true);
+        return $reservedList;
+    }
+
+    public function getParent(): ?PageInterface
+    {
+        return null;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->getTranslation()->getName();
     }
 }

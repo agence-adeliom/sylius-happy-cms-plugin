@@ -29,7 +29,7 @@ abstract class AbstractSitemapDumper implements SitemapDumperInterface
 
     public function getLastModifiedDate(mixed $entity): ?\DateTimeInterface
     {
-        if (in_array(EntityTimestampableTrait::class, class_implements($entity)) && method_exists($entity, 'getUpdatedAt')) {
+        if (class_implements($entity) && in_array(EntityTimestampableTrait::class, class_implements($entity)) && method_exists($entity, 'getUpdatedAt') && is_object($entity)) {
             return $entity->getUpdatedAt();
         }
 

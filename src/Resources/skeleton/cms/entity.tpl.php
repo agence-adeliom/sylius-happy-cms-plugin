@@ -45,7 +45,7 @@ use Sylius\Resource\Model\TranslationInterface;
 <?php if (true === $hasRouting) { ?>
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Adeliom\SyliusHappyCMSPlugin\Traits\EntityRouteTrait;
-use Symfony\Cmf\Bundle\RoutingBundle\Doctrine\Orm\Route as OrmRoute;
+use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\Route as OrmRoute;
 <?php } ?>
 
 #[ORM\HasLifecycleCallbacks]

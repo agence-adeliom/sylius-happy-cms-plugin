@@ -119,3 +119,4 @@ services:
       - "@security.csrf.token_manager"
     tags:
       - { name: sylius.live_component.admin, key: happycms-menu-item-tree-delete, template: '@SyliusHappyCMSPlugin/menu_item/crud/tree/components/delete.html.twig' }
+
