@@ -1,0 +1,5 @@
+
+redirect_route:
+  redirect_route_model: App\Entity\HappyCMS\Cmf\RedirectRoute
+  redirect_route_repository: App\Repository\HappyCMS\Cmf\RedirectRouteRepository
+  redirect_route_admin:  App\Admin\HappyCMS\Cmf\RedirectRouteAdmin

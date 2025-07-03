@@ -109,6 +109,16 @@ sylius_happy_cms:
     shared_block_model: App\Entity\HappyCMS\SharedBlock\SharedBlock
     shared_block_repository: App\Repository\HappyCMS\SharedBlock\SharedBlockRepository
     shared_block_admin: App\Admin\HappyCMS\SharedBlock\SharedBlockAdmin
+    
+  route:
+    route_model: App\Entity\HappyCMS\Cmf\Route
+    route_repository: App\Repository\HappyCMS\Cmf\RouteRepository
+    route_admin:  App\Admin\HappyCMS\Cmf\RouteAdmin  
+
+  redirect_route:
+    redirect_route_model: App\Entity\HappyCMS\Cmf\RedirectRoute
+    redirect_route_repository: App\Repository\HappyCMS\Cmf\RedirectRouteRepository
+    redirect_route_admin:  App\Admin\HappyCMS\Cmf\RedirectRouteAdmin
 ```
 
 3. bis: Déclare sylius_resources
@@ -183,6 +193,20 @@ sylius_resource:
       classes:
         model: App\Entity\HappyCMS\Media\Folder
         repository: App\Repository\HappyCMS\Media\FolderRepository
+    sylius_happy_cms.route:
+      driver: doctrine/orm
+      classes:
+        model: App\Entity\HappyCMS\Cmf\Route
+        repository: App\Repository\HappyCMS\Cmf\RouteRepository
+        controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+        form: App\Admin\HappyCMS\Cmf\RouteAdmin
+    sylius_happy_cms.redirect_route:
+      driver: doctrine/orm
+      classes:
+        model: App\Entity\HappyCMS\Cmf\RedirectRoute
+        repository: App\Repository\HappyCMS\Cmf\RedirectRouteRepository
+        controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+        form: App\Admin\HappyCMS\Cmf\RedirectRouteAdmin
 ```
 
 3. bis: Add CMS menu in Sylius BO
@@ -190,6 +214,9 @@ sylius_resource:
 into `config/services.yaml` add :
 
 ```yaml
+parameters:
+  cmf_routing.dynamic.persistence.orm.route_class: 'App\Entity\HappyCMS\Cmf\Route'
+  
 services:
   adeliom.sylius.cms.plugin.listener.admin.menu_builder:
     class: Adeliom\SyliusHappyCMSPlugin\Menu\AdminMenuListener

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Entity\Cmf;
 
+use Adeliom\SyliusHappyCMSPlugin\Repository\Cmf\RedirectRouteRepository;
 use Doctrine\DBAL\Types\Types;
 use Symfony\Cmf\Bundle\RoutingBundle\Model\RedirectRoute as RedirectRouteModel;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Routing\Route as SymfonyRoute;
 
-#[ORM\Entity]
-#[ORM\Table(name: 'sylius_happy_cms__redirect_route')]
+#[ORM\MappedSuperclass(repositoryClass: RedirectRouteRepository::class)]
 class RedirectRoute extends RedirectRouteModel implements RedirectRouteInterface
 {
     #[ORM\Id]

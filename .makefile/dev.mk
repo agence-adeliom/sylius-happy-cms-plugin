@@ -185,8 +185,6 @@ bundle_assets_build:
 
 HELP += $(call help,bundle_install_test_files,			Build bundles assets in watch mode)
 bundle_install_test_files:
-	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php bin/console make:easy-crud:create-entity Demo)
-	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php bin/console make:easy-crud:create-crud Demo)
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php bin/console make:happy-cms:install)
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php bin/console cache:clear)
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php bin/console doc:mig:diff --allow-empty-diff -n)

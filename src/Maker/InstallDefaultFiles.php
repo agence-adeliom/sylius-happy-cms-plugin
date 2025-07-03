@@ -78,6 +78,14 @@ final class InstallDefaultFiles extends AbstractMaker
 
         $io->newLine();
         $io->text('====');
+        $this->generateEntityRoute($io, $generator);
+
+        $io->newLine();
+        $io->text('====');
+        $this->generateRedirectRoute($io, $generator);
+
+        $io->newLine();
+        $io->text('====');
         $this->addServicesResource('services', $io);
 
         $io->newLine();
@@ -206,6 +214,40 @@ final class InstallDefaultFiles extends AbstractMaker
         $this->generateSyliusResource('shared_block', $io);
 
         $this->generateHappyCMSConfig('shared_block', $io);
+    }
+
+    private function generateEntityRoute(ConsoleStyle $io, Generator $generator): void
+    {
+        $scope = 'route';
+        $files = [
+            ['prefix' => 'Entity', 'suffix' => '', 'entityName' => 'route', 'addRepo' => true, 'addTrans' => false],
+            ['prefix' => 'Repository', 'suffix' => 'Repository', 'entityName' => 'route'],
+            ['prefix' => 'Admin', 'suffix' => 'Admin', 'entityName' => 'route'],
+        ];
+        $this->generateScope($scope, $files, $io, $generator);
+
+        $this->generateRoute('route', $io);
+
+        $this->generateSyliusResource('route', $io);
+
+        $this->generateHappyCMSConfig('route', $io);
+    }
+
+    private function generateRedirectRoute(ConsoleStyle $io, Generator $generator): void
+    {
+        $scope = 'redirectRoute';
+        $files = [
+            ['prefix' => 'Entity', 'suffix' => '', 'entityName' => 'redirectRoute', 'addRepo' => true, 'addTrans' => false],
+            ['prefix' => 'Repository', 'suffix' => 'Repository', 'entityName' => 'redirectRoute'],
+            ['prefix' => 'Admin', 'suffix' => 'Admin', 'entityName' => 'redirectRoute'],
+        ];
+        $this->generateScope($scope, $files, $io, $generator);
+
+        $this->generateRoute('redirect_route', $io);
+
+        $this->generateSyliusResource('redirect_route', $io);
+
+        $this->generateHappyCMSConfig('redirect_route', $io);
     }
 
     /**

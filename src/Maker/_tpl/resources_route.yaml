@@ -1,0 +1,8 @@
+
+sylius_happy_cms.route:
+  driver: doctrine/orm
+  classes:
+    model: App\Entity\HappyCMS\Cmf\Route
+    repository: App\Repository\HappyCMS\Cmf\RouteRepository
+    controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+    form: App\Admin\HappyCMS\Cmf\RouteAdmin

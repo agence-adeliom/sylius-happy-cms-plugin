@@ -20,6 +20,7 @@ services:
     class: Adeliom\SyliusHappyCMSPlugin\EventListener\EntityRouteIndexer
     arguments:
       - '@cmf_routing.orm_content_repository'
+      - "@parameter_bag"
     tags:
       -   name: 'doctrine.event_listener'
           event: 'postPersist'
@@ -32,6 +33,15 @@ services:
 
   Adeliom\SyliusHappyCMSPlugin\Services\RouteRenderService:
     alias: sylius.happy_cms.plugin.services.render
+
+  Adeliom\SyliusHappyCMSPlugin\Repository\Menu\MenuRepositoryInterface:
+    alias: happy_cms_menu.menu_item.repository
+
+  Adeliom\SyliusHappyCMSPlugin\Repository\Menu\MenuItemRepositoryInterface:
+    alias: happy_cms_menu.menu.repository
+
+  Adeliom\SyliusHappyCMSPlugin\Repository\Page\PageRepositoryInterface:
+    alias: happy_cms_page.page.repository
 
   sylius.happy_cms.plugin.services.render:
     class: Adeliom\SyliusHappyCMSPlugin\Services\RouteRenderService

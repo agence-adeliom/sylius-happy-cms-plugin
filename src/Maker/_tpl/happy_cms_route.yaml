@@ -1,0 +1,5 @@
+
+route:
+  route_model: App\Entity\HappyCMS\Cmf\Route
+  route_repository: App\Repository\HappyCMS\Cmf\RouteRepository
+  route_admin:  App\Admin\HappyCMS\Cmf\RouteAdmin

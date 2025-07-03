@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Entity\Cmf;
 
+use Adeliom\SyliusHappyCMSPlugin\Repository\Cmf\RouteRepository;
 use Symfony\Cmf\Bundle\RoutingBundle\Model\Route as RouteModel;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
-#[ORM\Table(name: 'sylius_happy_cms__route')]
+#[ORM\MappedSuperclass(repositoryClass: RouteRepository::class)]
 class Route extends RouteModel implements RouteInterface
 {
     #[ORM\Id]

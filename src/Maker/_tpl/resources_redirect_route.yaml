@@ -1,0 +1,8 @@
+
+sylius_happy_cms.redirect_route:
+  driver: doctrine/orm
+  classes:
+    model: App\Entity\HappyCMS\Cmf\RedirectRoute
+    repository: App\Repository\HappyCMS\Cmf\RedirectRouteRepository
+    controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+    form: App\Admin\HappyCMS\Cmf\RedirectRouteAdmin

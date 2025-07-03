@@ -13,6 +13,7 @@ use Doctrine\ORM\Event\PostUpdateEventArgs;
 use Sylius\Resource\Model\TranslationInterface;
 use Symfony\Cmf\Bundle\RoutingBundle\Doctrine\Orm\ContentRepository;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 #[AsDoctrineListener('postPersist')]
 #[AsDoctrineListener('postUpdate')]
@@ -28,6 +29,7 @@ class EntityRouteIndexer
 
     public function __construct(
         protected ContentRepository $contentRepository,
+        protected ParameterBag $parameterBag,
     ) {
     }
 
@@ -108,7 +110,11 @@ class EntityRouteIndexer
             )->first();
 
             if (!($route instanceof RouteInterface)) {
-                $route = new Route();
+                $routeClass = $this->parameterBag->get('cmf_routing.dynamic.persistence.orm.route_class');
+                /**
+                 * @var RouteInterface $route
+                 */
+                $route = new $routeClass();
                 $route->setName($routeName);
             }
 

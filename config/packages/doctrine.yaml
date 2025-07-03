@@ -4,10 +4,7 @@ doctrine:
       adeliom_happy_cms_flexible_content_type: Adeliom\SyliusHappyCMSPlugin\Doctrine\FlexibleContentType
       happy_cms_media_type: Adeliom\SyliusHappyCMSPlugin\Doctrine\MediaType
   orm:
-
     resolve_target_entities:
       Adeliom\SyliusHappyCMSPlugin\Entity\Seo\SeoInterface: Adeliom\SyliusHappyCMSPlugin\Entity\Seo\Seo
-      Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface: Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\Route
-      Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RedirectRouteInterface: Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RedirectRoute
 
 

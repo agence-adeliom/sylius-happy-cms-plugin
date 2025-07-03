@@ -27,8 +27,15 @@ sylius_happy_cms:
     base_url: '/media/download'
     media_entity: Adeliom\SyliusHappyCMSPlugin\Entity\Media\Media
     folder_entity: Adeliom\SyliusHappyCMSPlugin\Entity\Media\Folder
-
   shared_block:
     shared_block_model: Adeliom\SyliusHappyCMSPlugin\Entity\SharedBlock\SharedBlock
     shared_block_repository: Adeliom\SyliusHappyCMSPlugin\Repository\SharedBlock\SharedBlockRepository
     shared_block_admin: Adeliom\SyliusHappyCMSPlugin\Admin\SharedBlock\SharedBlockAdmin
+  route:
+    route_model: Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\Route
+    route_repository: Adeliom\SyliusHappyCMSPlugin\Repository\Cmf\RouteRepository
+    route_admin: Adeliom\SyliusHappyCMSPlugin\Admin\Cmf\RouteAdmin
+  redirect_route:
+    redirect_route_model: Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RedirectRoute
+    redirect_route_repository: Adeliom\SyliusHappyCMSPlugin\Repository\Cmf\RedirectRouteRepository
+    redirect_route_admin: Adeliom\SyliusHappyCMSPlugin\Admin\Cmf\RedirectRouteAdmin

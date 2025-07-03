@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\DependencyInjection;
 
+use Adeliom\SyliusHappyCMSPlugin\Admin\Cmf\RedirectRouteAdminInterface;
+use Adeliom\SyliusHappyCMSPlugin\Admin\Cmf\RouteAdmin;
+use Adeliom\SyliusHappyCMSPlugin\Admin\Cmf\RouteAdminInterface;
 use Adeliom\SyliusHappyCMSPlugin\Admin\Config\ConfigAdmin;
 use Adeliom\SyliusHappyCMSPlugin\Admin\Config\ConfigAdminInterface;
 use Adeliom\SyliusHappyCMSPlugin\Admin\Menu\MenuAdmin;
@@ -14,6 +17,8 @@ use Adeliom\SyliusHappyCMSPlugin\Admin\Page\PageAdmin;
 use Adeliom\SyliusHappyCMSPlugin\Admin\Page\PageAdminInterface;
 use Adeliom\SyliusHappyCMSPlugin\Admin\SharedBlock\SharedBlockAdmin;
 use Adeliom\SyliusHappyCMSPlugin\Admin\SharedBlock\SharedBlockAdminInterface;
+use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RedirectRouteInterface;
+use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Config\ConfigInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Media\Folder;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Media\FolderInterface;
@@ -23,6 +28,9 @@ use Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuItemInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Page\PageInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\SharedBlock\SharedBlockInterface;
+use Adeliom\SyliusHappyCMSPlugin\Repository\Cmf\RedirectRouteRepositoryInterface;
+use Adeliom\SyliusHappyCMSPlugin\Repository\Cmf\RouteRepository;
+use Adeliom\SyliusHappyCMSPlugin\Repository\Cmf\RouteRepositoryInterface;
 use Adeliom\SyliusHappyCMSPlugin\Repository\Config\ConfigRepository;
 use Adeliom\SyliusHappyCMSPlugin\Repository\Config\ConfigRepositoryInterface;
 use Adeliom\SyliusHappyCMSPlugin\Repository\Menu\MenuItemRepository;
@@ -427,7 +435,99 @@ class Configuration implements ConfigurationInterface
                                 })
                             ->end()
                         ->end()
+                    ->end()
                 ->end()
+
+                ->arrayNode('route')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('route_model')
+                            ->isRequired()
+                            ->validate()
+                                ->ifString()
+                                ->then(static function ($value) {
+                                    if (!class_exists($value) || !is_a($value, RouteInterface::class, true)) {
+                                        throw new InvalidConfigurationException(sprintf('Route class must be a valid class extending %s. "%s" given.', RouteInterface::class, $value));
+                                    }
+
+                                    return $value;
+                                })
+                            ->end()
+                        ->end()
+                        ->scalarNode('route_repository')
+                            ->defaultValue(RouteRepository::class)
+                            ->validate()
+                                ->ifString()
+                                ->then(static function ($value) {
+                                    if (!class_exists($value) || !is_a($value, RouteRepositoryInterface::class, true)) {
+                                        throw new InvalidConfigurationException(sprintf('Route repository must be a valid class extending %s. "%s" given.', RouteRepositoryInterface::class, $value));
+                                    }
+
+                                    return $value;
+                                })
+                            ->end()
+                        ->end()
+                        ->scalarNode('route_admin')
+                            ->defaultValue(RouteAdmin::class)
+                            ->validate()
+                                ->ifString()
+                                ->then(static function ($value) {
+                                    if (!class_exists($value) || !is_a($value, RouteAdminInterface::class, true)) {
+                                        throw new InvalidConfigurationException(sprintf('Route admin must be a valid class extending %s. "%s" given.', RouteAdminInterface::class, $value));
+                                    }
+
+                                    return $value;
+                                })
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+
+                ->arrayNode('redirect_route')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('redirect_route_model')
+                            ->isRequired()
+                            ->validate()
+                                ->ifString()
+                                ->then(static function ($value) {
+                                    if (!class_exists($value) || !is_a($value, RedirectRouteInterface::class, true)) {
+                                        throw new InvalidConfigurationException(sprintf('Redirect Route class must be a valid class extending %s. "%s" given.', RedirectRouteInterface::class, $value));
+                                    }
+
+                                    return $value;
+                                })
+                            ->end()
+                        ->end()
+                        ->scalarNode('redirect_route_repository')
+                            ->defaultValue(RouteRepository::class)
+                            ->validate()
+                                ->ifString()
+                                ->then(static function ($value) {
+                                    if (!class_exists($value) || !is_a($value, RedirectRouteRepositoryInterface::class, true)) {
+                                        throw new InvalidConfigurationException(sprintf('Redirect Route repository must be a valid class extending %s. "%s" given.', RedirectRouteRepositoryInterface::class, $value));
+                                    }
+
+                                    return $value;
+                                })
+                            ->end()
+                        ->end()
+                        ->scalarNode('redirect_route_admin')
+                            ->defaultValue(RouteAdmin::class)
+                            ->validate()
+                                ->ifString()
+                                ->then(static function ($value) {
+                                    if (!class_exists($value) || !is_a($value, RedirectRouteAdminInterface::class, true)) {
+                                        throw new InvalidConfigurationException(sprintf('Redirect Route admin must be a valid class extending %s. "%s" given.', RedirectRouteAdminInterface::class, $value));
+                                    }
+
+                                    return $value;
+                                })
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+
             ->end();
 
         return $treeBuilder;
