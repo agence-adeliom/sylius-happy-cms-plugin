@@ -45,7 +45,7 @@ use Sylius\Resource\Model\TranslationInterface;
 <?php if (true === $hasRouting) { ?>
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Adeliom\SyliusHappyCMSPlugin\Traits\EntityRouteTrait;
-use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\Route as OrmRoute;
+use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
 <?php } ?>
 
 #[ORM\HasLifecycleCallbacks]
@@ -88,8 +88,8 @@ class <?= $classNameDetail->getShortName() ?> implements ResourceInterface, Tran
 <?php } ?>
 
 <?php if (true === $hasRouting) { ?>
-    /** @var Collection<int, OrmRoute> */
-    #[ORM\ManyToMany(targetEntity: OrmRoute::class, cascade: ["persist", "remove"])]
+    /** @var Collection<int, RouteInterface> */
+    #[ORM\ManyToMany(targetEntity: RouteInterface::class, cascade: ["persist", "remove"])]
     #[ORM\JoinTable('happy_cms_<?= mb_strtolower($scope) ?>__<?= $mainClassData['singular'] ?>_route')]
     protected Collection $routes;
 <?php } ?>

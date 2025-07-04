@@ -26,6 +26,11 @@ class Route extends RouteModel implements RouteInterface
     #[ORM\Column(type: \Doctrine\DBAL\Types\Types::INTEGER)]
     protected int $position = 0;
 
+    public function __construct(array $options = [])
+    {
+        parent::__construct($options);
+    }
+
     public function getId(): string
     {
         return (string) $this->id;

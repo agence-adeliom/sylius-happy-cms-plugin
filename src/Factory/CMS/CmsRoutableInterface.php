@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Factory\CMS;
 
+use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
 use Doctrine\Common\Collections\Collection;
 use Sylius\Component\Channel\Model\ChannelAwareInterface;
 use Sylius\Resource\Model\TranslationInterface;
@@ -42,9 +43,9 @@ interface CmsRoutableInterface extends ChannelAwareInterface
 
     public function getRouteUnikName(): string;
 
-    public function renderResponse(Request $request, Response $response, OrmRoute $route, bool $cacheEnabled): Response;
+    public function renderResponse(Request $request, Response $response, RouteInterface $route, bool $cacheEnabled): Response;
 
-    public function isHttpCacheEnabled(string $env, OrmRoute $route): bool;
+    public function isHttpCacheEnabled(string $env, RouteInterface $route): bool;
 
     /**
      * @return string[]
@@ -88,17 +89,17 @@ interface CmsRoutableInterface extends ChannelAwareInterface
     public function getTranslation(?string $locale = null): TranslationInterface;
 
     /**
-     * @return Collection<int, OrmRoute>
+     * @return Collection<int, RouteInterface>
      */
     public function getRoutes(): Collection;
 
     /**
      * Add a route to the collection.
      */
-    public function addRoute(OrmRoute $route): void;
+    public function addRoute(RouteInterface $route): void;
 
     /**
      * Remove a route from the collection.
      */
-    public function removeRoute(OrmRoute $route): void;
+    public function removeRoute(RouteInterface $route): void;
 }

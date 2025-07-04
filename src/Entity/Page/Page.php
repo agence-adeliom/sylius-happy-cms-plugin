@@ -8,6 +8,7 @@ use Adeliom\SyliusEasyCrudPlugin\Enum\ThreeStateStatusEnum;
 use Adeliom\SyliusEasyCrudPlugin\Traits\EntityIdTrait;
 use Adeliom\SyliusEasyCrudPlugin\Traits\EntityPublishableTrait;
 use Adeliom\SyliusEasyCrudPlugin\Traits\EntityTimestampableTrait;
+use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
 use Adeliom\SyliusHappyCMSPlugin\Repository\Page\PageRepository;
 use Adeliom\SyliusHappyCMSPlugin\Traits\EntityRouteTrait;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -18,7 +19,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use JMS\Serializer\Annotation as Serializer;
 use Sylius\Resource\Model\TranslatableTrait;
-use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\Route as OrmRoute;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -42,8 +42,8 @@ class Page implements PageInterface
         EntityRouteTrait::__construct as private entityRouteConstruct;
     }
 
-    /** @var Collection<int, OrmRoute> */
-    #[ORM\ManyToMany(targetEntity: OrmRoute::class, cascade: ['persist', 'remove'])]
+    /** @var Collection<int, RouteInterface> */
+    #[ORM\ManyToMany(targetEntity: RouteInterface::class, cascade: ['persist', 'remove'])]
     #[ORM\JoinTable('sylius_happy_cms__page_route')]
     protected Collection $routes;
 

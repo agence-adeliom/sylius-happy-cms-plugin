@@ -6,8 +6,11 @@ namespace Adeliom\SyliusHappyCMSPlugin\Admin\Cmf;
 
 use Adeliom\SyliusEasyCrudPlugin\Admin\AbstractAdmin;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TabField;
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action\Action;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Actions;
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\Field;
+use Sylius\Bundle\GridBundle\Builder\Filter\StringFilter;
 
 abstract class AbstractRouteAdmin extends AbstractAdmin implements RouteAdminInterface
 {
@@ -23,25 +26,48 @@ abstract class AbstractRouteAdmin extends AbstractAdmin implements RouteAdminInt
 
     public static function getDefaultSortColumn(): string
     {
-        return 'id';
+        return 'staticPrefix';
     }
 
     public function configureFilters(): iterable
     {
         yield from parent::configureFilters();
+
+        yield StringFilter::create('staticPrefix', ['tstaticPrefix'])
+            ->setLabel('sylius_happy_cms.page.route.field.static_prefix');
     }
 
     public function configureActions(string $pageName): Actions
     {
         $actions = parent::configureActions($pageName);
 
+        $actions->remove(Crud::PAGE_INDEX,  Action::NEW);
+
+        $actions->remove(Crud::PAGE_DETAIL,  Action::EDIT);
+        $actions->remove(Crud::PAGE_INDEX,  Action::EDIT);
+
+        $actions->remove(Crud::PAGE_INDEX,  Action::DELETE);
+        $actions->remove(Crud::PAGE_DETAIL,  Action::DELETE);
+        $actions->remove(Crud::PAGE_EDIT,  Action::DELETE);
+
         return $actions;
     }
 
     public function configureFields(string $pageName, ?string $context = null): iterable
     {
-        yield TabField::new('Page', 'sylius_happy_cms.page.admin.tab.page');
+        yield TabField::new('Route', 'sylius_happy_cms.route.admin.tab.route');
 
-        yield Field::new('staticPrefix', 'sylius_happy_cms.page.admin.slug');
+        yield Field::new('staticPrefix', 'sylius_happy_cms.route.admin.static_prefix');
+
+        yield Field::new('position', 'sylius_happy_cms.page.admin.position')
+            ->hideOnIndex();
+
+        yield Field::new('host', 'sylius_happy_cms.page.admin.host');
+
+        yield TabField::new('parameters', 'sylius_happy_cms.route.admin.tab.parameters');
+
+        yield Field::new('methods', 'sylius_happy_cms.page.admin.methods');
+
+        yield Field::new('options', 'sylius_happy_cms.page.admin.options');
     }
 }

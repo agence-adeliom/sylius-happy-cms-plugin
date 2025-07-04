@@ -33,7 +33,7 @@ class RedirectRoute extends RedirectRouteModel implements RedirectRouteInterface
     /**
      * Target route document to redirect to different dynamic route.
      */
-    #[ORM\ManyToOne(targetEntity: Route::class, cascade: ['persist'], fetch: 'EAGER')]
+    #[ORM\ManyToOne(targetEntity: RouteInterface::class, cascade: ['persist'], fetch: 'EAGER')]
     #[ORM\JoinColumn(name: 'routeTargetId', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
     protected ?SymfonyRoute $routeTarget = null;
 

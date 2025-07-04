@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Traits;
 
+use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Page\PageInterface;
 use Adeliom\SyliusHappyCMSPlugin\EventListener\EntityRouteIndexer;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -11,7 +12,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Sylius\Component\Channel\Model\ChannelInterface;
 use Sylius\Resource\Model\TranslationInterface;
-use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\Route as OrmRoute;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,7 +20,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 trait EntityRouteTrait
 {
-    #[ORM\ManyToMany(targetEntity: OrmRoute::class, cascade: ['persist', 'remove'])]
+    #[ORM\ManyToMany(targetEntity: RouteInterface::class, cascade: ['persist', 'remove'])]
     protected Collection $routes;
 
     #[ORM\ManyToOne]
@@ -33,7 +33,7 @@ trait EntityRouteTrait
     }
 
     /**
-     * @return Collection<int, OrmRoute>
+     * @return Collection<int, RouteInterface>
      */
     public function getRoutes(): Collection
     {
@@ -63,21 +63,21 @@ trait EntityRouteTrait
     }
 
     /**
-     * @param Collection<int, OrmRoute> $routes
+     * @param Collection<int, RouteInterface> $routes
      */
     public function setRoutes(Collection $routes): void
     {
         $this->routes = $routes;
     }
 
-    public function addRoute(OrmRoute $route): void
+    public function addRoute(RouteInterface $route): void
     {
         if (!$this->routes->contains($route)) {
             $this->routes->add($route);
         }
     }
 
-    public function removeRoute(OrmRoute $route): void
+    public function removeRoute(RouteInterface $route): void
     {
         if ($this->routes->contains($route)) {
             $this->routes->removeElement($route);
@@ -148,7 +148,7 @@ trait EntityRouteTrait
         );
     }
 
-    public function isHttpCacheEnabled(string $env, OrmRoute $route): bool
+    public function isHttpCacheEnabled(string $env, RouteInterface $route): bool
     {
         // Default behavior is to enable http cache
         //return $env === 'prod' ? true : false;
@@ -163,7 +163,7 @@ trait EntityRouteTrait
     //            enabled: true
     //            default_ttl: 0
     // To unvalide all route cache, you can use the command : happycms:cache:invalidate
-    public function renderResponse(Request $request, Response $response, OrmRoute $route, bool $cacheEnabled): Response
+    public function renderResponse(Request $request, Response $response, RouteInterface $route, bool $cacheEnabled): Response
     {
         // If cache is disabled, we return the response as is
         if (!$cacheEnabled) {
