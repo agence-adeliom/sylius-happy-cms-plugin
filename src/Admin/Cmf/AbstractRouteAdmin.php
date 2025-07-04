@@ -47,8 +47,6 @@ abstract class AbstractRouteAdmin extends AbstractAdmin implements RouteAdminInt
         $actions->remove(Crud::PAGE_INDEX,  Action::EDIT);
 
         $actions->remove(Crud::PAGE_INDEX,  Action::DELETE);
-        $actions->remove(Crud::PAGE_DETAIL,  Action::DELETE);
-        $actions->remove(Crud::PAGE_EDIT,  Action::DELETE);
 
         return $actions;
     }
@@ -69,5 +67,6 @@ abstract class AbstractRouteAdmin extends AbstractAdmin implements RouteAdminInt
         yield Field::new('methods', 'sylius_happy_cms.page.admin.methods');
 
         yield Field::new('options', 'sylius_happy_cms.page.admin.options');
+
     }
 }
