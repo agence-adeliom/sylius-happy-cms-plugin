@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\Entity\Cmf;
 
 use Adeliom\SyliusHappyCMSPlugin\Repository\Cmf\RouteRepository;
-use Symfony\Cmf\Bundle\RoutingBundle\Model\Route as RouteModel;
-
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Cmf\Bundle\RoutingBundle\Model\Route as RouteModel;
 
 #[ORM\MappedSuperclass(repositoryClass: RouteRepository::class)]
 class Route extends RouteModel implements RouteInterface
@@ -15,7 +14,7 @@ class Route extends RouteModel implements RouteInterface
     #[ORM\Id]
     #[ORM\Column(type: \Doctrine\DBAL\Types\Types::INTEGER, options: ['unsigned' => true])]
     #[ORM\GeneratedValue]
-    protected $id = null;
+    protected $id;
 
     #[ORM\Column(type: \Doctrine\DBAL\Types\Types::STRING, length: 255, unique: true)]
     protected string $name = '';

@@ -4,15 +4,9 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Repository\Cmf;
 
-use Adeliom\SyliusEasyCrudPlugin\Enum\ThreeStateStatusEnum;
-use Adeliom\SyliusEasyCrudPlugin\Repository\TranslationRepositoryInterface;
-use Adeliom\SyliusEasyCrudPlugin\Traits\TranslationRepositoryTrait;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
-use Adeliom\SyliusHappyCMSPlugin\Entity\Page\PageInterface;
-use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Sylius\Bundle\ResourceBundle\Doctrine\ORM\EntityRepository;
-use Sylius\Component\Channel\Model\ChannelInterface;
 use Sylius\Resource\Doctrine\Persistence\RepositoryInterface;
 
 /**

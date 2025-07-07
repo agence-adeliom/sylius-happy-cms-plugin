@@ -226,7 +226,7 @@ final class InstallDefaultFiles extends AbstractMaker
         ];
         $this->generateScope($scope, $files, $io, $generator);
 
-        $this->generateRoute('route', $io, null, 'Cmf');
+        $this->generateRoute(scope: 'route', io: $io, baseScope: 'Cmf');
 
         $this->generateSyliusResource('route', $io);
 
@@ -243,7 +243,7 @@ final class InstallDefaultFiles extends AbstractMaker
         ];
         $this->generateScope($scope, $files, $io, $generator);
 
-        $this->generateRoute('redirect_route', $io, null, 'Cmf');
+        $this->generateRoute(scope: 'redirect_route', io: $io, baseScope: 'Cmf');
 
         $this->generateSyliusResource('redirect_route', $io);
 
@@ -284,6 +284,7 @@ final class InstallDefaultFiles extends AbstractMaker
                     $generator->writeChanges();
                 }
             } catch (\Exception $exception) {
+                dump($exception);
                 $io->error($exception->getMessage());
             }
         }
@@ -419,6 +420,7 @@ final class InstallDefaultFiles extends AbstractMaker
 
             return self::YAML_ROUTES_FILE;
         } catch (\Exception $e) {
+            dump($e);
             $io->error($e->getCode() . ' : ' . $e->getMessage());
 
             return $e->getCode() . ' : ' . $e->getMessage();

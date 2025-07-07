@@ -8,7 +8,6 @@ use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
 use Doctrine\Common\Collections\Collection;
 use Sylius\Component\Channel\Model\ChannelAwareInterface;
 use Sylius\Resource\Model\TranslationInterface;
-use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\Route as OrmRoute;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

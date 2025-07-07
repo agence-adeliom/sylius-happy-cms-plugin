@@ -55,6 +55,7 @@ trait EntityRouteTrait
         foreach ($this->routes as $route) {
             if ($preview === $route->getOption(EntityRouteIndexer::OPTION_PREVIEW)) {
                 $route->setContent($this);
+
                 return $route;
             }
         }
@@ -303,6 +304,7 @@ trait EntityRouteTrait
 
         /** @var array{label: string, route: ?RouteObjectInterface} $reservedList */
         $reservedList = array_reverse($list, true);
+
         return $reservedList;
     }
 

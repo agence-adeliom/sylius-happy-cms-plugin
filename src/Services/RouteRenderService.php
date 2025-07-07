@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Services;
 
+use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\Route as OrmRoute;
+use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
 use Adeliom\SyliusHappyCMSPlugin\Event\Route\RouteRenderServiceEvent;
 use Adeliom\SyliusHappyCMSPlugin\EventListener\EntityRouteIndexer;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
@@ -16,7 +18,6 @@ use Sylius\Bundle\ResourceBundle\Controller\RequestConfiguration;
 use Sylius\Bundle\ResourceBundle\Controller\RequestConfigurationFactory;
 use Sylius\Resource\Metadata\Metadata;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\Route as OrmRoute;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -54,7 +55,7 @@ class RouteRenderService extends AbstractController
 
             foreach ($routes as $route) {
                 /**
-                 * @var OrmRoute $route
+                 * @var RouteInterface $route
                  */
                 $route->setOption(EntityRouteIndexer::OPTION_LAST_MODIFICATION_TIMESTAMP, time());
                 $this->manager->persist($route);

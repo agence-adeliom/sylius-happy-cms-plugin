@@ -41,12 +41,12 @@ abstract class AbstractRouteAdmin extends AbstractAdmin implements RouteAdminInt
     {
         $actions = parent::configureActions($pageName);
 
-        $actions->remove(Crud::PAGE_INDEX,  Action::NEW);
+        $actions->remove(Crud::PAGE_INDEX, Action::NEW);
 
-        $actions->remove(Crud::PAGE_DETAIL,  Action::EDIT);
-        $actions->remove(Crud::PAGE_INDEX,  Action::EDIT);
+        $actions->remove(Crud::PAGE_DETAIL, Action::EDIT);
+        $actions->remove(Crud::PAGE_INDEX, Action::EDIT);
 
-        $actions->remove(Crud::PAGE_INDEX,  Action::DELETE);
+        $actions->remove(Crud::PAGE_INDEX, Action::DELETE);
 
         return $actions;
     }
@@ -55,18 +55,20 @@ abstract class AbstractRouteAdmin extends AbstractAdmin implements RouteAdminInt
     {
         yield TabField::new('Route', 'sylius_happy_cms.route.admin.tab.route');
 
+        yield Field::new('host', 'sylius_happy_cms.page.admin.host');
+
         yield Field::new('staticPrefix', 'sylius_happy_cms.route.admin.static_prefix');
 
         yield Field::new('position', 'sylius_happy_cms.page.admin.position')
             ->hideOnIndex();
 
-        yield Field::new('host', 'sylius_happy_cms.page.admin.host');
+        yield TabField::new('parameters', 'sylius_happy_cms.route.admin.tab.parameters')
+            ->hideOnIndex();
 
-        yield TabField::new('parameters', 'sylius_happy_cms.route.admin.tab.parameters');
+        yield Field::new('methods', 'sylius_happy_cms.page.admin.methods')
+            ->hideOnIndex();
 
-        yield Field::new('methods', 'sylius_happy_cms.page.admin.methods');
-
-        yield Field::new('options', 'sylius_happy_cms.page.admin.options');
-
+        yield Field::new('options', 'sylius_happy_cms.page.admin.options')
+            ->hideOnIndex();
     }
 }

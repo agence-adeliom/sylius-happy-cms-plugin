@@ -6,8 +6,8 @@ namespace Adeliom\SyliusHappyCMSPlugin\Entity\Cmf;
 
 use Adeliom\SyliusHappyCMSPlugin\Repository\Cmf\RedirectRouteRepository;
 use Doctrine\DBAL\Types\Types;
-use Symfony\Cmf\Bundle\RoutingBundle\Model\RedirectRoute as RedirectRouteModel;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Cmf\Bundle\RoutingBundle\Model\RedirectRoute as RedirectRouteModel;
 use Symfony\Component\Routing\Route as SymfonyRoute;
 
 #[ORM\MappedSuperclass(repositoryClass: RedirectRouteRepository::class)]
@@ -16,7 +16,7 @@ class RedirectRoute extends RedirectRouteModel implements RedirectRouteInterface
     #[ORM\Id]
     #[ORM\Column(type: Types::INTEGER, options: ['unsigned' => true])]
     #[ORM\GeneratedValue]
-    protected $id = null;
+    protected $id;
 
     /**
      * Absolute uri to redirect to.
@@ -99,5 +99,4 @@ class RedirectRoute extends RedirectRouteModel implements RedirectRouteInterface
     {
         $this->parameters = $parameters;
     }
-
 }

@@ -90,6 +90,7 @@ platform:
 		(cd ${APP_DIR} && sed -i'' -e 's|APP_DEBUG: 0|APP_DEBUG: 1|g' compose.override.yml); \
 		(cd ${APP_DIR} && sed -i'' -e 's|- "80:80"|- "$(DOCKER_PHP_PORT):80"|g' compose.override.yml); \
 		(cd ${APP_DIR} && sed -i'' -e 's|            - public-media:/srv/sylius/public/media:ro,nocopy|            - public-media:/srv/sylius/public/media:ro,nocopy\n            - ../../:/srv/sylius/${PLUGIN_DIR}:rw|g' compose.override.yml); \
+		(cd ${APP_DIR} && sed -i'' -e 's|XDEBUG_MODE: debug|XDEBUG_MODE: coverage|g' compose.override.yml); \
 		(cd ${APP_DIR} && sed -i'' -e "s|];|    Adeliom\\\${CRUD_PLUGIN_NAMESPACE}\\\${CRUD_PLUGIN_NAMESPACE}::class => ['all' => true],\n    Adeliom\\\${CRUD_PLUGIN_NAMESPACE}\\\${CRUD_PLUGIN_NAMESPACE}::class => ['all' => true],\n];|g" config/bundles.php); \
 		(cd ${APP_DIR} && sed -i'' -e "s|];|    Adeliom\\\${PLUGIN_NAMESPACE}\\\${PLUGIN_NAMESPACE}::class => ['all' => true],\n    Adeliom\\\${CRUD_PLUGIN_NAMESPACE}\\\${CRUD_PLUGIN_NAMESPACE}::class => ['all' => true],\n];|g" config/bundles.php); \
 		(cd ${APP_DIR} && sed -i'' -e 's|            "App\\": "src/",|            "App\\": "src/",\n            "Adeliom\\${PLUGIN_NAMESPACE}\\": "${PLUGIN_DIR}/src/"|g' composer.json); \
@@ -100,6 +101,7 @@ platform:
 		(cd ${APP_DIR} && sed -i'' -e 's|init|\nsylius_easy_crud:\n  resource: "@SyliusEasyCrudPlugin/config/routes.yaml"\ninit|g' config/routes.yaml); \
 		(cd ${APP_DIR} && sed -i'' -e 's|init|\nsylius_happy_cms:\n  resource: "@SyliusHappyCMSPlugin/config/routes.yaml"\n|g' config/routes.yaml); \
 		(cd ${APP_DIR} && sed -i'' -e 's|plugin-proposal-object-rest-spread|plugin-transform-object-rest-spread|g' .babelrc); \
+		(cd ${APP_DIR} && sed -i'' -e 's|services:|parameters:\n  cmf_routing.dynamic.persistence.orm.route_class: App\\\Entity\\\HappyCMS\\\Cmf\\\Route\n\nservices:|g' config/services.yaml); \
 		(cd ${APP_DIR} && rm -rf config/packages/doctrine.yaml-e); \
 		(cd ${APP_DIR} && rm -rf config/packages/_sylius.yaml-e); \
 		(cd ${APP_DIR} && rm -rf .babelrc-e); \
@@ -185,7 +187,7 @@ bundle_assets_build:
 
 HELP += $(call help,bundle_install_test_files,			Build bundles assets in watch mode)
 bundle_install_test_files:
-	#cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php bin/console make:happy-cms:install)
+	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php bin/console make:happy-cms:install)
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php bin/console cache:clear)
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php bin/console doc:mig:diff --allow-empty-diff -n)
 	cd ${APP_DIR} && (ENV=$(ENV) docker compose run --rm php bin/console doc:mig:mig -n)

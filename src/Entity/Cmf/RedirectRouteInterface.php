@@ -8,5 +8,4 @@ use Sylius\Resource\Model\ResourceInterface;
 
 interface RedirectRouteInterface extends ResourceInterface, \Symfony\Cmf\Component\Routing\RedirectRouteInterface
 {
-
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\EventListener;
 
-use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\Route;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
