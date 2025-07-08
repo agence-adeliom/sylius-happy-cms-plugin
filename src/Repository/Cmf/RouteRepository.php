@@ -18,6 +18,14 @@ class RouteRepository extends EntityRepository implements RepositoryInterface, R
 
     protected int $cacheTtl;
 
+    public function createQueryBuilder(string $alias, string $indexBy = null): QueryBuilder
+    {
+        $queryBuilder = parent::createQueryBuilder($alias, $indexBy);
+        $queryBuilder->andWhere($alias . '.preview != 1 OR ' . $alias . '.preview IS NULL');
+
+        return $queryBuilder;
+    }
+
     /**
      * @param array<string, mixed> $cacheConfig
      */
@@ -32,5 +40,15 @@ class RouteRepository extends EntityRepository implements RepositoryInterface, R
         $qb = $this->createQueryBuilder('route');
 
         return $qb;
+    }
+
+    public function createNew(): RouteInterface
+    {
+        $className = $this->getClassName();
+
+        /** @var RouteInterface $route */
+        $route = new $className();
+
+        return $route;
     }
 }

@@ -19,11 +19,14 @@ class Route extends RouteModel implements RouteInterface
     #[ORM\Column(type: \Doctrine\DBAL\Types\Types::STRING, length: 255, unique: true)]
     protected string $name = '';
 
-    /**
-     * Sort order of this route when it is returned by the route provider.
-     */
     #[ORM\Column(type: \Doctrine\DBAL\Types\Types::INTEGER)]
     protected int $position = 0;
+
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::BOOLEAN, nullable: true)]
+    protected bool $preview = false;
+
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $lastModification = null;
 
     public function __construct(array $options = [])
     {
@@ -63,6 +66,26 @@ class Route extends RouteModel implements RouteInterface
     public function getPosition(): int
     {
         return $this->position;
+    }
+
+    public function isPreview(): bool
+    {
+        return $this->preview;
+    }
+
+    public function setPreview(bool $preview): void
+    {
+        $this->preview = $preview;
+    }
+
+    public function getLastModification(): ?\DateTimeInterface
+    {
+        return $this->lastModification;
+    }
+
+    public function setLastModification(?\DateTimeInterface $lastModification): void
+    {
+        $this->lastModification = $lastModification;
     }
 
     public function getRouteKey(): string

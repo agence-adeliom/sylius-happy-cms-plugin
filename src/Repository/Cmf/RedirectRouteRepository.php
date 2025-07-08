@@ -33,4 +33,14 @@ class RedirectRouteRepository extends EntityRepository implements RepositoryInte
 
         return $qb;
     }
+
+    public function createNew(): RedirectRouteInterface
+    {
+        $className = $this->getClassName();
+
+        /** @var RedirectRouteInterface $redirectRoute */
+        $redirectRoute = new $className();
+
+        return $redirectRoute;
+    }
 }

@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\Admin\Cmf;
 
 use Adeliom\SyliusEasyCrudPlugin\Admin\AbstractAdmin;
+use Adeliom\SyliusEasyCrudPlugin\Admin\Field\CheckboxField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TabField;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Actions;
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\Field;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 abstract class AbstractRedirectRouteAdmin extends AbstractAdmin implements RedirectRouteAdminInterface
 {
@@ -22,7 +25,7 @@ abstract class AbstractRedirectRouteAdmin extends AbstractAdmin implements Redir
 
     public static function getDefaultSortColumn(): string
     {
-        return 'id';
+        return 'staticPrefix';
     }
 
     public function configureFilters(): iterable
@@ -39,6 +42,15 @@ abstract class AbstractRedirectRouteAdmin extends AbstractAdmin implements Redir
 
     public function configureFields(string $pageName, ?string $context = null): iterable
     {
-        yield TabField::new('Page', 'sylius_happy_cms.page.admin.tab.page');
+        yield TabField::new('Route', 'sylius_happy_cms.redirection.admin.tab.redirection');
+
+        yield Field::new('host', 'sylius_happy_cms.redirection.admin.host');
+
+        yield Field::new('staticPrefix', 'sylius_happy_cms.redirection.admin.static_prefix');
+
+        yield Field::new('uri', 'sylius_happy_cms.redirection.admin.uri')
+            ->setFormType(TextType::class);
+
+        yield CheckboxField::new('permanent', 'sylius_happy_cms.redirection.admin.permanent');
     }
 }

@@ -5,9 +5,11 @@ sylius_happy_cms:
     pages: "Pages"
     menu: "Menu"
     menus: "Menus"
-    menu_item: "Elément de menu"
-    menu_items: "Eléments de menu"
-    shared_blocks: "Shared blocks"
+    menu_item: "Menu Item"
+    menu_items: "Menu Items"
+    shared_blocks: "Shared block"
+    routes: "Routing"
+    redirect_routes: "Redirection"
   page:
     admin:
       action:
@@ -197,6 +199,8 @@ sylius_happy_cms:
       menus: Menus
       shared_blocks: Shared blocks
       configurations: Configurations
+      routes: Routes
+      redirections: Redirections
   button_embeddable:
     label: Label
     link: Link
@@ -276,3 +280,23 @@ sylius_happy_cms:
       name: Rich text
       fields:
         wysiwyg: Rich text
+  route:
+    admin:
+      tab:
+        route: Route
+        parameters: Parameters
+      methods: Method
+      options: Options
+      position: Position
+      static_prefix: Uri
+      host: Host
+      preview: Preview
+      lastModification: Last modification
+  redirection:
+    admin:
+      tab:
+        redirection: Redirection
+      static_prefix: From uri
+      host: Host
+      uri: Target uri
+      permanent: Permanent

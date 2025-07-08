@@ -43,6 +43,12 @@ services:
   Adeliom\SyliusHappyCMSPlugin\Repository\Page\PageRepositoryInterface:
     alias: happy_cms_page.page.repository
 
+  Adeliom\SyliusHappyCMSPlugin\Repository\Cmf\RouteRepositoryInterface:
+    alias: happy_cms_page.route.repository
+
+  Adeliom\SyliusHappyCMSPlugin\Repository\Cmf\RedirectRouteRepositoryInterface:
+    alias: happy_cms_page.redirect_route.repository
+
   sylius.happy_cms.plugin.services.render:
     class: Adeliom\SyliusHappyCMSPlugin\Services\RouteRenderService
     arguments:
@@ -130,3 +136,18 @@ services:
     tags:
       - { name: sylius.live_component.admin, key: happycms-menu-item-tree-delete, template: '@SyliusHappyCMSPlugin/menu_item/crud/tree/components/delete.html.twig' }
 
+  sylius.happy_cms.plugin.listener.redirection_manager:
+    autowire: true
+    class: Adeliom\SyliusHappyCMSPlugin\Services\RedirectionManager
+    arguments:
+      - '@doctrine.orm.entity_manager'
+
+  Adeliom\SyliusHappyCMSPlugin\Services\RedirectionManagerInterface:
+    alias: sylius.happy_cms.plugin.listener.redirection_manager
+
+  sylius.happy_cms.exception_listener:
+    class: Adeliom\SyliusHappyCMSPlugin\EventListener\ExceptionListener
+    arguments:
+        - '@sylius.happy_cms.plugin.listener.redirection_manager'
+    tags:
+      - { name: kernel.event_listener, event: kernel.exception }
