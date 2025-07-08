@@ -63,7 +63,8 @@ abstract class AbstractRouteAdmin extends AbstractAdmin implements RouteAdminInt
 
     public function configureFields(string $pageName, ?string $context = null): iterable
     {
-        yield TabField::new('Route', 'sylius_happy_cms.route.admin.tab.route');
+        yield TabField::new('Route', 'sylius_happy_cms.route.admin.tab.route')
+            ->renderHorizontal();
 
         yield Field::new('host', 'sylius_happy_cms.route.admin.host');
 

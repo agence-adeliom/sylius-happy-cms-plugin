@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Adeliom\SyliusHappyCMSPlugin\Services;
+namespace Adeliom\SyliusHappyCMSPlugin\Services\Cmf;
 
 use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\Route as OrmRoute;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
@@ -41,7 +41,7 @@ class RouteRenderService extends AbstractController
     ) {
     }
 
-    public function invalidAllCache(): bool
+    public function invalidCache(): bool
     {
         $routeClass = $this->parameterBag->get('cmf_routing.dynamic.persistence.orm.route_class');
         if (is_string($routeClass)) {

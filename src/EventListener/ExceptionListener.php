@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\EventListener;
 
-use Adeliom\SyliusHappyCMSPlugin\Services\RedirectionManagerInterface;
+use Adeliom\SyliusHappyCMSPlugin\Services\Cmf\RedirectionManagerInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 

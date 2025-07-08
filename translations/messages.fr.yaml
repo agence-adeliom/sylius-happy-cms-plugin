@@ -303,3 +303,8 @@ sylius_happy_cms:
       host: Nom de domaine
       uri: Url cible
       permanent: Permanent
+      help:
+        static_prefix:  "Url 404 à rediriger ex : /fr_FR/ancienne-page"
+        host: "Ex: www.website.com (not required)"
+        uri:  "Si renseigner permet d'activer une redirection, ex : /fr_FR/nouvelle-page"
+        permanent: "A cocher pour une redirection permanente (301), sinon une temporaire (302) est appliquée"

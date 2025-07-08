@@ -43,4 +43,20 @@ class RedirectRouteRepository extends EntityRepository implements RepositoryInte
 
         return $redirectRoute;
     }
+
+    public function findByHostAndPath(string $host, string $path): ?RedirectRouteInterface
+    {
+        $qb = $this->createQueryBuilder('redirect_route');
+        $qb->where(
+            $qb->expr()->orX(
+                $qb->expr()->eq('redirect_route.host', ':host'),
+                $qb->expr()->isNull('redirect_route.host')
+            )
+        )
+        ->andWhere('redirect_route.staticPrefix', ':staticPrefix')
+        ->setParameter('host', $host)
+        ->setParameter('staticPrefix', $path);
+
+        return $qb->getQuery()->getOneOrNullResult();
+    }
 }

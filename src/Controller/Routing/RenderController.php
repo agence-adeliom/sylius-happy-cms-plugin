@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\Controller\Routing;
 
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
-use Adeliom\SyliusHappyCMSPlugin\Services\RouteRenderService;
+use Adeliom\SyliusHappyCMSPlugin\Services\Cmf\RouteRenderService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

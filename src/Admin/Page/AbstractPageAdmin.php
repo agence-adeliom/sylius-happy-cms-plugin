@@ -71,7 +71,8 @@ abstract class AbstractPageAdmin extends AbstractAdmin implements PageAdminInter
     public function configureFields(string $pageName, ?string $context = null): iterable
     {
         if (null === $context) {
-            yield TabField::new('Page', 'sylius_happy_cms.page.admin.tab.page');
+            yield TabField::new('Page', 'sylius_happy_cms.page.admin.tab.page')
+                ->renderHorizontal();
 
             yield ResourceChoiceField::new('parent', 'sylius_happy_cms.page.admin.field.parent')
                 ->setMultiple(false)

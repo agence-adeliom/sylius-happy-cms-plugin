@@ -42,15 +42,20 @@ abstract class AbstractRedirectRouteAdmin extends AbstractAdmin implements Redir
 
     public function configureFields(string $pageName, ?string $context = null): iterable
     {
-        yield TabField::new('Route', 'sylius_happy_cms.redirection.admin.tab.redirection');
+        yield TabField::new('Route', 'sylius_happy_cms.redirection.admin.tab.redirection')
+            ->renderHorizontal();
 
-        yield Field::new('host', 'sylius_happy_cms.redirection.admin.host');
+        yield Field::new('host', 'sylius_happy_cms.redirection.admin.host')
+            ->setHelp('sylius_happy_cms.redirection.admin.help.host');
 
-        yield Field::new('staticPrefix', 'sylius_happy_cms.redirection.admin.static_prefix');
+        yield Field::new('staticPrefix', 'sylius_happy_cms.redirection.admin.static_prefix')
+            ->setHelp('sylius_happy_cms.redirection.admin.help.static_prefix');
 
         yield Field::new('uri', 'sylius_happy_cms.redirection.admin.uri')
+            ->setHelp('sylius_happy_cms.redirection.admin.help.uri')
             ->setFormType(TextType::class);
 
-        yield CheckboxField::new('permanent', 'sylius_happy_cms.redirection.admin.permanent');
+        yield CheckboxField::new('permanent', 'sylius_happy_cms.redirection.admin.permanent')
+            ->setHelp('sylius_happy_cms.redirection.admin.help.permanent');
     }
 }

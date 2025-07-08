@@ -33,7 +33,8 @@ abstract class AbstractConfigAdmin extends AbstractAdmin implements ConfigAdminI
 
     public function configureFields(string $pageName, ?string $context = null): iterable
     {
-        yield TabField::new('sylius_happy_cms.config.admin.tab.configuration');
+        yield TabField::new('sylius_happy_cms.config.admin.tab.configuration')
+            ->renderHorizontal();
 
         yield Field::new('key', 'sylius_happy_cms.config.admin.field.key')
             ->setRequired(true);

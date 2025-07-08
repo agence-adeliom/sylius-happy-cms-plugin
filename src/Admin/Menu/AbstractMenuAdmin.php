@@ -50,7 +50,8 @@ abstract class AbstractMenuAdmin extends AbstractAdmin implements MenuAdminInter
 
     public function configureFields(string $pageName, ?string $context = null): iterable
     {
-        yield TabField::new('menu', 'sylius_happy_cms.menu.admin.tab.menu');
+        yield TabField::new('menu', 'sylius_happy_cms.menu.admin.tab.menu')
+            ->renderHorizontal();
 
         yield Field::new('name', 'sylius_happy_cms.menu.admin.field.name');
 

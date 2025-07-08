@@ -298,5 +298,10 @@ sylius_happy_cms:
         redirection: Redirection
       static_prefix: From uri
       host: Host
-      uri: Target uri
+      uri: To uri
       permanent: Permanent
+      help:
+        static_prefix:  "A 404 url to redirect, ex: /en_US/old-page"
+        host: "Ex: www.website.com (not required)"
+        uri:  "When fullfilled, activate the redirection to an uri, ex: /en_US/redirected-page"
+        permanent: "Check for a permanent redirection (301), otherwise a temporary one (302) is applied"

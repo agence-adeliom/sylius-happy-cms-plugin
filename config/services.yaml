@@ -31,7 +31,7 @@ services:
           priority: 500
           connection: 'default'
 
-  Adeliom\SyliusHappyCMSPlugin\Services\RouteRenderService:
+  Adeliom\SyliusHappyCMSPlugin\Services\Cmf\RouteRenderService:
     alias: sylius.happy_cms.plugin.services.render
 
   Adeliom\SyliusHappyCMSPlugin\Repository\Menu\MenuRepositoryInterface:
@@ -46,11 +46,8 @@ services:
   Adeliom\SyliusHappyCMSPlugin\Repository\Cmf\RouteRepositoryInterface:
     alias: happy_cms_page.route.repository
 
-  Adeliom\SyliusHappyCMSPlugin\Repository\Cmf\RedirectRouteRepositoryInterface:
-    alias: happy_cms_page.redirect_route.repository
-
   sylius.happy_cms.plugin.services.render:
-    class: Adeliom\SyliusHappyCMSPlugin\Services\RouteRenderService
+    class: Adeliom\SyliusHappyCMSPlugin\Services\Cmf\RouteRenderService
     arguments:
       - "@router"
       - "@sylius.resource_controller.request_configuration_factory"
@@ -137,12 +134,12 @@ services:
       - { name: sylius.live_component.admin, key: happycms-menu-item-tree-delete, template: '@SyliusHappyCMSPlugin/menu_item/crud/tree/components/delete.html.twig' }
 
   sylius.happy_cms.plugin.listener.redirection_manager:
-    autowire: true
-    class: Adeliom\SyliusHappyCMSPlugin\Services\RedirectionManager
+    class: Adeliom\SyliusHappyCMSPlugin\Services\Cmf\RedirectionManager
     arguments:
       - '@doctrine.orm.entity_manager'
+      - '@parameter_bag'
 
-  Adeliom\SyliusHappyCMSPlugin\Services\RedirectionManagerInterface:
+  Adeliom\SyliusHappyCMSPlugin\Services\Cmf\RedirectionManagerInterface:
     alias: sylius.happy_cms.plugin.listener.redirection_manager
 
   sylius.happy_cms.exception_listener:

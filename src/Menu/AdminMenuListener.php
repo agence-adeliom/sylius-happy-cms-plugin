@@ -36,11 +36,11 @@ final class AdminMenuListener
             ->setLabel('sylius_happy_cms.admin.menu.shared_blocks')
             ->setLabelAttribute('icon', 'solar:box-bold')
         ;
-        $newSubmenu
-            ->addChild('happy_cms_route', ['route' => 'sylius_happy_cms_admin_route_index'])
-            ->setLabel('sylius_happy_cms.admin.menu.routes')
-            ->setLabelAttribute('icon', 'file')
-        ;
+        //$newSubmenu
+        //    ->addChild('happy_cms_route', ['route' => 'sylius_happy_cms_admin_route_index'])
+        //    ->setLabel('sylius_happy_cms.admin.menu.routes')
+        //    ->setLabelAttribute('icon', 'file')
+        //;
         $newSubmenu
             ->addChild('happy_cms_redirect_route', ['route' => 'sylius_happy_cms_admin_redirect_route_index'])
             ->setLabel('sylius_happy_cms.admin.menu.redirections')

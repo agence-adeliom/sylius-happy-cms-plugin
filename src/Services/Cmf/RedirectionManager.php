@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Adeliom\SyliusHappyCMSPlugin\Services;
+namespace Adeliom\SyliusHappyCMSPlugin\Services\Cmf;
 
 use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RedirectRouteInterface;
 use Adeliom\SyliusHappyCMSPlugin\Repository\Cmf\RedirectRouteRepositoryInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -15,7 +16,7 @@ class RedirectionManager implements RedirectionManagerInterface
 {
     public function __construct(
         protected EntityManagerInterface $manager,
-        protected RedirectRouteRepositoryInterface $redirectRouteRepository,
+        protected ParameterBag $parameterBag,
     ) {
     }
 
@@ -27,12 +28,25 @@ class RedirectionManager implements RedirectionManagerInterface
         $uri = $event->getRequest()->getRequestUri();
         $host = $event->getRequest()->getHost();
 
+        $resources = $this->parameterBag->get('sylius.resources');
+        $modelClass = $resources['sylius_happy_cms.redirect_route']['classes']['model'] ?? 'Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RedirectRoute';
+
+        if (!is_a($modelClass, RedirectRouteInterface::class, true)) {
+            throw new \InvalidArgumentException(sprintf(
+                'The model class "%s" must implement "%s".',
+                $modelClass,
+                RedirectRouteInterface::class
+            ));
+        }
+
+        /** @var RedirectRouteRepositoryInterface $redirectRouteRepository **/
+        $redirectRouteRepository = $this->manager->getRepository($modelClass);
+
         // A redirect route is already persisted?
-        /** @var ?RedirectRouteInterface $redirectRoute * */
-        $redirectRoute = $this->redirectRouteRepository->findOneBy(['staticPrefix' => $uri, 'host' => $host]);
+        $redirectRoute = $redirectRouteRepository->findByHostAndPath($host, $uri);
         if (null === $redirectRoute) {
             // If not, we can create a new one
-            $redirectRoute = $this->redirectRouteRepository->createNew();
+            $redirectRoute = $redirectRouteRepository->createNew();
             $redirectRoute->setStaticPrefix($uri);
             $redirectRoute->setHost($host);
             $this->manager->persist($redirectRoute);
