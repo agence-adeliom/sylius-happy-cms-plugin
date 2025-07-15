@@ -79,7 +79,9 @@ class EntityRouteIndexer
         $event->getObjectManager()->persist($entity);
         $event->getObjectManager()->flush();
 
-        $this->updateChildRoutes($entity, $oldRoutes);
+        if ([] !== $oldRoutes) {
+            $this->updateChildRoutes($entity, $oldRoutes);
+        }
     }
 
     private function manageRoutes(CmsRoutableInterface &$entity, string $routeNamePrefix = ''): void
