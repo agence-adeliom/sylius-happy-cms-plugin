@@ -151,7 +151,7 @@ class EntityRouteIndexer
 
                 // Route exists ?
                 $route = $entity->getRoutes()->filter(static fn (Route $route) => $route->getName() === $routeName)->first();
-                if ($route) {
+                if ($route && isset($oldRoutes[$prefix]['from'])) {
                     $oldRoutes[$prefix]['to'] = $route->getStaticPrefix();
                     $isFromPreview = str_ends_with($oldRoutes[$prefix]['from'], '-preview') && $routeNamePrefix === self::ROUTE_PREVIEW;
                     $isToPreview = str_ends_with($oldRoutes[$prefix]['to'], '-preview') && $routeNamePrefix === self::ROUTE_PREVIEW;
