@@ -12,7 +12,7 @@ class TinyMCEField implements FieldInterface
 {
     use FieldTrait;
 
-    public static function new(string $propertyName, ?string $label = null): self
+    public static function new(string $propertyName, ?string $label = null, ?array $attrs = []): self
     {
         $field = (new self());
         $field
@@ -25,6 +25,7 @@ class TinyMCEField implements FieldInterface
             ->addCssFiles(TinymceBridgeType::configureAdminAssets()['css'])
             ->setFormType(TinymceBridgeType::class)
             ->addCssClass('field-happy-cms-media')
+            ->setAttr($attrs ?? [])
         ;
 
         return $field;
@@ -32,32 +33,32 @@ class TinyMCEField implements FieldInterface
 
     /**
      * @param array{
-     * toolbar: string,
-     * skin: ?string,
-     * content_css: ?string,
-     * content_style: ?string,
-     * config: ?string,
-     * plugins: ?string,
-     * toolbar: ?string,
-     * toolbar_mode: ?string,
-     * menubar: ?string,
-     * contextmenu: ?string,
-     * quickbars_insert_toolbar: ?string,
-     * quickbars_selection_toolbar: ?string,
-     * resize: ?string,
-     * icons: ?string,
-     * icons_url: ?string,
-     * setup: ?string,
-     * images_upload_url: ?string,
-     * images_upload_route: ?string,
-     * images_upload_route_params: ?array,
-     * images_upload_handler: ?string,
-     * images_upload_base_path: ?string,
-     * images_upload_credentials: ?boolean,
-     * images_reuse_filename: ?string,
-     * powerpaste_word_import: ?string,
-     * powerpaste_html_import: ?string,
-     * powerpaste_allow_local_images: ?string,
+     * toolbar?: ?string,
+     * skin?: ?string,
+     * content_css?: ?string,
+     * content_style?: ?string,
+     * config?: ?string,
+     * plugins?: ?string,
+     * toolbar?: ?string,
+     * toolbar_mode?: ?string,
+     * menubar?: ?string,
+     * contextmenu?: ?string,
+     * quickbars_insert_toolbar?: ?string,
+     * quickbars_selection_toolbar?: ?string,
+     * resize?: ?string,
+     * icons?: ?string,
+     * icons_url?: ?string,
+     * setup?: ?string,
+     * images_upload_url?: ?string,
+     * images_upload_route?: ?string,
+     * images_upload_route_params?: ?array,
+     * images_upload_handler?: ?string,
+     * images_upload_base_path?: ?string,
+     * images_upload_credentials?: ?boolean,
+     * images_reuse_filename?: ?string,
+     * powerpaste_word_import?: ?string,
+     * powerpaste_html_import?: ?string,
+     * powerpaste_allow_local_images?: ?string,
      * } $attr
      */
     public function setAttr(array $attr): void
