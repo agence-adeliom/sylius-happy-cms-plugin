@@ -73,7 +73,7 @@ class RouteRenderService extends AbstractController
         }
 
         if (true === $route->getOption(EntityRouteIndexer::OPTION_PREVIEW)) {
-            $this->denyAccessUnlessGranted(ContentDocumentVoter::PREVIEW, $contentDocument);
+            $this->denyAccessUnlessGranted(ContentDocumentVoter::ROLE_CMS_PREVIEW, $contentDocument);
         } else {
             if (!$contentDocument->isOnline()) {
                 throw $this->createNotFoundException('Document is not published');

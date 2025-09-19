@@ -12,7 +12,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class ContentDocumentVoter implements VoterInterface
 {
-    public const PREVIEW = 'preview';
+    public const ROLE_CMS_PREVIEW = 'ROLE_CMS_PREVIEW';
 
     /**
      * @param array<string, mixed> $attributes
