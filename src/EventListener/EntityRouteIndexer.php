@@ -153,8 +153,9 @@ class EntityRouteIndexer
                 $route = $entity->getRoutes()->filter(static fn (Route $route) => $route->getName() === $routeName)->first();
                 if ($route && isset($oldRoutes[$prefix]['from'])) {
                     $oldRoutes[$prefix]['to'] = $route->getStaticPrefix();
-                    $isFromPreview = str_ends_with($oldRoutes[$prefix]['from'], '-preview') && $routeNamePrefix === self::ROUTE_PREVIEW;
-                    $isToPreview = str_ends_with($oldRoutes[$prefix]['to'], '-preview') && $routeNamePrefix === self::ROUTE_PREVIEW;
+                    $isFromPreview = $oldRoutes[$prefix]['from'] && str_ends_with($oldRoutes[$prefix]['from'], '-preview') && $routeNamePrefix === self::ROUTE_PREVIEW;
+                    $isToPreview = $oldRoutes[$prefix]['to'] && str_ends_with($oldRoutes[$prefix]['to'], '-preview') &&
+                    $routeNamePrefix === self::ROUTE_PREVIEW;
                     $connection->executeQuery("UPDATE `orm_routes` SET staticPrefix = REPLACE(staticPrefix, ?, ?) WHERE staticPrefix LIKE ? AND name LIKE ?", [
                         str_replace($isFromPreview ? '-preview' : '', '', $oldRoutes[$prefix]['from']),
                         str_replace($isToPreview ? '-preview' : '', '', $oldRoutes[$prefix]['to']),
