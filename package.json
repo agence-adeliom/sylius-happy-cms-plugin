@@ -39,7 +39,7 @@
     "music-metadata-browser": "^2.2.6",
     "notie": "^4.3.1",
     "plyr": "^3.6.8",
-    "tailwindcss": "^2.2.4",
+    "tailwindcss": "^4.1.17",
     "vue": "^2.6.14",
     "vue-awesome": "^4.3.1",
     "vue-clipboard2": "^0.3.1",
