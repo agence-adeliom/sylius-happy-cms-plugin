@@ -35,7 +35,7 @@
     "stof/doctrine-extensions-bundle": "^1.6",
     "symfony/psr-http-message-bridge": "^2.0",
     "nyholm/psr7": "^1.4",
-    "presta/sitemap-bundle": "^3.0",
+    "presta/sitemap-bundle": "^4.2",
     "james-heinrich/getid3": "^1.9"
   },
   "conflict": {
