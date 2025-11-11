@@ -13,7 +13,7 @@
     "@agence-adeliom/sylius-happy-cms-assets" : "file:./assets"
   },
   "devDependencies": {
-    "@symfony/webpack-encore": "^2.0",
+    "@symfony/webpack-encore": "^5.2",
     "buffer": "^6.0.3",
     "eslint": "^8.56.0",
     "infinite-tree": "^1.18.0",
