@@ -39,7 +39,7 @@ class TreeComponent
 
         if (true !== $pageRepository->verify()) {
             $pageRepository->recoverFast([
-                                             'sortByField'   => 'lft', // Reorder sibling nodes by this field
+                                             'sortByField' => 'lft', // Reorder sibling nodes by this field
                                              // during recovery
                                              'sortDirection' => 'ASC',
                                          ]);
@@ -58,7 +58,7 @@ class TreeComponent
 
         if (true !== $pageRepository->verify()) {
             $pageRepository->recoverFast([
-                                             'sortByField'   => 'lft', // Reorder sibling nodes by this field
+                                             'sortByField' => 'lft', // Reorder sibling nodes by this field
                                              // during recovery
                                              'sortDirection' => 'ASC',
                                          ]);
@@ -77,7 +77,7 @@ class TreeComponent
 
         if (true !== $pageRepository->verify()) {
             $pageRepository->recoverFast([
-                                             'sortByField'   => 'lft',
+                                             'sortByField' => 'lft',
                                              'sortDirection' => 'ASC',
                                          ]);
             $this->entityManager->flush();
@@ -85,7 +85,6 @@ class TreeComponent
 
         $pageRepository->moveDown($pageToBeMoved, true);
         $this->entityManager->flush();
-
     }
 
     #[LiveAction]
@@ -96,7 +95,7 @@ class TreeComponent
 
         if (true !== $pageRepository->verify()) {
             $pageRepository->recoverFast([
-                                             'sortByField'   => 'lft', // Reorder sibling nodes by this field
+                                             'sortByField' => 'lft', // Reorder sibling nodes by this field
                                              // during recovery
                                              'sortDirection' => 'ASC',
                                          ]);

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\Twig\Components\MenuItemTree;
 
 use Adeliom\SyliusHappyCMSPlugin\Doctrine\Query\Menu\AllMenuItemsInterface;
-use Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuItemInterface;
 use Adeliom\SyliusHappyCMSPlugin\Repository\Menu\MenuItemRepositoryInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Sylius\Bundle\UiBundle\Twig\Component\TemplatePropTrait;
@@ -44,7 +43,7 @@ class TreeComponent
 
         if (true !== $this->menuItemRepository->verify()) {
             $this->menuItemRepository->recoverFast([
-                                                       'sortByField'   => 'lft', // Reorder sibling nodes by this field
+                                                       'sortByField' => 'lft', // Reorder sibling nodes by this field
                                                        // during recovery
                                                        'sortDirection' => 'ASC',
                                                    ]);
@@ -64,7 +63,7 @@ class TreeComponent
 
         if (true !== $this->menuItemRepository->verify()) {
             $this->menuItemRepository->recoverFast([
-                                                       'sortByField'   => 'lft', // Reorder sibling nodes by this field
+                                                       'sortByField' => 'lft', // Reorder sibling nodes by this field
                                                        // during recovery
                                                        'sortDirection' => 'ASC',
                                                    ]);
@@ -84,7 +83,7 @@ class TreeComponent
 
         if (true !== $this->menuItemRepository->verify()) {
             $this->menuItemRepository->recoverFast([
-                                                       'sortByField'   => 'lft',
+                                                       'sortByField' => 'lft',
                                                        'sortDirection' => 'ASC',
                                                    ]);
             $this->entityManager->flush();
@@ -103,7 +102,7 @@ class TreeComponent
 
         if (true !== $this->menuItemRepository->verify()) {
             $this->menuItemRepository->recoverFast([
-                                                       'sortByField'   => 'lft', // Reorder sibling nodes by this field
+                                                       'sortByField' => 'lft', // Reorder sibling nodes by this field
                                                        // during recovery
                                                        'sortDirection' => 'ASC',
                                                    ]);

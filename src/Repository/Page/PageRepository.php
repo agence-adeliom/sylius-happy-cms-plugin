@@ -129,9 +129,6 @@ class PageRepository extends NestedTreeRepository implements PageRepositoryInter
         return $this->getResult($qb->getQuery());
     }
 
-    /**
-     * @return ?PageInterface
-     */
     public function getByTemplate(string $template, string $locale, ChannelInterface $channel): ?PageInterface
     {
         $qb = $this->getPublishedQuery();

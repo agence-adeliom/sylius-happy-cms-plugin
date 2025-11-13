@@ -16,7 +16,7 @@ use Sylius\Resource\Model\ResourceInterface;
  */
 final class SharedBlockConfigurator implements FieldConfiguratorInterface
 {
-    public function __construct(protected SharedBlockCollection $collection)
+    public function __construct(private SharedBlockCollection $collection)
     {
     }
 

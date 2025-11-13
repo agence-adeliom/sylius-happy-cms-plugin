@@ -25,10 +25,10 @@ use function Symfony\Component\String\u;
 final class FlexibleContentConfigurator implements FieldConfiguratorInterface
 {
     public function __construct(
-        protected BlockCollection $collection,
-        protected SharedBlockCollection $sharedBlockCollection,
-    )
-    {}
+        private BlockCollection $collection,
+        private SharedBlockCollection $sharedBlockCollection,
+    ) {
+    }
 
     public function supports(FieldDto $field, ?ResourceInterface $resource = null): bool
     {

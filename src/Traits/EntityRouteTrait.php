@@ -180,7 +180,7 @@ trait EntityRouteTrait
         // It's store into the route option 'last_modification_timestamp'
         // This allow to simply check the last modification date of the entity and before rendering all page
         // This code is executed on the controller top actions
-        if (!is_null($route->getLastModification())) {
+        if (null !== $route->getLastModification()) {
             // Force public cache even if a session is started
             // Carreful to not have client component in you cache
             // Or wrap those component into a sub request (esi render, or live component)
@@ -230,45 +230,46 @@ trait EntityRouteTrait
 
         // 3. Le slug des parents
         $parents = [];
-        while (!is_null($translatable)) {
+        while (null !== $translatable) {
             if ($accessor->isReadable($translatable, 'parent')) {
                 $parent = $accessor->getValue($translatable, 'parent');
-                if (is_null($parent)) {
+                if (null === $parent) {
                     $translatable = null;
+
                     break;
-                } else {
-                    $parentSlug = '';
-                    if ($accessor->isReadable($parent, 'translation')) {
-                        $parentTranslation = $parent->getTranslation($translation->getLocale());
-                        $parentSlug = $accessor->getValue($parentTranslation, 'slug');
-                    } else if ($accessor->isReadable($parent, 'slug')) {
-                        $parentSlug = $accessor->getValue($parent, 'slug');
-                    }
-                    $isHomepage = false;
-                    if ($accessor->isReadable($parent, 'isHomePage')) {
-                        $isHomepage = $accessor->getValue($parent, 'isHomePage');
-                    }
-                    if ($parentSlug && !$isHomepage) {
-                        $parents[] = $parentSlug;
-                    }
-                    // Prochaine boucle la parent devient le translatable
-                    $translatable = $parent;
                 }
+                $parentSlug = '';
+                if ($accessor->isReadable($parent, 'translation')) {
+                    $parentTranslation = $parent->getTranslation($translation->getLocale());
+                    $parentSlug = $accessor->getValue($parentTranslation, 'slug');
+                } elseif ($accessor->isReadable($parent, 'slug')) {
+                    $parentSlug = $accessor->getValue($parent, 'slug');
+                }
+                $isHomepage = false;
+                if ($accessor->isReadable($parent, 'isHomePage')) {
+                    $isHomepage = $accessor->getValue($parent, 'isHomePage');
+                }
+                if ($parentSlug && !$isHomepage) {
+                    $parents[] = $parentSlug;
+                }
+                // Prochaine boucle la parent devient le translatable
+                $translatable = $parent;
             }
         }
 
-        return str_replace([
+        return str_replace(
+            [
                                '{{parents}}',
                                '{{current}}',
                                '{{preview}}',
-                           ], [
+                           ],
+            [
                                (count($parents) > 0) ? '/' . implode('/', array_reverse($parents)) : '',
                                $current,
                                $preview,
                            ],
-            $urlPattern
+            $urlPattern,
         );
-
     }
 
     public function getVariablePattern(TranslationInterface $translation, bool $isPreview): string

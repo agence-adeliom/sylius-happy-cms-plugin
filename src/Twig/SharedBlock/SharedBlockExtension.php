@@ -38,21 +38,22 @@ class SharedBlockExtension extends AbstractExtension
             $resources = $this->parameterBag->get('sylius.resources');
             $modelClass = $resources[$resourceName]['classes']['model'] ?? null;
 
-            if (is_null($modelClass) || !is_a($modelClass, SharedBlockInterface::class, true)) {
+            if (null === $modelClass || !is_a($modelClass, SharedBlockInterface::class, true)) {
                 throw new \InvalidArgumentException(sprintf('The resource "%s" must implement "%s".', $resourceName, SharedBlockInterface::class));
             }
 
             $repository = $this->manager->getRepository($modelClass);
 
-            if (is_null($repository) || !method_exists($repository, 'getByKey')) {
+            if (null === $repository || !method_exists($repository, 'getByKey')) {
                 throw new \InvalidArgumentException(sprintf('The resource "%s" repository must have a method "%s".', $resourceName, 'getByKey'));
             }
 
             /** @var SharedBlockInterface|null $object */
             $object = $repository->getByKey($key);
-            if (!is_null($object)) {
+            if (null !== $object) {
                 return $object->getId();
             }
+
             return null;
         } catch (\Exception $exception) {
             return null;

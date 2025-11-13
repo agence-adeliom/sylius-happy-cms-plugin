@@ -53,7 +53,7 @@ class TinyMCEField implements FieldInterface
      * images_upload_route_params: ?array,
      * images_upload_handler: ?string,
      * images_upload_base_path: ?string,
-     * images_upload_credentials: ?boolean,
+     * images_upload_credentials: ?bool,
      * images_reuse_filename: ?string,
      * powerpaste_word_import: ?string,
      * powerpaste_html_import: ?string,

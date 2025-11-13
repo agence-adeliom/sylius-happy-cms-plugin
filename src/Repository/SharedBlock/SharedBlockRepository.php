@@ -10,7 +10,6 @@ use Adeliom\SyliusHappyCMSPlugin\Entity\SharedBlock\SharedBlockInterface;
 use Doctrine\ORM\QueryBuilder;
 use Sylius\Bundle\ResourceBundle\Doctrine\ORM\EntityRepository;
 use Sylius\Bundle\ResourceBundle\Doctrine\ORM\ResourceRepositoryTrait;
-use Sylius\Component\Resource\Model\ResourceInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
 
 class SharedBlockRepository extends EntityRepository implements SharedBlockRepositoryInterface, RepositoryInterface, TranslationRepositoryInterface
@@ -55,6 +54,7 @@ class SharedBlockRepository extends EntityRepository implements SharedBlockRepos
 
     /**
      * @param string[] $types
+     *
      * @return SharedBlockInterface[]
      */
     public function findByTypes(array $types): array
