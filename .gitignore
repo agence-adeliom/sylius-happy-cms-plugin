@@ -20,6 +20,8 @@
 /tests/TestApplication/.env.*.local
 /var/
 
+composer.lock
+
 .idea/*
 .claude/*
 .ddev/*
