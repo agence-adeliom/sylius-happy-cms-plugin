@@ -1,131 +1,129 @@
-<div align="center">
+<p align="center">
+    <a href="https://sylius.com" target="_blank">
+        <picture>
+          <source media="(prefers-color-scheme: dark)" srcset="https://media.sylius.com/sylius-logo-800-dark.png">
+          <source media="(prefers-color-scheme: light)" srcset="https://media.sylius.com/sylius-logo-800.png">
+          <img alt="Sylius Logo." src="https://media.sylius.com/sylius-logo-800.png">
+        </picture>
+    </a>
+</p>
 
-# Sylius Happy CMS Plugin
+<h1 align="center">Plugin Skeleton</h1>
 
-
-</div>
-
-
-![Happy CMS banner](docs/screens/happy_cms.jpg "Happy CMS banner")
-
-<div align="center">
-
-[Overview](#overview) • [Installation](#installation) • [Documentation](#documentation)
-
-</div>
-
----
-
-## Overview
-
-Happy CMS is a Content Management System (CMS) plugin for Sylius that enables you to create and manage dynamic, routable Sylius resources content with ease. It provides a flexible framework for building pages, managing blocks of content, and defining custom routable entities, all integrated seamlessly into your Sylius e-commerce platform.
-
-### A duo: Happy CMS + Easy CRUD
-
-This plugin is built to work hand in hand with [Sylius Easy CRUD Plugin]() to provide a seamless experience for managing CMS routable resources in front, and CRUD admin interfaces easily within Sylius.
-
----
-
-## Installation
-
-### 1. Install via Composer
-
-```bash
-composer require agence-adeliom/sylius-happy-cms-plugin
-composer require --dev symfony/maker-bundle
-```
-
-### 2. Enable the Bundle
-
-Add the plugin to `config/bundles.php`:
-
-```php
-<?php
-
-return [
-    // ...
-    Adeliom\SyliusEasyCrudPlugin\SyliusEasyCrudPlugin::class => ['all' => true],
-    Adeliom\SyliusHappyCMSPlugin\SyliusHappyCMSPlugin::class => ['all' => true],
-   
-    Symfony\Bundle\MakerBundle\MakerBundle::class => ['dev' => true, 'test' => true],
-];
-```
-
-### 3. Import Configuration
-
-In `config/packages/_sylius.yaml`:
-
-```yaml
-imports:
-  - { resource: "@SyliusEasyCrudPlugin/config/config.yaml" }
-  - { resource: "@SyliusHappyCMSPlugin/config/config.yaml" }
-```
-
-### 4. Import Routes
-
-In `config/routes.yaml`:
-
-```yaml
-sylius_happy_cms:
-  resource: "@SyliusHappyCMSPlugin/config/routes.yaml"
-  
-sylius_easy_crud:
-  resource: "@SyliusEasyCrudPlugin/config/routes.yaml"
-```
-
-### 4. Generate default files in your project (entities, repositories and admin classes) :
-
-Actually, we don't have Symfony recipes, so we created a command to generate files automatically.
-
-```bash
-php bin/console make:happy-cms:install
-```
-This command will :
-- Create all entities, repositories and admin class
-- update config/routes.yaml by adding route properly declared
-- update config/packages/sylius_resource.yaml by adding sylius routes properly declared
-- update config/packages/sylius_happy_cms.yaml by adding new files properly declared
-
-If something goes wrong, you can do those actions manually, check [detailed configuration](./docs/DETAILED_CONFIG.md).
-
-### 5. Install Assets
-
-```bash
-php bin/console assets:install
-```
-
-### 6. Update database
-
-```bash
-php bin/console doc:mig:diff
-php bin/console doc:mig:mig
-php bin/console cache:clear
-```
-
-At this point, the plugin should be installed and ready to use!
-
----
+<p align="center">Skeleton for starting Sylius plugins.</p>
 
 ## Documentation
 
-- **[Configure Homepage](./docs/HOMEPAGE.md)**
-- **[Create custom routable entities](./docs/CREATE_ROUTABLE_ENTITIES.md)**
-- **[Create custom CMS blocks](./docs/CREATE_BLOCK.md)**
-- **[Detailed default configuration](./docs/DETAILED_CONFIG.md)**
-- **[How routing work](./docs/ROUTING.md)**
+For a comprehensive guide on Sylius Plugins development please go to Sylius documentation,
+there you will find the <a href="https://docs.sylius.com/en/latest/plugin-development-guide/index.html">Plugin Development Guide</a>, that is full of examples.
 
----
+For more information about the **Test Application** included in the skeleton, please refer to the [Sylius documentation](https://docs.sylius.com/sylius-plugins/plugins-development-guide/testapplication).
 
-<div align="center">
+## Quickstart Installation
 
-**If this plugin helped you, please consider giving it a ⭐ on GitHub!**
+Run `composer create-project sylius/plugin-skeleton ProjectName`.
 
-Made with ❤️ by [Adeliom](https://www.adeliom.com/)
+### Traditional
 
+1. From the plugin skeleton root directory, run the following commands:
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![PHP Version](https://img.shields.io/badge/php-%5E8.2-blue)](https://php.net)
-[![Sylius Version](https://img.shields.io/badge/sylius-%5E2.0-blue)](https://sylius.com)
-[![Latest Version](https://img.shields.io/packagist/v/agence-adeliom/sylius-easy-crud-plugin)](https://packagist.org/packages/agence-adeliom/sylius-happy-cms-plugin)
+    ```bash
+    (cd vendor/sylius/test-application && yarn install)
+    (cd vendor/sylius/test-application && yarn build)
+    vendor/bin/console assets:install
+   
+    vendor/bin/console doctrine:database:create
+    vendor/bin/console doctrine:migrations:migrate -n
+    # Optionally load data fixtures
+    vendor/bin/console sylius:fixtures:load -n
+    ```
 
-</div>
+To be able to set up a plugin's database, remember to configure your database credentials in `tests/Application/.env` and `tests/Application/.env.test`.
+
+2. Run your local server:
+
+      ```bash
+      symfony server:ca:install
+      symfony server:start -d
+      ```
+
+3. Open your browser and navigate to `https://localhost:8000`.
+
+### Docker
+
+1. Execute `make init` to initialize the container and install the dependencies.
+
+2. Execute `make database-init` to create the database and run migrations.
+
+3. (Optional) Execute `make load-fixtures` to load the fixtures.
+
+4. Your app is available at `http://localhost`.
+
+## Usage
+
+### Running plugin tests
+
+  - PHPUnit
+
+    ```bash
+    vendor/bin/phpunit
+    ```
+
+  - Behat (non-JS scenarios)
+
+    ```bash
+    vendor/bin/behat --strict --tags="~@javascript&&~@mink:chromedriver"
+    ```
+
+  - Behat (JS scenarios)
+ 
+    1. [Install Symfony CLI command](https://symfony.com/download).
+ 
+    2. Start Headless Chrome:
+    
+      ```bash
+      google-chrome-stable --enable-automation --disable-background-networking --no-default-browser-check --no-first-run --disable-popup-blocking --disable-default-apps --allow-insecure-localhost --disable-translate --disable-extensions --no-sandbox --enable-features=Metal --headless --remote-debugging-port=9222 --window-size=2880,1800 --proxy-server='direct://' --proxy-bypass-list='*' http://127.0.0.1
+      ```
+    
+    3. Install SSL certificates (only once needed) and run test application's webserver on `127.0.0.1:8080`:
+    
+      ```bash
+      symfony server:ca:install
+      APP_ENV=test symfony server:start --port=8080 --daemon
+      ```
+    
+    4. Run Behat:
+    
+      ```bash
+      vendor/bin/behat --strict --tags="@javascript,@mink:chromedriver"
+      ```
+    
+  - Static Analysis
+      
+    - PHPStan
+    
+      ```bash
+      vendor/bin/phpstan analyse -c phpstan.neon -l max src/  
+      ```
+
+  - Coding Standard
+  
+    ```bash
+    vendor/bin/ecs check
+    ```
+
+### Opening Sylius with your plugin
+
+- Using `test` environment:
+
+    ```bash
+    APP_ENV=test vendor/bin/console vendor/bin/console sylius:fixtures:load -n
+    APP_ENV=test symfony server:start -d
+    ```
+    
+- Using `dev` environment:
+
+    ```bash
+    vendor/bin/console vendor/bin/console sylius:fixtures:load -n
+    symfony server:start -d
+    ```

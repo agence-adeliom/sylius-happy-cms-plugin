@@ -19,7 +19,6 @@ use Adeliom\SyliusEasyCrudPlugin\Enum\ColumnSizeEnum;
 use Adeliom\SyliusEasyCrudPlugin\Enum\ThreeStateStatusEnum;
 use Adeliom\SyliusHappyCMSPlugin\Admin\Field\FlexibleContentField;
 use Adeliom\SyliusHappyCMSPlugin\Admin\Field\SEOField;
-use App\Entity\HappyCMS\Page\Page;
 use Sylius\Bundle\GridBundle\Builder\Filter\StringFilter;
 
 abstract class AbstractPageAdmin extends AbstractAdmin implements PageAdminInterface
@@ -81,7 +80,6 @@ abstract class AbstractPageAdmin extends AbstractAdmin implements PageAdminInter
             yield ResourceChoiceField::new('parent', 'sylius_happy_cms.page.admin.field.parent')
                 ->setMultiple(false)
                 ->setRequired(false)
-                ->setEntityClass(Page::class)
                 ->setResourceAlias('sylius_happy_cms.page');
 
             yield Field::new('name', 'sylius_happy_cms.page.admin.field.name')
@@ -93,7 +91,7 @@ abstract class AbstractPageAdmin extends AbstractAdmin implements PageAdminInter
                 ->onlyOnIndex();
 
             yield ColumnField::new('sylius_happy_cms.page.admin.panel.metadatas')
-                ->setSize(ColumnSizeEnum::WIDE_8_OF_16);
+                ->setSize(ColumnSizeEnum::WIDE_6_OF_12);
 
             yield TranslationField::new('translations', 'sylius_happy_cms.page.admin.field.translations')
                 ->addField(
@@ -112,7 +110,7 @@ abstract class AbstractPageAdmin extends AbstractAdmin implements PageAdminInter
                 ->hideOnIndex();
 
             yield ColumnField::new('sylius_happy_cms.page.admin.panel.publication')
-                ->setSize(ColumnSizeEnum::WIDE_8_OF_16);
+                ->setSize(ColumnSizeEnum::WIDE_6_OF_12);
 
             yield EnumField::new('publishState', 'sylius_happy_cms.page.admin.field.state')
                 ->setEnum(ThreeStateStatusEnum::class)

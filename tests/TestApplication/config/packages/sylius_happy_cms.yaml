@@ -1,0 +1,52 @@
+sylius_happy_cms:
+  page:
+    page_model: Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Page\Page
+    page_repository: Tests\Adeliom\SyliusHappyCMSPlugin\Repository\HappyCMS\Page\PageRepository
+    page_admin: Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\Page\PageAdmin
+  
+  seo:
+    title:
+      suffix: HappyCMS Test Application
+  
+
+  config:
+    config_model: Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Config\Config
+    config_repository: Tests\Adeliom\SyliusHappyCMSPlugin\Repository\HappyCMS\Config\ConfigRepository
+    config_admin: Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\Config\ConfigAdmin
+  
+
+  media:
+    storage_name: uploads.storage
+    base_url: '/media/download'
+    media_entity: Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Media\Media
+    folder_entity: Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Media\Folder
+  
+
+  menu:
+    menu:
+      menu_model: Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Menu\Menu
+      menu_repository: Tests\Adeliom\SyliusHappyCMSPlugin\Repository\HappyCMS\Menu\MenuRepository
+      menu_admin:  Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\Menu\MenuAdmin
+    menu_item:
+      menu_item_model: Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Menu\MenuItem
+      menu_item_repository: Tests\Adeliom\SyliusHappyCMSPlugin\Repository\HappyCMS\Menu\MenuItemRepository
+      menu_item_admin:  Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\Menu\MenuItemAdmin
+  
+
+  shared_block:
+    shared_block_model: Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\SharedBlock\SharedBlock
+    shared_block_repository: Tests\Adeliom\SyliusHappyCMSPlugin\Repository\HappyCMS\SharedBlock\SharedBlockRepository
+    shared_block_admin: Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\SharedBlock\SharedBlockAdmin
+  
+
+  route:
+    route_model: Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Cmf\Route
+    route_repository: Tests\Adeliom\SyliusHappyCMSPlugin\Repository\HappyCMS\Cmf\RouteRepository
+    route_admin:  Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\Cmf\RouteAdmin
+  
+
+  redirect_route:
+    redirect_route_model: Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Cmf\RedirectRoute
+    redirect_route_repository: Tests\Adeliom\SyliusHappyCMSPlugin\Repository\HappyCMS\Cmf\RedirectRouteRepository
+    redirect_route_admin:  Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\Cmf\RedirectRouteAdmin
+  

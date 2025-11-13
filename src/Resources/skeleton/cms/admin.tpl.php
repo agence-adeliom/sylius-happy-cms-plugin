@@ -102,7 +102,7 @@ final class <?= $classNameDetail->getShortName() ?>Admin extends AbstractAdmin i
         mb_strtolower($classNameDetail->getShortName()) ?>');
 
             yield ColumnField::new('happy_cms.<?= $scope ?>.admin.panel.metadata')
-                ->setSize(ColumnSizeEnum::WIDE_8_OF_16);
+                ->setSize(ColumnSizeEnum::WIDE_6_OF_12);
 
             yield Field::new('name')
                 ->setLabel('<?= $classNameDetail->getShortName() ?>')
@@ -159,7 +159,7 @@ final class <?= $classNameDetail->getShortName() ?>Admin extends AbstractAdmin i
                 ->hideOnIndex();
 
             yield ColumnField::new('happy_cms.<?= $scope ?>.admin.panel.publication')
-                ->setSize(ColumnSizeEnum::WIDE_8_OF_16);
+                ->setSize(ColumnSizeEnum::WIDE_6_OF_12);
 
             yield FormTypeField::new('publishDate', 'Date de publication', DateTimeType::class)
                 ->setFormTypeOption('widget', 'single_text')

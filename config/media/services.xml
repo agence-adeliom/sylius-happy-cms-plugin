@@ -29,7 +29,9 @@
         <service id="Adeliom\SyliusHappyCMSPlugin\Services\Media\MediaHelper" alias="happy.cms.media.manager" public="true"/>
 
         <service id="happy.cms.media.form.media" class="Adeliom\SyliusHappyCMSPlugin\Form\MediaType" public="true" autowire="true">
-            <argument key="$manager" type="service" id="happy.cms.media.manager"/>
+            <call method="setManager">
+                <argument key="$manager" type="service" id="happy.cms.media.manager"/>
+            </call>
         </service>
 
         <service id="happy.cms.media.twig.happy.cms.media_extension" class="Adeliom\SyliusHappyCMSPlugin\Twig\Media\MediaExtension" public="true" autowire="true">

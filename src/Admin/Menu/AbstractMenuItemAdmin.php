@@ -133,7 +133,7 @@ abstract class AbstractMenuItemAdmin extends AbstractAdmin implements MenuItemAd
         //yield Field::new('position', 'sylius_happy_cms.menu_item.admin.field.position');
 
         yield ColumnField::new('col2', '')
-            ->setSize(ColumnSizeEnum::WIDE_8_OF_16);
+            ->setSize(ColumnSizeEnum::WIDE_6_OF_12);
         //yield TabField::new('menu', 'sylius_happy_cms.menu_item.admin.tab.menu_item')
         //    ->renderHorizontal();
 

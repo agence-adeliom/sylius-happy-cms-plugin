@@ -1,0 +1,96 @@
+sylius_resource:
+    resources:
+        
+        sylius_happy_cms.page:
+            driver: doctrine/orm
+            classes:
+                model: Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Page\Page
+                controller: Adeliom\SyliusHappyCMSPlugin\Controller\Page\PageResourceController
+                repository: Tests\Adeliom\SyliusHappyCMSPlugin\Repository\HappyCMS\Page\PageRepository
+                form: Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\Page\PageAdmin
+            translation:
+                classes:
+                    model: Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Page\PageTranslation
+                    controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+                    form: Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\Page\PageAdmin
+        
+        
+        sylius_happy_cms.config:
+            driver: doctrine/orm
+            classes:
+                model: Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Config\Config
+                controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+                repository: Tests\Adeliom\SyliusHappyCMSPlugin\Repository\HappyCMS\Config\ConfigRepository
+                form: Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\Config\ConfigAdmin
+            translation:
+                classes:
+                    model: Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Config\ConfigTranslation
+                    controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+                    form: Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\Config\ConfigAdmin
+        
+        
+        sylius_happy_cms.media:
+            driver: doctrine/orm
+            classes:
+                model: Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Media\Media
+                repository: Tests\Adeliom\SyliusHappyCMSPlugin\Repository\HappyCMS\Media\MediaRepository
+        
+        sylius_happy_cms.media_folder:
+            driver: doctrine/orm
+            classes:
+                model: Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Media\Folder
+                repository: Tests\Adeliom\SyliusHappyCMSPlugin\Repository\HappyCMS\Media\FolderRepository
+        
+        
+        sylius_happy_cms.menu:
+            driver: doctrine/orm
+            classes:
+                model: Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Menu\Menu
+                controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+                repository: Tests\Adeliom\SyliusHappyCMSPlugin\Repository\HappyCMS\Menu\MenuRepository
+                form: Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\Menu\MenuAdmin
+        
+        sylius_happy_cms.menu_item:
+            driver: doctrine/orm
+            classes:
+                model: Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Menu\MenuItem
+                controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+                repository: Tests\Adeliom\SyliusHappyCMSPlugin\Repository\HappyCMS\Menu\MenuItemRepository
+                form: Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\Menu\MenuItemAdmin
+            translation:
+                classes:
+                    model: Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Menu\MenuItemTranslation
+                    controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+                    form: Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\Menu\MenuItemAdmin
+        
+        
+        sylius_happy_cms.shared_block:
+            driver: doctrine/orm
+            classes:
+                model: Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\SharedBlock\SharedBlock
+                controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+                repository: Tests\Adeliom\SyliusHappyCMSPlugin\Repository\HappyCMS\SharedBlock\SharedBlockRepository
+                form: Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\SharedBlock\SharedBlockAdmin
+            translation:
+                classes:
+                    model: Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\SharedBlock\SharedBlockTranslation
+                    controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+                    form: Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\SharedBlock\SharedBlockAdmin
+        
+        
+        sylius_happy_cms.route:
+            driver: doctrine/orm
+            classes:
+                model: Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Cmf\Route
+                repository: Tests\Adeliom\SyliusHappyCMSPlugin\Repository\HappyCMS\Cmf\RouteRepository
+                controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+                form: Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\Cmf\RouteAdmin
+        
+        
+        sylius_happy_cms.redirect_route:
+            driver: doctrine/orm
+            classes:
+                model: Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Cmf\RedirectRoute
+                repository: Tests\Adeliom\SyliusHappyCMSPlugin\Repository\HappyCMS\Cmf\RedirectRouteRepository
+                controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
+                form: Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\Cmf\RedirectRouteAdmin

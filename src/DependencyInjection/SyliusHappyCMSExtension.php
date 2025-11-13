@@ -20,11 +20,7 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
 {
     use PrependDoctrineMigrationsTrait;
 
-    /**
-     * @param array<string, mixed> $configs
-     *
-     * @throws \Exception
-     */
+    /** @psalm-suppress UnusedVariable */
     public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();
@@ -154,7 +150,7 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
 
     protected function getMigrationsNamespace(): string
     {
-        return 'Adeliom\SyliusHappyCMSPlugin\Migrations';
+        return 'DoctrineMigrations';
     }
 
     protected function getMigrationsDirectory(): string
@@ -162,9 +158,6 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
         return '@SyliusHappyCMSPlugin/src/Migrations';
     }
 
-    /**
-     * @return string[]
-     */
     protected function getNamespacesOfMigrationsExecutedBefore(): array
     {
         return [
