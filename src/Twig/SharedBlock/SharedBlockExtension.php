@@ -6,6 +6,7 @@ namespace Adeliom\SyliusHappyCMSPlugin\Twig\SharedBlock;
 
 use Adeliom\SyliusHappyCMSPlugin\Entity\SharedBlock\SharedBlockInterface;
 use Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock\Helper;
+use Adeliom\SyliusHappyCMSPlugin\Repository\SharedBlock\SharedBlockRepositoryInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Twig\Extension\AbstractExtension;
@@ -35,6 +36,15 @@ class SharedBlockExtension extends AbstractExtension
     {
         try {
             $resourceName = 'sylius_happy_cms.shared_block';
+            /** @var array<string, array{
+             *  classes: array{
+             *     model: class-string,
+             *     controller: class-string,
+             *     repository: class-string,
+             *     form: class-string,
+             *     factory: class-string,
+             *  }
+             * }|null> $resources */
             $resources = $this->parameterBag->get('sylius.resources');
             $modelClass = $resources[$resourceName]['classes']['model'] ?? null;
 
@@ -42,6 +52,7 @@ class SharedBlockExtension extends AbstractExtension
                 throw new \InvalidArgumentException(sprintf('The resource "%s" must implement "%s".', $resourceName, SharedBlockInterface::class));
             }
 
+            /** @var SharedBlockRepositoryInterface|null $repository */
             $repository = $this->manager->getRepository($modelClass);
 
             if (null === $repository || !method_exists($repository, 'getByKey')) {
