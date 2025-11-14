@@ -38,10 +38,10 @@ services:
     public: true
 
   Adeliom\SyliusHappyCMSPlugin\Repository\Menu\MenuRepositoryInterface:
-    alias: happy_cms_menu.menu_item.repository
+    alias: happy_cms_menu.menu.repository
 
   Adeliom\SyliusHappyCMSPlugin\Repository\Menu\MenuItemRepositoryInterface:
-    alias: happy_cms_menu.menu.repository
+    alias: happy_cms_menu.menu_item.repository
 
   Adeliom\SyliusHappyCMSPlugin\Repository\Page\PageRepositoryInterface:
     alias: happy_cms_page.page.repository
