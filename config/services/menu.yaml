@@ -41,7 +41,6 @@ services:
         autowire: true
         arguments:
             - '@doctrine.orm.entity_manager'
-            - '@twig'
             - '@router'
         tags:
             - controller.service_arguments

@@ -20,7 +20,7 @@ class MenuItemController
 
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private RouterInterface $router,
+        private RouterInterface $router
     ) {
         $repository = $this->entityManager->getRepository(MenuItemInterface::class);
         if ($repository instanceof MenuItemRepositoryInterface) {
