@@ -1,6 +1,6 @@
 services:
     happy_cms_menu.menu.repository:
-        class: Adeliom\SyliusHappyCMSPlugin\Repository\Menu\MenuItemRepository
+        class: Adeliom\SyliusHappyCMSPlugin\Repository\Menu\MenuRepositoryInterface
         arguments:
             - '@doctrine.orm.entity_manager'
         calls:
