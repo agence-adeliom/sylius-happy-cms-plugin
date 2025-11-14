@@ -108,7 +108,7 @@ class EntityRouteIndexer
     private function computeRoutes(
         array &$routesChanges,
         CmsRoutableInterface &$entity,
-        string $routeNamePrefix = '',
+        string $routeNamePrefix,
         ObjectManager $objectManager,
     ): void
     {
