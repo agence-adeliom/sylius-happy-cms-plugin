@@ -7,6 +7,7 @@ namespace Adeliom\SyliusHappyCMSPlugin\Traits;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Page\PageInterface;
 use Adeliom\SyliusHappyCMSPlugin\EventListener\EntityRouteIndexer;
+use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -231,6 +232,7 @@ trait EntityRouteTrait
         // 3. Le slug des parents
         $parents = [];
         while (null !== $translatable) {
+            assert($translatable instanceof CmsRoutableInterface);
             if ($accessor->isReadable($translatable, 'parent')) {
                 $parent = $accessor->getValue($translatable, 'parent');
                 if (null === $parent) {
@@ -238,8 +240,9 @@ trait EntityRouteTrait
 
                     break;
                 }
+                assert(is_object($parent));
                 $parentSlug = '';
-                if ($accessor->isReadable($parent, 'translation')) {
+                if ($accessor->isReadable($parent, 'translation') && method_exists($parent, 'getTranslation')) {
                     $parentTranslation = $parent->getTranslation($translation->getLocale());
                     $parentSlug = $accessor->getValue($parentTranslation, 'slug');
                 } elseif ($accessor->isReadable($parent, 'slug')) {
@@ -252,7 +255,7 @@ trait EntityRouteTrait
                 if ($parentSlug && !$isHomepage) {
                     $parents[] = $parentSlug;
                 }
-                // Prochaine boucle la parent devient le translatable
+                // Next loop, until parent is null
                 $translatable = $parent;
             }
         }
