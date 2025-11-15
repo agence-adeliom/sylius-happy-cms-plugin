@@ -37,7 +37,10 @@ class SeoExtension extends AbstractExtension implements GlobalsInterface
     public const MAX_DESCRITION_LENGTH = 155;
 
     /**
-     * @param array<string, mixed> $titleConfig
+     * @param array{
+     *      separator: string,
+     *     suffix: string
+     *  } $titleConfig
      * @param array<string, mixed> $breadcrumbConfig
      */
     public function __construct(
@@ -100,7 +103,11 @@ class SeoExtension extends AbstractExtension implements GlobalsInterface
          */
         $result = $this->eventDispatcher->dispatch($event, 'sylius_happy_cms.seo.title');
 
-        return $result->getArgument('title') ?: $title;
+        if (is_string($result->getArgument('title'))) {
+            return $result->getArgument('title');
+        }
+
+        return $title ?? '';
     }
 
     public function renderSeoMetas(?SEO $seo): ?Markup

@@ -66,6 +66,7 @@ class MenuExtension extends AbstractExtension
         $template = '@SyliusHappyCMSPlugin/front/menus/' . $code . '.html.twig';
 
         if (!empty($extra['template'])) {
+            assert(is_string($extra['template']), 'Template parameter must be a string');
             $template = $extra['template'];
         }
 

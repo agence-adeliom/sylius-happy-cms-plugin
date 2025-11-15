@@ -98,14 +98,14 @@ class Media implements MediaInterface, \Stringable
     }
 
     /**
-     * @return array<string, mixed>
+     * @return string[]
      */
     public function getMetas(): array
     {
         return $this->metas;
     }
 
-    public function getMeta(string $key, mixed $default = null): mixed
+    public function getMeta(string $key, string|null $default = null): string|null
     {
         return $this->metas[$key] ?? $default;
     }

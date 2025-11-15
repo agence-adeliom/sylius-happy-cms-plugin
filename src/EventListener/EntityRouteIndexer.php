@@ -110,8 +110,7 @@ class EntityRouteIndexer
         CmsRoutableInterface &$entity,
         string $routeNamePrefix,
         ObjectManager $objectManager,
-    ): void
-    {
+    ): void {
         foreach ($entity->getTranslations() as $translation) {
             $routeName = $routeNamePrefix .
                 $translation->getLocale() . '_' .
@@ -208,8 +207,7 @@ class EntityRouteIndexer
         string $staticPrefix,
         string $previousStaticPrefix,
         PersistentCollection $excludedRoutes,
-    ): void
-    {
+    ): void {
         if ($previousStaticPrefix && $previousStaticPrefix !== $staticPrefix) {
             $allRoutes = $this->manager->getRepository(RouteInterface::class)->findAll();
 

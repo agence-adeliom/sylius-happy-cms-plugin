@@ -53,6 +53,15 @@ class RouteExtension extends AbstractExtension
     public function getPathBySeoKey(string $key, string $resourceName = 'sylius_happy_cms.page', ?string $locale = null): ?string
     {
         try {
+            /** @var array<string, array{
+             *  classes: array{
+             *     model: class-string,
+             *     controller: class-string,
+             *     repository: class-string,
+             *     form: class-string,
+             *     factory: class-string,
+             *  }
+             * }|null> $resources */
             $resources = $this->parameterBag->get('sylius.resources');
             $modelClass = $resources[$resourceName]['classes']['model'] ?? null;
 
@@ -62,7 +71,7 @@ class RouteExtension extends AbstractExtension
 
             $repository = $this->manager->getRepository($modelClass);
 
-            if (null === $repository || !method_exists($repository, 'getBySeoKey')) {
+            if (!method_exists($repository, 'getBySeoKey')) {
                 throw new \InvalidArgumentException(sprintf('The resource "%s" repository must have a method "%s".', $resourceName, 'getBySeoKey'));
             }
 
@@ -87,6 +96,15 @@ class RouteExtension extends AbstractExtension
     public function getPathByKey(string $key, string $resourceName = 'sylius_happy_cms.page'): ?string
     {
         try {
+            /** @var array<string, array{
+             *  classes: array{
+             *     model: class-string,
+             *     controller: class-string,
+             *     repository: class-string,
+             *     form: class-string,
+             *     factory: class-string,
+             *  }
+             * }|null> $resources */
             $resources = $this->parameterBag->get('sylius.resources');
             $modelClass = $resources[$resourceName]['classes']['model'] ?? null;
 
@@ -96,7 +114,7 @@ class RouteExtension extends AbstractExtension
 
             $repository = $this->manager->getRepository($modelClass);
 
-            if (null === $repository || !method_exists($repository, 'getByKey')) {
+            if (!method_exists($repository, 'getByKey')) {
                 throw new \InvalidArgumentException(sprintf('The resource "%s" repository must have a method "%s".', $resourceName, 'getByKey'));
             }
 
@@ -121,6 +139,15 @@ class RouteExtension extends AbstractExtension
         ?ChannelInterface $channel = null,
     ): ?string {
         try {
+            /** @var array<string, array{
+             *  classes: array{
+             *     model: class-string,
+             *     controller: class-string,
+             *     repository: class-string,
+             *     form: class-string,
+             *     factory: class-string,
+             *  }
+             * }|null> $resources */
             $resources = $this->parameterBag->get('sylius.resources');
             $modelClass = $resources[$resourceName]['classes']['model'] ?? null;
 
@@ -130,7 +157,7 @@ class RouteExtension extends AbstractExtension
 
             $repository = $this->manager->getRepository($modelClass);
 
-            if (null === $repository || !method_exists($repository, 'getByTemplate')) {
+            if (!method_exists($repository, 'getByTemplate')) {
                 throw new \InvalidArgumentException(sprintf('The resource "%s" repository must have a method "%s".', $resourceName, 'getByTemplate'));
             }
 
@@ -159,6 +186,15 @@ class RouteExtension extends AbstractExtension
     public function getPathById(int $id, string $resourceName = 'sylius_happy_cms.page'): ?string
     {
         try {
+            /** @var array<string, array{
+             *  classes: array{
+             *     model: class-string,
+             *     controller: class-string,
+             *     repository: class-string,
+             *     form: class-string,
+             *     factory: class-string,
+             *  }
+             * }|null> $resources */
             $resources = $this->parameterBag->get('sylius.resources');
             $modelClass = $resources[$resourceName]['classes']['model'] ?? null;
 
@@ -167,10 +203,6 @@ class RouteExtension extends AbstractExtension
             }
 
             $repository = $this->manager->getRepository($modelClass);
-
-            if (null === $repository) {
-                throw new \InvalidArgumentException(sprintf('The resource "%s" repository is not found.', $resourceName));
-            }
 
             /** @var CmsRoutableInterface|null $object */
             $object = $repository->find($id);

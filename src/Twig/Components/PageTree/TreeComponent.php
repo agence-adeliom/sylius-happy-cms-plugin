@@ -6,7 +6,9 @@ namespace Adeliom\SyliusHappyCMSPlugin\Twig\Components\PageTree;
 
 use Adeliom\SyliusHappyCMSPlugin\Doctrine\Query\Page\AllPagesInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Page\PageInterface;
+use Adeliom\SyliusHappyCMSPlugin\Repository\Page\PageRepositoryInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
 use Sylius\Bundle\UiBundle\Twig\Component\TemplatePropTrait;
 use Sylius\TwigHooks\LiveComponent\HookableLiveComponentTrait;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
@@ -37,6 +39,10 @@ class TreeComponent
         $pageRepository = $this->entityManager->getRepository(PageInterface::class);
         $pageToBeMoved = $pageRepository->find($pageId);
 
+        assert($pageToBeMoved instanceof PageInterface, 'Page to be moved must be instance of PageInterface');
+
+        assert($pageRepository instanceof NestedTreeRepository && $pageRepository instanceof PageRepositoryInterface, 'Page repository must be instance of NestedTreeRepository');
+
         if (true !== $pageRepository->verify()) {
             $pageRepository->recoverFast([
                                              'sortByField' => 'lft', // Reorder sibling nodes by this field
@@ -55,6 +61,10 @@ class TreeComponent
     {
         $pageRepository = $this->entityManager->getRepository(PageInterface::class);
         $pageToBeMoved = $pageRepository->find($pageId);
+
+        assert($pageToBeMoved instanceof PageInterface, 'Page to be moved must be instance of PageInterface');
+
+        assert($pageRepository instanceof NestedTreeRepository && $pageRepository instanceof PageRepositoryInterface, 'Page repository must be instance of NestedTreeRepository');
 
         if (true !== $pageRepository->verify()) {
             $pageRepository->recoverFast([
@@ -75,6 +85,10 @@ class TreeComponent
         $pageRepository = $this->entityManager->getRepository(PageInterface::class);
         $pageToBeMoved = $pageRepository->find($pageId);
 
+        assert($pageToBeMoved instanceof PageInterface, 'Page to be moved must be instance of PageInterface');
+
+        assert($pageRepository instanceof NestedTreeRepository && $pageRepository instanceof PageRepositoryInterface, 'Page repository must be instance of NestedTreeRepository');
+
         if (true !== $pageRepository->verify()) {
             $pageRepository->recoverFast([
                                              'sortByField' => 'lft',
@@ -92,6 +106,10 @@ class TreeComponent
     {
         $pageRepository = $this->entityManager->getRepository(PageInterface::class);
         $pageToBeMoved = $pageRepository->find($pageId);
+
+        assert($pageToBeMoved instanceof PageInterface, 'Page to be moved must be instance of PageInterface');
+
+        assert($pageRepository instanceof NestedTreeRepository && $pageRepository instanceof PageRepositoryInterface, 'Page repository must be instance of NestedTreeRepository');
 
         if (true !== $pageRepository->verify()) {
             $pageRepository->recoverFast([
@@ -117,6 +135,13 @@ class TreeComponent
         $children = [];
 
         foreach ($pages as $page) {
+            /**
+             * @var array{
+             *     'id': int,
+             *     'name': string,
+             *     'parent_id': int|null,
+             * } $page
+             */
             $treeChild = [
                 'id' => $page['id'],
                 'name' => $page['name'],

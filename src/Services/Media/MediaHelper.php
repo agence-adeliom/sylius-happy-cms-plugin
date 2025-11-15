@@ -360,9 +360,9 @@ class MediaHelper
         return 'fa-file-o';
     }
 
-    public function fileIsType(string|Media $type, string $compare): bool
+    public function fileIsType(string|MediaInterface $type, string $compare): bool
     {
-        if ($type instanceof Media) {
+        if ($type instanceof MediaInterface) {
             $type = $type->getMime();
         }
         $mimes = $this->parameters->get('sylius_happy_cms.media.extended_mimes');
