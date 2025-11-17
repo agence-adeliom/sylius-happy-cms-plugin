@@ -26,7 +26,9 @@ class MediaHelper
 
     public function getFolderClassName(): string
     {
-        return $this->parameters->get('sylius_happy_cms.media.folder_entity');
+        /** @var string $folderEntity */
+        $folderEntity = $this->parameters->get('sylius_happy_cms.media.folder_entity');
+        return $folderEntity;
     }
 
     /**
@@ -44,7 +46,9 @@ class MediaHelper
 
     public function getMediaClassName(): string
     {
-        return $this->parameters->get('sylius_happy_cms.media.media_entity');
+        /** @var string $mediaClass */
+        $mediaClass = $this->parameters->get('sylius_happy_cms.media.media_entity');
+        return $mediaClass;
     }
 
     public function getMediaRepository(): ?MediaRepositoryInterface
@@ -61,7 +65,9 @@ class MediaHelper
 
     public function getBaseUrl(): string
     {
-        return $this->parameters->get('sylius_happy_cms.media.base_url') ?? '';
+        /** @var string $baseUrl */
+        $baseUrl = $this->parameters->get('sylius_happy_cms.media.base_url');
+        return $baseUrl;
     }
 
     public function getRandomString(): string

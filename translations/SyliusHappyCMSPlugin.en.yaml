@@ -230,4 +230,6 @@ sylius_happy_cms:
       generate_all_alt_content: 'Click the button below to generate alt text for all files. The task will run in the background and take some time to finish. However, you can continue with your operations.'
       generate_all_alt_submit: 'Yes, I want to generate alt text for all files'
       generating_all_alt: Generating...
-
+error:
+  already_exists: 'Already exists'
+not_allowed_file_ext: 'File extension is not allowed'

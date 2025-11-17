@@ -25,7 +25,15 @@ class MenuCreationListener
     // the entity instance and the lifecycle event
     public function prePersist(MenuInterface $menu): void
     {
-        /** @var ?array<string, mixed> $resources */
+        /** @var array<string, array{
+         *  classes: array{
+         *     model: class-string,
+         *     controller: class-string,
+         *     repository: class-string,
+         *     form: class-string,
+         *     factory: class-string,
+         *  }
+         * }|null> $resources */
         $resources = $this->parameterBag->get('sylius.resources');
         if (!is_array($resources) || !is_array($resources['sylius_happy_cms.menu_item'])) {
             return;

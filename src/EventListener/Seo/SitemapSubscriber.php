@@ -48,20 +48,20 @@ class SitemapSubscriber implements EventSubscriberInterface
                  */
                 $event = $this->eventDispatcher->dispatch(new AfterSitemapEntities($sitemapDumpable->getEntities()));
                 $entities = $event->getEntities();
-                $replaceUrl = \Closure::fromCallable([$sitemapDumpable, 'replaceUrl']);
+                $replaceUrlCallback = $sitemapDumpable->replaceUrl(...);
                 if ($entities) {
                     foreach ($entities as $entity) {
                         /** @var CmsSeoInterface&AbstractTranslation $canonicalTranslation */
                         $canonicalTranslation = $entity->getTranslation();
                         if ($canonicalTranslation->getSEO()->getSitemap()) {
-                            $url = $this->getUrl($urlGenerator, $sitemapDumpable, $entity, $canonicalTranslation, $replaceUrl);
+                            $url = $this->getUrl($urlGenerator, $sitemapDumpable, $entity, $canonicalTranslation, $replaceUrlCallback);
                             $concreteUrl = new UrlConcrete($url, $sitemapDumpable->getLastModifiedDate($entity));
                             $decoratedUrl = new GoogleMultilangUrlDecorator($concreteUrl);
 
                             foreach ($entity->getTranslations() as $translation) {
                                 /** @var CmsSeoInterface&AbstractTranslation $translation */
                                 if ($canonicalTranslation !== $translation && $translation->getSEO()->getSitemap()) {
-                                    $url = $this->getUrl($urlGenerator, $sitemapDumpable, $entity, $translation, $replaceUrl);
+                                    $url = $this->getUrl($urlGenerator, $sitemapDumpable, $entity, $translation, $replaceUrlCallback);
                                     $decoratedUrl->addLink($url, $translation->getLocale());
                                 }
                             }
@@ -78,7 +78,7 @@ class SitemapSubscriber implements EventSubscriberInterface
         SitemapDumperInterface $sitemapDumpable,
         mixed $entity,
         CmsSeoInterface&AbstractTranslation $translation,
-        ?callable $replaceUrl = null,
+        ?callable $replaceUrlCallback = null,
         ?int $page = null,
     ): string {
         $params = $sitemapDumpable->getSitemapRouteParams($entity);
@@ -90,7 +90,7 @@ class SitemapSubscriber implements EventSubscriberInterface
             UrlGeneratorInterface::ABSOLUTE_URL,
         );
 
-        if ($updatedUrl = $replaceUrl($url, $entity)) {
+        if ($updatedUrl = $replaceUrlCallback($url, $entity)) {
             $url = $updatedUrl;
         }
 
