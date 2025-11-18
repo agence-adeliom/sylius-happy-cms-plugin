@@ -84,7 +84,7 @@ class RouteRenderService extends AbstractController
         foreach ($breadcrumbItems as $breadcrumbItem) {
             $this->breadcrumb->addSimpleItem(
                 $breadcrumbItem['label'],
-                $breadcrumbItem['route']->getPath(),
+                $breadcrumbItem['route']?->getPath(),
             );
         }
 
