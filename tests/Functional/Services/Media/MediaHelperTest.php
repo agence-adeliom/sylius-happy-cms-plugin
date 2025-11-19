@@ -57,4 +57,32 @@ final class MediaHelperTest extends KernelTestCase
 
         $this->assertSame('Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Media\Folder', $result);
     }
+
+    public function testRandomStringExpectedValue(): void
+    {
+        $result = $this->mediaHelper->getRandomString();
+
+        $this->assertIsString($result);
+        $this->assertNotEmpty($result);
+    }
+
+    public function testCleanNameExpectedValue(): void
+    {
+        $result = $this->mediaHelper->cleanName('my&/ `*name', false);
+
+        $this->assertSame('my name', $result);
+
+        $result = $this->mediaHelper->cleanName('my&/ `*name', true);
+
+        $this->assertSame('my name', $result);
+    }
+
+    public function testItemTimeExpectedValue(): void
+    {
+        $time = time();
+        $result = $this->mediaHelper->getItemTime($time);
+
+        $this->assertIsString($result);
+        $this->assertSame(date('Y-m-d', $time), $result);
+    }
 }

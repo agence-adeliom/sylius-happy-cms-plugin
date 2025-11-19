@@ -43,8 +43,9 @@ class RouteRenderService extends AbstractController
 
     public function invalidCache(): bool
     {
+        /** @var string|class-string<RouteInterface>|null  $routeClass */
         $routeClass = $this->parameterBag->get('cmf_routing.dynamic.persistence.orm.route_class');
-        if (is_string($routeClass)) {
+        if (is_string($routeClass) && class_exists($routeClass)) {
             $qb = $this->manager->getRepository($routeClass)->createQueryBuilder('r');
             $routes = $qb
                 ->select()
@@ -52,10 +53,12 @@ class RouteRenderService extends AbstractController
                 ->getQuery()
                 ->getResult();
             $this->manager->beginTransaction();
-            foreach ($routes as $route) {
-                /** @var RouteInterface $route */
-                $route->setLastModification(new \DateTime());
-                $this->manager->persist($route);
+            if (is_array($routes)) {
+                foreach ($routes as $route) {
+                    /** @var RouteInterface $route */
+                    $route->setLastModification(new \DateTime());
+                    $this->manager->persist($route);
+                }
             }
             $this->manager->flush();
             $this->manager->commit();

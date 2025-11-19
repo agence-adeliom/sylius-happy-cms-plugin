@@ -23,7 +23,11 @@ class MediaDataLoader implements LoaderInterface
     public function find(mixed $path): BinaryInterface|string
     {
         try {
+            assert(is_string($path), '$path must be a string');
+
             $mimeType = $this->filesystem->mimeType($path);
+
+            assert(is_string($mimeType), 'Mime type cannot be found');
 
             $extension = $this->getExtension($mimeType);
 
@@ -37,7 +41,7 @@ class MediaDataLoader implements LoaderInterface
         }
     }
 
-    private function getExtension(?string $mimeType): ?string
+    private function getExtension(string $mimeType): ?string
     {
         return $this->extensionGuesser->getExtensions($mimeType)[0] ?? null;
     }
