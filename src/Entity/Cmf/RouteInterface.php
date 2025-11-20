@@ -28,4 +28,6 @@ interface RouteInterface extends ResourceInterface, RouteObjectInterface
      *                       storage layer
      */
     public function setContent(object $object): static;
+
+    public function getPath(): string;
 }

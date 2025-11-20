@@ -28,6 +28,7 @@ class MediaHelper
     {
         /** @var string $folderEntity */
         $folderEntity = $this->parameters->get('sylius_happy_cms.media.folder_entity');
+
         return $folderEntity;
     }
 
@@ -48,6 +49,7 @@ class MediaHelper
     {
         /** @var string $mediaClass */
         $mediaClass = $this->parameters->get('sylius_happy_cms.media.media_entity');
+
         return $mediaClass;
     }
 
@@ -67,6 +69,7 @@ class MediaHelper
     {
         /** @var string $baseUrl */
         $baseUrl = $this->parameters->get('sylius_happy_cms.media.base_url');
+
         return $baseUrl;
     }
 
@@ -102,6 +105,7 @@ class MediaHelper
     public function getItemTime(?int $time): ?string
     {
         $format = $this->parameters->get('sylius_happy_cms.media.last_modified_format');
+
         return $time && is_string($format) ? (new \DateTime(sprintf('@%s', $time)))->format($format) : null;
     }
 
@@ -113,7 +117,7 @@ class MediaHelper
         }
 
         try {
-            if (!is_null($mediaRepository = $this->getMediaRepository())) {
+            if (null !== ($mediaRepository = $this->getMediaRepository())) {
                 if (is_numeric($media) || is_string($media)) {
                     /**
                      * @var ?MediaInterface $media
@@ -384,7 +388,7 @@ class MediaHelper
         if ($type instanceof MediaInterface) {
             $type = $type->getMime();
         }
-        /** @var array|null|false $mimes */
+        /** @var array|false|null $mimes */
         $mimes = $this->parameters->get('sylius_happy_cms.media.extended_mimes');
         if ($type && is_array($mimes)) {
             foreach (['image', 'video', 'audio'] as $test) {

@@ -23,7 +23,7 @@ interface CmsRoutableInterface extends ChannelAwareInterface
     public function isOnline(): bool;
 
     /**
-     * @return array<int, array{label: string, route: ?RouteObjectInterface}>
+     * @return array<int, array{label: string, route: ?RouteInterface}>
      */
     public function getBreadcrumbItems(): array;
 

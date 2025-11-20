@@ -424,7 +424,7 @@ class MediaManager
 
         if ($mediaRepository && !empty($mediaRepository->findBy([
             'folder' => $entity->getFolder(),
-            'name' => $entity->getName()
+            'name' => $entity->getName(),
             ]))) {
             throw new AlreadyExist($this->translator->trans('error.already_exists', [], 'SyliusHappyCMSPlugin'));
         }
@@ -533,8 +533,7 @@ class MediaManager
 
         $mediaRepository = $this->getHelper()->getMediaRepository();
 
-        if ($mediaRepository && !empty($mediaRepository->findBy(['folder' => $entity->getFolder(), 'name' =>
-            $entity->getName()]))) {
+        if ($mediaRepository && !empty($mediaRepository->findBy(['folder' => $entity->getFolder(), 'name' => $entity->getName()]))) {
             throw new AlreadyExist($this->translator->trans('error.already_exists', [], 'SyliusHappyCMSPlugin'));
         }
 

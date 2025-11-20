@@ -2,7 +2,9 @@ parameters:
     level: max
     reportUnmatchedIgnoredErrors: false
     paths:
-        - src/Services
+        - src/Resources
+        - src/Routing
+        - src/Security
         - tests/Behat
 
     excludePaths:
