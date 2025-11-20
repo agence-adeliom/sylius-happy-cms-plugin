@@ -26,7 +26,10 @@ class MenuRepository extends EntityRepository implements MenuRepositoryInterface
     }
 
     /**
-     * @param array<string, mixed> $cacheConfig
+     * @param array{
+     *     enabled: ?bool,
+     *     ttl: ?int
+     * } $cacheConfig
      */
     public function setConfig(array $cacheConfig): void
     {
@@ -58,7 +61,10 @@ class MenuRepository extends EntityRepository implements MenuRepositoryInterface
             $qb = $qb->getQuery()->disableResultCache();
         }
 
-        return $qb->getResult();
+        /** @var MenuInterface[] $result */
+        $result = $qb->getResult();
+
+        return $result;
     }
 
     /**
@@ -78,6 +84,9 @@ class MenuRepository extends EntityRepository implements MenuRepositoryInterface
             $qb = $qb->getQuery()->disableResultCache();
         }
 
-        return $qb->getOneOrNullResult();
+        /** @var ?MenuInterface $result */
+        $result = $qb->getOneOrNullResult();
+
+        return $result;
     }
 }

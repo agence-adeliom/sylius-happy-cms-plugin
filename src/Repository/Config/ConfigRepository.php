@@ -23,8 +23,11 @@ class ConfigRepository extends EntityRepository implements ConfigRepositoryInter
         $qb->where('c.key = :key')
             ->setParameter('key', $key);
 
-        return $qb
-            ->getQuery()
-            ->getOneOrNullResult();
+        $query = $qb
+            ->getQuery();
+
+        $result = $query->getOneOrNullResult();
+
+        return $result instanceof ConfigInterface ? $result : null;
     }
 }

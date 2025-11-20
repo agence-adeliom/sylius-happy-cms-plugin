@@ -35,8 +35,11 @@ class SharedBlockRepository extends EntityRepository implements SharedBlockRepos
     {
         $qb = $this->getPublishedQuery();
 
-        return $qb->getQuery()
+        /** @var SharedBlockInterface[] $result */
+        $result = $qb->getQuery()
             ->getResult();
+
+        return $result;
     }
 
     /**
@@ -48,8 +51,11 @@ class SharedBlockRepository extends EntityRepository implements SharedBlockRepos
         $qb->andWhere('block.type = :type')
             ->setParameter('type', $type);
 
-        return $qb->getQuery()
+        /** @var SharedBlockInterface[] $result */
+        $result = $qb->getQuery()
             ->getResult();
+
+        return $result;
     }
 
     /**
@@ -63,7 +69,10 @@ class SharedBlockRepository extends EntityRepository implements SharedBlockRepos
         $qb->andWhere('block.type IN (:types)')
             ->setParameter('types', $types);
 
-        return $qb->getQuery()
+        /** @var SharedBlockInterface[] $result */
+        $result = $qb->getQuery()
             ->getResult();
+
+        return $result;
     }
 }

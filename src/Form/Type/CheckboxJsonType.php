@@ -19,6 +19,12 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class CheckboxJsonType extends CheckboxType
 {
+    /**
+     * @param array{
+     *     value: string,
+     *     false_values: mixed[]
+     * } $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         parent::buildForm($builder, $options);

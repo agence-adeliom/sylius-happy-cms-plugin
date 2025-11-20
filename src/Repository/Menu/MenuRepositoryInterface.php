@@ -12,7 +12,10 @@ interface MenuRepositoryInterface extends RepositoryInterface
     public function findOneByCode(string $code): ?MenuInterface;
 
     /**
-     * @param array<string, mixed> $cacheConfig
+     * @param array{
+     *     enabled: ?bool,
+     *     ttl: ?int
+     * } $cacheConfig
      */
     public function setConfig(array $cacheConfig): void;
 }

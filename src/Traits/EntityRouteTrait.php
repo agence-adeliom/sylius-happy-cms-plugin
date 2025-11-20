@@ -13,7 +13,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Sylius\Component\Channel\Model\ChannelInterface;
 use Sylius\Resource\Model\TranslationInterface;
-use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
@@ -41,17 +40,17 @@ trait EntityRouteTrait
         return $this->routes;
     }
 
-    public function getOnlineRoute(): ?RouteObjectInterface
+    public function getOnlineRoute(): ?RouteInterface
     {
         return $this->getRoute(false);
     }
 
-    public function getPreviewRoute(): ?RouteObjectInterface
+    public function getPreviewRoute(): ?RouteInterface
     {
         return $this->getRoute(true);
     }
 
-    private function getRoute(bool $preview = false): ?RouteObjectInterface
+    private function getRoute(bool $preview = false): ?RouteInterface
     {
         foreach ($this->routes as $route) {
             if ($preview === $route->getOption(EntityRouteIndexer::OPTION_PREVIEW)) {
@@ -329,7 +328,7 @@ trait EntityRouteTrait
             // If getParent no exists or throws an exception, we just ignore it
         }
 
-        /** @var array{label: string, route: ?RouteObjectInterface} $reservedList */
+        /** @var array<int, array{label: string, route: ?RouteInterface}> $reservedList */
         $reservedList = array_reverse($list, true);
 
         return $reservedList;

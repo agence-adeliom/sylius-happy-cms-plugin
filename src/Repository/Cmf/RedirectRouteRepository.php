@@ -19,7 +19,10 @@ class RedirectRouteRepository extends EntityRepository implements RepositoryInte
     protected int $cacheTtl;
 
     /**
-     * @param array<string, mixed> $cacheConfig
+     * @param array{
+     *     enabled: ?bool,
+     *     ttl: ?int
+     * } $cacheConfig
      */
     public function setConfig(array $cacheConfig): void
     {
@@ -57,6 +60,11 @@ class RedirectRouteRepository extends EntityRepository implements RepositoryInte
         ->setParameter('host', $host)
         ->setParameter('staticPrefix', $path);
 
-        return $qb->getQuery()->getOneOrNullResult();
+        $query = $qb->getQuery();
+
+        /** @var RedirectRouteInterface|null $result */
+        $result = $query->getOneOrNullResult();
+
+        return $result;
     }
 }

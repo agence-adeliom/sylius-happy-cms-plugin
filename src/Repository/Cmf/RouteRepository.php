@@ -18,7 +18,7 @@ class RouteRepository extends EntityRepository implements RepositoryInterface, R
 
     protected int $cacheTtl;
 
-    public function createQueryBuilder($alias, $indexBy = null): QueryBuilder
+    public function createQueryBuilder(string $alias, ?string $indexBy = null): QueryBuilder
     {
         $queryBuilder = parent::createQueryBuilder($alias, $indexBy);
         $queryBuilder->andWhere($alias . '.preview != 1 OR ' . $alias . '.preview IS NULL');
@@ -27,7 +27,10 @@ class RouteRepository extends EntityRepository implements RepositoryInterface, R
     }
 
     /**
-     * @param array<string, mixed> $cacheConfig
+     * @param array{
+     *     enabled: ?bool,
+     *     ttl: ?int
+     * } $cacheConfig
      */
     public function setConfig(array $cacheConfig): void
     {

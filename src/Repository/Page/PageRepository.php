@@ -16,7 +16,8 @@ use Sylius\Component\Channel\Model\ChannelInterface;
 use Sylius\Resource\Doctrine\Persistence\RepositoryInterface;
 
 /**
- * @implements NestedTreeRepository<PageInterface>
+ * @extends NestedTreeRepository<PageInterface>
+ * @implements RepositoryInterface<PageInterface>
  */
 class PageRepository extends NestedTreeRepository implements PageRepositoryInterface, RepositoryInterface, TranslationRepositoryInterface
 {
@@ -28,7 +29,10 @@ class PageRepository extends NestedTreeRepository implements PageRepositoryInter
     protected int $cacheTtl;
 
     /**
-     * @param array<string, mixed> $cacheConfig
+     * @param array{
+     *     enabled: ?bool,
+     *     ttl: ?int
+     * } $cacheConfig
      */
     public function setConfig(array $cacheConfig): void
     {
@@ -80,7 +84,10 @@ class PageRepository extends NestedTreeRepository implements PageRepositoryInter
 
         $query = $qb->getQuery();
 
-        return $query->getOneOrNullResult();
+        /** @var ?PageInterface $result */
+        $result = $query->getOneOrNullResult();
+
+        return $result;
     }
 
     /**
@@ -99,10 +106,16 @@ class PageRepository extends NestedTreeRepository implements PageRepositoryInter
     private function getResult(Query $query): array
     {
         if ($this->cacheEnabled) {
-            return $query->enableResultCache($this->cacheTtl)->getResult();
+            /** @var PageInterface[] $result */
+            $result = $query->enableResultCache($this->cacheTtl)->getResult();
+
+            return $result;
         }
 
-        return $query->getResult();
+        /** @var PageInterface[] $result */
+        $result = $query->getResult();
+
+        return $result;
     }
 
     /**
@@ -149,7 +162,7 @@ class PageRepository extends NestedTreeRepository implements PageRepositoryInter
         return $page;
     }
 
-    public function getBySeoKey(string $seoKey, string $locale): PageInterface
+    public function getBySeoKey(string $seoKey, string $locale): ?PageInterface
     {
         /** @var PageInterface|null $page */
         $page = $this->getPublishedQuery()
@@ -158,7 +171,8 @@ class PageRepository extends NestedTreeRepository implements PageRepositoryInter
             ->setParameter('seo_key', $seoKey)
             ->setParameter('locale', $locale)
             ->getQuery()
-            ->getSingleResult();
+            ->setMaxResults(1)
+            ->getOneOrNullResult();
 
         return $page;
     }
@@ -183,7 +197,7 @@ class PageRepository extends NestedTreeRepository implements PageRepositoryInter
 
     public function findPreviousPage(PageInterface $page): ?PageInterface
     {
-        return $this->createQueryBuilder('page')
+        $query = $this->createQueryBuilder('page')
             ->andWhere('page.id != :id')
             ->andWhere('page.lvl = :level')
             ->andWhere('page.position < :position')
@@ -193,13 +207,17 @@ class PageRepository extends NestedTreeRepository implements PageRepositoryInter
             ->setParameter('position', $page->getPosition() ?? null)
             ->orderBy('page.id', 'DESC')
             ->getQuery()
-            ->setMaxResults(1)
-            ->getOneOrNullResult();
+            ->setMaxResults(1);
+
+        /** @var ?PageInterface $result */
+        $result = $query->getOneOrNullResult();
+
+        return $result;
     }
 
     public function findNextPage(PageInterface $page): ?PageInterface
     {
-        return $this->createQueryBuilder('page')
+        $query = $this->createQueryBuilder('page')
             ->andWhere('page.id != :id')
             ->andWhere('page.lvl = :level')
             ->andWhere('page.position > :position')
@@ -209,8 +227,12 @@ class PageRepository extends NestedTreeRepository implements PageRepositoryInter
             ->setParameter('position', $page->getPosition() ?? null)
             ->orderBy('page.id', 'ASC')
             ->getQuery()
-            ->setMaxResults(1)
-            ->getOneOrNullResult();
+            ->setMaxResults(1);
+
+        /** @var ?PageInterface $result */
+        $result = $query->getOneOrNullResult();
+
+        return $result;
     }
 
     /**
@@ -225,7 +247,7 @@ class PageRepository extends NestedTreeRepository implements PageRepositoryInter
     public function findFrontPages(string $locale, array $slugs = [], ?string $host = null): array
     {
         $qb = $this->getPublishedQuery();
-        $allItemsPublished = true;
+        $allItemsPublished = null;
 
         // Will search differently if we're looking for homepage.
         $searchForHomepage = [] === $slugs;
@@ -233,7 +255,10 @@ class PageRepository extends NestedTreeRepository implements PageRepositoryInter
         $useConstructedTree = false;
         $constructedTree = [];
 
-        foreach ($this->getBySlug(last($slugs), $locale) as $item) {
+        /** @var string $lastSlug */
+        $lastSlug = last($slugs);
+
+        foreach ($this->getBySlug($lastSlug, $locale) as $item) {
             $hasNonPageElement = false;
             $allItemsPublished = true;
 
