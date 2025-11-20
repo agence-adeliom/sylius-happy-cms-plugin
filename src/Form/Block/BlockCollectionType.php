@@ -12,12 +12,30 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class BlockCollectionType extends CollectionType implements AdminFormTypeInterface
 {
+    /**
+     * @param array{
+     *     allow_extra_fields: ?bool,
+     *     allow_add: bool,
+     *     allow_delete: bool,
+     *     allow_drag: bool,
+     *     delete_empty: bool,
+     *     entry_options: array,
+     *     entry_type: class-string,
+     *     prototype: ?string,
+     *     prototype_name: string,
+     *     prototype_data: array|null,
+     *     required: bool,
+     *     allow_extra_fields?: bool,
+     *     blocks: FormTypeInterface[],
+     * } $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if ($options['allow_add'] && $options['prototype']) {
@@ -67,6 +85,23 @@ class BlockCollectionType extends CollectionType implements AdminFormTypeInterfa
         $builder->addEventSubscriber($resizeListener);
     }
 
+    /**
+     * @param array{
+     *     allow_extra_fields: ?bool,
+     *     allow_add: bool,
+     *     allow_delete: bool,
+     *     allow_drag: bool,
+     *     delete_empty: bool,
+     *     entry_options: array,
+     *     entry_type: class-string,
+     *     prototype: ?string,
+     *     prototype_name: string,
+     *     prototype_data: array|null,
+     *     required: bool,
+     *     allow_extra_fields?: bool,
+     *     blocks: FormTypeInterface[],
+     * } $options
+     */
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars = array_replace($view->vars, [
@@ -78,8 +113,14 @@ class BlockCollectionType extends CollectionType implements AdminFormTypeInterfa
         if ($form->getConfig()->hasAttribute('prototypes')) {
             $prototypes = $form->getConfig()->getAttribute('prototypes');
             $view->vars['prototypes'] = [];
-            foreach ($prototypes as $type => $prototype) {
-                $view->vars['prototypes'][$type] = $prototype->setParent($form)->createView($view);
+            if (is_array($prototypes)) {
+                foreach ($prototypes as $type => $prototype) {
+                    if ($prototype instanceof FormInterface) {
+                        $view->vars['prototypes'][$type] = $prototype->setParent($form)->createView($view);
+                    } else {
+                        throw new \InvalidArgumentException('Prototype should be an instance of FormInterface');
+                    }
+                }
             }
         }
     }

@@ -36,24 +36,14 @@ class Helper
     private array $traces = [];
 
     public function __construct(
-        /**
-         * @readonly
-         */
         private Environment $twig,
-        /**
-         * @readonly
-         */
         private EventDispatcherInterface $eventDispatcher,
-        /**
-         * @readonly
-         */
-        private BlockCollection $collection,
-        private FormFactoryInterface $formFactory,
-        private EntityManagerInterface $entityManager,
-        private RequestStack $requestStack,
-        private AssetRenderer $assetRenderer,
-    ) {
-    }
+        private readonly BlockCollection $collection,
+        private readonly AssetRenderer $assetRenderer,
+        //private readonly FormFactoryInterface $formFactory,
+        //private readonly EntityManagerInterface $entityManager,
+        //private readonly RequestStack $requestStack
+    ) {}
 
     public function includeAssets(Environment $env, array $context, ?string $nonce = null): string
     {

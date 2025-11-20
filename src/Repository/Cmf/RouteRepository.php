@@ -18,7 +18,8 @@ class RouteRepository extends EntityRepository implements RepositoryInterface, R
 
     protected int $cacheTtl;
 
-    public function createQueryBuilder(string $alias, ?string $indexBy = null): QueryBuilder
+    /** @phpstan-ignore-next-line */
+    public function createQueryBuilder($alias, $indexBy = null): QueryBuilder
     {
         $queryBuilder = parent::createQueryBuilder($alias, $indexBy);
         $queryBuilder->andWhere($alias . '.preview != 1 OR ' . $alias . '.preview IS NULL');
