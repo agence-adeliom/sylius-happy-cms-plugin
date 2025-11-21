@@ -134,12 +134,16 @@ abstract class AbstractBlock extends AbstractType implements BlockTypeInterface
             'css' => [],
             'webpack' => [],
         ];
-        foreach ($this->tempBuilder->getForm() as $child) {
-            $formTypeClass = get_class($child->getConfig()->getType()->getInnerType());
-            if (method_exists($formTypeClass, 'configureAdminAssets')) {
-                $assets = call_user_func([$formTypeClass, 'configureAdminAssets']);
-                if (is_array($assets)) {
-                    $adminAssets = array_merge_recursive($adminAssets, $assets);
+        if (!is_null($this->tempBuilder)) {
+            foreach ($this->tempBuilder->getForm() as $child) {
+                $formTypeClass = get_class($child->getConfig()->getType()->getInnerType());
+                if (method_exists($formTypeClass, 'configureAdminAssets')) {
+                    $assets = call_user_func([$formTypeClass, 'configureAdminAssets']);
+                    if (is_array($assets)) {
+                        /** @var array{js: array<string|Asset>|null, css: array<string|Asset>|null, webpack: array<string|Asset>|null} $mergedAssets */
+                        $mergedAssets = array_merge_recursive($adminAssets, $assets);
+                        $adminAssets = $mergedAssets;
+                    }
                 }
             }
         }
@@ -155,8 +159,10 @@ abstract class AbstractBlock extends AbstractType implements BlockTypeInterface
     public function configureAdminFormThemes(): array
     {
         $this->setRootBuilder();
-
-        return $this->getAdminFormThemesRecursive($this->tempBuilder);
+        if (!is_null($this->tempBuilder)) {
+            return $this->getAdminFormThemesRecursive($this->tempBuilder);
+        }
+        return [];
     }
 
     /**
@@ -201,19 +207,19 @@ abstract class AbstractBlock extends AbstractType implements BlockTypeInterface
                 continue;
             }
 
-            if ($isCollection) {
-                $innerType = $child->getConfig()->getOption('entry_type');
-                if (
-                    (
-                        !in_array($innerType, array_keys($this->treatedFormTypeThemes)) ||
-                        (isset($this->treatedFormTypeThemes[$innerType]) && $this->treatedFormTypeThemes[$innerType] !==
-                            $formTypeClass)
-                    ) && is_subclass_of($innerType, BlockTypeInterface::class)
-                ) {
-                    $this->treatedFormTypeThemes[$innerType] = $formTypeClass;
-                    $tempBuilder = $this->tempBuilder($innerType, (string) (time() + usleep(100)));
-                    $adminFormThemes = $this->getAdminFormThemesRecursive($tempBuilder, $adminFormThemes);
-                }
+            /** @var class-string|null $innerType */
+            $innerType = $child->getConfig()->getOption('entry_type');
+            if (
+                !is_null($innerType) &&
+                (
+                    !in_array($innerType, array_keys($this->treatedFormTypeThemes)) ||
+                    (isset($this->treatedFormTypeThemes[$innerType]) && $this->treatedFormTypeThemes[$innerType] !==
+                        $formTypeClass)
+                ) && is_subclass_of($innerType, BlockTypeInterface::class)
+            ) {
+                $this->treatedFormTypeThemes[$innerType] = $formTypeClass;
+                $tempBuilder = $this->tempBuilder($innerType, (string) (time() + rand(1, 100)));
+                $adminFormThemes = $this->getAdminFormThemesRecursive($tempBuilder, $adminFormThemes);
             }
         }
 
@@ -223,9 +229,12 @@ abstract class AbstractBlock extends AbstractType implements BlockTypeInterface
     private function getAdminFormThemes(string $formTypeClass, array $adminFormThemes): array
     {
         if (method_exists($formTypeClass, 'configureAdminFormThemes')) {
-            $formThemes = call_user_func([$formTypeClass, 'configureAdminFormThemes']);
-            if (is_array($formThemes)) {
-                $adminFormThemes = array_merge($adminFormThemes, $formThemes);
+            $callable = [$formTypeClass, 'configureAdminFormThemes'];
+            if (is_callable($callable)) {
+                $formThemes = call_user_func($callable);
+                if (is_array($formThemes)) {
+                    $adminFormThemes = array_merge($adminFormThemes, $formThemes);
+                }
             }
         }
 

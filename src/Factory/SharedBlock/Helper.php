@@ -174,7 +174,10 @@ class Helper
         $stats['type'] = $blockType::class;
         $stats['assets'] = $event->getAssets();
 
-        $this->assets = array_merge_recursive($this->assets, $stats['assets']);
+        /** @var array{js: array<string|Asset>|null, css: array<string|Asset>|null, webpack: array<string|Asset>|null} $mergedAssets */
+        $mergedAssets = array_merge_recursive($this->assets, $stats['assets']);
+
+        $this->assets = $mergedAssets;
 
         if (is_string($stats['id'])) {
             $this->stopTracing($stats['id'], $stats);

@@ -13,7 +13,7 @@ class BlockRender extends Event
 {
     /**
      * @param array<string, mixed> $data
-     * @param array<string, mixed> $assets
+     * @param array{js: array<string|Asset>|null, css: array<string|Asset>|null, webpack: array<string|Asset>|null} $assets
      */
     public function __construct(
         private BlockTypeInterface|SharedBlockTypeInterface $block,
