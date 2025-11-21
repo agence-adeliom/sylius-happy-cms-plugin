@@ -43,8 +43,7 @@ class MenuCreationListener
             return;
         }
 
-        $modelClass = $resources['sylius_happy_cms.menu_item']['classes']['model']
-            ?? null;
+        $modelClass = $resources['sylius_happy_cms.menu_item']['classes']['model'];
 
         if (!is_string($modelClass) || !class_exists($modelClass)) {
             return;
@@ -53,7 +52,7 @@ class MenuCreationListener
         /** @var MenuItemInterface $rootItem */
         $rootItem = new $modelClass();
         $rootItem->setMenu($menu);
-        $rootItem->setPublishState(ThreeStateStatusEnum::PUBLISHED()->getValue());
+        $rootItem->setPublishState(ThreeStateStatusEnum::PUBLISHED);
         $rootItem->setPosition(0);
 
         $menu->addItem($rootItem);

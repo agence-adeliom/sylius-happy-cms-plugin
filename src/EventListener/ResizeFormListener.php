@@ -17,7 +17,7 @@ class ResizeFormListener implements EventSubscriberInterface
 {
     /**
      * @param array<string, mixed> $options
-     * @param array<string, mixed>|null $prototypeOptions
+     * @param array<string, mixed> $prototypeOptions
      */
     public function __construct(
         protected string $type,
@@ -25,10 +25,10 @@ class ResizeFormListener implements EventSubscriberInterface
         protected bool $allowAdd = false,
         protected bool $allowDelete = false,
         private bool|\Closure $deleteEmpty = false,
-        protected ?array $prototypeOptions = null,
+        protected array $prototypeOptions = [],
     ) {
         $this->deleteEmpty = \is_bool($deleteEmpty) ? $deleteEmpty : $deleteEmpty(...);
-        $this->prototypeOptions = $prototypeOptions ?? $options;
+        $this->prototypeOptions = empty($prototypeOptions) ? $options : $prototypeOptions;
     }
 
     /**
@@ -65,9 +65,13 @@ class ResizeFormListener implements EventSubscriberInterface
         // Then add all rows again in the correct order
         foreach ($data as $name => $value) {
             if (!empty($value['block_type'])) {
-                $form->add($name, $value['block_type'], array_replace([
-                                                                          'property_path' => '[' . $name . ']',
-                                                                      ], $this->prototypeOptions));
+                $form->add(
+                    $name,
+                    $value['block_type'],
+                    array_replace([
+                      'property_path' => '[' . $name . ']',
+                    ], $this->prototypeOptions),
+                );
             }
         }
     }
@@ -116,6 +120,7 @@ class ResizeFormListener implements EventSubscriberInterface
         }
 
         if ($this->deleteEmpty) {
+            /** @var array<string|int, mixed> $previousData */
             $previousData = $form->getData();
             /** @var FormInterface $child */
             foreach ($form as $name => $child) {

@@ -72,7 +72,7 @@ class EntityRouteIndexer
         }
     }
 
-    private function manageRoutes(CmsRoutableInterface $entity, ObjectManager $objectManager)
+    private function manageRoutes(CmsRoutableInterface $entity, ObjectManager $objectManager): void
     {
         $routesChanges = [];
 
@@ -94,16 +94,16 @@ class EntityRouteIndexer
         }
     }
 
-    private function removeRoutes(CmsRoutableInterface &$entity, string $routeNamePrefix = ''): void
-    {
-        $routesToRemove = $entity->getRoutes()->filter(
-            static fn (RouteInterface $route) => str_starts_with($route->getName(), $routeNamePrefix),
-        );
-
-        foreach ($routesToRemove as $route) {
-            $entity->removeRoute($route);
-        }
-    }
+    //private function removeRoutes(CmsRoutableInterface &$entity, string $routeNamePrefix = ''): void
+    //{
+    //    $routesToRemove = $entity->getRoutes()->filter(
+    //        static fn (RouteInterface $route) => str_starts_with($route->getName(), $routeNamePrefix),
+    //    );
+    //
+    //    foreach ($routesToRemove as $route) {
+    //        $entity->removeRoute($route);
+    //    }
+    //}
 
     private function computeRoutes(
         array &$routesChanges,
@@ -138,7 +138,7 @@ class EntityRouteIndexer
             $route->setHost($entity->getRouteHost($translation));
 
             // Get previus static prefix
-            $previousStaticPrefix = $route->getStaticPrefix() ?? '';
+            $previousStaticPrefix = $route->getStaticPrefix();
 
             // Does the current entity is a child route of an other entity?
             // We dispath an event to give the possibility to add a static prefix before this one
@@ -157,7 +157,7 @@ class EntityRouteIndexer
             $event = $this->dispatcher->dispatch(
                 new CalculateRouteStaticPrefixEvent($entity, $translation),
             );
-            $otherEntityPath = $event->getRouteStaticPrefix() ?? '';
+            $otherEntityPath = $event->getRouteStaticPrefix();
 
             // Get current entity path
             $currentEntityPath = $entity->getRouteStaticPrefix($translation, $routeNamePrefix === self::ROUTE_PREVIEW);
@@ -202,6 +202,8 @@ class EntityRouteIndexer
      * same prefix.
      * This method will find all routes that start with the previous static prefix and update them to use the new
      * TODO: replace findAll() with an optimized query to avoid loading all routes
+     *
+     * @param PersistentCollection<int, RouteInterface> $excludedRoutes
      */
     private function rewriteOtherStaticPrefix(
         string $staticPrefix,
@@ -212,7 +214,7 @@ class EntityRouteIndexer
             $allRoutes = $this->manager->getRepository(RouteInterface::class)->findAll();
 
             if (is_array($allRoutes) && count($allRoutes) > 0) {
-                $routesToUpdate = array_filter($allRoutes, function (RouteInterface $route) use ($staticPrefix, $previousStaticPrefix) {
+                $routesToUpdate = array_filter($allRoutes, function (RouteInterface $route) use ($previousStaticPrefix) {
                     return str_starts_with($route->getStaticPrefix(), $previousStaticPrefix);
                 });
 

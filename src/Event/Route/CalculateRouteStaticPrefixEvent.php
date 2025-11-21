@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\Event\Route;
 
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
-use Sylius\Component\Resource\Model\TranslationInterface;
+use Sylius\Resource\Model\TranslationInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class CalculateRouteStaticPrefixEvent extends Event

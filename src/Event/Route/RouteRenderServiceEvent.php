@@ -30,6 +30,14 @@ class RouteRenderServiceEvent extends Event
         return $this->parameters;
     }
 
+    /** @param array{
+     *     metadata?: Metadata,
+     *     configuration?: RequestConfiguration,
+     *     resource?: CmsRoutableInterface,
+     *     route?: RouteInterface,
+     *     preview?: bool
+     * } $parameters
+     */
     public function setParameters(array $parameters): void
     {
         $this->parameters = array_merge($this->parameters, $parameters);

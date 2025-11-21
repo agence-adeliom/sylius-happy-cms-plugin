@@ -39,7 +39,8 @@ class Helper
         //private readonly FormFactoryInterface $formFactory,
         //private readonly EntityManagerInterface $entityManager,
         //private readonly RequestStack $requestStack
-    ) {}
+    ) {
+    }
 
     public function includeAssets(Environment $env, array $context, ?string $nonce = null): string
     {

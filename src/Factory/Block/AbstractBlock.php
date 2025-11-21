@@ -134,7 +134,7 @@ abstract class AbstractBlock extends AbstractType implements BlockTypeInterface
             'css' => [],
             'webpack' => [],
         ];
-        if (!is_null($this->tempBuilder)) {
+        if (null !== $this->tempBuilder) {
             foreach ($this->tempBuilder->getForm() as $child) {
                 $formTypeClass = get_class($child->getConfig()->getType()->getInnerType());
                 if (method_exists($formTypeClass, 'configureAdminAssets')) {
@@ -159,9 +159,10 @@ abstract class AbstractBlock extends AbstractType implements BlockTypeInterface
     public function configureAdminFormThemes(): array
     {
         $this->setRootBuilder();
-        if (!is_null($this->tempBuilder)) {
+        if (null !== $this->tempBuilder) {
             return $this->getAdminFormThemesRecursive($this->tempBuilder);
         }
+
         return [];
     }
 
@@ -210,7 +211,7 @@ abstract class AbstractBlock extends AbstractType implements BlockTypeInterface
             /** @var class-string|null $innerType */
             $innerType = $child->getConfig()->getOption('entry_type');
             if (
-                !is_null($innerType) &&
+                null !== $innerType &&
                 (
                     !in_array($innerType, array_keys($this->treatedFormTypeThemes)) ||
                     (isset($this->treatedFormTypeThemes[$innerType]) && $this->treatedFormTypeThemes[$innerType] !==
