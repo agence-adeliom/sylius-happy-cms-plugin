@@ -14,7 +14,7 @@ services:
     arguments:
       - '@sylius.happy_cms.shared_block.block_collection'
     tags:
-      - { name: sylius.ui.template_event.context_provider }
+      - { name: sylius.twig_hooks.context_provider }
 
   sylius.happy_cms.plugin.listener.entity_route_indexer:
     class: Adeliom\SyliusHappyCMSPlugin\EventListener\EntityRouteIndexer
