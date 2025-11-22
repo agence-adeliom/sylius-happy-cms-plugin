@@ -13,9 +13,7 @@ use Symfony\Component\Routing\Route as SymfonyRoute;
 #[ORM\MappedSuperclass(repositoryClass: RedirectRouteRepository::class)]
 class RedirectRoute extends RedirectRouteModel implements RedirectRouteInterface
 {
-    /**
-     * @var int|null
-     */
+    /** @var int|null */
     #[ORM\Id]
     #[ORM\Column(type: Types::INTEGER, options: ['unsigned' => true])]
     #[ORM\GeneratedValue]

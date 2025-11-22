@@ -110,6 +110,7 @@ class Media implements MediaInterface, \Stringable
         if ($this->metas[$key] && is_string($this->metas[$key])) {
             return $this->metas[$key];
         }
+
         return $default;
     }
 

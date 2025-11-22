@@ -8,7 +8,6 @@ use Adeliom\SyliusHappyCMSPlugin\Entity\Config\ConfigInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Config\ConfigTranslationInterface;
 use Adeliom\SyliusHappyCMSPlugin\Enum\Config\ConfigTypeEnum;
 use Doctrine\Common\Collections\Collection;
-use Sylius\Resource\Model\TranslationInterface;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 

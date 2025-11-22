@@ -12,9 +12,7 @@ use Symfony\Cmf\Bundle\RoutingBundle\Model\Route as RouteModel;
 #[ORM\MappedSuperclass(repositoryClass: RouteRepository::class)]
 class Route extends RouteModel implements RouteInterface
 {
-    /**
-     * @var int|null
-     */
+    /** @var int|null */
     #[ORM\Id]
     #[ORM\Column(type: Types::INTEGER, options: ['unsigned' => true])]
     #[ORM\GeneratedValue]

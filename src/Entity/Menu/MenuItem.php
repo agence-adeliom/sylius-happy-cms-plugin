@@ -272,7 +272,7 @@ class MenuItem implements MenuItemInterface
      */
     public function getParents(?array $parents = [], ?MenuItemInterface $parent = null): array
     {
-        if (is_null($parents)) {
+        if (null === $parents) {
             $parents = [];
         }
 

@@ -80,8 +80,9 @@ class ConfigTranslation extends AbstractTranslation implements ConfigTranslation
 
     public function setDate(?\DateTime $date): void
     {
-        if (is_null($date)) {
+        if (null === $date) {
             $this->value = null;
+
             return;
         }
         if (ConfigTypeEnum::DATE() == $this->getType()) {
@@ -104,8 +105,9 @@ class ConfigTranslation extends AbstractTranslation implements ConfigTranslation
 
     public function setTime(?\DateTime $date): void
     {
-        if (is_null($date)) {
+        if (null === $date) {
             $this->value = null;
+
             return;
         }
         if (ConfigTypeEnum::TIME() == $this->getType()) {
