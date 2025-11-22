@@ -7,6 +7,7 @@ namespace Adeliom\SyliusHappyCMSPlugin\DataMapperInterface;
 use Sylius\Component\Locale\Provider\LocaleProviderInterface;
 use Sylius\Resource\Model\TranslatableInterface;
 use Symfony\Component\Form\DataMapperInterface;
+use Symfony\Component\Form\Form;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class ContentTranslatableDataMapper implements DataMapperInterface
@@ -31,8 +32,9 @@ class ContentTranslatableDataMapper implements DataMapperInterface
         }
     }
 
-    public function mapDataToForms(mixed $viewData, \Traversable $forms)
+    public function mapDataToForms(mixed $viewData, \Traversable $forms): void
     {
+        /** @phpstan-ignore-next-line */
         if (!(($viewData::class === $this->class || is_subclass_of($viewData, $this->class)) && $viewData instanceof TranslatableInterface)) {
             return;
         }
@@ -48,8 +50,9 @@ class ContentTranslatableDataMapper implements DataMapperInterface
         }
     }
 
-    public function mapFormsToData(\Traversable $forms, mixed &$viewData)
+    public function mapFormsToData(\Traversable $forms, mixed &$viewData): void
     {
+        /** @phpstan-ignore-next-line */
         if (!(($viewData::class === $this->class || is_subclass_of($viewData, $this->class)) && $viewData instanceof TranslatableInterface)) {
             return;
         }
@@ -57,7 +60,7 @@ class ContentTranslatableDataMapper implements DataMapperInterface
         $translation = $viewData->getTranslation($this->locale);
         $forms = iterator_to_array($forms);
         foreach ($forms as $form) {
-            /** @var \Symfony\Component\Form\Form $form */
+            /** @var Form $form */
             $this->propertyAccessor->setValue($translation, $form->getName(), $form->getData());
         }
     }

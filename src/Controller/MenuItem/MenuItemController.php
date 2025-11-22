@@ -30,22 +30,8 @@ class MenuItemController
 
     public function indexAction(Request $request): Response
     {
-        return new RedirectResponse($this->router->generate($request->get('route')));
-    }
-
-    private function findMenuItemOr404(int $id): MenuItemInterface
-    {
-        $menuItem = null;
-        if (null !== $this->menuItemRepository) {
-            /** @var MenuItemInterface|null $menuItem */
-            $menuItem = $this->menuItemRepository->find($id);
-
-            if (null === $menuItem) {
-                throw new NotFoundHttpException(sprintf('MenuItem with id %d does not exist.', $id));
-            }
-        }
-        Assert::isInstanceOf($menuItem, MenuItemInterface::class);
-
-        return $menuItem;
+        $route = $request->get('route');
+        assert(is_string($route), 'Route must be a string');
+        return new RedirectResponse($this->router->generate($route));
     }
 }

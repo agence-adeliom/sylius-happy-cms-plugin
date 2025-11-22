@@ -98,7 +98,7 @@ class Media implements MediaInterface, \Stringable
     }
 
     /**
-     * @return string[]
+     * @return array<string, mixed>
      */
     public function getMetas(): array
     {
@@ -107,7 +107,10 @@ class Media implements MediaInterface, \Stringable
 
     public function getMeta(string $key, string|null $default = null): string|null
     {
-        return $this->metas[$key] ?? $default;
+        if ($this->metas[$key] && is_string($this->metas[$key])) {
+            return $this->metas[$key];
+        }
+        return $default;
     }
 
     public function setMetas(array $metas): void
@@ -136,7 +139,7 @@ class Media implements MediaInterface, \Stringable
             } while ($current);
         }
 
-        return trim($tree, $separator);
+        return trim($tree ?? '', $separator);
     }
 
     public function __toString(): string

@@ -8,9 +8,7 @@ use Adeliom\SyliusHappyCMSPlugin\Entity\Page\Page as BasePage;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Page\PageTranslationInterface;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Repository\HappyCMS\Page\PageRepository;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 
-#[Serializer\ExclusionPolicy('ALL')]
 #[ORM\Entity(repositoryClass: PageRepository::class)]
 #[ORM\Table(name: 'sylius_happy_cms__page')]
 class Page extends BasePage

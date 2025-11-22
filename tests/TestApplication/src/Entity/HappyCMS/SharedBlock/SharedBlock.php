@@ -8,9 +8,7 @@ use Adeliom\SyliusHappyCMSPlugin\Entity\SharedBlock\SharedBlock as BaseSharedBlo
 use Adeliom\SyliusHappyCMSPlugin\Entity\SharedBlock\SharedBlockTranslationInterface;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Repository\HappyCMS\SharedBlock\SharedBlockRepository;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 
-#[Serializer\ExclusionPolicy('ALL')]
 #[ORM\Entity(repositoryClass: SharedBlockRepository::class)]
 #[ORM\Table(name: 'sylius_happy_cms__shared_block')]
 class SharedBlock extends BaseSharedBlock

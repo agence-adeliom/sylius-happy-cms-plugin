@@ -68,7 +68,7 @@ class MenuItem implements MenuItemInterface
     protected ?MenuItemInterface $parent = null;
 
     /** @var Collection<int, MenuItemInterface> */
-    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: MenuItemInterface::class, cascade: ['all'])]
+    #[ORM\OneToMany(targetEntity: MenuItemInterface::class, mappedBy: 'parent', cascade: ['all'])]
     #[ORM\OrderBy(['root' => 'ASC', 'lft' => 'ASC'])]
     protected Collection $children;
 
@@ -103,7 +103,7 @@ class MenuItem implements MenuItemInterface
         return $this->lft;
     }
 
-    public function setLft(mixed $lft): void
+    public function setLft(int $lft): void
     {
         $this->lft = $lft;
     }
@@ -113,7 +113,7 @@ class MenuItem implements MenuItemInterface
         return $this->lvl;
     }
 
-    public function setLvl(mixed $lvl): void
+    public function setLvl(int $lvl): void
     {
         $this->lvl = $lvl;
     }
@@ -123,7 +123,7 @@ class MenuItem implements MenuItemInterface
         return $this->rgt;
     }
 
-    public function setRgt(mixed $rgt): void
+    public function setRgt(int $rgt): void
     {
         $this->rgt = $rgt;
     }
@@ -239,14 +239,14 @@ class MenuItem implements MenuItemInterface
     public function getPublishedChildren(): Collection
     {
         return $this->children->filter(
-            static fn (MenuItemInterface $child) => $child->getPublishState() == ThreeStateStatusEnum::PUBLISHED()->getValue(),
+            static fn (MenuItemInterface $child) => $child->getPublishState() == ThreeStateStatusEnum::PUBLISHED,
         );
     }
 
     #[ORM\PreRemove]
     public function onRemove(): void
     {
-        $this->setPublishState(ThreeStateStatusEnum::UNPUBLISHED()->getValue());
+        $this->setPublishState(ThreeStateStatusEnum::UNPUBLISHED);
     }
 
     /**
@@ -272,6 +272,10 @@ class MenuItem implements MenuItemInterface
      */
     public function getParents(?array $parents = [], ?MenuItemInterface $parent = null): array
     {
+        if (is_null($parents)) {
+            $parents = [];
+        }
+
         if (empty($parent)) {
             $parents[] = (string) $this;
             $parent = $this;

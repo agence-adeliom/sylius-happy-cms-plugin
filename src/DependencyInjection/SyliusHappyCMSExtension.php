@@ -58,6 +58,7 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
     private function processPageConfiguration(array $config, ContainerBuilder $container): void
     {
         foreach ($config as $key => $value) {
+            /** @phpstan-ignore-next-line */
             $container->setParameter('sylius_happy_cms.page.' . $key, $value);
         }
     }
@@ -68,6 +69,7 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
     private function processSeoConfiguration(array $config, ContainerBuilder $container): void
     {
         foreach ($config as $key => $value) {
+            /** @phpstan-ignore-next-line */
             $container->setParameter('sylius_happy_cms.seo.' . $key, $value);
         }
     }
@@ -78,6 +80,7 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
     private function processConfigConfiguration(array $config, ContainerBuilder $container): void
     {
         foreach ($config as $key => $value) {
+            /** @phpstan-ignore-next-line */
             $container->setParameter('sylius_happy_cms.config.' . $key, $value);
         }
     }
@@ -90,9 +93,11 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
         foreach ($config as $key => $value) {
             if (is_array($value)) {
                 foreach ($value as $type => $class) {
+                    /** @phpstan-ignore-next-line */
                     $container->setParameter(sprintf('sylius_happy_cms.menu.%s.%s', $key, $type), $class);
                 }
             }
+            /** @phpstan-ignore-next-line */
             $container->setParameter(sprintf('sylius_happy_cms.menu.%s', $key), $value);
         }
     }
@@ -105,9 +110,11 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
         foreach ($config as $key => $value) {
             if (is_array($value)) {
                 foreach ($value as $type => $class) {
+                    /** @phpstan-ignore-next-line */
                     $container->setParameter(sprintf('sylius_happy_cms.shared_block.%s.%s', $key, $type), $class);
                 }
             }
+            /** @phpstan-ignore-next-line */
             $container->setParameter(sprintf('sylius_happy_cms.shared_block.%s', $key), $value);
         }
     }
@@ -118,6 +125,7 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
     private function processMediaConfiguration(array $config, ContainerBuilder $container): void
     {
         foreach ($config as $key => $value) {
+            /** @phpstan-ignore-next-line */
             $container->setParameter('sylius_happy_cms.media.' . $key, $value);
         }
 

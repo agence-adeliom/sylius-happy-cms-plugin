@@ -5,13 +5,15 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\Controller\Page;
 
 use Adeliom\SyliusHappyCMSPlugin\Services\Cmf\RouteRenderService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class PageController
+class PageController extends AbstractController
 {
     public function __construct(
         protected RouteRenderService $routeRenderService,
@@ -22,15 +24,16 @@ class PageController
 
     public function clearCacheAction(Request $request): Response
     {
-        $flashbag = $request->getSession()->getBag('flashes');
+        /** @var FlashBagInterface $flashBag */
+        $flashBag = $request->getSession()->getBag('flashes');
 
         try {
             $this->routeRenderService->invalidCache();
 
-            $flashbag->add('success', $this->translator->trans('sylius_happy_cms.cache.successfully_cleared'));
+            $flashBag->add('success', $this->translator->trans('sylius_happy_cms.cache.successfully_cleared'));
         } catch (\RuntimeException $exception) {
             try {
-                $flashbag->add('error', $this->translator->trans('sylius_happy_cms.cache.something_went_wrong'));
+                $flashBag->add('error', $this->translator->trans('sylius_happy_cms.cache.something_went_wrong'));
             } catch (\RuntimeException $exception) {
                 // DO nothing, flash service not available
             }

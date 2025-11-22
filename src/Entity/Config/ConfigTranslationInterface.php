@@ -10,4 +10,8 @@ use Sylius\Resource\Model\TranslationInterface;
 interface ConfigTranslationInterface extends TranslationInterface, ResourceInterface
 {
     public function setDate(?\DateTime $date): void;
+
+    public function setValue(mixed $value): void;
+
+    public function getValue(): mixed;
 }

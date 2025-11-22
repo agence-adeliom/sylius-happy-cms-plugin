@@ -16,7 +16,6 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\PrePersist;
 use Doctrine\ORM\Mapping\PreRemove;
 use Doctrine\ORM\Mapping\PreUpdate;
-use JMS\Serializer\Annotation as Serializer;
 use Sylius\Resource\Model\AbstractTranslation;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -30,13 +29,10 @@ class PageTranslation extends AbstractTranslation implements PageTranslationInte
         EntitySeoTrait::__construct as private SEOConstruct;
     }
 
-    #[Groups('Default')]
+    #[Groups(['Default', 'Detailed', 'Autocomplete'])]
     #[ORM\Id]
     #[ORM\Column(type: Types::INTEGER, options: ['unsigned' => true])]
     #[ORM\GeneratedValue]
-    #[Serializer\Expose]
-    #[Serializer\Type('integer')]
-    #[Serializer\Groups(['Detailed', 'Default', 'Autocomplete'])]
     protected ?int $id = null;
 
     public function getId(): ?int
