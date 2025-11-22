@@ -40,7 +40,6 @@ services:
         public: true
         autowire: true
         arguments:
-            - '@doctrine.orm.entity_manager'
             - '@router'
         tags:
             - controller.service_arguments
