@@ -234,4 +234,6 @@ error:
     already_exists: 'Already exists'
     cant_upload: 'Upload failed'
     creating_dir: 'Error while creating directory'
+    move_into_self: 'Impossible to move/copy into itself'
+    moving: 'Error while moving the file/folder'
 not_allowed_file_ext: 'File extension is not allowed'

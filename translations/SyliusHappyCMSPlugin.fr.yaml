@@ -234,4 +234,6 @@ error:
     already_exists: 'Existe déjà'
     cant_upload: 'Echec du téléchargement'
     creating_dir: 'Erreur lors de la création du répertoire'
+    move_into_self: 'Impossible de déplacer/copier dans lui-même'
+    moving: 'Erreur lors du déplacement du fichier/dossier'
 not_allowed_file_ext: 'Le type de fichier n''est pas autorisé'
