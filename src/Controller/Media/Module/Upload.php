@@ -7,6 +7,9 @@ namespace Adeliom\SyliusHappyCMSPlugin\Controller\Media\Module;
 use Adeliom\SyliusHappyCMSPlugin\Event\Media\MediaBeforeFileCreated;
 use Adeliom\SyliusHappyCMSPlugin\Event\Media\MediaFileSaved;
 use Adeliom\SyliusHappyCMSPlugin\Event\Media\MediaFileUploaded;
+use League\Flysystem\FilesystemException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpFoundation\File\File;
@@ -32,11 +35,21 @@ trait Upload
 
         $random_name = filter_var($request->request->get('random_names'), \FILTER_VALIDATE_BOOLEAN);
         if (is_string($request->request->get('custom_attrs', '[]'))) {
+
+            /** @var array<int, array{
+             * name: string,
+             * options: array<string, mixed>,
+             * }> $custom_attr
+             **/
             $custom_attr = json_decode($request->request->get('custom_attrs', '[]'), true, 512, \JSON_THROW_ON_ERROR);
         }
         $result = [];
 
-        if (($one = $request->files->get('file')) && $this->allowUpload($one)) {
+        $one = $request->files->get('file');
+
+        assert($one instanceof UploadedFile || null === $one);
+
+        if ($one && $this->allowUpload($one)) {
             try {
                 $one = $this->optimizeUpload($one);
                 $orig_name = $one->getClientOriginalName();
@@ -49,11 +62,18 @@ trait Upload
                         return new JsonResponse($chunksRes);
                     }
 
-                    $one = new File($chunksRes['path']);
+                    if (is_string($chunksRes['path'])) {
+                        $one = new File($chunksRes['path']);
+                    }
                 }
 
                 if (!empty($custom_attr)) {
                     $custom_attr = array_filter($custom_attr, static fn ($entry) => $entry['name'] === $orig_name);
+                    /** @var array{
+                     * name: string,
+                     * options: array<string, mixed>,
+                     * } $custom_attr
+                     **/
                     $custom_attr = current($custom_attr);
                 }
 
@@ -99,6 +119,12 @@ trait Upload
     public function uploadEditedImage(Request $request): JsonResponse
     {
         if ($this->allowUpload()) {
+
+            /** @var array{
+            *     folder: int|null,
+            *     name: string,
+            *     data: string,
+            *     } $data */
             $data = json_decode($request->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
             $upload_folder_id = $data['folder'];
@@ -107,7 +133,7 @@ trait Upload
                 $folder = $this->manager->getFolder($upload_folder_id);
             }
 
-            $upload_path = $folder ? $folder->getPath() : null;
+            $upload_path = $folder?->getPath();
             $original = $data['name'];
             $name_only = pathinfo((string) $original, \PATHINFO_FILENAME) . '_' . $this->helper->getRandomString();
 
@@ -122,10 +148,10 @@ trait Upload
                     'success' => true,
                     'message' => $media->getName(),
                 ];
-            } catch (\Exception $exception) {
+            } catch (FilesystemException|NotFoundExceptionInterface|ContainerExceptionInterface|\Exception $e) {
                 $result = [
                     'success' => false,
-                    'message' => $exception->getMessage(),
+                    'message' => $e->getMessage(),
                 ];
             }
         } else {
@@ -146,6 +172,11 @@ trait Upload
     public function uploadLink(Request $request): JsonResponse
     {
         if ($this->allowUpload()) {
+            /** @var array{
+             *     url: string,
+             *     folder: int|null,
+             *     random_names: bool,
+             *     } $data */
             $data = json_decode($request->getContent(), true, 512, \JSON_THROW_ON_ERROR);
             $url = $data['url'];
             $upload_folder_id = $data['folder'];
@@ -169,7 +200,7 @@ trait Upload
                     'success' => true,
                     'message' => $media->getName(),
                 ];
-            } catch (\Exception $exception) {
+            } catch (FilesystemException|NotFoundExceptionInterface|ContainerExceptionInterface|\Exception $exception) {
                 $result = [
                     'success' => false,
                     'message' => $exception->getMessage(),
@@ -187,10 +218,8 @@ trait Upload
 
     /**
      * allow/disallow user upload.
-     *
-     * @return bool [boolean]
      */
-    protected function allowUpload(string|UploadedFile|null $file = null): bool
+    protected function allowUpload(UploadedFile $file = null): bool
     {
         return true;
     }
@@ -206,15 +235,27 @@ trait Upload
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array{
+     *     path: string|false,
+     *     final: bool,
+     *     successes: string[],
+     *     errors: string[],
+     *     warnings: string[],
+     * }
      */
     private static function resumableUpload(Request $request, string $tmpFilePath, string $filename, string $chunksDir): array
     {
+        /* @var string[] $successes */
         $successes = [];
+        /* @var string[] $errors */
         $errors = [];
+        /* @var string[] $warnings */
         $warnings = [];
 
-        $identifier = trim($request->get('dzuuid', ''));
+        $dzuuid = $request->get('dzuuid', '');
+        assert(is_string($dzuuid));
+
+        $identifier = trim($dzuuid);
         $fileChunksFolder = sprintf('%s/%s', $chunksDir, $identifier);
         $filesystem = new Filesystem();
         $filesystem->mkdir(Path::normalize($fileChunksFolder));
@@ -224,23 +265,61 @@ trait Upload
         $extension = isset($info['extension']) ? '.' . strtolower($info['extension']) : '';
         $filename = $info['filename'];
 
-        $totalSize = (int) $request->get('dztotalfilesize', 0);
-        $totalChunks = (int) $request->get('dztotalchunkcount', 0);
-        $chunkInd = (int) $request->get('dzchunkindex', 0);
-        $chunkSize = (int) $request->get('dzchunksize', 0);
-        $startByte = (int) $request->get('dzchunkbyteoffset', 0);
+        /** @var int|string $totalSize */
+        $totalSize = $request->get('dztotalfilesize', 0);
+        if (!is_int($totalSize)) {
+            $totalSize = (int) $totalSize;
+        }
+
+        /** @var int|string $totalChunks */
+        $totalChunks = $request->get('dztotalchunkcount', 0);
+        if (!is_int($totalChunks)) {
+            $totalChunks = (int) $totalChunks;
+        }
+
+        /** @var int|string $chunkInd */
+        $chunkInd = $request->get('dzchunkindex', 0);
+        if (!is_int($chunkInd)) {
+            $chunkInd = (int) $chunkInd;
+        }
+
+        //$chunkSize = $request->get('dzchunksize', 0);
+        //$startByte = $request->get('dzchunkbyteoffset', 0);
 
         $chunkFile = sprintf('%s/%s.part%d', $fileChunksFolder, $filename, $chunkInd);
 
         if (!move_uploaded_file($tmpFilePath, $chunkFile)) {
-            $errors[] = ['text' => 'Move error', 'name' => $filename, 'index' => $chunkInd];
+            $errors[] = sprintf('Move error, filename %s, index %s', $filename, $chunkInd);
         }
 
-        if (0 === count($errors) && $newPath = self::checkAllParts($fileChunksFolder, $filename, $extension, $totalSize, $totalChunks, $chunksDir, $successes, $errors, $warnings)) {
-            return ['final' => true, 'path' => $newPath, 'successes' => $successes, 'errors' => $errors, 'warnings' => $warnings];
+        if (is_array($errors) && count($errors) == 0 &&
+            $newPath = self::checkAllParts(
+                $fileChunksFolder,
+                $filename,
+                $extension,
+                $totalSize,
+                $totalChunks,
+                $chunksDir,
+                $successes,
+                $errors,
+                $warnings)
+        ) {
+            return [
+                'final' => true,
+                'path' => $newPath,
+                'successes' => $successes,
+                'errors' => $errors,
+                'warnings' => $warnings
+            ];
         }
 
-        return ['final' => false, 'successes' => $successes, 'errors' => $errors, 'warnings' => $warnings];
+        return [
+            'final' => false,
+            'path' => false,
+            'successes' => $successes,
+            'errors' => $errors,
+            'warnings' => $warnings
+        ];
     }
 
     /**
@@ -248,7 +327,17 @@ trait Upload
      * @param string[] $errors
      * @param string[] $warnings
      */
-    private static function checkAllParts(string $fileChunksFolder, string $filename, string $extension, int $totalSize, int $totalChunks, string $chunksDir, array &$successes, array &$errors, array &$warnings): string|bool
+    private static function checkAllParts(
+        string $fileChunksFolder,
+        string $filename,
+        string $extension,
+        int $totalSize,
+        int $totalChunks,
+        string $chunksDir,
+        array &$successes,
+        array &$errors,
+        array &$warnings
+    ): string|false
     {
         $parts = glob(Path::normalize(sprintf('%s/*', $fileChunksFolder)));
         if (is_array($parts)) {
@@ -290,7 +379,8 @@ trait Upload
      * @param string[] $errors
      * @param string[] $warnings
      */
-    private static function createFileFromChunks(string $fileChunksFolder, string $fileName, string $extension, int $totalSize, int $totalChunks, string $chunksDir, array &$successes, array &$errors, array &$warnings): bool|string
+    private static function createFileFromChunks(string $fileChunksFolder, string $fileName, string $extension, int
+    $totalSize, int $totalChunks, string $chunksDir, array &$successes, array &$errors, array &$warnings): false|string
     {
         $relPath = Path::normalize($chunksDir . '/assembled');
         $filesystem = new Filesystem();

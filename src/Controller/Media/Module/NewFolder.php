@@ -16,6 +16,10 @@ trait NewFolder
      */
     public function createNewFolder(Request $request): JsonResponse
     {
+        /** @var array{
+         *    folder: int|null,
+         *    new_folder_name: string
+         * } $data */
         $data = json_decode($request->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         $currentFolderId = $data['folder'];

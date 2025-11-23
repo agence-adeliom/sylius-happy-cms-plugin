@@ -232,4 +232,6 @@ sylius_happy_cms:
       generating_all_alt: 'Génération en cours...'
 error:
     already_exists: 'Existe déjà'
+    cant_upload: 'Echec du téléchargement'
+    creating_dir: 'Erreur lors de la création du répertoire'
 not_allowed_file_ext: 'Le type de fichier n''est pas autorisé'

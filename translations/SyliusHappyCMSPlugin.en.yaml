@@ -231,5 +231,7 @@ sylius_happy_cms:
       generate_all_alt_submit: 'Yes, I want to generate alt text for all files'
       generating_all_alt: Generating...
 error:
-  already_exists: 'Already exists'
+    already_exists: 'Already exists'
+    cant_upload: 'Upload failed'
+    creating_dir: 'Error while creating directory'
 not_allowed_file_ext: 'File extension is not allowed'
