@@ -76,7 +76,6 @@ trait Move
                         $this->manager->save($entity);
 
                         $result[] = array_merge($defaults, ['success' => true]);
-                        $toBroadCast[] = $defaults;
 
                         // fire event
                         $this->eventDispatcher->dispatch(
@@ -89,6 +88,11 @@ trait Move
                     } catch (\Exception $exception) {
                         throw new \Exception($this->translator->trans('error.moving', [], 'SyliusHappyCMSPlugin'), $exception->getCode(), $exception);
                     }
+                } else {
+                    $result[] = [
+                        'success' => false,
+                        'message' => 'Entity not found',
+                    ];
                 }
             } catch (\Exception $e) {
                 $result[] = [
