@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\Controller\Media\Module;
 
 use Adeliom\SyliusHappyCMSPlugin\Entity\Media\FolderInterface;
-use Adeliom\SyliusHappyCMSPlugin\Entity\Media\Media;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Media\MediaInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use League\Flysystem\FilesystemException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -19,6 +20,13 @@ trait GetContent
      */
     public function getFiles(Request $request): JsonResponse
     {
+        /**
+         * @var array{
+         *     folder: int|null,
+         *     path: string|null,
+         *     search: string|null
+         * } $data
+         */
         $data = json_decode($request->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         $folder = null;
         $path = '/';
@@ -66,30 +74,44 @@ trait GetContent
     {
         $mediaId = null;
         if (is_string($request->getContent())) {
+            /**
+             * @var array{
+             *     item: int
+             * } $data
+             */
             $data = json_decode($request->getContent(), true, 512, \JSON_THROW_ON_ERROR);
             $mediaId = $data['item'];
 
-            /** @var Media|null $media */
-            $media = $this->helper->getMediaRepository()->findOneBy(['id' => $mediaId]);
-            if ($media) {
-                $path = $media->getPath();
-                $time = $media->getLastModified() ?? null;
-                $metas = $media->getMetas();
+            $mediaRepository = $this->helper->getMediaRepository();
+            if ($mediaRepository) {
+                /** @var MediaInterface|null $media */
+                $media = $mediaRepository->findOneBy(['id' => $mediaId]);
+                if ($media) {
+                    $path = $media->getPath();
+                    $time = $media->getLastModified() ?? null;
+                    $metas = $media->getMetas();
 
-                $item = [
-                    'id' => $media->getId(),
-                    'name' => $media->getName(),
-                    'type' => $media->getMime(),
-                    'size' => $media->getSize(),
-                    'path' => $this->manager->publicUrl($media),
-                    'download_url' => $this->manager->downloadUrl($media),
-                    'storage_path' => $path,
-                    'last_modified' => $time,
-                    'last_modified_formated' => $this->helper->getItemTime($time),
-                    'metas' => $metas,
-                ];
+                    try {
+                        $item = [
+                            'id' => $media->getId(),
+                            'name' => $media->getName(),
+                            'type' => $media->getMime(),
+                            'size' => $media->getSize(),
+                            'path' => $this->manager->publicUrl($media),
+                            'download_url' => $this->manager->downloadUrl($media),
+                            'storage_path' => $path,
+                            'last_modified' => $time,
+                            'last_modified_formated' => $this->helper->getItemTime($time),
+                            'metas' => $metas,
+                        ];
+                    } catch (ContainerExceptionInterface|NotFoundExceptionInterface|\Exception $e) {
+                        return new JsonResponse([
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
 
-                return new JsonResponse($item);
+                    return new JsonResponse($item);
+                }
             }
         }
 
@@ -152,21 +174,34 @@ trait GetContent
      *
      * @return array<MediaInterface|FolderInterface>
      */
-    protected function getFolderContent(int|string|FolderInterface $folder = null, bool $rec = false, ?string $search
+    protected function getFolderContent(int|string|FolderInterface|null $folder = null, bool $rec = false, ?string $search
     = null): array
     {
         if (is_int($folder)) {
             $folder = $this->manager->getFolder($folder);
         }
-        if (!method_exists($this->helper->getFolderRepository(), 'createQueryBuilder')) {
+
+        $folderRepository = $this->helper->getFolderRepository();
+
+        if (!$folderRepository) {
+            throw new \RuntimeException('Folder Repository not found');
+        }
+
+        $mediaRepository = $this->helper->getMediaRepository();
+
+        if (!$mediaRepository) {
+            throw new \RuntimeException('Media Repository not found');
+        }
+
+        if (!method_exists($folderRepository, 'createQueryBuilder')) {
             return [];
         }
-        if (!method_exists($this->helper->getMediaRepository(), 'createQueryBuilder')) {
+        if (!method_exists($mediaRepository, 'createQueryBuilder')) {
             return [];
         }
 
-        $folderQuery = $this->helper->getFolderRepository()->createQueryBuilder('f');
-        $mediaQuery = $this->helper->getMediaRepository()->createQueryBuilder('m');
+        $folderQuery = $folderRepository->createQueryBuilder('f');
+        $mediaQuery = $mediaRepository->createQueryBuilder('m');
 
         if ($folder === null) {
             $folderQuery->andWhere('f.parent IS NULL');
@@ -183,7 +218,9 @@ trait GetContent
             $mediaQuery->andWhere('m.name LIKE :search')->setParameter('search', '%' . trim($search) . '%');
         }
 
+        /** @var array<FolderInterface> $folders */
         $folders = $folderQuery->getQuery()->getResult();
+        /** @var array<MediaInterface> $medias */
         $medias = $mediaQuery->getQuery()->getResult();
 
         $results = array_merge($folders, $medias);

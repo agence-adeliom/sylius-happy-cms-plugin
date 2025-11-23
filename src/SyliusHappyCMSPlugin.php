@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin;
 
-use Adeliom\SyliusHappyCMSPlugin\DependencyInjection\SyliusHappyCMSExtension;
 use Sylius\Bundle\CoreBundle\Application\SyliusPluginTrait;
-use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
-use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class SyliusHappyCMSPlugin extends AbstractBundle
+final class SyliusHappyCMSPlugin extends Bundle
 {
     use SyliusPluginTrait;
 
-    public function getContainerExtension(): ?ExtensionInterface
+    public function getPath(): string
     {
-        return new SyliusHappyCMSExtension();
+        return \dirname(__DIR__);
     }
 }

@@ -26,7 +26,10 @@ class MediaHelper
 
     public function getFolderClassName(): string
     {
-        return $this->parameters->get('sylius_happy_cms.media.folder_entity');
+        /** @var string $folderEntity */
+        $folderEntity = $this->parameters->get('sylius_happy_cms.media.folder_entity');
+
+        return $folderEntity;
     }
 
     /**
@@ -44,7 +47,10 @@ class MediaHelper
 
     public function getMediaClassName(): string
     {
-        return $this->parameters->get('sylius_happy_cms.media.media_entity');
+        /** @var string $mediaClass */
+        $mediaClass = $this->parameters->get('sylius_happy_cms.media.media_entity');
+
+        return $mediaClass;
     }
 
     public function getMediaRepository(): ?MediaRepositoryInterface
@@ -61,20 +67,33 @@ class MediaHelper
 
     public function getBaseUrl(): string
     {
-        return $this->parameters->get('sylius_happy_cms.media.base_url') ?? '';
+        /** @var string $baseUrl */
+        $baseUrl = $this->parameters->get('sylius_happy_cms.media.base_url');
+
+        return $baseUrl;
     }
 
     public function getRandomString(): string
     {
-        $randomString = call_user_func($this->parameters->get('sylius_happy_cms.media.sanitized_text'));
+        $randomString = false;
+        $sanitizedTextFunction = $this->parameters->get('sylius_happy_cms.media.sanitized_text');
+        if (is_callable($sanitizedTextFunction)) {
+            $randomString = call_user_func($sanitizedTextFunction);
+        }
 
-        return $randomString ?: '';
+        return is_string($randomString) ? $randomString : '';
     }
 
     public function cleanName(string $text, ?bool $folder = false): string
     {
-        $pattern = $this->filePattern($this->parameters->get(sprintf('sylius_happy_cms.media.%s', $folder ? 'allowed_folderNames_chars' : 'allowed_fileNames_chars')));
-        $text = preg_replace($pattern, '', $text);
+        /** @var string|false|null $chars */
+        $chars = $this->parameters->get(sprintf('sylius_happy_cms.media.%s', $folder ? 'allowed_folderNames_chars' : 'allowed_fileNames_chars'));
+        if (is_string($chars)) {
+            $pattern = $this->filePattern($chars);
+            $text = preg_replace($pattern, '', $text);
+        } else {
+            $text = false;
+        }
 
         return $text ?: $this->getRandomString();
     }
@@ -85,7 +104,9 @@ class MediaHelper
      */
     public function getItemTime(?int $time): ?string
     {
-        return $time ? (new \DateTime(sprintf('@%s', $time)))->format($this->parameters->get('sylius_happy_cms.media.last_modified_format')) : null;
+        $format = $this->parameters->get('sylius_happy_cms.media.last_modified_format');
+
+        return $time && is_string($format) ? (new \DateTime(sprintf('@%s', $time)))->format($format) : null;
     }
 
     public function getMedia(int|string|MediaInterface $media): ?MediaInterface
@@ -96,13 +117,15 @@ class MediaHelper
         }
 
         try {
-            if (is_numeric($media) || is_string($media)) {
-                /**
-                 * @var ?MediaInterface $media
-                 */
-                $media = $this->getMediaRepository()->find($media);
+            if (null !== ($mediaRepository = $this->getMediaRepository())) {
+                if (is_numeric($media) || is_string($media)) {
+                    /**
+                     * @var ?MediaInterface $media
+                     */
+                    $media = $mediaRepository->find($media);
 
-                return $media;
+                    return $media;
+                }
             }
             if ($media instanceof MediaInterface) {
                 return $media;
@@ -360,13 +383,14 @@ class MediaHelper
         return 'fa-file-o';
     }
 
-    public function fileIsType(string|Media $type, string $compare): bool
+    public function fileIsType(string|MediaInterface $type, string $compare): bool
     {
-        if ($type instanceof Media) {
+        if ($type instanceof MediaInterface) {
             $type = $type->getMime();
         }
+        /** @var array|false|null $mimes */
         $mimes = $this->parameters->get('sylius_happy_cms.media.extended_mimes');
-        if ($type) {
+        if ($type && is_array($mimes)) {
             foreach (['image', 'video', 'audio'] as $test) {
                 if ((str_contains($type, $test) || in_array($type, $mimes[$test] ?? [])) && $test === $compare) {
                     return true;

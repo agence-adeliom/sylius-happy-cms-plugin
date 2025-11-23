@@ -4,45 +4,41 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Controller\Page;
 
-use Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuItemInterface;
-use Adeliom\SyliusHappyCMSPlugin\Repository\Menu\MenuItemRepositoryInterface;
 use Adeliom\SyliusHappyCMSPlugin\Services\Cmf\RouteRenderService;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Twig\Environment;
-use Webmozart\Assert\Assert;
 
-class PageController
+class PageController extends AbstractController
 {
-
     public function __construct(
         protected RouteRenderService $routeRenderService,
         protected RouterInterface $router,
         protected TranslatorInterface $translator,
-    ) {}
+    ) {
+    }
 
     public function clearCacheAction(Request $request): Response
     {
-        $flashbag = $request->getSession()->getBag('flashes');
+        /** @var FlashBagInterface $flashBag */
+        $flashBag = $request->getSession()->getBag('flashes');
+
         try {
             $this->routeRenderService->invalidCache();
 
-            $flashbag->add('success', $this->translator->trans('sylius_happy_cms.cache.successfully_cleared'));
+            $flashBag->add('success', $this->translator->trans('sylius_happy_cms.cache.successfully_cleared'));
         } catch (\RuntimeException $exception) {
             try {
-                $flashbag->add('error', $this->translator->trans('sylius_happy_cms.cache.something_went_wrong'));
-            }
-            catch (\RuntimeException $exception) {
+                $flashBag->add('error', $this->translator->trans('sylius_happy_cms.cache.something_went_wrong'));
+            } catch (\RuntimeException $exception) {
                 // DO nothing, flash service not available
             }
         }
+
         return new RedirectResponse($this->router->generate('sylius_happy_cms_admin_page_index'));
     }
 

@@ -1,0 +1,345 @@
+sylius_easy_crud:
+    resource: "@SyliusEasyCrudPlugin/config/routes.yaml"
+
+sylius_happy_cms:
+    resource: "@SyliusHappyCMSPlugin/config/routes.yaml"
+
+sylius_happy_cms_page_admin:
+    resource: |
+        alias: sylius_happy_cms.page
+        section: admin
+        templates: "@SyliusHappyCMSPlugin\\page\\crud"
+        redirect: update
+        grid: sylius_happy_cms_page_admin
+        form:
+            type: Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\Page\PageAdmin
+            options:
+                context: $context
+        vars:
+            all:
+                icon: 'file'
+                subheader: sylius_happy_cms.page.admin.ui.subheader
+                breadcrumb: sylius_happy_cms.page.admin.ui.index
+                templates:
+                    form: "@SyliusEasyCrudPlugin\\crud\\form\\_form.html.twig"
+            index:
+                header: sylius_happy_cms.page.admin.ui.index
+            create:
+                header: sylius_happy_cms.page.admin.ui.create
+            update:
+                header: sylius_happy_cms.page.admin.ui.update
+                redirect:
+                    route: update
+                    parameters:
+                        context: $context
+                        id: $id
+                route:
+                    parameters:
+                        context: $context
+                        id: $id
+            show:
+                header: sylius_happy_cms.page.admin.ui.show
+                redirect:
+                    route: update # needed to redirect from show to update after updating flex content
+                    parameters:
+                        context: $context
+                        id: $id
+                route:
+                    parameters:
+                        context: $context
+         # needed to keep context in URL after updating flex content
+                        id: $id
+    type: sylius.resource
+    prefix: admin
+
+sylius_happy_cms_config_admin:
+    resource: |
+        alias: sylius_happy_cms.config
+        section: admin
+        templates: "@SyliusEasyCrudPlugin\\crud"
+        redirect: update
+        grid: sylius_happy_cms_config_admin
+        form:
+            type: Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\Config\ConfigAdmin
+            options:
+                context: $context
+        vars:
+            all:
+                icon: 'file'
+                subheader: sylius_happy_cms.config.admin.ui.subheader
+                breadcrumb: sylius_happy_cms.config.admin.ui.index
+                templates:
+                    form: "@SyliusEasyCrudPlugin\\crud\\form\\_form.html.twig"
+            index:
+                header: sylius_happy_cms.config.admin.ui.index
+            create:
+                header: sylius_happy_cms.config.admin.ui.create
+            update:
+                header: sylius_happy_cms.config.admin.ui.update
+                redirect:
+                    route: update
+                    parameters:
+                        context: $context
+                        id: $id
+                route:
+                    parameters:
+                        context: $context
+                        id: $id
+            show:
+                header: sylius_happy_cms.config.admin.ui.show
+                redirect:
+                    route: update # needed to redirect from show to update after updating flex content
+                    parameters:
+                        context: $context
+                        id: $id
+                route:
+                    parameters:
+                        context: $context
+         # needed to keep context in URL after updating flex content
+                        id: $id
+    type: sylius.resource
+    prefix: admin
+
+sylius_happy_cms_menu_admin:
+    resource: |
+        alias: sylius_happy_cms.menu
+        section: admin
+        templates: "@SyliusEasyCrudPlugin\\crud"
+        redirect: update
+        grid: sylius_happy_cms_menu_admin
+        form:
+            type: Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\Menu\MenuAdmin
+            options:
+                context: $context
+        vars:
+            all:
+                icon: 'file'
+                subheader: sylius_happy_cms.menu.admin.ui.subheader
+                breadcrumb: sylius_happy_cms.menu.admin.ui.index
+                templates:
+                    form: "@SyliusEasyCrudPlugin\\crud\\form\\_form.html.twig"
+            index:
+                header: sylius_happy_cms.menu.admin.ui.index
+            create:
+                header: sylius_happy_cms.menu.admin.ui.create
+            update:
+                header: sylius_happy_cms.menu.admin.ui.update
+                redirect:
+                    route: update
+                    parameters:
+                        context: $context
+                        id: $id
+                route:
+                    parameters:
+                        context: $context
+                        id: $id
+            show:
+                header: sylius_happy_cms.menu.admin.ui.show
+                redirect:
+                    route: update # needed to redirect from show to update after updating flex content
+                    parameters:
+                        context: $context
+                        id: $id
+                route:
+                    parameters:
+                        context: $context
+         # needed to keep context in URL after updating flex content
+                        id: $id
+    type: sylius.resource
+    prefix: admin
+
+sylius_happy_cms_menu_item_admin:
+    resource: |
+        alias: sylius_happy_cms.menu_item
+        section: admin
+        templates: "@SyliusHappyCMSPlugin\\menu_item\\crud"
+        except: ['index']
+        redirect: update
+        grid: sylius_happy_cms_menu_item_admin
+        form:
+            type: Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\Menu\MenuItemAdmin
+            options:
+                context: $context
+        vars:
+            all:
+                icon: 'file'
+                subheader: sylius_happy_cms.menu_item.admin.ui.subheader
+                breadcrumb: sylius_happy_cms.menu_item.admin.ui.index
+                templates:
+                    form: "@SyliusEasyCrudPlugin\\crud\\form\\_form.html.twig"
+            index:
+                header: sylius_happy_cms.menu_item.admin.ui.index
+            create:
+                header: sylius_happy_cms.menu_item.admin.ui.create
+            update:
+                header: sylius_happy_cms.menu_item.admin.ui.update
+                templates:
+                    form: "@SyliusEasyCrudPlugin\\crud\\form\\_form.html.twig"
+                    breadcrumb: "@SyliusHappyCMSPlugin\\menu_item\\crud\\_breadcrumb.html.twig"
+                redirect:
+                    route: update
+                    parameters:
+                        context: $context
+                        id: $id
+                route:
+                    parameters:
+                        context: $context
+                        id: $id
+            show:
+                header: sylius_happy_cms.menu_item.admin.ui.show
+                redirect:
+                    route: update # needed to redirect from show to update after updating flex content
+                    parameters:
+                        context: $context
+                        id: $id
+                route:
+                    parameters:
+                        context: $context
+         # needed to keep context in URL after updating flex content
+                        id: $id
+    type: sylius.resource
+    prefix: admin
+
+sylius_happy_cms_shared_block_admin:
+    resource: |
+        alias: sylius_happy_cms.shared_block
+        section: admin
+        templates: "@SyliusEasyCrudPlugin\\crud"
+        redirect: update
+        grid: sylius_happy_cms_shared_block_admin
+        form:
+            type: Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\SharedBlock\SharedBlockAdmin
+            options:
+                context: $context
+        vars:
+            all:
+                icon: 'file'
+                subheader: sylius_happy_cms.shared_block.admin.ui.subheader
+                breadcrumb: sylius_happy_cms.shared_block.admin.ui.index
+                templates:
+                    form: "@SyliusEasyCrudPlugin\\crud\\form\\_form.html.twig"
+            index:
+                header: sylius_happy_cms.shared_block.admin.ui.index
+            create:
+                header: sylius_happy_cms.shared_block.admin.ui.create
+            update:
+                header: sylius_happy_cms.shared_block.admin.ui.update
+                redirect:
+                    route: update
+                    parameters:
+                        context: $context
+                        id: $id
+                route:
+                    parameters:
+                        context: $context
+                        id: $id
+            show:
+                header: sylius_happy_cms.shared_block.admin.ui.show
+                redirect:
+                    route: update # needed to redirect from show to update after updating flex content
+                    parameters:
+                        context: $context
+                        id: $id
+                route:
+                    parameters:
+                        context: $context
+         # needed to keep context in URL after updating flex content
+                        id: $id
+    type: sylius.resource
+    prefix: admin
+
+sylius_happy_cms_route_admin:
+    resource: |
+        alias: sylius_happy_cms.route
+        section: admin
+        templates: "@SyliusEasyCrudPlugin\\crud"
+        redirect: update
+        grid: sylius_happy_cms_route_admin
+        form:
+            type: Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\Cmf\RouteAdmin
+            options:
+                context: $context
+        vars:
+            all:
+                icon: 'file'
+                subheader: sylius_happy_cms.route.admin.ui.subheader
+                breadcrumb: sylius_happy_cms.route.admin.ui.index
+                templates:
+                    form: "@SyliusEasyCrudPlugin\\crud\\form\\_form.html.twig"
+            index:
+                header: sylius_happy_cms.route.admin.ui.index
+            create:
+                header: sylius_happy_cms.route.admin.ui.create
+            update:
+                header: sylius_happy_cms.route.admin.ui.update
+                redirect:
+                    route: update
+                    parameters:
+                        context: $context
+                        id: $id
+                route:
+                    parameters:
+                        context: $context
+                        id: $id
+            show:
+                header: sylius_happy_cms.route.admin.ui.show
+                redirect:
+                    route: update # needed to redirect from show to update after updating flex content
+                    parameters:
+                        context: $context
+                        id: $id
+                route:
+                    parameters:
+                        context: $context
+         # needed to keep context in URL after updating flex content
+                        id: $id
+    type: sylius.resource
+    prefix: admin
+
+sylius_happy_cms_redirect_route_admin:
+    resource: |
+        alias: sylius_happy_cms.redirect_route
+        section: admin
+        templates: "@SyliusEasyCrudPlugin\\crud"
+        redirect: update
+        grid: sylius_happy_cms_redirect_route_admin
+        form:
+            type: Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\Cmf\RedirectRouteAdmin
+            options:
+                context: $context
+        vars:
+            all:
+                icon: 'file'
+                subheader: sylius_happy_cms.redirect_route.admin.ui.subheader
+                breadcrumb: sylius_happy_cms.redirect_route.admin.ui.index
+                templates:
+                    form: "@SyliusEasyCrudPlugin\\crud\\form\\_form.html.twig"
+            index:
+                header: sylius_happy_cms.redirect_route.admin.ui.index
+            create:
+                header: sylius_happy_cms.redirect_route.admin.ui.create
+            update:
+                header: sylius_happy_cms.redirect_route.admin.ui.update
+                redirect:
+                    route: update
+                    parameters:
+                        context: $context
+                        id: $id
+                route:
+                    parameters:
+                        context: $context
+                        id: $id
+            show:
+                header: sylius_happy_cms.redirect_route.admin.ui.show
+                redirect:
+                    route: update # needed to redirect from show to update after updating flex content
+                    parameters:
+                        context: $context
+                        id: $id
+                route:
+                    parameters:
+                        context: $context
+         # needed to keep context in URL after updating flex content
+                        id: $id
+    type: sylius.resource
+    prefix: admin

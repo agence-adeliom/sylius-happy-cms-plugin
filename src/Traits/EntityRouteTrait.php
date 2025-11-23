@@ -7,12 +7,12 @@ namespace Adeliom\SyliusHappyCMSPlugin\Traits;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Page\PageInterface;
 use Adeliom\SyliusHappyCMSPlugin\EventListener\EntityRouteIndexer;
+use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Sylius\Component\Channel\Model\ChannelInterface;
 use Sylius\Resource\Model\TranslationInterface;
-use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
@@ -40,17 +40,17 @@ trait EntityRouteTrait
         return $this->routes;
     }
 
-    public function getOnlineRoute(): ?RouteObjectInterface
+    public function getOnlineRoute(): ?RouteInterface
     {
         return $this->getRoute(false);
     }
 
-    public function getPreviewRoute(): ?RouteObjectInterface
+    public function getPreviewRoute(): ?RouteInterface
     {
         return $this->getRoute(true);
     }
 
-    private function getRoute(bool $preview = false): ?RouteObjectInterface
+    private function getRoute(bool $preview = false): ?RouteInterface
     {
         foreach ($this->routes as $route) {
             if ($preview === $route->getOption(EntityRouteIndexer::OPTION_PREVIEW)) {
@@ -180,7 +180,7 @@ trait EntityRouteTrait
         // It's store into the route option 'last_modification_timestamp'
         // This allow to simply check the last modification date of the entity and before rendering all page
         // This code is executed on the controller top actions
-        if (!is_null($route->getLastModification())) {
+        if (null !== $route->getLastModification()) {
             // Force public cache even if a session is started
             // Carreful to not have client component in you cache
             // Or wrap those component into a sub request (esi render, or live component)
@@ -230,45 +230,48 @@ trait EntityRouteTrait
 
         // 3. Le slug des parents
         $parents = [];
-        while (!is_null($translatable)) {
+        while (null !== $translatable) {
+            assert($translatable instanceof CmsRoutableInterface);
             if ($accessor->isReadable($translatable, 'parent')) {
                 $parent = $accessor->getValue($translatable, 'parent');
-                if (is_null($parent)) {
+                if (null === $parent) {
                     $translatable = null;
+
                     break;
-                } else {
-                    $parentSlug = '';
-                    if ($accessor->isReadable($parent, 'translation')) {
-                        $parentTranslation = $parent->getTranslation($translation->getLocale());
-                        $parentSlug = $accessor->getValue($parentTranslation, 'slug');
-                    } else if ($accessor->isReadable($parent, 'slug')) {
-                        $parentSlug = $accessor->getValue($parent, 'slug');
-                    }
-                    $isHomepage = false;
-                    if ($accessor->isReadable($parent, 'isHomePage')) {
-                        $isHomepage = $accessor->getValue($parent, 'isHomePage');
-                    }
-                    if ($parentSlug && !$isHomepage) {
-                        $parents[] = $parentSlug;
-                    }
-                    // Prochaine boucle la parent devient le translatable
-                    $translatable = $parent;
                 }
+                assert(is_object($parent));
+                $parentSlug = '';
+                if ($accessor->isReadable($parent, 'translation') && method_exists($parent, 'getTranslation')) {
+                    $parentTranslation = $parent->getTranslation($translation->getLocale());
+                    $parentSlug = $accessor->getValue($parentTranslation, 'slug');
+                } elseif ($accessor->isReadable($parent, 'slug')) {
+                    $parentSlug = $accessor->getValue($parent, 'slug');
+                }
+                $isHomepage = false;
+                if ($accessor->isReadable($parent, 'isHomePage')) {
+                    $isHomepage = $accessor->getValue($parent, 'isHomePage');
+                }
+                if ($parentSlug && !$isHomepage) {
+                    $parents[] = $parentSlug;
+                }
+                // Next loop, until parent is null
+                $translatable = $parent;
             }
         }
 
-        return str_replace([
+        return str_replace(
+            [
                                '{{parents}}',
                                '{{current}}',
                                '{{preview}}',
-                           ], [
+                           ],
+            [
                                (count($parents) > 0) ? '/' . implode('/', array_reverse($parents)) : '',
                                $current,
                                $preview,
                            ],
-            $urlPattern
+            $urlPattern,
         );
-
     }
 
     public function getVariablePattern(TranslationInterface $translation, bool $isPreview): string
@@ -302,7 +305,7 @@ trait EntityRouteTrait
     }
 
     /**
-     * @return array{label: string, route: ?RouteObjectInterface}
+     * @return array<int, array{label: string, route: ?RouteInterface}>
      */
     public function getBreadcrumbItems(): array
     {
@@ -325,7 +328,7 @@ trait EntityRouteTrait
             // If getParent no exists or throws an exception, we just ignore it
         }
 
-        /** @var array{label: string, route: ?RouteObjectInterface} $reservedList */
+        /** @var array<int, array{label: string, route: ?RouteInterface}> $reservedList */
         $reservedList = array_reverse($list, true);
 
         return $reservedList;

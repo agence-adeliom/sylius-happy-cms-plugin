@@ -73,6 +73,7 @@ final class MakeHappyCMS extends AbstractMaker
     public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void
     {
         $argument = $command->getDefinition()->getArgument('scope');
+        /** @var string $scope */
         $scope = $io->ask($argument->getDescription(), 'Faq');
 
         $input->setArgument('scope', $scope);
@@ -95,13 +96,23 @@ final class MakeHappyCMS extends AbstractMaker
      */
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
-        $namespace = Str::asCamelCase($input->getArgument('entryNamespace'));
+        /** @var string $entryNamespace */
+        $entryNamespace = $input->getArgument('entryNamespace');
+        /** @var string $scope */
         $scope = $input->getArgument('scope');
+        /** @var bool $hasFlexibleContent */
         $hasFlexibleContent = $input->getArgument('hasFlexibleContent') ?? true;
+        /** @var bool $hasRouting */
         $hasRouting = $input->getArgument('hasRouting') ?? true;
+        /** @var bool $hasTaxonomy */
         $hasTaxonomy = $input->getArgument('hasTaxonomy') ?? true;
+        /** @var string|class-string $entryClassName */
+        $entryClassName = $input->getArgument('entryClassName');
+        /** @var string|class-string $taxonomyClassName */
+        $taxonomyClassName = $input->getArgument('taxonomyClassName');
 
-        $entryClassName = Str::asClassName($input->getArgument('entryClassName'));
+        $namespace = Str::asCamelCase($entryNamespace);
+        $entryClassName = Str::asClassName($entryClassName);
         $entryClassNameDetail = $generator->createClassNameDetails(
             $entryClassName,
             'Entity\\HappyCMS\\' . $namespace . '\\',
@@ -116,7 +127,7 @@ final class MakeHappyCMS extends AbstractMaker
         $taxonomyClassNameTranslationDetail = false;
 
         if ($hasTaxonomy) {
-            $taxonomyClassName = Str::asClassName($input->getArgument('taxonomyClassName'));
+            $taxonomyClassName = Str::asClassName($taxonomyClassName);
             $taxonomyClassNameDetail = $generator->createClassNameDetails(
                 $taxonomyClassName,
                 'Entity\\HappyCMS\\' . $namespace . '\\',
@@ -134,11 +145,8 @@ final class MakeHappyCMS extends AbstractMaker
             $this->managerRegistry,
         );
 
-        $projectDir = $this->parameterBag->get('kernel.project_dir');
-
         try {
             $resourceConfigGenerator = new CrudMakerService(
-                is_string($projectDir) ? $projectDir : '',
                 $generator,
                 $namespace,
                 $entity,
@@ -146,8 +154,10 @@ final class MakeHappyCMS extends AbstractMaker
                 $entityTranslation,
             );
 
+            /** @var class-string $fullName */
+            $fullName = $entryClassNameDetail->getFullName();
             $resourceConfigGenerator->generateEntity(
-                $entryClassNameDetail->getFullName(),
+                $fullName,
                 self::TPL_FILES['entity'],
                 [
                     'classNameDetail' => $entryClassNameDetail,
@@ -160,22 +170,28 @@ final class MakeHappyCMS extends AbstractMaker
                 ],
             );
 
-            $resourceConfigGenerator->generateEntity(
-                $taxonomyClassNameDetail->getFullName(),
-                self::TPL_FILES['entity'],
-                [
-                    'classNameDetail' => $taxonomyClassNameDetail,
-                    'scope' => ucfirst($scope),
-                    'addRepo' => true,
-                    'addTrans' => true,
-                    'hasRouting' => false,
-                    'isOwningSide' => false,
-                    'relationClassNameDetail' => $entryClassNameDetail,
-                ],
-            );
+            if ($hasTaxonomy && $taxonomyClassNameDetail) {
+                /** @var class-string $fullName */
+                $fullName = $taxonomyClassNameDetail->getFullName();
+                $resourceConfigGenerator->generateEntity(
+                    $fullName,
+                    self::TPL_FILES['entity'],
+                    [
+                        'classNameDetail' => $taxonomyClassNameDetail,
+                        'scope' => ucfirst($scope),
+                        'addRepo' => true,
+                        'addTrans' => true,
+                        'hasRouting' => false,
+                        'isOwningSide' => false,
+                        'relationClassNameDetail' => $entryClassNameDetail,
+                    ],
+                );
+            }
 
+            /** @var class-string $fullName */
+            $fullName = $entryClassNameTranslationDetail->getFullName();
             $resourceConfigGenerator->generateEntity(
-                $entryClassNameTranslationDetail->getFullName(),
+                $fullName,
                 self::TPL_FILES['translation'],
                 [
                     'classNameDetail' => $entryClassNameTranslationDetail,
@@ -186,19 +202,25 @@ final class MakeHappyCMS extends AbstractMaker
                 ],
             );
 
-            $resourceConfigGenerator->generateEntity(
-                $taxonomyClassNameTranslationDetail->getFullName(),
-                self::TPL_FILES['translation'],
-                [
-                    'classNameDetail' => $taxonomyClassNameTranslationDetail,
-                    'scope' => ucfirst($scope),
-                    'hasFlexibleContent' => $hasFlexibleContent,
-                    'extraFields' => [],
-                ],
-            );
+            if ($hasTaxonomy && $taxonomyClassNameDetail) {
+                /** @var class-string $fullName */
+                $fullName = $taxonomyClassNameTranslationDetail->getFullName();
+                $resourceConfigGenerator->generateEntity(
+                    $fullName,
+                    self::TPL_FILES['translation'],
+                    [
+                        'classNameDetail' => $taxonomyClassNameTranslationDetail,
+                        'scope' => ucfirst($scope),
+                        'hasFlexibleContent' => $hasFlexibleContent,
+                        'extraFields' => [],
+                    ],
+                );
+            }
 
+            /** @var class-string $fullName */
+            $fullName = $entryClassNameDetail->getFullName();
             $resourceConfigGenerator->generateRepository(
-                $entryClassNameDetail->getFullName(),
+                $fullName,
                 self::TPL_FILES['repository'],
                 [
                     'classNameDetail' => $entryClassNameDetail,
@@ -207,15 +229,19 @@ final class MakeHappyCMS extends AbstractMaker
                 ],
             );
 
-            $resourceConfigGenerator->generateRepository(
-                $taxonomyClassNameDetail->getFullName(),
-                self::TPL_FILES['repository'],
-                [
-                    'classNameDetail' => $taxonomyClassNameDetail,
-                    'relationClassNameDetail' => $entryClassNameDetail,
-                    'scope' => ucfirst($scope),
-                ],
-            );
+            if ($hasTaxonomy && $taxonomyClassNameDetail) {
+                /** @var class-string $fullName */
+                $fullName = $taxonomyClassNameDetail->getFullName();
+                $resourceConfigGenerator->generateRepository(
+                    $fullName,
+                    self::TPL_FILES['repository'],
+                    [
+                        'classNameDetail' => $taxonomyClassNameDetail,
+                        'relationClassNameDetail' => $entryClassNameDetail,
+                        'scope' => ucfirst($scope),
+                    ],
+                );
+            }
 
             $resourceConfigGenerator->generateAdmin(
                 className: $entryClassNameDetail->getFullName(),
@@ -229,17 +255,19 @@ final class MakeHappyCMS extends AbstractMaker
                 ],
             );
 
-            $resourceConfigGenerator->generateAdmin(
-                className: $taxonomyClassNameDetail->getFullName(),
-                templatePath: self::TPL_FILES['admin'],
-                variables: [
-                    'classNameDetail' => $taxonomyClassNameDetail,
-                    'relationClassNameDetail' => $entryClassNameDetail,
-                    'scope' => ucfirst($scope),
-                    'hasFlexibleContent' => $hasFlexibleContent,
-                    'hasRouting' => $hasRouting,
-                ],
-            );
+            if ($hasTaxonomy && $taxonomyClassNameDetail) {
+                $resourceConfigGenerator->generateAdmin(
+                    className:    $taxonomyClassNameDetail->getFullName(),
+                    templatePath: self::TPL_FILES['admin'],
+                    variables:    [
+                                      'classNameDetail' => $taxonomyClassNameDetail,
+                                      'relationClassNameDetail' => $entryClassNameDetail,
+                                      'scope' => ucfirst($scope),
+                                      'hasFlexibleContent' => $hasFlexibleContent,
+                                      'hasRouting' => $hasRouting,
+                                  ],
+                );
+            }
 
             $resourceConfigGenerator->generateController(
                 className: $entryClassNameDetail->getFullName(),
@@ -258,7 +286,7 @@ final class MakeHappyCMS extends AbstractMaker
             );
             $config = $resourceConfigGenerator->generateRoute(true, $entryClassNameDetail->getFullName());
             $io->text($config);
-            if ($hasTaxonomy) {
+            if ($hasTaxonomy && $taxonomyClassNameDetail) {
                 $configTaxonomy = $resourceConfigGenerator->generateRoute(true, $taxonomyClassNameDetail->getFullName());
                 $io->newLine();
                 $io->text($configTaxonomy);
@@ -277,7 +305,7 @@ final class MakeHappyCMS extends AbstractMaker
             );
             $io->text($config);
 
-            if ($hasTaxonomy) {
+            if ($hasTaxonomy && $taxonomyClassNameDetail) {
                 $configTaxonomy = $resourceConfigGenerator->generateResource(
                     true,
                     $taxonomyClassNameDetail->getFullName(),

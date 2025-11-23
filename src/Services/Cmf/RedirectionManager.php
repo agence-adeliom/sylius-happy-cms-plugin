@@ -28,6 +28,15 @@ class RedirectionManager implements RedirectionManagerInterface
         $uri = $event->getRequest()->getRequestUri();
         $host = $event->getRequest()->getHost();
 
+        /** @var array<string, array{
+         *  classes: array{
+         *     model: class-string,
+         *     controller: class-string,
+         *     repository: class-string,
+         *     form: class-string,
+         *     factory: class-string,
+         *  }
+         * }|null> $resources */
         $resources = $this->parameterBag->get('sylius.resources');
         $modelClass = $resources['sylius_happy_cms.redirect_route']['classes']['model'] ?? 'Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RedirectRoute';
 

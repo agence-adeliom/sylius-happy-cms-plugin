@@ -25,7 +25,7 @@ interface ConfigInterface extends ResourceInterface, TranslatableInterface
 
     public function setDescription(string $description): void;
 
-    public function setType(mixed $type): void;
+    public function setType(string $type): void;
 
     /**
      * @return Collection<(int|string), TranslationInterface|ConfigTranslationInterface>

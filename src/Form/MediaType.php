@@ -20,12 +20,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class MediaType extends AbstractType implements AdminFormTypeInterface
 {
-    public function __construct(
-        /**
-         * @readonly
-         */
-        private MediaManager $manager,
-    ) {
+    private MediaManager $manager;
+
+    public function setManager(MediaManager $manager): void
+    {
+        $this->manager = $manager;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

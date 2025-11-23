@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Block;
 
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
 use Adeliom\SyliusEasyCrudPlugin\Form\ResourceChoiceType;
 use Adeliom\SyliusHappyCMSPlugin\Asset\AssetHappyCMSPackage;
 use Adeliom\SyliusHappyCMSPlugin\Entity\SharedBlock\SharedBlock;
@@ -55,6 +56,11 @@ class SharedBlockType extends AbstractBlock implements ServiceSubscriberInterfac
         return '<img class="card-img-top" src="' . $this->getPackages()->getUrl('dist/placeholder-image.webp', AssetHappyCMSPackage::PACKAGE_NAME) . '" alt="">';
     }
 
+    /**
+     * Declare here the assets that make back-office working as expected
+     *
+     * @return array{js?: array<string|Asset>|null, css?: array<string|Asset>|null, webpack?: array<string|Asset>|null}
+     */
     public function configureAdminAssets(): array
     {
         return [];

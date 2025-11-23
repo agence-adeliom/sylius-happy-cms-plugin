@@ -17,8 +17,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class
-RouteExtension extends AbstractExtension
+class RouteExtension extends AbstractExtension
 {
     public function __construct(
         private readonly EntityManagerInterface $manager,
@@ -54,30 +53,40 @@ RouteExtension extends AbstractExtension
     public function getPathBySeoKey(string $key, string $resourceName = 'sylius_happy_cms.page', ?string $locale = null): ?string
     {
         try {
+            /** @var array<string, array{
+             *  classes: array{
+             *     model: class-string,
+             *     controller: class-string,
+             *     repository: class-string,
+             *     form: class-string,
+             *     factory: class-string,
+             *  }
+             * }|null> $resources */
             $resources = $this->parameterBag->get('sylius.resources');
             $modelClass = $resources[$resourceName]['classes']['model'] ?? null;
 
-            if (is_null($modelClass) || !is_a($modelClass, CmsRoutableInterface::class, true)) {
+            if (null === $modelClass || !is_a($modelClass, CmsRoutableInterface::class, true)) {
                 throw new \InvalidArgumentException(sprintf('The resource "%s" must implement "%s".', $resourceName, CmsRoutableInterface::class));
             }
 
             $repository = $this->manager->getRepository($modelClass);
 
-            if (is_null($repository) || !method_exists($repository, 'getBySeoKey')) {
+            if (!method_exists($repository, 'getBySeoKey')) {
                 throw new \InvalidArgumentException(sprintf('The resource "%s" repository must have a method "%s".', $resourceName, 'getBySeoKey'));
             }
 
-            if (is_null($locale)) {
+            if (null === $locale) {
                 $locale = $this->requestStack->getCurrentRequest()?->getLocale() ?? 'en_US';
             }
 
             /** @var CmsRoutableInterface|null $object */
             $object = $repository->getBySeoKey($key, $locale);
-            if (!is_null($object)) {
+            if (null !== $object) {
                 return $this->router->generate(RouteObjectInterface::OBJECT_BASED_ROUTE_NAME, [
                     RouteObjectInterface::ROUTE_OBJECT => $object->getOnlineRoute(),
                 ]);
             }
+
             return '';
         } catch (NoResultException | NonUniqueResultException $e) {
             return '';
@@ -87,26 +96,36 @@ RouteExtension extends AbstractExtension
     public function getPathByKey(string $key, string $resourceName = 'sylius_happy_cms.page'): ?string
     {
         try {
+            /** @var array<string, array{
+             *  classes: array{
+             *     model: class-string,
+             *     controller: class-string,
+             *     repository: class-string,
+             *     form: class-string,
+             *     factory: class-string,
+             *  }
+             * }|null> $resources */
             $resources = $this->parameterBag->get('sylius.resources');
             $modelClass = $resources[$resourceName]['classes']['model'] ?? null;
 
-            if (is_null($modelClass) || !is_a($modelClass, CmsRoutableInterface::class, true)) {
+            if (null === $modelClass || !is_a($modelClass, CmsRoutableInterface::class, true)) {
                 throw new \InvalidArgumentException(sprintf('The resource "%s" must implement "%s".', $resourceName, CmsRoutableInterface::class));
             }
 
             $repository = $this->manager->getRepository($modelClass);
 
-            if (is_null($repository) || !method_exists($repository, 'getByKey')) {
+            if (!method_exists($repository, 'getByKey')) {
                 throw new \InvalidArgumentException(sprintf('The resource "%s" repository must have a method "%s".', $resourceName, 'getByKey'));
             }
 
             /** @var CmsRoutableInterface|null $object */
             $object = $repository->getByKey($key);
-            if (!is_null($object)) {
+            if (null !== $object) {
                 return $this->router->generate(RouteObjectInterface::OBJECT_BASED_ROUTE_NAME, [
                     RouteObjectInterface::ROUTE_OBJECT => $object->getOnlineRoute(),
                 ]);
             }
+
             return '';
         } catch (NoResultException | NonUniqueResultException $e) {
             return '';
@@ -118,37 +137,46 @@ RouteExtension extends AbstractExtension
         string $resourceName = 'sylius_happy_cms.page',
         ?string $locale = null,
         ?ChannelInterface $channel = null,
-    ) : ?string
-    {
+    ): ?string {
         try {
+            /** @var array<string, array{
+             *  classes: array{
+             *     model: class-string,
+             *     controller: class-string,
+             *     repository: class-string,
+             *     form: class-string,
+             *     factory: class-string,
+             *  }
+             * }|null> $resources */
             $resources = $this->parameterBag->get('sylius.resources');
             $modelClass = $resources[$resourceName]['classes']['model'] ?? null;
 
-            if (is_null($modelClass) || !is_a($modelClass, CmsRoutableInterface::class, true)) {
+            if (null === $modelClass || !is_a($modelClass, CmsRoutableInterface::class, true)) {
                 throw new \InvalidArgumentException(sprintf('The resource "%s" must implement "%s".', $resourceName, CmsRoutableInterface::class));
             }
 
             $repository = $this->manager->getRepository($modelClass);
 
-            if (is_null($repository) || !method_exists($repository, 'getByTemplate')) {
+            if (!method_exists($repository, 'getByTemplate')) {
                 throw new \InvalidArgumentException(sprintf('The resource "%s" repository must have a method "%s".', $resourceName, 'getByTemplate'));
             }
 
-            if (is_null($locale)) {
+            if (null === $locale) {
                 $locale = $this->requestStack->getCurrentRequest()?->getLocale() ?? 'en_US';
             }
 
-            if (is_null($channel)) {
+            if (null === $channel) {
                 $channel = $this->channelContext->getChannel();
             }
 
             /** @var CmsRoutableInterface|null $object */
             $object = $repository->getByTemplate($key, $locale, $channel);
-            if (!is_null($object)) {
+            if (null !== $object) {
                 return $this->router->generate(RouteObjectInterface::OBJECT_BASED_ROUTE_NAME, [
                     RouteObjectInterface::ROUTE_OBJECT => $object->getOnlineRoute(),
                 ]);
             }
+
             return '';
         } catch (NoResultException | NonUniqueResultException $e) {
             return '';
@@ -158,26 +186,32 @@ RouteExtension extends AbstractExtension
     public function getPathById(int $id, string $resourceName = 'sylius_happy_cms.page'): ?string
     {
         try {
+            /** @var array<string, array{
+             *  classes: array{
+             *     model: class-string,
+             *     controller: class-string,
+             *     repository: class-string,
+             *     form: class-string,
+             *     factory: class-string,
+             *  }
+             * }|null> $resources */
             $resources = $this->parameterBag->get('sylius.resources');
             $modelClass = $resources[$resourceName]['classes']['model'] ?? null;
 
-            if (is_null($modelClass) || !is_a($modelClass, CmsRoutableInterface::class, true)) {
+            if (null === $modelClass || !is_a($modelClass, CmsRoutableInterface::class, true)) {
                 throw new \InvalidArgumentException(sprintf('The resource "%s" must implement "%s".', $resourceName, CmsRoutableInterface::class));
             }
 
             $repository = $this->manager->getRepository($modelClass);
 
-            if (is_null($repository)) {
-                throw new \InvalidArgumentException(sprintf('The resource "%s" repository is not found.', $resourceName));
-            }
-
             /** @var CmsRoutableInterface|null $object */
             $object = $repository->find($id);
-            if (!is_null($object)) {
+            if (null !== $object) {
                 return $this->router->generate(RouteObjectInterface::OBJECT_BASED_ROUTE_NAME, [
                     RouteObjectInterface::ROUTE_OBJECT => $object->getOnlineRoute(),
                 ]);
             }
+
             return '';
         } catch (NoResultException | NonUniqueResultException $e) {
             return '';

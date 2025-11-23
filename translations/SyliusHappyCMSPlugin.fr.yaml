@@ -230,3 +230,10 @@ sylius_happy_cms:
       generate_all_alt_content: 'Cliquez sur le bouton ci-desso pour générer le texte alt pour tous les fichiers. La tâche sera lancé en fond et prendra un certain temps à se finir. Vous pouvez cependant continuer vos opérations.'
       generate_all_alt_submit: 'Oui, je souhaite générer le texte alt pour tous les fichiers'
       generating_all_alt: 'Génération en cours...'
+error:
+    already_exists: 'Existe déjà'
+    cant_upload: 'Echec du téléchargement'
+    creating_dir: 'Erreur lors de la création du répertoire'
+    move_into_self: 'Impossible de déplacer/copier dans lui-même'
+    moving: 'Erreur lors du déplacement du fichier/dossier'
+not_allowed_file_ext: 'Le type de fichier n''est pas autorisé'

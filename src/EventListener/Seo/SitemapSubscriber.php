@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\EventListener\Seo;
 
 use Adeliom\SyliusHappyCMSPlugin\Event\Seo\AfterSitemapEntities;
+use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsSeoInterface;
 use Adeliom\SyliusHappyCMSPlugin\Services\Seo\Sitemap\SitemapDumperInterface;
 use Presta\SitemapBundle\Event\SitemapPopulateEvent;
@@ -12,6 +13,7 @@ use Presta\SitemapBundle\Sitemap\Url\GoogleMultilangUrlDecorator;
 use Presta\SitemapBundle\Sitemap\Url\UrlConcrete;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Sylius\Resource\Model\AbstractTranslation;
+use Sylius\Resource\Model\TranslatableInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -47,25 +49,28 @@ class SitemapSubscriber implements EventSubscriberInterface
                  * @var AfterSitemapEntities $event
                  */
                 $event = $this->eventDispatcher->dispatch(new AfterSitemapEntities($sitemapDumpable->getEntities()));
+                /** @var iterable<CmsRoutableInterface> $entities */
                 $entities = $event->getEntities();
-                $replaceUrl = \Closure::fromCallable([$sitemapDumpable, 'replaceUrl']);
+                $replaceUrlCallback = $sitemapDumpable->replaceUrl(...);
                 if ($entities) {
                     foreach ($entities as $entity) {
-                        /** @var CmsSeoInterface&AbstractTranslation $canonicalTranslation */
-                        $canonicalTranslation = $entity->getTranslation();
-                        if ($canonicalTranslation->getSEO()->getSitemap()) {
-                            $url = $this->getUrl($urlGenerator, $sitemapDumpable, $entity, $canonicalTranslation, $replaceUrl);
-                            $concreteUrl = new UrlConcrete($url, $sitemapDumpable->getLastModifiedDate($entity));
-                            $decoratedUrl = new GoogleMultilangUrlDecorator($concreteUrl);
+                        if ($entity instanceof TranslatableInterface && $entity instanceof CmsRoutableInterface) {
+                            /** @var CmsSeoInterface&AbstractTranslation $canonicalTranslation */
+                            $canonicalTranslation = $entity->getTranslation();
+                            if ($canonicalTranslation->getSEO()->getSitemap()) {
+                                $url = $this->getUrl($urlGenerator, $sitemapDumpable, $entity, $canonicalTranslation, $replaceUrlCallback);
+                                $concreteUrl = new UrlConcrete($url, $sitemapDumpable->getLastModifiedDate($entity));
+                                $decoratedUrl = new GoogleMultilangUrlDecorator($concreteUrl);
 
-                            foreach ($entity->getTranslations() as $translation) {
-                                /** @var CmsSeoInterface&AbstractTranslation $translation */
-                                if ($canonicalTranslation !== $translation && $translation->getSEO()->getSitemap()) {
-                                    $url = $this->getUrl($urlGenerator, $sitemapDumpable, $entity, $translation, $replaceUrl);
-                                    $decoratedUrl->addLink($url, $translation->getLocale());
+                                foreach ($entity->getTranslations() as $translation) {
+                                    /** @var CmsSeoInterface&AbstractTranslation $translation */
+                                    if ($canonicalTranslation !== $translation && $translation->getSEO()->getSitemap()) {
+                                        $url = $this->getUrl($urlGenerator, $sitemapDumpable, $entity, $translation, $replaceUrlCallback);
+                                        $decoratedUrl->addLink($url, $translation->getLocale() ?? 'en_US');
+                                    }
                                 }
+                                $urls->addUrl($decoratedUrl, $sitemapDumpable->getSitemapSection());
                             }
-                            $urls->addUrl($decoratedUrl, $sitemapDumpable->getSitemapSection());
                         }
                     }
                 }
@@ -76,9 +81,9 @@ class SitemapSubscriber implements EventSubscriberInterface
     private function getUrl(
         UrlGeneratorInterface $urlGenerator,
         SitemapDumperInterface $sitemapDumpable,
-        mixed $entity,
+        CmsRoutableInterface $entity,
         CmsSeoInterface&AbstractTranslation $translation,
-        ?callable $replaceUrl = null,
+        ?callable $replaceUrlCallback = null,
         ?int $page = null,
     ): string {
         $params = $sitemapDumpable->getSitemapRouteParams($entity);
@@ -90,7 +95,7 @@ class SitemapSubscriber implements EventSubscriberInterface
             UrlGeneratorInterface::ABSOLUTE_URL,
         );
 
-        if ($updatedUrl = $replaceUrl($url, $entity)) {
+        if (is_callable($replaceUrlCallback) && $updatedUrl = $replaceUrlCallback($url, $entity)) {
             $url = $updatedUrl;
         }
 

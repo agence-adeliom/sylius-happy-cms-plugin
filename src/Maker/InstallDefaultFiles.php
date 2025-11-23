@@ -293,14 +293,15 @@ final class InstallDefaultFiles extends AbstractMaker
     /**
      * @param array{
      *     default: ?string,
-     *     update: string[]|null,
-     *     create: string[]|null,
-     * }|null $templates
+     *     update?: string[]|null,
+     *     create?: string[]|null,
+     *     show?: string[]|null,
+     * } $templates
      */
     public function generateRoute(
         string $scope,
         ConsoleStyle $io,
-        ?array $templates = [
+        array $templates = [
             'default' => '@SyliusEasyCrudPlugin\\\\crud',
             'update' => [],
             'create' => [],

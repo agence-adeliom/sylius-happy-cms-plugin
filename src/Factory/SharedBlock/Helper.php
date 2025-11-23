@@ -11,7 +11,6 @@ use Adeliom\SyliusHappyCMSPlugin\Entity\SharedBlock\SharedBlockTranslationInterf
 use Adeliom\SyliusHappyCMSPlugin\Event\Block\BlockRender;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Environment;
 use Twig\Error\LoaderError;
@@ -41,10 +40,10 @@ class Helper
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly SharedBlockCollection $collection,
         private readonly EntityManagerInterface $entityManager,
-        private readonly string $class,
-        private readonly FormFactory $formFactory,
         private RequestStack $requestStack,
         private AssetRenderer $assetRenderer,
+        //private readonly string $class,
+        //private readonly FormFactory $formFactory,
     ) {
     }
 
@@ -85,7 +84,7 @@ class Helper
     }
 
     /**
-     * @param array<string, array<string, mixed>> $stats
+     * @param array<string, mixed>  $stats
      */
     private function stopTracing(string $id, array $stats): void
     {
@@ -108,8 +107,9 @@ class Helper
             return null;
         }
 
+        /** @var ?SharedBlockInterface $sharedBlock */
         $sharedBlock = $this->entityManager->getRepository(SharedBlockInterface::class)->find($data['block']);
-        if ($sharedBlock instanceof SharedBlockInterface) {
+        if ($sharedBlock instanceof SharedBlockInterface && $this->requestStack->getCurrentRequest()) {
             /** @var ?SharedBlockTranslationInterface $translation */
             $translation = $sharedBlock->getTranslation($this->requestStack->getCurrentRequest()->getLocale());
             /** @var ?SharedBlockTranslationInterface $translation */
@@ -126,6 +126,10 @@ class Helper
         }
 
         if (null === $block) {
+            return null;
+        }
+
+        if (null === $sharedBlock) {
             return null;
         }
 
@@ -168,11 +172,16 @@ class Helper
         $stats['settings'] = $blockData;
         $stats['extra'] = $extra;
         $stats['type'] = $blockType::class;
-        $stats['assets'] = $event->getAssets() ?: [];
+        $stats['assets'] = $event->getAssets();
 
-        $this->assets = array_merge_recursive($this->assets, $stats['assets']);
+        /** @var array{js: array<string|Asset>|null, css: array<string|Asset>|null, webpack: array<string|Asset>|null} $mergedAssets */
+        $mergedAssets = array_merge_recursive($this->assets, $stats['assets']);
 
-        $this->stopTracing($stats['id'], $stats);
+        $this->assets = $mergedAssets;
+
+        if (is_string($stats['id'])) {
+            $this->stopTracing($stats['id'], $stats);
+        }
 
         // Render
         return new Markup($this->twig->render($blockType->getFrontEndTemplatePath(), array_merge([

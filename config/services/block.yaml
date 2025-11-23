@@ -42,10 +42,10 @@ services:
       - '@twig'
       - '@event_dispatcher'
       - '@sylius.happy_cms.block_collection'
-      - '@form.factory'
-      - '@doctrine.orm.entity_manager'
-      - '@request_stack'
       - '@adeliom.sylius.asset.renderer'
+#      - '@form.factory'
+#      - '@doctrine.orm.entity_manager'
+#      - '@request_stack'
     tags:
       - { name: twig.runtime }
 
@@ -101,10 +101,10 @@ services:
       - '@event_dispatcher'
       - '@sylius.happy_cms.shared_block.block_collection'
       - '@doctrine.orm.entity_manager'
-      - '%sylius_happy_cms.shared_block.shared_block_model%'
-      - '@form.factory'
       - '@request_stack'
       - '@adeliom.sylius.asset.renderer'
+#      - '%sylius_happy_cms.shared_block.shared_block_model%'
+#      - '@form.factory'
     tags:
       - { name: twig.runtime }
 

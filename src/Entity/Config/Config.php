@@ -92,7 +92,7 @@ class Config implements ConfigInterface
         return $this->type;
     }
 
-    public function setType(mixed $type): void
+    public function setType(string $type): void
     {
         $this->type = $type;
     }

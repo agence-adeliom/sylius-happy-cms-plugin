@@ -14,8 +14,11 @@ class MediaGenerateAlt extends Event
      */
     public const NAME = 'em.file.alt.generate';
 
-    public function __construct(public MediaInterface $entity, public string $filePath, public ?string $alt = null)
-    {
+    public function __construct(
+        public MediaInterface $entity,
+        public string $filePath,
+        public string $alt = '',
+    ) {
     }
 
     public function getEntity(): MediaInterface

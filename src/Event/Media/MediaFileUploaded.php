@@ -18,7 +18,7 @@ class MediaFileUploaded extends Event
      */
     public function __construct(
         private string $filePath,
-        private string $mimeType,
+        private string|null $mimeType,
         private array $options = [],
     ) {
     }
@@ -30,7 +30,7 @@ class MediaFileUploaded extends Event
 
     public function getMimeType(): string
     {
-        return $this->mimeType;
+        return $this->mimeType ?? '';
     }
 
     /**

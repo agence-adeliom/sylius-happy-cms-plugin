@@ -28,7 +28,10 @@ interface MenuItemRepositoryInterface extends
     public function filterByMenu(int $menuId, string $locale): QueryBuilder;
 
     /**
-     * @param array<string, mixed> $cacheConfig
+     * @param array{
+     *     enabled: ?bool,
+     *     ttl: ?int
+     * } $cacheConfig
      */
     public function setConfig(array $cacheConfig): void;
 }

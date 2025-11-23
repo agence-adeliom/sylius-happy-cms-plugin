@@ -35,8 +35,12 @@ final class MakeBlock extends AbstractMaker
 
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
+        $blockType = $input->getArgument('block-type');
+
+        assert(is_string($blockType));
+
         $blockClassNameDetails = $generator->createClassNameDetails(
-            $input->getArgument('block-type'),
+            $blockType,
             'Blocks\\',
             'Type',
         );

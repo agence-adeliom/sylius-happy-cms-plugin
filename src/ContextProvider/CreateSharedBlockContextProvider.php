@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\ContextProvider;
 
 use Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock\SharedBlockCollection;
-use Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock\SharedBlockTypeInterface;
-use Sylius\Bundle\UiBundle\ContextProvider\ContextProviderInterface;
-use Sylius\Bundle\UiBundle\Registry\TemplateBlock;
+use Sylius\TwigHooks\Hookable\AbstractHookable;
+use Sylius\TwigHooks\Provider\ContextProviderInterface;
 
 class CreateSharedBlockContextProvider implements ContextProviderInterface
 {
@@ -17,19 +16,19 @@ class CreateSharedBlockContextProvider implements ContextProviderInterface
     }
 
     /**
-     * @param array<string, mixed> $templateContext
+     * @param array<string, mixed> $hookContext
      *
-     * @return array<string, SharedBlockTypeInterface[]>
+     * @return array<string, mixed>
      */
-    public function provide(array $templateContext, TemplateBlock $templateBlock): array
+    public function provide(AbstractHookable $hookable, array $hookContext): array
     {
         return [
             'blocks' => $this->sharedBlockCollection->getBlocks(),
         ];
     }
 
-    public function supports(TemplateBlock $templateBlock): bool
+    public function supports(AbstractHookable $hookable): bool
     {
-        return 'sylius.cms.shared_block.choose' === $templateBlock->getEventName() && 'content' === $templateBlock->getName();
+        return 'sylius.cms.shared_block.choose' === $hookable->name;
     }
 }

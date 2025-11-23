@@ -9,6 +9,9 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
+ * @implements DataTransformerInterface<bool|string|null,string|null>
+ * >
+ *
  * Transforms between a Boolean and a string.
  *
  * Part modified in this file : line 56 > 61
@@ -30,7 +33,7 @@ class BooleanToStringTransformer implements DataTransformerInterface
     /**
      * Transforms a Boolean into a string.
      *
-     * @param bool $value Boolean value
+     * @param bool|string|null $value Boolean value
      *
      * @throws TransformationFailedException if the given value is not a Boolean
      */

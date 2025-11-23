@@ -17,14 +17,13 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Event\PreRemoveEventArgs;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
-use JMS\Serializer\Annotation as Serializer;
 use Sylius\Resource\Model\TranslatableTrait;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[Gedmo\Tree(type: 'nested')]
 #[ORM\MappedSuperclass(repositoryClass: PageRepository::class)]
-#[Serializer\ExclusionPolicy('ALL')]
 class Page implements PageInterface
 {
     use EntityIdTrait;
@@ -128,7 +127,7 @@ class Page implements PageInterface
         return $this->lft;
     }
 
-    public function setLft(mixed $lft): void
+    public function setLft(int $lft): void
     {
         $this->lft = $lft;
     }
@@ -138,7 +137,7 @@ class Page implements PageInterface
         return $this->lvl;
     }
 
-    public function setLvl(mixed $lvl): void
+    public function setLvl(int $lvl): void
     {
         $this->lvl = $lvl;
     }
@@ -148,7 +147,7 @@ class Page implements PageInterface
         return $this->rgt;
     }
 
-    public function setRgt(mixed $rgt): void
+    public function setRgt(int $rgt): void
     {
         $this->rgt = $rgt;
     }
@@ -276,7 +275,7 @@ class Page implements PageInterface
             }
         }
 
-        $this->setPublishState(ThreeStateStatusEnum::UNPUBLISHED()->getValue());
+        $this->setPublishState(ThreeStateStatusEnum::UNPUBLISHED);
         $this->parent = null;
     }
 
@@ -296,21 +295,15 @@ class Page implements PageInterface
         return $this->translations;
     }
 
-    #[Serializer\Expose]
-    #[Serializer\VirtualProperty]
-    #[Serializer\SerializedName('slug')]
-    #[Serializer\Type('string')]
-    #[Serializer\Groups(['Autocomplete'])]
+    #[Groups(['Autocomplete'])]
+    #[SerializedName('slug')]
     public function getSlug(): ?string
     {
         return $this->getTranslation()->getSlug();
     }
 
-    #[Serializer\Expose]
-    #[Serializer\VirtualProperty]
-    #[Serializer\SerializedName('name')]
-    #[Serializer\Type('string')]
-    #[Serializer\Groups(['Autocomplete'])]
+    #[Groups(['Autocomplete'])]
+    #[SerializedName('name')]
     public function getName(): ?string
     {
         return $this->getTranslation()->getName();

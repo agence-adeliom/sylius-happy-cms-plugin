@@ -18,6 +18,8 @@ class MediaLoader extends Loader
 
         $importedRoutes = $this->import($resource, $type);
 
+        assert($importedRoutes instanceof RouteCollection, '$importedRoutes must be an instance of RouteCollection');
+
         $routes->addCollection($importedRoutes);
 
         return $routes;

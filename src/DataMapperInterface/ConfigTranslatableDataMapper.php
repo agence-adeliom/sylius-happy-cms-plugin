@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\DataMapperInterface;
 
 use Adeliom\SyliusHappyCMSPlugin\Entity\Config\ConfigInterface;
+use Adeliom\SyliusHappyCMSPlugin\Entity\Config\ConfigTranslationInterface;
 use Adeliom\SyliusHappyCMSPlugin\Enum\Config\ConfigTypeEnum;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Form\DataMapperInterface;
@@ -56,9 +57,11 @@ class ConfigTranslatableDataMapper implements DataMapperInterface
                 continue;
             }
             // si on est sur le bon type de champ (code, email, etc...) avec les translations
-            if ($key === sprintf('translations_%s', $configType)) {
+            if (is_string($configType) && $key === sprintf('translations_%s', $configType)) {
+                /** @var array<string, ConfigTranslationInterface>|Collection<string, ConfigTranslationInterface> $newTranslations */
                 $newTranslations = $form->getData();
                 // si la donnée est l'ancienne translation elle est sous forme de collection doctrine, sinon la nouvelle donnée est un tableau simple
+                /** @var array<string, ConfigTranslationInterface> $translationLocalesToKeep */
                 $translationLocalesToKeep = $newTranslations instanceof Collection ? $newTranslations->toArray() : $newTranslations;
                 foreach ($viewData->getTranslations() as $translation) {
                     if (!in_array($translation->getLocale(), array_keys($translationLocalesToKeep))) {
@@ -67,7 +70,9 @@ class ConfigTranslatableDataMapper implements DataMapperInterface
                     } else {
                         // sinon on la met a jour directement (supprimer et ajouter pose des soucis d'unicité avec doctrine)
                         $locale = $translation->getLocale();
-                        $viewData->getTranslation($locale)->setValue($newTranslations[$locale]->getValue());
+                        /** @var ConfigTranslationInterface $viewTranslation */
+                        $viewTranslation = $viewData->getTranslation($locale);
+                        $viewTranslation->setValue($newTranslations[$locale]->getValue());
                     }
                 }
             }

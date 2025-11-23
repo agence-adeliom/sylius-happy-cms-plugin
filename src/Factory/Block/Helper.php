@@ -4,14 +4,10 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Factory\Block;
 
-use _PHPStan_d06f792a9\React\Http\Message\Request;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
 use Adeliom\SyliusEasyCrudPlugin\Services\AssetRenderer;
 use Adeliom\SyliusHappyCMSPlugin\Event\Block\BlockRender;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -36,22 +32,13 @@ class Helper
     private array $traces = [];
 
     public function __construct(
-        /**
-         * @readonly
-         */
         private Environment $twig,
-        /**
-         * @readonly
-         */
         private EventDispatcherInterface $eventDispatcher,
-        /**
-         * @readonly
-         */
-        private BlockCollection $collection,
-        private FormFactoryInterface $formFactory,
-        private EntityManagerInterface $entityManager,
-        private RequestStack $requestStack,
-        private AssetRenderer $assetRenderer,
+        private readonly BlockCollection $collection,
+        private readonly AssetRenderer $assetRenderer,
+        //private readonly FormFactoryInterface $formFactory,
+        //private readonly EntityManagerInterface $entityManager,
+        //private readonly RequestStack $requestStack
     ) {
     }
 
@@ -73,7 +60,7 @@ class Helper
     /**
      * @return array<string, mixed>
      */
-    private function startTracing(BlockTypeInterface|Bl $block): array
+    private function startTracing(BlockTypeInterface $block): array
     {
         return [
             'id' => uniqid(),
@@ -90,7 +77,7 @@ class Helper
     }
 
     /**
-     * @param array<string, array<string, mixed>> $stats
+     * @param array<string, mixed> $stats
      */
     private function stopTracing(string $id, array $stats): void
     {
@@ -107,7 +94,9 @@ class Helper
      */
     public function renderBlock(array $data, bool $preview = false, array $extra = []): ?Markup
     {
-        if ((int) ($data['block_published'] ?? null) === 0 && $preview === false) {
+        $blockPublished = $data['block_published'] ?? null;
+
+        if (!$blockPublished && $preview === false) {
             return null;
         }
 
@@ -150,9 +139,14 @@ class Helper
         $stats['settings'] = $blockData;
         $stats['assets'] = $event->getAssets();
 
-        $this->assets = array_merge_recursive($this->assets, $stats['assets']);
+        /** @var array{js: array<string|Asset>|null, css: array<string|Asset>|null, webpack: array<string|Asset>|null} $mergedAssets */
+        $mergedAssets = array_merge_recursive($this->assets, $stats['assets']);
 
-        $this->stopTracing($stats['id'], $stats);
+        $this->assets = $mergedAssets;
+
+        if (is_string($stats['id'])) {
+            $this->stopTracing($stats['id'], $stats);
+        }
 
         return new Markup($this->twig->render($block->getFrontEndTemplatePath(), array_merge([
                                                                                                  'block' => $data,

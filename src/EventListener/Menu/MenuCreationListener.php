@@ -25,7 +25,15 @@ class MenuCreationListener
     // the entity instance and the lifecycle event
     public function prePersist(MenuInterface $menu): void
     {
-        /** @var ?array<string, mixed> $resources */
+        /** @var array<string, array{
+         *  classes: array{
+         *     model: class-string,
+         *     controller: class-string,
+         *     repository: class-string,
+         *     form: class-string,
+         *     factory: class-string,
+         *  }
+         * }|null> $resources */
         $resources = $this->parameterBag->get('sylius.resources');
         if (!is_array($resources) || !is_array($resources['sylius_happy_cms.menu_item'])) {
             return;
@@ -35,8 +43,7 @@ class MenuCreationListener
             return;
         }
 
-        $modelClass = $resources['sylius_happy_cms.menu_item']['classes']['model']
-            ?? null;
+        $modelClass = $resources['sylius_happy_cms.menu_item']['classes']['model'];
 
         if (!is_string($modelClass) || !class_exists($modelClass)) {
             return;
@@ -45,7 +52,7 @@ class MenuCreationListener
         /** @var MenuItemInterface $rootItem */
         $rootItem = new $modelClass();
         $rootItem->setMenu($menu);
-        $rootItem->setPublishState(ThreeStateStatusEnum::PUBLISHED()->getValue());
+        $rootItem->setPublishState(ThreeStateStatusEnum::PUBLISHED);
         $rootItem->setPosition(0);
 
         $menu->addItem($rootItem);

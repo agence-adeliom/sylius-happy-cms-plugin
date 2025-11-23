@@ -20,6 +20,9 @@ class MediaType extends Type
         return $platform->getBigIntTypeDeclarationSQL($column);
     }
 
+    /**
+     * @return array<int, string|null>
+     */
     public function getMappedDatabaseTypes(AbstractPlatform $platform): array
     {
         return [MediaInterface::class, null];

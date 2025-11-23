@@ -17,6 +17,17 @@ trait Move
      */
     public function moveItem(Request $request): JsonResponse
     {
+        /**
+         * @var array{
+         *     destination: int,
+         *     moved_files: array<int, array{
+         *          id: int,
+         *          name: string,
+         *          type: string,
+         *          storage_path: string
+         * }>
+         * } $data
+         */
         $data = json_decode($request->getContent(), true, 512, \JSON_THROW_ON_ERROR);
         $destinationId = $data['destination'];
         $movedFiles = $data['moved_files'];
@@ -65,13 +76,23 @@ trait Move
                         $this->manager->save($entity);
 
                         $result[] = array_merge($defaults, ['success' => true]);
-                        $toBroadCast[] = $defaults;
 
                         // fire event
-                        $this->eventDispatcher->dispatch(new MediaFileMoved($defaults['old_path'], $defaults['new_path']), MediaFileMoved::NAME);
+                        $this->eventDispatcher->dispatch(
+                            new MediaFileMoved(
+                                $defaults['old_path'],
+                                $defaults['new_path'],
+                            ),
+                            MediaFileMoved::NAME,
+                        );
                     } catch (\Exception $exception) {
                         throw new \Exception($this->translator->trans('error.moving', [], 'SyliusHappyCMSPlugin'), $exception->getCode(), $exception);
                     }
+                } else {
+                    $result[] = [
+                        'success' => false,
+                        'message' => 'Entity not found',
+                    ];
                 }
             } catch (\Exception $e) {
                 $result[] = [

@@ -32,7 +32,10 @@ class MenuItemRepository extends NestedTreeRepository implements MenuItemReposit
     }
 
     /**
-     * @param array<string, mixed> $cacheConfig
+     * @param array{
+     *     enabled: ?bool,
+     *     ttl: ?int
+     * } $cacheConfig
      */
     public function setConfig(array $cacheConfig): void
     {
@@ -75,7 +78,10 @@ class MenuItemRepository extends NestedTreeRepository implements MenuItemReposit
             $qb = $qb->getQuery()->disableResultCache();
         }
 
-        return $qb->getResult();
+        /** @var MenuItemInterface[] $result */
+        $result = $qb->getResult();
+
+        return $result;
     }
 
     /**
@@ -86,6 +92,7 @@ class MenuItemRepository extends NestedTreeRepository implements MenuItemReposit
         $qb = $this->getPublishedQuery();
         $qb->andWhere('menuitem.menu = :menu')
             ->setParameter('menu', $menu);
+
         if ($returnQueryBuilder) {
             return $qb;
         }
@@ -96,7 +103,10 @@ class MenuItemRepository extends NestedTreeRepository implements MenuItemReposit
             $qb = $qb->getQuery()->disableResultCache();
         }
 
-        return $qb->getResult();
+        /** @var MenuItemInterface[] $result */
+        $result = $qb->getResult();
+
+        return $result;
     }
 
     public function filterByMenu(int $menuId, string $locale): QueryBuilder

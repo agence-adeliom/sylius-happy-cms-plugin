@@ -93,10 +93,12 @@ class MediaManager
 
     public function getFolder(int $id): ?FolderInterface
     {
-        /**
-         * @var ?FolderInterface $folder
-         */
-        $folder = $this->getHelper()->getFolderRepository()->find($id);
+        $folder = null;
+        $folderRepository = $this->getHelper()->getFolderRepository();
+        if ($folderRepository) {
+            /** @var ?FolderInterface $folder */
+            $folder = $folderRepository->find($id);
+        }
 
         return $folder;
     }
@@ -120,11 +122,15 @@ class MediaManager
             $slugs = array_values(array_filter(explode('/', (string) $path)));
             $parent = null;
             foreach ($slugs as $i => $slug) {
-                /** @var ?FolderInterface $folder */
-                $folder = $this->getHelper()->getFolderRepository()->findOneBy([
-                                                                                   'parent' => $parent,
-                                                                                   'slug' => $slug,
-                                                                               ]);
+                $folder = null;
+                $folderRepository = $this->getHelper()->getFolderRepository();
+                if ($folderRepository) {
+                    /** @var FolderInterface $folder */
+                    $folder = $folderRepository->findOneBy([
+                       'parent' => $parent,
+                       'slug' => $slug,
+                    ]);
+                }
                 if (
                     ($folder) !== null
                 ) {
@@ -166,8 +172,10 @@ class MediaManager
             $folderCreation = true;
         }
 
-        if (!$folderCreation) {
-            $existFolder = $this->getHelper()->getFolderRepository()->findOneBy(['parent' => $folder ?: null, 'name' => $name]);
+        $folderRepository = $this->getHelper()->getFolderRepository();
+
+        if (!$folderCreation && $folderRepository) {
+            $existFolder = $folderRepository->findOneBy(['parent' => $folder ?: null, 'name' => $name]);
             if ($existFolder instanceof FolderInterface) {
                 return $existFolder;
             }
@@ -211,7 +219,7 @@ class MediaManager
         }
 
         $folder = $this->folderByPath($path);
-        if (false === $folder) {
+        if (false === $folder && is_string($path)) {
             $folder = $this->createFolder(basename($path), dirname($path));
         }
 
@@ -333,7 +341,12 @@ class MediaManager
         $filename = strtolower((new AsciiSlugger())->slug(strtolower((string) $entity->getName()))->toString() . '.' . MediaHelper::mime2ext($infos['mime']));
         $entity->setSlug($filename);
 
-        if (!empty($this->getHelper()->getMediaRepository()->findBy(['folder' => $entity->getFolder(), 'name' => $entity->getName()]))) {
+        $mediaRepository = $this->getHelper()->getMediaRepository();
+
+        if ($mediaRepository && !empty($mediaRepository->findBy([
+            'folder' => $entity->getFolder(),
+            'name' => $entity->getName()]))
+        ) {
             throw new AlreadyExist($this->translator->trans('error.already_exists', [], 'SyliusHappyCMSPlugin'));
         }
 
@@ -345,15 +358,13 @@ class MediaManager
         $entity->setLastModified($this->filesystem->lastModified($entity->getPath()));
         $entity->setMime($this->filesystem->mimeType($entity->getPath()));
 
-        if (str_contains($entity->getMime(), 'image/')) {
+        if ($entity->getMime() && str_contains($entity->getMime(), 'image/')) {
             $tmp = tmpfile();
             if (false !== $tmp) {
                 fwrite($tmp, $this->filesystem->read($entity->getPath()));
                 $meta = stream_get_meta_data($tmp);
-                if (isset($meta['uri'])) {
-                    $path = $meta['uri'];
-                    $this->setImageMetas($entity, $path, $source);
-                }
+                /** @phpstan-ignore-next-line */
+                $this->setImageMetas($entity, $meta['uri'], $source);
             }
         }
 
@@ -400,20 +411,28 @@ class MediaManager
             $entity->setName($name);
         }
 
-        $ignore = array_merge($this->parameters->get('sylius_happy_cms.media.unallowed_mimes'), ['application/octet-stream']);
+        /** @var array|null $unAllowedMimes */
+        $unAllowedMimes = $this->parameters->get('sylius_happy_cms.media.unallowed_mimes');
+
+        $ignore = array_merge($unAllowedMimes ?? [], ['application/octet-stream']);
 
         // check for mime type
-        if (Str::contains($file_type, $ignore)) {
+        if (is_string($file_type) && Str::contains($file_type, $ignore)) {
             throw new ExtNotAllowed($this->translator->trans('not_allowed_file_ext', [], 'SyliusHappyCMSPlugin'));
         }
 
-        if (!empty($this->getHelper()->getMediaRepository()->findBy(['folder' => $entity->getFolder(), 'name' => $entity->getName()]))) {
+        $mediaRepository = $this->getHelper()->getMediaRepository();
+
+        if ($mediaRepository && !empty($mediaRepository->findBy([
+            'folder' => $entity->getFolder(),
+            'name' => $entity->getName(),
+            ]))) {
             throw new AlreadyExist($this->translator->trans('error.already_exists', [], 'SyliusHappyCMSPlugin'));
         }
 
         try {
             $filepath = $entity->getPath();
-            if (is_string($filepath) && !$this->filesystem->fileExists($filepath)) {
+            if (!$this->filesystem->fileExists($filepath)) {
                 $stream = file_get_contents($source);
                 if ($stream) {
                     $this->filesystem->write($filepath, $stream);
@@ -497,17 +516,25 @@ class MediaManager
         $entity->setSize($source->getSize());
         $entity->setLastModified($source->getMTime());
 
+        /** @var array|null $unAllowedMimes */
+        $unAllowedMimes = $this->parameters->get('sylius_happy_cms.media.unallowed_mimes');
+
+        /** @var array|null $unAllowedExt */
+        $unAllowedExt = $this->parameters->get('sylius_happy_cms.media.unallowed_ext');
+
         // check for mime type
-        if (Str::contains($entity->getMime(), $this->parameters->get('sylius_happy_cms.media.unallowed_mimes'))) {
+        if (is_array($unAllowedMimes) && is_string($entity->getMime()) && Str::contains($entity->getMime(), $unAllowedMimes)) {
             throw new ExtNotAllowed($this->translator->trans('not_allowed_file_ext', [], 'SyliusHappyCMSPlugin'));
         }
 
         // check for extension
-        if (Str::contains($ext_only, $this->parameters->get('sylius_happy_cms.media.unallowed_ext'))) {
+        if (is_array($unAllowedExt) && is_string($ext_only) && Str::contains($ext_only, $unAllowedExt)) {
             throw new ExtNotAllowed($this->translator->trans('not_allowed_file_ext', [], 'SyliusHappyCMSPlugin'));
         }
 
-        if (!empty($this->getHelper()->getMediaRepository()->findBy(['folder' => $entity->getFolder(), 'name' => $entity->getName()]))) {
+        $mediaRepository = $this->getHelper()->getMediaRepository();
+
+        if ($mediaRepository && !empty($mediaRepository->findBy(['folder' => $entity->getFolder(), 'name' => $entity->getName()]))) {
             throw new AlreadyExist($this->translator->trans('error.already_exists', [], 'SyliusHappyCMSPlugin'));
         }
 

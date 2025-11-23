@@ -36,8 +36,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\DBAL\Types\Types;
-use JMS\Serializer\Annotation as Serializer;
- use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\SerializedName;
+use Symfony\Component\Validator\Constraints as Assert;
 use Sylius\Resource\Model\ResourceInterface;
 use Sylius\Resource\Model\TranslatableInterface;
 use Sylius\Resource\Model\TranslatableTrait;
@@ -56,7 +57,6 @@ use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
 <?php } ?>
 #[ORM\Table(name: 'sylius_happy_cms__<?= Str::asSnakeCase($classNameDetail->getShortName()) ?>')]
 #[ORM\Index(columns: ['publishState'], name: '<?= mb_strtolower($scope) ?>__<?= $mainClassData['singular'] ?>_indexes')]
-#[Serializer\ExclusionPolicy('ALL')]
 class <?= $classNameDetail->getShortName() ?> implements ResourceInterface, TranslatableInterface<?= $hasRouting ? ', CmsRoutableInterface ' : ' ' ?>
 {
     use TranslatableTrait {
@@ -135,11 +135,8 @@ class <?= $classNameDetail->getShortName() ?> implements ResourceInterface, Tran
         return <?= $classNameDetail->getShortName() ?>Translation::class;
     }
 
-    #[Serializer\Expose]
-    #[Serializer\VirtualProperty]
-    #[Serializer\SerializedName('name')]
-    #[Serializer\Type('string')]
-    #[Serializer\Groups(['Detailed', 'Default', 'Autocomplete'])]
+    #[Groups(['Detailed', 'Default', 'Autocomplete'])]
+    #[SerializedName('name')]
     public function getName(): ?string
     {
         return $this->getTranslation()->getName();

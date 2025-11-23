@@ -1,0 +1,23 @@
+imports:
+    - { resource: "@SyliusEasyCrudPlugin/config/config.yaml" }
+    - { resource: "@SyliusHappyCMSPlugin/config/config.yaml" }
+    - { resource: "packages/sylius_happy_cms.yaml" }
+    - { resource: "packages/sylius_resource.yaml" }
+    - { resource: "services.yaml" }
+    - { resource: "services_test.php" }
+
+twig:
+    paths:
+        '%kernel.project_dir%/../../../tests/TestApplication/templates': ~
+
+# Remove if you do not need to extend entities
+doctrine:
+    orm:
+        entity_managers:
+            default:
+                mappings:
+                    TestApplication:
+                        is_bundle: false
+                        type: attribute
+                        dir: '%kernel.project_dir%/../../../tests/TestApplication/src/Entity'
+                        prefix: Tests\Adeliom\SyliusHappyCMSPlugin

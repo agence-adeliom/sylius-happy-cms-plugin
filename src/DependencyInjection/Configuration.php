@@ -58,475 +58,475 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->addDefaultsIfNotSet()
             ->children()
-                ->arrayNode('page')
-                    ->addDefaultsIfNotSet()
-                    ->children()
-                        ->scalarNode('page_model')
-                            ->isRequired()
-                            ->validate()
-                                ->ifString()
-                                ->then(function ($value) {
-                                    if (!class_exists($value) || !is_a($value, PageInterface::class, true)) {
-                                        throw new InvalidConfigurationException(sprintf('Page class must be a valid class extending %s. "%s" given.', PageInterface::class, $value));
-                                    }
+            ->arrayNode('page')
+            ->addDefaultsIfNotSet()
+            ->children()
+            ->scalarNode('page_model')
+            ->isRequired()
+            ->validate()
+            ->ifString()
+            ->then(function ($value) {
+                if (!class_exists($value) || !is_a($value, PageInterface::class, true)) {
+                    throw new InvalidConfigurationException(sprintf('Page class must be a valid class extending %s. "%s" given.', PageInterface::class, $value));
+                }
 
-                                    return $value;
-                                })
-                            ->end()
-                        ->end()
+                return $value;
+            })
+            ->end()
+            ->end()
 
-                        ->scalarNode('page_repository')
-                            ->defaultValue(PageRepository::class)
-                            ->validate()
-                                ->ifString()
-                                ->then(function ($value) {
-                                    if (!class_exists($value) || !is_a($value, PageRepositoryInterface::class, true)) {
-                                        throw new InvalidConfigurationException(sprintf('Page repository must be a valid class extending %s. "%s" given.', PageRepositoryInterface::class, $value));
-                                    }
+            ->scalarNode('page_repository')
+            ->defaultValue(PageRepository::class)
+            ->validate()
+            ->ifString()
+            ->then(function ($value) {
+                if (!class_exists($value) || !is_a($value, PageRepositoryInterface::class, true)) {
+                    throw new InvalidConfigurationException(sprintf('Page repository must be a valid class extending %s. "%s" given.', PageRepositoryInterface::class, $value));
+                }
 
-                                    return $value;
-                                })
-                            ->end()
-                        ->end()
+                return $value;
+            })
+            ->end()
+            ->end()
 
-                        ->scalarNode('page_admin')
-                            ->defaultValue(PageAdmin::class)
-                            ->validate()
-                                ->ifString()
-                                ->then(function ($value) {
-                                    if (!class_exists($value) || !is_a($value, PageAdminInterface::class, true)) {
-                                        throw new InvalidConfigurationException(sprintf('Page repository must be a valid class extending %s. "%s" given.', PageAdminInterface::class, $value));
-                                    }
+            ->scalarNode('page_admin')
+            ->defaultValue(PageAdmin::class)
+            ->validate()
+            ->ifString()
+            ->then(function ($value) {
+                if (!class_exists($value) || !is_a($value, PageAdminInterface::class, true)) {
+                    throw new InvalidConfigurationException(sprintf('Page repository must be a valid class extending %s. "%s" given.', PageAdminInterface::class, $value));
+                }
 
-                                    return $value;
-                                })
-                            ->end()
-                        ->end()
+                return $value;
+            })
+            ->end()
+            ->end()
 
-                        ->booleanNode('sitemap')
-                            ->defaultValue(true)
-                        ->end()
+            ->booleanNode('sitemap')
+            ->defaultValue(true)
+            ->end()
 
-                    ->end()
-                ->end()
+            ->end()
+            ->end()
 
-                ->arrayNode('seo')
-                    ->addDefaultsIfNotSet()
-                    ->children()
-                        ->scalarNode('enable_profiler')->defaultValue('%kernel.debug%')->end()
-                        ->arrayNode('ignore_profiler')
-                            ->defaultValue([
-                                   '^/admin*',
-                               ])->scalarPrototype()->end()
-                        ->end()
-                        ->arrayNode('title')
-                            ->addDefaultsIfNotSet()
-                            ->children()
-                                ->scalarNode('separator')->defaultValue('|')->end()
-                                ->scalarNode('suffix')->defaultValue('')->end()
-                            ->end()
-                        ->end()
-                        ->arrayNode('breadcrumbs')
-                            ->addDefaultsIfNotSet()
-                            ->children()
-                                ->scalarNode('class')->defaultValue('breadcrumb')->end()
-                                ->scalarNode('item_class')->defaultValue('breadcrumb-item')->end()
-                                ->scalarNode('link_class')->defaultValue('')->end()
-                                ->scalarNode('current_class')->defaultValue('active')->end()
-                                ->scalarNode('separator')->defaultValue('>')->end()
-                                ->scalarNode('separator_class')->defaultValue('breadcrumb-separator')->end()
-                            ->end()
-                        ->end()
-                    ->end()
-                ->end()
+            ->arrayNode('seo')
+            ->addDefaultsIfNotSet()
+            ->children()
+            ->scalarNode('enable_profiler')->defaultValue('%kernel.debug%')->end()
+            ->arrayNode('ignore_profiler')
+            ->defaultValue([
+                               '^/admin*',
+                           ])->scalarPrototype()->end()
+            ->end()
+            ->arrayNode('title')
+            ->addDefaultsIfNotSet()
+            ->children()
+            ->scalarNode('separator')->defaultValue('|')->end()
+            ->scalarNode('suffix')->defaultValue('')->end()
+            ->end()
+            ->end()
+            ->arrayNode('breadcrumbs')
+            ->addDefaultsIfNotSet()
+            ->children()
+            ->scalarNode('class')->defaultValue('breadcrumb')->end()
+            ->scalarNode('item_class')->defaultValue('breadcrumb-item')->end()
+            ->scalarNode('link_class')->defaultValue('')->end()
+            ->scalarNode('current_class')->defaultValue('active')->end()
+            ->scalarNode('separator')->defaultValue('>')->end()
+            ->scalarNode('separator_class')->defaultValue('breadcrumb-separator')->end()
+            ->end()
+            ->end()
+            ->end()
+            ->end()
 
-                ->arrayNode('config')
-                    ->addDefaultsIfNotSet()
-                    ->children()
-                        ->scalarNode('config_model')
-                            ->isRequired()
-                            ->validate()
-                                ->ifString()
-                                ->then(static function ($value) {
-                                    if (!class_exists($value) || !is_a($value, ConfigInterface::class, true)) {
-                                        throw new InvalidConfigurationException(sprintf('Config class must be a valid class extending %s. "%s" given.', ConfigInterface::class, $value));
-                                    }
+            ->arrayNode('config')
+            ->addDefaultsIfNotSet()
+            ->children()
+            ->scalarNode('config_model')
+            ->isRequired()
+            ->validate()
+            ->ifString()
+            ->then(static function ($value) {
+                if (!class_exists($value) || !is_a($value, ConfigInterface::class, true)) {
+                    throw new InvalidConfigurationException(sprintf('Config class must be a valid class extending %s. "%s" given.', ConfigInterface::class, $value));
+                }
 
-                                    return $value;
-                                })
-                            ->end()
-                        ->end()
-                        ->scalarNode('config_repository')
-                            ->defaultValue(ConfigRepository::class)
-                            ->validate()
-                                ->ifString()
-                                ->then(static function ($value) {
-                                    if (!class_exists($value) || !is_a($value, ConfigRepositoryInterface::class, true)) {
-                                        throw new InvalidConfigurationException(sprintf('Config repository must be a valid class extending %s. "%s" given.', ConfigRepositoryInterface::class, $value));
-                                    }
+                return $value;
+            })
+            ->end()
+            ->end()
+            ->scalarNode('config_repository')
+            ->defaultValue(ConfigRepository::class)
+            ->validate()
+            ->ifString()
+            ->then(static function ($value) {
+                if (!class_exists($value) || !is_a($value, ConfigRepositoryInterface::class, true)) {
+                    throw new InvalidConfigurationException(sprintf('Config repository must be a valid class extending %s. "%s" given.', ConfigRepositoryInterface::class, $value));
+                }
 
-                                    return $value;
-                                })
-                            ->end()
-                        ->end()
-                        ->scalarNode('config_admin')
-                            ->defaultValue(ConfigAdmin::class)
-                            ->validate()
-                                ->ifString()
-                                ->then(static function ($value) {
-                                    if (!class_exists($value) || !is_a($value, ConfigAdminInterface::class, true)) {
-                                        throw new InvalidConfigurationException(sprintf('Config admin must be a valid class extending %s. "%s" given.', ConfigAdminInterface::class, $value));
-                                    }
+                return $value;
+            })
+            ->end()
+            ->end()
+            ->scalarNode('config_admin')
+            ->defaultValue(ConfigAdmin::class)
+            ->validate()
+            ->ifString()
+            ->then(static function ($value) {
+                if (!class_exists($value) || !is_a($value, ConfigAdminInterface::class, true)) {
+                    throw new InvalidConfigurationException(sprintf('Config admin must be a valid class extending %s. "%s" given.', ConfigAdminInterface::class, $value));
+                }
 
-                                    return $value;
-                                })
-                            ->end()
-                        ->end()
+                return $value;
+            })
+            ->end()
+            ->end()
 
-                    ->end()
-                ->end()
+            ->end()
+            ->end()
 
-                ->arrayNode('menu')
-                    ->addDefaultsIfNotSet()
-                    ->children()
-                        ->arrayNode('menu')
-                            ->addDefaultsIfNotSet()
-                            ->children()
-                                ->scalarNode('menu_model')
-                                    ->isRequired()
-                                    ->validate()
-                                        ->ifString()
-                                        ->then(function ($value) {
-                                            if (!class_exists($value) || !is_a($value, MenuInterface::class, true)) {
-                                                throw new InvalidConfigurationException(sprintf('Entry class must be a valid class extending %s. "%s" given.', MenuInterface::class, $value));
-                                            }
+            ->arrayNode('menu')
+            ->addDefaultsIfNotSet()
+            ->children()
+            ->arrayNode('menu')
+            ->addDefaultsIfNotSet()
+            ->children()
+            ->scalarNode('menu_model')
+            ->isRequired()
+            ->validate()
+            ->ifString()
+            ->then(function ($value) {
+                if (!class_exists($value) || !is_a($value, MenuInterface::class, true)) {
+                    throw new InvalidConfigurationException(sprintf('Entry class must be a valid class extending %s. "%s" given.', MenuInterface::class, $value));
+                }
 
-                                            return $value;
-                                        })
-                                    ->end()
-                                ->end()
-                                ->scalarNode('menu_repository')
-                                    ->defaultValue(MenuRepository::class)
-                                    ->validate()
-                                        ->ifString()
-                                        ->then(function ($value) {
-                                            if (!class_exists($value) || !is_a($value, MenuRepositoryInterface::class, true)) {
-                                                throw new InvalidConfigurationException(sprintf('Entry repository must be a valid class extending %s. "%s" given.', MenuRepositoryInterface::class, $value));
-                                            }
+                return $value;
+            })
+            ->end()
+            ->end()
+            ->scalarNode('menu_repository')
+            ->defaultValue(MenuRepository::class)
+            ->validate()
+            ->ifString()
+            ->then(function ($value) {
+                if (!class_exists($value) || !is_a($value, MenuRepositoryInterface::class, true)) {
+                    throw new InvalidConfigurationException(sprintf('Entry repository must be a valid class extending %s. "%s" given.', MenuRepositoryInterface::class, $value));
+                }
 
-                                            return $value;
-                                        })
-                                    ->end()
-                                ->end()
-                                ->scalarNode('menu_admin')
-                                    ->defaultValue(MenuAdmin::class)
-                                    ->validate()
-                                        ->ifString()
-                                        ->then(static function ($value) {
-                                            if (!class_exists($value) || !is_a($value, MenuAdminInterface::class, true)) {
-                                                throw new InvalidConfigurationException(sprintf('Menu admin must be a valid class extending %s. "%s" given.', MenuAdminInterface::class, $value));
-                                            }
+                return $value;
+            })
+            ->end()
+            ->end()
+            ->scalarNode('menu_admin')
+            ->defaultValue(MenuAdmin::class)
+            ->validate()
+            ->ifString()
+            ->then(static function ($value) {
+                if (!class_exists($value) || !is_a($value, MenuAdminInterface::class, true)) {
+                    throw new InvalidConfigurationException(sprintf('Menu admin must be a valid class extending %s. "%s" given.', MenuAdminInterface::class, $value));
+                }
 
-                                            return $value;
-                                        })
-                                    ->end()
-                                ->end()
-                            ->end()
-                        ->end()
-                        ->arrayNode('menu_item')
-                            ->addDefaultsIfNotSet()
-                            ->children()
-                                ->scalarNode('menu_item_model')
-                                    ->isRequired()
-                                    ->validate()
-                                        ->ifString()
-                                        ->then(function ($value) {
-                                            if (!class_exists($value) || !is_a($value, MenuItemInterface::class, true)) {
-                                                throw new InvalidConfigurationException(sprintf('Category class must be a valid class extending %s. "%s" given.', MenuItemInterface::class, $value));
-                                            }
+                return $value;
+            })
+            ->end()
+            ->end()
+            ->end()
+            ->end()
+            ->arrayNode('menu_item')
+            ->addDefaultsIfNotSet()
+            ->children()
+            ->scalarNode('menu_item_model')
+            ->isRequired()
+            ->validate()
+            ->ifString()
+            ->then(function ($value) {
+                if (!class_exists($value) || !is_a($value, MenuItemInterface::class, true)) {
+                    throw new InvalidConfigurationException(sprintf('Category class must be a valid class extending %s. "%s" given.', MenuItemInterface::class, $value));
+                }
 
-                                            return $value;
-                                        })
-                                    ->end()
-                                ->end()
-                                ->scalarNode('menu_item_repository')
-                                    ->defaultValue(MenuItemRepository::class)
-                                    ->validate()
-                                        ->ifString()
-                                        ->then(function ($value) {
-                                            if (!class_exists($value) || !is_a($value, MenuItemRepositoryInterface::class, true)) {
-                                                throw new InvalidConfigurationException(sprintf('Category repository must be a valid class extending %s. "%s" given.', MenuItemRepositoryInterface::class, $value));
-                                            }
+                return $value;
+            })
+            ->end()
+            ->end()
+            ->scalarNode('menu_item_repository')
+            ->defaultValue(MenuItemRepository::class)
+            ->validate()
+            ->ifString()
+            ->then(function ($value) {
+                if (!class_exists($value) || !is_a($value, MenuItemRepositoryInterface::class, true)) {
+                    throw new InvalidConfigurationException(sprintf('Category repository must be a valid class extending %s. "%s" given.', MenuItemRepositoryInterface::class, $value));
+                }
 
-                                            return $value;
-                                        })
-                                    ->end()
-                                ->end()
-                                ->scalarNode('menu_item_admin')
-                                ->defaultValue(MenuItemAdmin::class)
-                                    ->validate()
-                                        ->ifString()
-                                        ->then(static function ($value) {
-                                            if (!class_exists($value) || !is_a($value, MenuItemAdminInterface::class, true)) {
-                                                throw new InvalidConfigurationException(sprintf('Menu admin must be a valid class extending %s. "%s" given.', MenuItemAdminInterface::class, $value));
-                                            }
+                return $value;
+            })
+            ->end()
+            ->end()
+            ->scalarNode('menu_item_admin')
+            ->defaultValue(MenuItemAdmin::class)
+            ->validate()
+            ->ifString()
+            ->then(static function ($value) {
+                if (!class_exists($value) || !is_a($value, MenuItemAdminInterface::class, true)) {
+                    throw new InvalidConfigurationException(sprintf('Menu admin must be a valid class extending %s. "%s" given.', MenuItemAdminInterface::class, $value));
+                }
 
-                                            return $value;
-                                        })
-                                    ->end()
-                                ->end()
-                            ->end()
-                        ->end()
-                        ->arrayNode('cache')
-                            ->addDefaultsIfNotSet()
-                            ->children()
-                                ->booleanNode('enabled')->defaultFalse()->end()
-                                ->integerNode('ttl')->defaultValue(300)->end()
-                            ->end()
-                        ->end()
-                    ->end()
-                ->end()
+                return $value;
+            })
+            ->end()
+            ->end()
+            ->end()
+            ->end()
+            ->arrayNode('cache')
+            ->addDefaultsIfNotSet()
+            ->children()
+            ->booleanNode('enabled')->defaultFalse()->end()
+            ->integerNode('ttl')->defaultValue(300)->end()
+            ->end()
+            ->end()
+            ->end()
+            ->end()
 
-                ->arrayNode('media')
-                    ->addDefaultsIfNotSet()
-                    ->children()
-                        ->scalarNode('storage_name')
-                            ->defaultValue('default.storage')
-                        ->end()
-                        ->scalarNode('base_url')
-                            ->defaultValue('/')
-                        ->end()
-                        ->scalarNode('media_entity')
-                            ->defaultValue(Media::class)
-                            ->isRequired()
-                            ->validate()
-                            ->ifString()
-                            ->then(static function ($value) {
-                                if (!class_exists($value) || !is_a($value, MediaInterface::class, true)) {
-                                    throw new InvalidConfigurationException(sprintf('Media class must be a valid class extending %s. "%s" given.', MediaInterface::class, $value));
-                                }
+            ->arrayNode('media')
+            ->addDefaultsIfNotSet()
+            ->children()
+            ->scalarNode('storage_name')
+            ->defaultValue('default.storage')
+            ->end()
+            ->scalarNode('base_url')
+            ->defaultValue('/')
+            ->end()
+            ->scalarNode('media_entity')
+            ->defaultValue(Media::class)
+            ->isRequired()
+            ->validate()
+            ->ifString()
+            ->then(static function ($value) {
+                if (!class_exists($value) || !is_a($value, MediaInterface::class, true)) {
+                    throw new InvalidConfigurationException(sprintf('Media class must be a valid class extending %s. "%s" given.', MediaInterface::class, $value));
+                }
 
-                                return $value;
-                            })
-                            ->end()
-                        ->end()
-                        ->scalarNode('folder_entity')
-                            ->defaultValue(Folder::class)
-                            ->isRequired()
-                            ->validate()
-                            ->ifString()
-                            ->then(static function ($value) {
-                                if (!class_exists($value) || !is_a($value, FolderInterface::class, true)) {
-                                    throw new InvalidConfigurationException(sprintf('Media Folder class must be a valid class extending %s. "%s" given.', FolderInterface::class, $value));
-                                }
+                return $value;
+            })
+            ->end()
+            ->end()
+            ->scalarNode('folder_entity')
+            ->defaultValue(Folder::class)
+            ->isRequired()
+            ->validate()
+            ->ifString()
+            ->then(static function ($value) {
+                if (!class_exists($value) || !is_a($value, FolderInterface::class, true)) {
+                    throw new InvalidConfigurationException(sprintf('Media Folder class must be a valid class extending %s. "%s" given.', FolderInterface::class, $value));
+                }
 
-                                return $value;
-                            })
-                            ->end()
-                        ->end()
-                        ->scalarNode('ignore_files')
-                            ->defaultValue('/^\..*/')
-                        ->end()
-                        ->scalarNode('allowed_fileNames_chars')
-                            ->defaultValue("\._\-\'\s\(\),")
-                        ->end()
-                        ->scalarNode('allowed_folderNames_chars')
-                            ->defaultValue("_\-\s")
-                        ->end()
-                        ->arrayNode('unallowed_mimes')
-                            ->scalarPrototype()->end()
-                            ->defaultValue([
-                                'php',
-                                'java',
-                            ])
-                        ->end()
-                        ->arrayNode('locales')
-                            ->scalarPrototype()->end()
-                            ->defaultValue([
-                                'en_US',
-                                'de_DE',
-                                'fr_FR',
-                                'es_ES',
-                                'es_MX',
-                                'pl_PL',
-                                'pt_PT',
-                                'zh_CN',
-                            ])
-                        ->end()
-                        ->arrayNode('unallowed_ext')
-                            ->defaultValue([
-                                'php',
-                                'jav',
-                                'py',
-                            ])
-                            ->scalarPrototype()->end()
-                        ->end()
-                        ->arrayNode('extended_mimes')
-                            ->addDefaultsIfNotSet()
-                            ->children()
-                                ->arrayNode('image')->scalarPrototype()->end()->isRequired()->defaultValue(['binary/octet-stream'])->end()
-                                ->arrayNode('archive')->scalarPrototype()->end()->isRequired()->defaultValue(['application/x-tar', 'application/zip'])->end()
-                            ->end()
-                        ->end()
-                        ->scalarNode('sanitized_text')
-                            ->defaultValue('uniqid')
-                        ->end()
-                        ->scalarNode('last_modified_format')
-                            ->defaultValue('Y-m-d')
-                        ->end()
-                        ->booleanNode('hide_files_ext')
-                            ->defaultTrue()
-                        ->end()
-                        ->booleanNode('get_folder_info')
-                            ->defaultTrue()
-                        ->end()
-                        ->booleanNode('enable_broadcasting')
-                            ->defaultFalse()
-                        ->end()
-                        ->booleanNode('enable_generating_alts')
-                            ->defaultFalse()
-                        ->end()
-                        ->integerNode('pagination_amount')
-                            ->defaultValue(50)
-                            ->min(4)
-                        ->end()
-                    ->end()
-                ->end()
+                return $value;
+            })
+            ->end()
+            ->end()
+            ->scalarNode('ignore_files')
+            ->defaultValue('/^\..*/')
+            ->end()
+            ->scalarNode('allowed_fileNames_chars')
+            ->defaultValue("\._\-\'\s\(\),")
+            ->end()
+            ->scalarNode('allowed_folderNames_chars')
+            ->defaultValue("_\-\s")
+            ->end()
+            ->arrayNode('unallowed_mimes')
+            ->scalarPrototype()->end()
+            ->defaultValue([
+                               'php',
+                               'java',
+                           ])
+            ->end()
+            ->arrayNode('locales')
+            ->scalarPrototype()->end()
+            ->defaultValue([
+                               'en_US',
+                               'de_DE',
+                               'fr_FR',
+                               'es_ES',
+                               'es_MX',
+                               'pl_PL',
+                               'pt_PT',
+                               'zh_CN',
+                           ])
+            ->end()
+            ->arrayNode('unallowed_ext')
+            ->defaultValue([
+                               'php',
+                               'jav',
+                               'py',
+                           ])
+            ->scalarPrototype()->end()
+            ->end()
+            ->arrayNode('extended_mimes')
+            ->addDefaultsIfNotSet()
+            ->children()
+            ->arrayNode('image')->scalarPrototype()->end()->isRequired()->defaultValue(['binary/octet-stream'])->end()
+            ->arrayNode('archive')->scalarPrototype()->end()->isRequired()->defaultValue(['application/x-tar', 'application/zip'])->end()
+            ->end()
+            ->end()
+            ->scalarNode('sanitized_text')
+            ->defaultValue('uniqid')
+            ->end()
+            ->scalarNode('last_modified_format')
+            ->defaultValue('Y-m-d')
+            ->end()
+            ->booleanNode('hide_files_ext')
+            ->defaultTrue()
+            ->end()
+            ->booleanNode('get_folder_info')
+            ->defaultTrue()
+            ->end()
+            ->booleanNode('enable_broadcasting')
+            ->defaultFalse()
+            ->end()
+            ->booleanNode('enable_generating_alts')
+            ->defaultFalse()
+            ->end()
+            ->integerNode('pagination_amount')
+            ->defaultValue(50)
+            ->min(4)
+            ->end()
+            ->end()
+            ->end()
 
-                ->arrayNode('shared_block')
-                    ->addDefaultsIfNotSet()
-                    ->children()
-                        ->scalarNode('shared_block_model')
-                            ->isRequired()
-                            ->validate()
-                                ->ifString()
-                                ->then(static function ($value) {
-                                    if (!class_exists($value) || !is_a($value, SharedBlockInterface::class, true)) {
-                                        throw new InvalidConfigurationException(sprintf('Block class must be a valid class extending %s. "%s" given.', SharedBlockInterface::class, $value));
-                                    }
+            ->arrayNode('shared_block')
+            ->addDefaultsIfNotSet()
+            ->children()
+            ->scalarNode('shared_block_model')
+            ->isRequired()
+            ->validate()
+            ->ifString()
+            ->then(static function ($value) {
+                if (!class_exists($value) || !is_a($value, SharedBlockInterface::class, true)) {
+                    throw new InvalidConfigurationException(sprintf('Block class must be a valid class extending %s. "%s" given.', SharedBlockInterface::class, $value));
+                }
 
-                                    return $value;
-                                })
-                            ->end()
-                        ->end()
-                        ->scalarNode('shared_block_repository')
-                            ->defaultValue(SharedBlockRepository::class)
-                            ->validate()
-                                ->ifString()
-                                ->then(static function ($value) {
-                                    if (!class_exists($value) || !is_a($value, SharedBlockRepositoryInterface::class, true)) {
-                                        throw new InvalidConfigurationException(sprintf('Shared block repository must be a valid class extending %s. "%s" given.', SharedBlockRepositoryInterface::class, $value));
-                                    }
+                return $value;
+            })
+            ->end()
+            ->end()
+            ->scalarNode('shared_block_repository')
+            ->defaultValue(SharedBlockRepository::class)
+            ->validate()
+            ->ifString()
+            ->then(static function ($value) {
+                if (!class_exists($value) || !is_a($value, SharedBlockRepositoryInterface::class, true)) {
+                    throw new InvalidConfigurationException(sprintf('Shared block repository must be a valid class extending %s. "%s" given.', SharedBlockRepositoryInterface::class, $value));
+                }
 
-                                    return $value;
-                                })
-                            ->end()
-                        ->end()
-                        ->scalarNode('shared_block_admin')
-                            ->defaultValue(SharedBlockAdmin::class)
-                            ->validate()
-                            ->ifString()
-                                ->then(static function ($value) {
-                                    if (!class_exists($value) || !is_a($value, SharedBlockAdminInterface::class, true)) {
-                                        throw new InvalidConfigurationException(sprintf('Shared block amin must be a valid class extending %s. "%s" given.', SharedBlockAdminInterface::class, $value));
-                                    }
+                return $value;
+            })
+            ->end()
+            ->end()
+            ->scalarNode('shared_block_admin')
+            ->defaultValue(SharedBlockAdmin::class)
+            ->validate()
+            ->ifString()
+            ->then(static function ($value) {
+                if (!class_exists($value) || !is_a($value, SharedBlockAdminInterface::class, true)) {
+                    throw new InvalidConfigurationException(sprintf('Shared block amin must be a valid class extending %s. "%s" given.', SharedBlockAdminInterface::class, $value));
+                }
 
-                                    return $value;
-                                })
-                            ->end()
-                        ->end()
-                    ->end()
-                ->end()
+                return $value;
+            })
+            ->end()
+            ->end()
+            ->end()
+            ->end()
 
-                ->arrayNode('route')
-                    ->addDefaultsIfNotSet()
-                    ->children()
-                        ->scalarNode('route_model')
-                            ->isRequired()
-                            ->validate()
-                                ->ifString()
-                                ->then(static function ($value) {
-                                    if (!class_exists($value) || !is_a($value, RouteInterface::class, true)) {
-                                        throw new InvalidConfigurationException(sprintf('Route class must be a valid class extending %s. "%s" given.', RouteInterface::class, $value));
-                                    }
+            ->arrayNode('route')
+            ->addDefaultsIfNotSet()
+            ->children()
+            ->scalarNode('route_model')
+            ->isRequired()
+            ->validate()
+            ->ifString()
+            ->then(static function ($value) {
+                if (!class_exists($value) || !is_a($value, RouteInterface::class, true)) {
+                    throw new InvalidConfigurationException(sprintf('Route class must be a valid class extending %s. "%s" given.', RouteInterface::class, $value));
+                }
 
-                                    return $value;
-                                })
-                            ->end()
-                        ->end()
-                        ->scalarNode('route_repository')
-                            ->defaultValue(RouteRepository::class)
-                            ->validate()
-                                ->ifString()
-                                ->then(static function ($value) {
-                                    if (!class_exists($value) || !is_a($value, RouteRepositoryInterface::class, true)) {
-                                        throw new InvalidConfigurationException(sprintf('Route repository must be a valid class extending %s. "%s" given.', RouteRepositoryInterface::class, $value));
-                                    }
+                return $value;
+            })
+            ->end()
+            ->end()
+            ->scalarNode('route_repository')
+            ->defaultValue(RouteRepository::class)
+            ->validate()
+            ->ifString()
+            ->then(static function ($value) {
+                if (!class_exists($value) || !is_a($value, RouteRepositoryInterface::class, true)) {
+                    throw new InvalidConfigurationException(sprintf('Route repository must be a valid class extending %s. "%s" given.', RouteRepositoryInterface::class, $value));
+                }
 
-                                    return $value;
-                                })
-                            ->end()
-                        ->end()
-                        ->scalarNode('route_admin')
-                            ->defaultValue(RouteAdmin::class)
-                            ->validate()
-                                ->ifString()
-                                ->then(static function ($value) {
-                                    if (!class_exists($value) || !is_a($value, RouteAdminInterface::class, true)) {
-                                        throw new InvalidConfigurationException(sprintf('Route admin must be a valid class extending %s. "%s" given.', RouteAdminInterface::class, $value));
-                                    }
+                return $value;
+            })
+            ->end()
+            ->end()
+            ->scalarNode('route_admin')
+            ->defaultValue(RouteAdmin::class)
+            ->validate()
+            ->ifString()
+            ->then(static function ($value) {
+                if (!class_exists($value) || !is_a($value, RouteAdminInterface::class, true)) {
+                    throw new InvalidConfigurationException(sprintf('Route admin must be a valid class extending %s. "%s" given.', RouteAdminInterface::class, $value));
+                }
 
-                                    return $value;
-                                })
-                            ->end()
-                        ->end()
-                    ->end()
-                ->end()
+                return $value;
+            })
+            ->end()
+            ->end()
+            ->end()
+            ->end()
 
-                ->arrayNode('redirect_route')
-                    ->addDefaultsIfNotSet()
-                    ->children()
-                        ->scalarNode('redirect_route_model')
-                            ->isRequired()
-                            ->validate()
-                                ->ifString()
-                                ->then(static function ($value) {
-                                    if (!class_exists($value) || !is_a($value, RedirectRouteInterface::class, true)) {
-                                        throw new InvalidConfigurationException(sprintf('Redirect Route class must be a valid class extending %s. "%s" given.', RedirectRouteInterface::class, $value));
-                                    }
+            ->arrayNode('redirect_route')
+            ->addDefaultsIfNotSet()
+            ->children()
+            ->scalarNode('redirect_route_model')
+            ->isRequired()
+            ->validate()
+            ->ifString()
+            ->then(static function ($value) {
+                if (!class_exists($value) || !is_a($value, RedirectRouteInterface::class, true)) {
+                    throw new InvalidConfigurationException(sprintf('Redirect Route class must be a valid class extending %s. "%s" given.', RedirectRouteInterface::class, $value));
+                }
 
-                                    return $value;
-                                })
-                            ->end()
-                        ->end()
-                        ->scalarNode('redirect_route_repository')
-                            ->defaultValue(RouteRepository::class)
-                            ->validate()
-                                ->ifString()
-                                ->then(static function ($value) {
-                                    if (!class_exists($value) || !is_a($value, RedirectRouteRepositoryInterface::class, true)) {
-                                        throw new InvalidConfigurationException(sprintf('Redirect Route repository must be a valid class extending %s. "%s" given.', RedirectRouteRepositoryInterface::class, $value));
-                                    }
+                return $value;
+            })
+            ->end()
+            ->end()
+            ->scalarNode('redirect_route_repository')
+            ->defaultValue(RouteRepository::class)
+            ->validate()
+            ->ifString()
+            ->then(static function ($value) {
+                if (!class_exists($value) || !is_a($value, RedirectRouteRepositoryInterface::class, true)) {
+                    throw new InvalidConfigurationException(sprintf('Redirect Route repository must be a valid class extending %s. "%s" given.', RedirectRouteRepositoryInterface::class, $value));
+                }
 
-                                    return $value;
-                                })
-                            ->end()
-                        ->end()
-                        ->scalarNode('redirect_route_admin')
-                            ->defaultValue(RouteAdmin::class)
-                            ->validate()
-                                ->ifString()
-                                ->then(static function ($value) {
-                                    if (!class_exists($value) || !is_a($value, RedirectRouteAdminInterface::class, true)) {
-                                        throw new InvalidConfigurationException(sprintf('Redirect Route admin must be a valid class extending %s. "%s" given.', RedirectRouteAdminInterface::class, $value));
-                                    }
+                return $value;
+            })
+            ->end()
+            ->end()
+            ->scalarNode('redirect_route_admin')
+            ->defaultValue(RouteAdmin::class)
+            ->validate()
+            ->ifString()
+            ->then(static function ($value) {
+                if (!class_exists($value) || !is_a($value, RedirectRouteAdminInterface::class, true)) {
+                    throw new InvalidConfigurationException(sprintf('Redirect Route admin must be a valid class extending %s. "%s" given.', RedirectRouteAdminInterface::class, $value));
+                }
 
-                                    return $value;
-                                })
-                            ->end()
-                        ->end()
-                    ->end()
-                ->end()
+                return $value;
+            })
+            ->end()
+            ->end()
+            ->end()
+            ->end()
 
             ->end();
 

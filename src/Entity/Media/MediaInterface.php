@@ -31,10 +31,10 @@ interface MediaInterface extends ResourceInterface
 
     public function getName(): ?string;
 
-    /** @return  array<string, mixed> */
+    /** @return string[] */
     public function getMetas(): array;
 
-    public function getMeta(string $key, mixed $default = null): mixed;
+    public function getMeta(string $key, string|null $default = null): string|null;
 
     public function getLastModified(): ?int;
 

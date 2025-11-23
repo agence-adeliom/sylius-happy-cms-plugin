@@ -14,11 +14,11 @@ interface MenuItemInterface extends ResourceInterface, TranslatableInterface, \S
 
     public function getLft(): ?int;
 
-    public function setLft(mixed $lft): void;
+    public function setLft(int $lft): void;
 
     public function getRgt(): ?int;
 
-    public function setRgt(mixed $rgt): void;
+    public function setRgt(int $rgt): void;
 
     public function getRoot(): ?int;
 

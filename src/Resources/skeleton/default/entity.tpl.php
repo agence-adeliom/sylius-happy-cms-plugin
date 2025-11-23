@@ -24,9 +24,6 @@ use <?= str_replace('Entity', 'Repository', Str::getNamespace($classNameDetail->
 <?php } ?>
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
-
-#[Serializer\ExclusionPolicy('ALL')]
 <?php if ($addRepo === true) { ?>
 #[ORM\Entity(repositoryClass: <?= $classNameDetail->getShortName() ?>Repository::class)]
 <?php } else { ?>

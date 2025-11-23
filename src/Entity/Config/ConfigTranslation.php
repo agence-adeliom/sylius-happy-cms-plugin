@@ -19,14 +19,14 @@ class ConfigTranslation extends AbstractTranslation implements ConfigTranslation
     use EntityIdTrait;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $value = null;
+    private mixed $value = null;
 
-    public function getValue(): ?string
+    public function getValue(): mixed
     {
         return $this->value;
     }
 
-    public function setValue(?string $value): void
+    public function setValue(mixed $value): void
     {
         $this->value = $value;
     }
@@ -80,14 +80,19 @@ class ConfigTranslation extends AbstractTranslation implements ConfigTranslation
 
     public function setDate(?\DateTime $date): void
     {
-        if (ConfigTypeEnum::DATE() == $this->getType() && $date) {
+        if (null === $date) {
+            $this->value = null;
+
+            return;
+        }
+        if (ConfigTypeEnum::DATE() == $this->getType()) {
             $this->value = $date->format('Y-m-d');
         }
     }
 
     public function getDate(): ?\DateTime
     {
-        if (ConfigTypeEnum::DATE() == $this->getType()) {
+        if (ConfigTypeEnum::DATE() == $this->getType() && is_string($this->value)) {
             try {
                 return new \DateTime($this->value);
             } catch (\Exception) {
@@ -100,6 +105,11 @@ class ConfigTranslation extends AbstractTranslation implements ConfigTranslation
 
     public function setTime(?\DateTime $date): void
     {
+        if (null === $date) {
+            $this->value = null;
+
+            return;
+        }
         if (ConfigTypeEnum::TIME() == $this->getType()) {
             $this->value = $date->format('H:i:s');
         }
@@ -107,7 +117,7 @@ class ConfigTranslation extends AbstractTranslation implements ConfigTranslation
 
     public function getTime(): ?\DateTime
     {
-        if (ConfigTypeEnum::TIME() == $this->getType()) {
+        if (ConfigTypeEnum::TIME() == $this->getType() && is_string($this->value)) {
             try {
                 return new \DateTime($this->value);
             } catch (\Exception) {
@@ -127,7 +137,7 @@ class ConfigTranslation extends AbstractTranslation implements ConfigTranslation
 
     public function getDatetime(): ?\DateTime
     {
-        if (ConfigTypeEnum::DATETIME() == $this->getType()) {
+        if (ConfigTypeEnum::DATETIME() == $this->getType() && is_string($this->value)) {
             try {
                 return new \DateTime($this->value);
             } catch (\Exception) {

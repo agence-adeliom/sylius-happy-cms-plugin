@@ -94,6 +94,10 @@ class MediaRuntime implements RuntimeExtensionInterface
 
         $type = $media->getMime();
 
+        if (null === $type) {
+            return null;
+        }
+
         return $this->manager->getHelper()->fileIsType($type, $compare);
     }
 
@@ -217,8 +221,8 @@ class MediaRuntime implements RuntimeExtensionInterface
             'title' => $media->getMeta('title', $media->getName()),
         ];
         $code = $media->getMeta('code');
-        if ('reference' === $format) {
-            $params += $code;
+        if ('reference' === $format && is_string($code)) {
+            $params['code'] = $code;
         }
 
         return array_merge($params, ['attributes' => $options]);
@@ -239,6 +243,10 @@ class MediaRuntime implements RuntimeExtensionInterface
             'alt' => $media->getMeta('alt', $media->getName()),
             'title' => $media->getMeta('title', $media->getName()),
         ];
+
+        /**
+         * @var array{width: int|null, height: int|null, ratio: float|null} $box
+         */
         $box = $media->getMeta('dimensions');
 
         $params += [
@@ -264,9 +272,20 @@ class MediaRuntime implements RuntimeExtensionInterface
                 $pictureParams = [];
                 foreach ($set as $key => $formatName) {
                     $settings = $this->getFormat($formatName);
+                    /**
+                     * @var array{
+                     *     filters?: array{
+                     *          thumbnail?: array{
+                     *              size: array{0: int|null, 1: int|null}
+                     *          }
+                     *     }
+                     * } $formatSettings
+                     */
+                    $formatSettings = $settings[$formatName] ?? [];
                     if (\is_string($key) || isset($options['picture'])) {
                         $src = $this->path($media, $formatName);
-                        [$width, $height] = $settings[$formatName]['filters']['thumbnail']['size'];
+                        assert(isset($formatSettings['filters']['thumbnail']), 'Thumbnail filter is not defined for format ' . $formatName);
+                        [$width, $height] = $formatSettings['filters']['thumbnail']['size'];
                         $mediaQuery = \is_string($key)
                             ? $key
                             : ($width ? sprintf('(max-width: %dpx)', $width) : null);
@@ -302,6 +321,16 @@ class MediaRuntime implements RuntimeExtensionInterface
                 } else {
                     foreach ($srcSetFormats as $formatName => $settings) {
                         /** @var string $formatName */
+                        /**
+                         * @var array{
+                         *     filters?: array{
+                         *          thumbnail?: array{
+                         *              size: array{0: int|null, 1: int|null}
+                         *          }
+                         *     }
+                         * } $settings
+                         */
+                        assert(isset($settings['filters']['thumbnail']), 'Thumbnail filter is not defined for format ' . $formatName);
                         [$width, $height] = $settings['filters']['thumbnail']['size'];
                         $srcSet[] = [
                             'width' => $width ?: null,
@@ -336,6 +365,16 @@ class MediaRuntime implements RuntimeExtensionInterface
             $pictureParams = [];
             foreach ($formats as $formatName => $settings) {
                 /** @var string $formatName */
+                /**
+                 * @var array{
+                 *     filters?: array{
+                 *          thumbnail?: array{
+                 *              size: array{0: int|null, 1: int|null}
+                 *          }
+                 *     }
+                 * } $settings
+                 */
+                assert(isset($settings['filters']['thumbnail']), 'Thumbnail filter is not defined for format ' . $formatName);
                 $src = $this->path($media, $formatName);
                 [$width, $height] = $settings['filters']['thumbnail']['size'];
                 $mediaQuery = $width ? sprintf('(max-width: %dpx)', $width) : null;
@@ -351,8 +390,18 @@ class MediaRuntime implements RuntimeExtensionInterface
             $pictureParams['img'] = $params + $options;
             $params = ['picture' => $pictureParams];
         } elseif (isset($formats[$format])) {
-            if (isset($formats[$format]['filters']['thumbnail'])) {
-                [$width, $height] = $formats[$format]['filters']['thumbnail']['size'];
+            /**
+             * @var array{
+             *     filters?: array{
+             *          thumbnail?: array{
+             *              size: array{0: int|null, 1: int|null}
+             *          }
+             *     }
+             * } $formatSettings
+             */
+            $formatSettings = $formats[$format];
+            if (isset($formatSettings['filters']['thumbnail'])) {
+                [$width, $height] = $formatSettings['filters']['thumbnail']['size'];
                 $params += [
                     'width' => $width ?: null,
                     'height' => $height ?: null,
@@ -364,7 +413,6 @@ class MediaRuntime implements RuntimeExtensionInterface
         }
 
         if (isset($params['ratio'])) {
-            /** @phpstan-ignore-next-line */
             $params['orientation'] = ($params['ratio'] && $params['ratio'] <= 100) ? 'landscape' : 'portrait';
         }
 
