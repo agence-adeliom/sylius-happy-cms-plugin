@@ -31,7 +31,7 @@ This plugin is built to work hand in hand with [Sylius Easy CRUD Plugin]() to pr
 ### 1. Install via Composer
 
 ```bash
-composer require agence-adeliom/sylius-happy-cms-plugin
+composer require agence-adeliom/sylius-happy-cms-plugin --no-scripts
 composer require --dev symfony/maker-bundle
 ```
 
@@ -73,7 +73,7 @@ sylius_easy_crud:
   resource: "@SyliusEasyCrudPlugin/config/routes.yaml"
 ```
 
-### 4. Generate default files in your project (entities, repositories and admin classes) :
+### 5. Generate default files in your project (entities, repositories and admin classes) :
 
 Actually, we don't have Symfony recipes, so we created a command to generate files automatically.
 
