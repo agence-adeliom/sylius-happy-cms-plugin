@@ -8,6 +8,7 @@ sylius_happy_cms:
     menu_item: "Menu Item"
     menu_items: "Menu Items"
     shared_blocks: "Shared block"
+    shared_block: "Shared block"
     routes: "Routing"
     redirect_routes: "Redirection"
     configs: "Configurations"

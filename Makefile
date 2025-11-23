@@ -10,8 +10,8 @@ reset:
 	@rm -rf compose.override.yml
 
 install:
-	yarn install || true
-	yarn run build || true
+	npm install || true
+	npm run-script build || true
 	@make init
 	@make database-init
 	@make load-fixtures

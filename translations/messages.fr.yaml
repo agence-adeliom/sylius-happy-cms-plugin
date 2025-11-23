@@ -7,6 +7,7 @@ sylius_happy_cms:
     menu_item: "Elément de menu"
     menu_items: "Eléments de menu"
     shared_blocks: "Blocs partagés"
+    shared_block: "Bloc partagé"
     route: "Route"
     routes: "Routes"
     redirect_route: "Redirection"
