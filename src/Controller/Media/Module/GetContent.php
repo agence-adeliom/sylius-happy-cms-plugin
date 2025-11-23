@@ -174,7 +174,7 @@ trait GetContent
      *
      * @return array<MediaInterface|FolderInterface>
      */
-    protected function getFolderContent(int|string|FolderInterface $folder = null, bool $rec = false, ?string $search
+    protected function getFolderContent(int|string|FolderInterface|null $folder = null, bool $rec = false, ?string $search
     = null): array
     {
         if (is_int($folder)) {

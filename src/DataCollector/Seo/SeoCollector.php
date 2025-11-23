@@ -61,7 +61,7 @@ final class SeoCollector extends AbstractDataCollector
     ) {
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null): void
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
         $this->data['config'] = $this->config;
         $this->data['enabled'] = $this->enabled;

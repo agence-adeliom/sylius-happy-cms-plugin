@@ -217,7 +217,7 @@ trait Upload
     /**
      * allow/disallow user upload.
      */
-    protected function allowUpload(UploadedFile $file = null): bool
+    protected function allowUpload(?UploadedFile $file = null): bool
     {
         return true;
     }
