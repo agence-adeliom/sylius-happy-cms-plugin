@@ -29,6 +29,6 @@ class CreateSharedBlockContextProvider implements ContextProviderInterface
 
     public function supports(AbstractHookable $hookable): bool
     {
-        return 'sylius.cms.shared_block.choose' === $hookable->getName();
+        return 'sylius.cms.shared_block.choose' === $hookable->name;
     }
 }

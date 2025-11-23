@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Controller\Media\Module;
 
+use League\Flysystem\DirectoryListing;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\StorageAttributes;
 use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
@@ -17,20 +18,20 @@ trait Download
     /**
      * zip folder.
      *
-     * @throws \League\Flysystem\FilesystemException
+     * @throws FilesystemException
      */
     public function downloadFolder(Request $request): StreamedResponse
     {
         $name = $request->request->get('name');
         $folders = $request->request->get('folders');
 
-        /** @var array<string> $allPaths */
+        /** @var DirectoryListing<StorageAttributes> $allPaths */
         $allPaths = $this->filesystem->listContents(sprintf('%s/%s', $folders, $name))
             ->filter(static fn (StorageAttributes $attributes) => $attributes->isFile())
             ->map(static fn (StorageAttributes $attributes) => $attributes->path())
             ->toArray();
 
-        if ([] !== $allPaths && is_string($name)) {
+        if (is_string($name)) {
             return $this->zipAndDownloadDir(
                 $name,
                 $allPaths,
@@ -47,6 +48,7 @@ trait Download
     {
         $data = $request->request->get('list', '[]');
         if (is_string($data)) {
+            /** @var array<int, array{name: string, storage_path: string}> $list */
             $list = json_decode($data, true, 512, \JSON_THROW_ON_ERROR);
         }
         $name = $request->request->get('name');
@@ -60,7 +62,7 @@ trait Download
     /**
      * zip ops.
      *
-     * @param array<string, mixed> $list
+     * @param array<int, array{name: string, storage_path: string}> $list
      */
     protected function zipAndDownload(string $name, array $list): StreamedResponse
     {
@@ -86,9 +88,11 @@ trait Download
     }
 
     /**
-     * @param array<string, mixed> $list
+     * zip dir ops.
+     *
+     * @param DirectoryListing<StorageAttributes> $list
      */
-    protected function zipAndDownloadDir(string $name, array $list): StreamedResponse
+    protected function zipAndDownloadDir(string $name, DirectoryListing $list): StreamedResponse
     {
         return new StreamedResponse(function () use ($name, $list): void {
             $zipOption = new Archive();
@@ -100,11 +104,12 @@ trait Download
                 $zipOption,
             );
 
-            foreach ($list as $file) {
-                $dir_name = pathinfo($file, \PATHINFO_DIRNAME);
-                $file_name = pathinfo($file, \PATHINFO_BASENAME);
+            foreach ($list->toArray() as $file) {
+                $path = $file->path();
+                $dir_name = pathinfo($path, \PATHINFO_DIRNAME);
+                $file_name = pathinfo($path, \PATHINFO_BASENAME);
                 $full_name = sprintf('%s/%s', $dir_name, $file_name);
-                $streamRead = $this->filesystem->readStream($file);
+                $streamRead = $this->filesystem->readStream($path);
                 $zip->addFileFromStream($full_name, $streamRead);
             }
 
@@ -113,7 +118,7 @@ trait Download
     }
 
     /**
-     * @throws \Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException
+     * @throws NotLoadableException
      */
     public function downloadFile(string $path): StreamedResponse
     {

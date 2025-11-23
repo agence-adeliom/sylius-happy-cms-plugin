@@ -77,8 +77,12 @@ final class FlexibleContentConfigurator implements FieldConfiguratorInterface
         $field->setFormTypeOptionIfNotSet('delete_empty', true);
 
         $blocksCollection = $this->collection->enabledSupportFilter();
+
+        /** @var BlockTypeInterface[] $blockTypes */
+        $blockTypes = $field->getCustomOptions()->get(FlexibleContentField::OPTION_BLOCKS);
+
         $blocks = $blocksCollection->getAllowedBlocks(
-            $field->getCustomOptions()->get(FlexibleContentField::OPTION_BLOCKS),
+            $blockTypes,
             $resource,
         );
 
@@ -103,9 +107,11 @@ final class FlexibleContentConfigurator implements FieldConfiguratorInterface
         // the 'entryIsComplex' setting tells if the collection item is so complex that needs a special
         // rendering not applied to simple collection items
         if (null === $field->getCustomOption(FlexibleContentField::OPTION_ENTRY_IS_COMPLEX)) {
-            $definesEntryType = null !== $entryTypeFunction = $field->getCustomOption(
+            /** @var string|null $entryTypeFunction */
+            $entryTypeFunction = $field->getCustomOption(
                 FlexibleContentField::OPTION_ENTRY_TYPE,
             );
+            $definesEntryType = null !== $entryTypeFunction;
             $isSymfonyCoreFormType = null !== u($entryTypeFunction ?? '')
                 ->indexOf('Symfony\Component\Form\Extension\Core\Type');
 
@@ -127,12 +133,15 @@ final class FlexibleContentConfigurator implements FieldConfiguratorInterface
         }
 
         $collectionItemsAsText = [];
-        foreach ($field->getValue() ?? [] as $item) {
-            if (!\is_string($item) && !(\is_object($item) && method_exists($item, '__toString'))) {
-                return $this->countNumElements($field->getValue());
-            }
+        $itemList = $field->getValue() ?? [];
+        if (is_array($itemList)) {
+            foreach ($itemList as $item) {
+                if (!\is_string($item) && !(\is_object($item) && method_exists($item, '__toString'))) {
+                    return $this->countNumElements($field->getValue());
+                }
 
-            $collectionItemsAsText[] = (string) $item;
+                $collectionItemsAsText[] = (string) $item;
+            }
         }
 
         return u(', ')->join($collectionItemsAsText)->truncate(512, '…')->toString();

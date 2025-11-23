@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Controller\Media\Module;
 
+use Adeliom\SyliusHappyCMSPlugin\Entity\Media\FolderInterface;
+use Adeliom\SyliusHappyCMSPlugin\Entity\Media\MediaInterface;
 use Adeliom\SyliusHappyCMSPlugin\Event\Media\MediaFileDeleted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,10 +17,18 @@ trait Delete
      */
     public function deleteItem(Request $request): JsonResponse
     {
+        /** @var array{
+         *     deleted_files: array<int, array{
+         *          id: int,
+         *          name: string,
+         *          type: string,
+         *          storage_path: string
+         *      }>
+         *  } $data
+         */
         $data = json_decode($request->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         $result = [];
-        $toBroadCast = [];
 
         foreach ($data['deleted_files'] as $one) {
             $id = $one['id'];
@@ -35,7 +45,7 @@ trait Delete
             try {
                 $entity = 'folder' === $type ? $this->manager->getFolder($id) : $this->manager->getMedia($id);
 
-                if ($entity) {
+                if ($entity instanceof MediaInterface || $entity instanceof FolderInterface) {
                     $this->manager->delete($entity);
 
                     $result[] = array_merge($defaults, ['success' => true]);

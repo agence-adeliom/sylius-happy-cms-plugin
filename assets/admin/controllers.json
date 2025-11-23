@@ -1,4 +1,29 @@
 {
-  "controllers": [],
+  "controllers": {
+    "page-tree-tree": {
+      "main": "controllers/PageTreeController.js",
+      "webpackMode": "lazy",
+      "fetch": "lazy",
+      "enabled": true
+    },
+    "page-tree-delete": {
+      "main": "controllers/DeletePageController.js",
+      "webpackMode": "lazy",
+      "fetch": "lazy",
+      "enabled": true
+    },
+    "menu-item-tree-tree": {
+      "main": "controllers/MenuItemTreeController.js",
+      "webpackMode": "lazy",
+      "fetch": "lazy",
+      "enabled": true
+    },
+    "menu-item-tree-delete": {
+      "main": "controllers/DeleteMenuItemController.js",
+      "webpackMode": "lazy",
+      "fetch": "lazy",
+      "enabled": true
+    }
+  },
   "entrypoints": []
 }

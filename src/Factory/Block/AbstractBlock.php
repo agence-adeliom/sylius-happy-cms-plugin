@@ -106,7 +106,7 @@ abstract class AbstractBlock extends AbstractType implements BlockTypeInterface
     /**
      * Declare here the assets that make front working as expected
      *
-     * @return array{js: array<string|Asset>|null, css: array<string|Asset>|null, webpack: array<string|Asset>|null}
+     * @return array{js?: array<string|Asset>|null, css?: array<string|Asset>|null, webpack?: array<string|Asset>|null}
      */
     public function configureAssets(): array
     {
@@ -120,7 +120,7 @@ abstract class AbstractBlock extends AbstractType implements BlockTypeInterface
     /**
      * Declare here the assets that make back-office working as expected
      *
-     * @return array{js: array<string|Asset>|null, css: array<string|Asset>|null, webpack: array<string|Asset>|null}
+     * @return array{js?: array<string|Asset>|null, css?: array<string|Asset>|null, webpack?: array<string|Asset>|null}
      */
     public function configureAdminAssets(): array
     {

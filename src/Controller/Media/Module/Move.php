@@ -82,8 +82,9 @@ trait Move
                         $this->eventDispatcher->dispatch(
                             new MediaFileMoved(
                                 $defaults['old_path'],
-                                $defaults['new_path']
-                            ), MediaFileMoved::NAME
+                                $defaults['new_path'],
+                            ),
+                            MediaFileMoved::NAME,
                         );
                     } catch (\Exception $exception) {
                         throw new \Exception($this->translator->trans('error.moving', [], 'SyliusHappyCMSPlugin'), $exception->getCode(), $exception);
