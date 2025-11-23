@@ -35,7 +35,6 @@ trait Upload
 
         $random_name = filter_var($request->request->get('random_names'), \FILTER_VALIDATE_BOOLEAN);
         if (is_string($request->request->get('custom_attrs', '[]'))) {
-
             /** @var array<int, array{
              * name: string,
              * options: array<string, mixed>,
@@ -119,12 +118,11 @@ trait Upload
     public function uploadEditedImage(Request $request): JsonResponse
     {
         if ($this->allowUpload()) {
-
             /** @var array{
-            *     folder: int|null,
-            *     name: string,
-            *     data: string,
-            *     } $data */
+             *     folder: int|null,
+             *     name: string,
+             *     data: string,
+             *     } $data */
             $data = json_decode($request->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
             $upload_folder_id = $data['folder'];
@@ -245,11 +243,11 @@ trait Upload
      */
     private static function resumableUpload(Request $request, string $tmpFilePath, string $filename, string $chunksDir): array
     {
-        /* @var string[] $successes */
+        /** @var string[] $successes */
         $successes = [];
-        /* @var string[] $errors */
+        /** @var string[] $errors */
         $errors = [];
-        /* @var string[] $warnings */
+        /** @var string[] $warnings */
         $warnings = [];
 
         $dzuuid = $request->get('dzuuid', '');
@@ -302,14 +300,15 @@ trait Upload
                 $chunksDir,
                 $successes,
                 $errors,
-                $warnings)
+                $warnings,
+            )
         ) {
             return [
                 'final' => true,
                 'path' => $newPath,
                 'successes' => $successes,
                 'errors' => $errors,
-                'warnings' => $warnings
+                'warnings' => $warnings,
             ];
         }
 
@@ -318,7 +317,7 @@ trait Upload
             'path' => false,
             'successes' => $successes,
             'errors' => $errors,
-            'warnings' => $warnings
+            'warnings' => $warnings,
         ];
     }
 
@@ -336,9 +335,8 @@ trait Upload
         string $chunksDir,
         array &$successes,
         array &$errors,
-        array &$warnings
-    ): string|false
-    {
+        array &$warnings,
+    ): string|false {
         $parts = glob(Path::normalize(sprintf('%s/*', $fileChunksFolder)));
         if (is_array($parts)) {
             $successes[] = count($parts) . sprintf(' of %d parts done so far in %s', $totalChunks, $fileChunksFolder);
@@ -379,8 +377,7 @@ trait Upload
      * @param string[] $errors
      * @param string[] $warnings
      */
-    private static function createFileFromChunks(string $fileChunksFolder, string $fileName, string $extension, int
-    $totalSize, int $totalChunks, string $chunksDir, array &$successes, array &$errors, array &$warnings): false|string
+    private static function createFileFromChunks(string $fileChunksFolder, string $fileName, string $extension, int $totalSize, int $totalChunks, string $chunksDir, array &$successes, array &$errors, array &$warnings): false|string
     {
         $relPath = Path::normalize($chunksDir . '/assembled');
         $filesystem = new Filesystem();

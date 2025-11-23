@@ -34,18 +34,18 @@ trait Rename
 
             try {
                 $object = 'folder' === $type ? $this->manager->getFolder($file['id']) : $this->manager->getMedia($file['id']);
-                if (is_null($object)) {
+                if (null === $object) {
                     throw new \Exception('File not found');
                 }
                 $old_filename = $object->getName();
-                if (is_null($old_filename)) {
+                if (null === $old_filename) {
                     throw new \Exception('Old filename is null');
                 }
                 $object->setName($new_filename);
                 $this->manager->save($object);
                 $this->eventDispatcher->dispatch(
                     new MediaFileRenamed($old_filename, $new_filename),
-                    MediaFileRenamed::NAME
+                    MediaFileRenamed::NAME,
                 );
             } catch (\Exception $exception) {
                 $message = $exception->getMessage();
