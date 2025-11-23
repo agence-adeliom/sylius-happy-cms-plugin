@@ -363,9 +363,8 @@ class MediaManager
             if (false !== $tmp) {
                 fwrite($tmp, $this->filesystem->read($entity->getPath()));
                 $meta = stream_get_meta_data($tmp);
-                if(isset($meta['uri']) && is_string($meta['uri'])) {
-                    $this->setImageMetas($entity, $meta['uri'], $source);
-                }
+                /** @phpstan-ignore-next-line */
+                $this->setImageMetas($entity, $meta['uri'], $source);
             }
         }
 
