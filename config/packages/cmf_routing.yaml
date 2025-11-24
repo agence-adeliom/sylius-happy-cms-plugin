@@ -1,5 +1,5 @@
 parameters:
-  cmf_routing.dynamic.persistence.orm.route_class: 'Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\Route'
+  cmf_routing.dynamic.persistence.orm.route_class: 'App\Entity\HappyCMS\Cmf\Route'
 
 cmf_routing:
     chain:

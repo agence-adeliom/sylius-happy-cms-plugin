@@ -88,13 +88,13 @@ This command will :
 
 If something goes wrong, you can do those actions manually, check [detailed configuration](./docs/DETAILED_CONFIG.md).
 
-### 5. Install Assets
+### 6. Install Assets
 
 ```bash
 php bin/console assets:install
 ```
 
-### 6. Update database
+### 7. Update database
 
 ```bash
 php bin/console doc:mig:diff
