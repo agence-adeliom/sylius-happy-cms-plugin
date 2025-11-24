@@ -6,12 +6,12 @@ ENV ?= "dev"
 
 reset:
 	@make -s clean
-	@rm -rf vendor composer.lock node_modules
+	@rm -rf vendor composer.lock node_modules var/cache var/log
 	@rm -rf compose.override.yml
 
 install:
-	npm install || true
-	npm run-script build || true
+	yarn install || true
+	#yarn run || true
 	@make init
 	@make database-init
 	@make load-fixtures
@@ -32,7 +32,6 @@ init:
 		cp compose.override.dist.yml compose.override.yml; \
 	fi
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php composer install --no-interaction --no-scripts
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php composer require symfony/maker-bundle --dev --no-interaction --no-scripts
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php composer require symfony/maker-bundle --dev --no-interaction --no-scripts
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm nodejs || true
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) up -d
@@ -86,9 +85,9 @@ ddev-check:
 	@$(DDEV) poweroff >/dev/null 2>&1 && echo "You are using ddev, we need to stop it to free needed ports" || (echo "DDEV is not installed, no port conflicts detected")
 
 database-init:
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console doctrine:database:drop -n --force
+	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console doctrine:database:drop -n --force --if-exists
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console doctrine:database:create -n
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm -i php rm vendor/sylius/test-application/migrations/*.php
+	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm -i php rm vendor/sylius/test-application/migrations/*.php || true
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console doctrine:migrations:migrate -n
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console doctrine:migrations:diff -n
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console doctrine:migrations:migrate -n
