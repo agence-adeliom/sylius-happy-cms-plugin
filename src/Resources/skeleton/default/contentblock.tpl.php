@@ -21,7 +21,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 #[ORM\Table(name: 'sylius_happy_cms__<?= Str::asSnakeCase($parentClassShortName) ?>_content_block')]
 #[ORM\Index(columns: ['<?= Str::asSnakeCase($parentClassShortName) ?>_id', 'locale', 'position'], name: 'idx_<?= Str::asSnakeCase($parentClassShortName) ?>_locale_position')]
-#[ORM\Index(columns: ['<?= Str::asSnakeCase($parentClassShortName) ?>_id', 'locale', 'published'], name: 'idx_<?= Str::asSnakeCase($parentClassShortName) ?>_locale_published')]
+#[ORM\Index(columns: ['<?= Str::asSnakeCase($parentClassShortName) ?>_id', 'locale', 'publishState'], name: 'idx_<?= Str::asSnakeCase($parentClassShortName) ?>_locale_published')]
 class <?= $classNameDetail->getShortName() ?> extends Base<?= $parentClassShortName ?>ContentBlock
 {
 }

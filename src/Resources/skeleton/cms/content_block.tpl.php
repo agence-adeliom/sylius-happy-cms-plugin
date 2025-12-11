@@ -24,7 +24,7 @@ use Sylius\Resource\Model\ResourceInterface;
 #[ORM\Entity]
 #[ORM\Table(name: 'happy_cms_<?= mb_strtolower($scope) ?>__<?= Str::asSnakeCase($parentClassNameDetail->getShortName()) ?>_content_block')]
 #[ORM\Index(columns: ['<?= Str::asSnakeCase($parentClassNameDetail->getShortName()) ?>_id', 'locale', 'position'], name: 'idx_<?= Str::asSnakeCase($parentClassNameDetail->getShortName()) ?>_locale_position')]
-#[ORM\Index(columns: ['<?= Str::asSnakeCase($parentClassNameDetail->getShortName()) ?>_id', 'locale', 'published'], name: 'idx_<?= Str::asSnakeCase($parentClassNameDetail->getShortName()) ?>_locale_published')]
+#[ORM\Index(columns: ['<?= Str::asSnakeCase($parentClassNameDetail->getShortName()) ?>_id', 'locale', 'publishState'], name: 'idx_<?= Str::asSnakeCase($parentClassNameDetail->getShortName()) ?>_locale_published')]
 class <?= $classNameDetail->getShortName() ?> extends ContentBlock implements ContentBlockInterface
 {
     #[ORM\ManyToOne(targetEntity: <?= $parentClassNameDetail->getShortName() ?>Interface::class, inversedBy: 'contentBlocks')]

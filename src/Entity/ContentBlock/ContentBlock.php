@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock;
 
+use Adeliom\SyliusEasyCrudPlugin\Enum\ThreeStateStatusEnum;
 use Adeliom\SyliusEasyCrudPlugin\Traits\EntityIdTrait;
 use Adeliom\SyliusEasyCrudPlugin\Traits\EntityPublishableTrait;
 use Adeliom\SyliusEasyCrudPlugin\Traits\EntityTimestampableTrait;
@@ -46,9 +47,6 @@ abstract class ContentBlock implements ContentBlockInterface
     #[Assert\Type('integer')]
     #[Assert\PositiveOrZero]
     protected int $position = 0;
-
-    #[ORM\Column(name: 'published', type: Types::BOOLEAN, options: ['default' => false])]
-    protected bool $published = false;
 
     #[ORM\Column(name: 'layer', type: Types::STRING, length: 100, nullable: true)]
     #[Assert\Type('string')]
@@ -124,13 +122,9 @@ abstract class ContentBlock implements ContentBlockInterface
 
     public function isPublished(): bool
     {
-        return $this->published;
+        return $this->isOnline();
     }
 
-    public function setPublished(bool $published): void
-    {
-        $this->published = $published;
-    }
 
     public function getLayer(): ?string
     {
@@ -145,7 +139,7 @@ abstract class ContentBlock implements ContentBlockInterface
     public function publish(): void
     {
         $this->publishedData = $this->draftData;
-        $this->published = true;
+        $this->setPublishState(ThreeStateStatusEnum::PUBLISHED);
     }
 
     public function hasUnpublishedChanges(): bool

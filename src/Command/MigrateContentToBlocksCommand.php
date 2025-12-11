@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Command;
 
+use Adeliom\SyliusEasyCrudPlugin\Enum\ThreeStateStatusEnum;
 use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentBlockInterface;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -306,7 +307,7 @@ class MigrateContentToBlocksCommand extends Command
         $contentBlock->setType($blockType);
         $contentBlock->setLocale($locale ?? 'en');
         $contentBlock->setPosition($position);
-        $contentBlock->setPublished($published);
+        $contentBlock->setPublishState($published ? ThreeStateStatusEnum::PUBLISHED : ThreeStateStatusEnum::UNPUBLISHED);
         $contentBlock->setLayer(null);
 
         // Set data

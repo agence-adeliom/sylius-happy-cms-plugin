@@ -46,7 +46,7 @@ interface ContentBlockInterface
 
     public function isPublished(): bool;
 
-    public function setPublished(bool $published): void;
+    public function setPublishState(?string $state): void;
 
     public function getLayer(): ?string;
 
