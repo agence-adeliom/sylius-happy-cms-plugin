@@ -11,14 +11,23 @@ sylius_shop_homepage:
 
 ```php
 public function indexAction(Request $request): Response
-{
-    $page = $this->manager
-        ->getRepository(Page::class)
-        ->getHomePage($request->getLocale());
-    if (!is_null($page) && !is_null($page->getOnlineRoute())) {
-        return $this->routeRenderService->renderAction($page, $request, $page->getOnlineRoute());
-    } else {
+    {
+        /** @var ?PageRepositoryInterface $pageRepository */
+        $pageRepository = $this->entityManager->getRepository(PageInterface::class);
+        if ($pageRepository instanceof PageRepositoryInterface) {
+            $page = $pageRepository
+                ->getHomePage($request->getLocale());
+            if (null !== $page) {
+                $onlineRoute = $page->getOnlineRoute();
+                if ($onlineRoute instanceof RouteInterface) {
+                    return $this->routeRenderService->renderAction(
+                        $page,
+                        $request,
+                        $onlineRoute,
+                    );
+                }
+            }
+        }
         return new Response('', Response::HTTP_NOT_FOUND);
     }
-}
 ```

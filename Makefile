@@ -13,10 +13,15 @@ install:
 	yarn install || true
 	#yarn run || true
 	@make init
-	@make database-init
-	@make load-fixtures
+	@make install-database
 	@make frontend-clear
 	echo "Setup completed! You can now access the application at http://localhost"
+
+install-database:
+	@make database-init
+	@make load-fixtures
+	@make load-demo-content
+	echo "Data installation completed!"
 
 # Run QA tools
 publish:
@@ -99,6 +104,10 @@ database-reset:
 
 load-fixtures:
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console sylius:fixtures:load -n
+
+load-demo-content:
+	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console happycms:starter:create-demo-pages -n
+	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console happycms:starter:create-demo-menu
 
 phpstan:
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/phpstan analyse -c phpstan.neon

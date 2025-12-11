@@ -127,7 +127,12 @@ jobs:
                 run: |
                     (vendor/bin/console doctrine:database:create -vvv)
                     (vendor/bin/console doctrine:schema:create -vvv)
-
+                    (vendor/bin/console doctrine:migrations:migrate -n -vvv)
+                    (vendor/bin/console doctrine:migrations:diff -n -vvv)
+                    (vendor/bin/console doctrine:migrations:migrate -n -vvv)
+                    (vendor/bin/console happycms:starter:create-demo-pages -n -vvv)
+                    (vendor/bin/console happycms:starter:create-demo-menu -n -vvv)
+    
             -
                 name: Prepare test application assets
                 run: |

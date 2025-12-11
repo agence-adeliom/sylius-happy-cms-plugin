@@ -54,4 +54,8 @@ interface PageInterface extends ResourceInterface, TranslatableInterface, CmsRou
     public function getPosition(): ?int;
 
     public function setPosition(int $position): void;
+
+    public function setTemplate(?string $template): void;
+
+    public function setPublishState(?string $state): void;
 }

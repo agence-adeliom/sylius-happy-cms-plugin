@@ -109,6 +109,7 @@ At this point, the plugin should be installed and ready to use!
 ## Documentation
 
 - **[Configure Homepage](./docs/HOMEPAGE.md)**
+- **[Create demo content](./docs/DEMO_CONTENT.md)**
 - **[Create custom routable entities](./docs/CREATE_ROUTABLE_ENTITIES.md)**
 - **[Create custom CMS blocks](./docs/CREATE_BLOCK.md)**
 - **[Detailed default configuration](./docs/DETAILED_CONFIG.md)**

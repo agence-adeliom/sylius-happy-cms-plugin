@@ -68,7 +68,7 @@ class RouteRenderService extends AbstractController
     public function renderAction(
         CmsRoutableInterface $contentDocument,
         Request $request,
-        ?OrmRoute $route = null,
+        ?RouteInterface $route = null,
     ): Response {
         if (null === $route) {
             /**
@@ -161,8 +161,6 @@ class RouteRenderService extends AbstractController
         Request $request,
     ): array {
         try {
-            /** @var ParameterBag $parameterBag */
-            $parameterBag = $request->attributes->get('parameterBag');
             /** @var array<string, array{
              *  classes: array{
              *     model: class-string,
@@ -172,7 +170,7 @@ class RouteRenderService extends AbstractController
              *     factory: class-string,
              *  }
              * }|null> $resources */
-            $resources = $parameterBag->get('sylius.resources');
+            $resources = $this->parameterBag->get('sylius.resources');
         } catch (InvalidArgumentException $exception) {
             return [null, null];
         }

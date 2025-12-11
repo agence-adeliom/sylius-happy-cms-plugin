@@ -166,3 +166,25 @@ services:
       - '@parameter_bag'
     tags:
       - { name: 'console.command' }
+
+  sylius.happy_cms.command.create_demo_pages:
+    class: Adeliom\SyliusHappyCMSPlugin\Command\Starter\CreateDemoPagesCommand
+    arguments:
+      - '@happy.cms.media.manager'
+      - '@kernel'
+      - "@parameter_bag"
+      - '@doctrine.orm.entity_manager'
+      - '@logger'
+    tags:
+      - { name: 'console.command' }
+
+  sylius.happy_cms.command.create_demo_menu:
+    class: Adeliom\SyliusHappyCMSPlugin\Command\Starter\CreateDemoMenuCommand
+    arguments:
+      - '@happy.cms.media.manager'
+      - '@kernel'
+      - "@parameter_bag"
+      - '@doctrine.orm.entity_manager'
+      - '@logger'
+    tags:
+      - { name: 'console.command' }

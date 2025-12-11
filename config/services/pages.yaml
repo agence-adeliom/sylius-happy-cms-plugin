@@ -16,4 +16,5 @@ services:
       - '@sylius.happy_cms.plugin.services.render'
       - '@router'
       - '@translator'
+      - '@doctrine.orm.entity_manager'
     public: true

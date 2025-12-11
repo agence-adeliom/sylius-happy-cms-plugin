@@ -9,4 +9,10 @@ use Sylius\Resource\Model\ResourceInterface;
 interface MenuInterface extends ResourceInterface, \Stringable
 {
     public function addItem(MenuItemInterface $item): void;
+
+    public function setCode(string $code): void;
+
+    public function setName(?string $name): void;
+
+    public function setStatus(bool $status = false): void;
 }
