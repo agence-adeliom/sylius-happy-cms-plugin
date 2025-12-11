@@ -106,6 +106,7 @@ final class InstallDefaultFiles extends AbstractMaker
         $files = [
             ['prefix' => 'Entity', 'suffix' => '', 'addRepo' => true, 'addTrans' => true],
             ['prefix' => 'Entity', 'suffix' => 'Translation'],
+            ['prefix' => 'Entity', 'suffix' => 'ContentBlock', 'templateName' => 'contentblock', 'parentClassName' => 'Page'],
             ['prefix' => 'Repository', 'suffix' => 'Repository'],
             ['prefix' => 'Admin', 'suffix' => 'Admin'],
         ];
@@ -271,14 +272,20 @@ final class InstallDefaultFiles extends AbstractMaker
                         $classNameDetail->getFullName() . ' already exists',
                     ));
                 } else {
+                    // Determine template name: use custom template if specified, otherwise use prefix
+                    $templateName = isset($data['templateName']) && is_string($data['templateName'])
+                        ? $data['templateName']
+                        : strtolower(is_string($data['prefix']) ? $data['prefix'] : '');
+
                     $generator->generateClass(
                         $classNameDetail->getFullName(),
-                        __DIR__ . '/../Resources/skeleton/default/' . strtolower(is_string($data['prefix']) ? $data['prefix'] : '') . '.tpl.php',
+                        __DIR__ . '/../Resources/skeleton/default/' . $templateName . '.tpl.php',
                         [
                             'classNameDetail' => $classNameDetail,
                             'scope' => ucfirst($scope),
                             'addRepo' => $data['addRepo'] ?? false,
                             'addTrans' => $data['addTrans'] ?? false,
+                            'parentClassName' => $data['parentClassName'] ?? ucfirst($scope),
                         ],
                     );
                     $generator->writeChanges();

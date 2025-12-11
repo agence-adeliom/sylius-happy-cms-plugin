@@ -22,6 +22,7 @@ final class MakeHappyCMS extends AbstractMaker
     public const TPL_FILES = [
         'entity' => __DIR__ . '/../../Resources/skeleton/cms/entity.tpl.php',
         'translation' => __DIR__ . '/../../Resources/skeleton/cms/translation.tpl.php',
+        'content_block' => __DIR__ . '/../../Resources/skeleton/cms/content_block.tpl.php',
         'repository' => __DIR__ . '/../../Resources/skeleton/cms/repository.tpl.php',
         'admin' => __DIR__ . '/../../Resources/skeleton/cms/admin.tpl.php',
         'controller' => __DIR__ . '/../../Resources/skeleton/cms/controller.tpl.php',
@@ -122,9 +123,15 @@ final class MakeHappyCMS extends AbstractMaker
             'Entity\\HappyCMS\\' . $namespace . '\\',
             'Translation',
         );
+        $entryClassNameContentBlockDetail = $generator->createClassNameDetails(
+            $entryClassName,
+            'Entity\\HappyCMS\\' . $namespace . '\\',
+            'ContentBlock',
+        );
 
         $taxonomyClassNameDetail = false;
         $taxonomyClassNameTranslationDetail = false;
+        $taxonomyClassNameContentBlockDetail = false;
 
         if ($hasTaxonomy) {
             $taxonomyClassName = Str::asClassName($taxonomyClassName);
@@ -136,6 +143,11 @@ final class MakeHappyCMS extends AbstractMaker
                 $taxonomyClassName,
                 'Entity\\HappyCMS\\' . $namespace . '\\',
                 'Translation',
+            );
+            $taxonomyClassNameContentBlockDetail = $generator->createClassNameDetails(
+                $taxonomyClassName,
+                'Entity\\HappyCMS\\' . $namespace . '\\',
+                'ContentBlock',
             );
         }
 
@@ -213,6 +225,33 @@ final class MakeHappyCMS extends AbstractMaker
                         'scope' => ucfirst($scope),
                         'hasFlexibleContent' => $hasFlexibleContent,
                         'extraFields' => [],
+                    ],
+                );
+            }
+
+            // Generate ContentBlock entities
+            /** @var class-string $fullName */
+            $fullName = $entryClassNameContentBlockDetail->getFullName();
+            $resourceConfigGenerator->generateEntity(
+                $fullName,
+                self::TPL_FILES['content_block'],
+                [
+                    'classNameDetail' => $entryClassNameContentBlockDetail,
+                    'parentClassNameDetail' => $entryClassNameDetail,
+                    'scope' => ucfirst($scope),
+                ],
+            );
+
+            if ($hasTaxonomy && $taxonomyClassNameDetail && $taxonomyClassNameContentBlockDetail) {
+                /** @var class-string $fullName */
+                $fullName = $taxonomyClassNameContentBlockDetail->getFullName();
+                $resourceConfigGenerator->generateEntity(
+                    $fullName,
+                    self::TPL_FILES['content_block'],
+                    [
+                        'classNameDetail' => $taxonomyClassNameContentBlockDetail,
+                        'parentClassNameDetail' => $taxonomyClassNameDetail,
+                        'scope' => ucfirst($scope),
                     ],
                 );
             }
