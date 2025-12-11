@@ -158,3 +158,11 @@ services:
       - '@sylius.happy_cms.plugin.services.render'
     tags:
       - { name: 'console.command' }
+
+  sylius.happy_cms.command.migrate_content_to_new_block_builder:
+    class: Adeliom\SyliusHappyCMSPlugin\Command\MigrateContentToBlocksCommand
+    arguments:
+      - '@doctrine.orm.entity_manager'
+      - '@parameter_bag'
+    tags:
+      - { name: 'console.command' }

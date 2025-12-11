@@ -77,6 +77,8 @@ class <?= $classNameDetail->getShortName() ?> implements ResourceInterface, Tran
     use EntityRouteTrait {
         EntityRouteTrait::__construct as private _entityRouteConstruct;
     }
+<?php } ?>
+<?php if (true === $hasFlexibleContent) { ?>
     use ContentEditableTrait;
 <?php } ?>
 

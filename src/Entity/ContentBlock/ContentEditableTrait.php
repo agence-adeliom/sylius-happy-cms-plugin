@@ -6,7 +6,6 @@ namespace Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\Criteria;
 
 trait ContentEditableTrait
 {
@@ -30,7 +29,9 @@ trait ContentEditableTrait
     {
         if (!$this->contentBlocks->contains($contentBlock)) {
             $this->contentBlocks->add($contentBlock);
-            $contentBlock->setContentOwner($this);
+            if (method_exists($contentBlock, 'setContentOwner')) {
+                $contentBlock->setContentOwner($this);
+            }
         }
     }
 
@@ -38,7 +39,9 @@ trait ContentEditableTrait
     {
         if ($this->contentBlocks->contains($contentBlock)) {
             $this->contentBlocks->removeElement($contentBlock);
-            $contentBlock->setContentOwner(null);
+            if (method_exists($contentBlock, 'setContentOwner')) {
+                $contentBlock->setContentOwner(null);
+            }
         }
     }
 
@@ -52,15 +55,29 @@ trait ContentEditableTrait
      */
     public function getPublishedContentBlocks(string $locale, ?string $layer = null): Collection
     {
-        $criteria = Criteria::create()
-            ->where(Criteria::expr()->eq('locale', $locale))
-            ->andWhere(Criteria::expr()->eq('published', true))
-            ->orderBy(['position' => 'ASC']);
+        // Filtrer via une closure puis trier par position asc
+        $filtered = $this->contentBlocks->filter(function (ContentBlockInterface $contentBlock) use ($locale, $layer): bool {
+            if (method_exists($contentBlock, 'getLocale') && $contentBlock->getLocale() !== $locale) {
+                return false;
+            }
+            if (method_exists($contentBlock, 'isPublished') && !$contentBlock->isPublished()) {
+                return false;
+            }
+            if (null !== $layer && method_exists($contentBlock, 'getLayer') && $contentBlock->getLayer() !== $layer) {
+                return false;
+            }
 
-        if (null !== $layer) {
-            $criteria->andWhere(Criteria::expr()->eq('layer', $layer));
-        }
+            return true;
+        });
 
-        return $this->contentBlocks->matching($criteria);
+        $values = $filtered->getValues();
+        usort($values, static function ($a, $b): int {
+            $posA = method_exists($a, 'getPosition') ? $a->getPosition() : 0;
+            $posB = method_exists($b, 'getPosition') ? $b->getPosition() : 0;
+
+            return $posA <=> $posB;
+        });
+
+        return new ArrayCollection($values);
     }
 }

@@ -215,7 +215,7 @@ final class MakeHappyCMS extends AbstractMaker
                 ],
             );
 
-            if ($hasTaxonomy && $taxonomyClassNameDetail) {
+            if ($hasTaxonomy && $taxonomyClassNameDetail && $taxonomyClassNameTranslationDetail) {
                 /** @var class-string $fullName */
                 $fullName = $taxonomyClassNameTranslationDetail->getFullName();
                 $resourceConfigGenerator->generateEntity(
@@ -344,7 +344,7 @@ final class MakeHappyCMS extends AbstractMaker
             );
             $io->text($config);
 
-            if ($hasTaxonomy && $taxonomyClassNameDetail) {
+            if ($hasTaxonomy && $taxonomyClassNameDetail && $taxonomyClassNameTranslationDetail) {
                 $configTaxonomy = $resourceConfigGenerator->generateResource(
                     true,
                     $taxonomyClassNameDetail->getFullName(),

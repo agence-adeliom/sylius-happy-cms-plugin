@@ -4,8 +4,14 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock;
 
+use Sylius\Resource\Model\ResourceInterface;
+
 interface ContentBlockInterface
 {
+    public function setContentOwner(?ResourceInterface $contentOwner): void;
+
+    public function getContentOwner(): ?ResourceInterface;
+
     public function getType(): ?string;
 
     public function setType(string $type): void;
