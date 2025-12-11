@@ -12,7 +12,7 @@ use Sylius\Resource\Model\ResourceInterface;
 class PageContentBlock extends ContentBlock implements PageContentBlockInterface
 {
     #[ORM\ManyToOne(targetEntity: PageInterface::class, inversedBy: 'contentBlocks')]
-    #[ORM\JoinColumn(name: 'content_owner_id', referencedColumnName: 'id', nullable: false, onDelete: 'set null')]
+    #[ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id', nullable: true, onDelete: 'set null')]
     protected ?ResourceInterface $contentOwner = null;
 
     public function getContentOwner(): ?ResourceInterface

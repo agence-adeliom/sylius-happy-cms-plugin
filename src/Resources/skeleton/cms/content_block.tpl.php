@@ -19,7 +19,7 @@ use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentBlock;
 use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentBlockInterface;
 use <?= $parentClassNameDetail->getFullName() ?>Interface;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
+use Sylius\Resource\Model\ResourceInterface;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'happy_cms_<?= mb_strtolower($scope) ?>__<?= Str::asSnakeCase($parentClassNameDetail->getShortName()) ?>_content_block')]
@@ -28,34 +28,17 @@ use Symfony\Component\Validator\Constraints as Assert;
 class <?= $classNameDetail->getShortName() ?> extends ContentBlock implements ContentBlockInterface
 {
     #[ORM\ManyToOne(targetEntity: <?= $parentClassNameDetail->getShortName() ?>Interface::class, inversedBy: 'contentBlocks')]
-    #[ORM\JoinColumn(name: '<?= Str::asSnakeCase($parentClassNameDetail->getShortName()) ?>_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
-    #[Assert\NotNull]
-    protected ?<?= $parentClassNameDetail->getShortName() ?>Interface $contentOwner = null;
+    #[ORM\JoinColumn(name: '<?= Str::asSnakeCase($parentClassNameDetail->getShortName()) ?>_id', referencedColumnName: 'id', nullable: true, onDelete: 'set null')]
+    protected ?ResourceInterface $contentOwner = null;
 
-    public function getContentOwner(): ?<?= $parentClassNameDetail->getShortName() ?>Interface
+    public function getContentOwner(): ?ResourceInterface
     {
         return $this->contentOwner;
     }
 
-    public function setContentOwner(?<?= $parentClassNameDetail->getShortName() ?>Interface $contentOwner): void
+    public function setContentOwner(?ResourceInterface $contentOwner): void
     {
         $this->contentOwner = $contentOwner;
-    }
-
-    /**
-     * @deprecated Use getContentOwner() instead
-     */
-    public function get<?= $parentClassNameDetail->getShortName() ?>(): ?<?= $parentClassNameDetail->getShortName() ?>Interface
-    {
-        return $this->getContentOwner();
-    }
-
-    /**
-     * @deprecated Use setContentOwner() instead
-     */
-    public function set<?= $parentClassNameDetail->getShortName() ?>(?<?= $parentClassNameDetail->getShortName() ?>Interface $<?= Str::asLowerCamelCase($parentClassNameDetail->getShortName()) ?>): void
-    {
-        $this->setContentOwner($<?= Str::asLowerCamelCase($parentClassNameDetail->getShortName()) ?>);
     }
 }
 
