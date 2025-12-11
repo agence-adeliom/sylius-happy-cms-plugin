@@ -143,16 +143,8 @@ jobs:
                 run: vendor/bin/console sylius:fixtures:load -n
 
             -
-                name: Update schema in test application
-                run: vendor/bin/console doctrine:schema:update --force -vvv
-
-            -
                 name: Load demo pages in test application
                 run: vendor/bin/console happycms:starter:create-demo-pages -n
-                
-            -
-                name: Load demo menus in test application
-                run: vendor/bin/console happycms:starter:create-demo-menu -n
                 
             -
                 name: Validate composer.json
