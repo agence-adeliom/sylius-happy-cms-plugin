@@ -146,6 +146,10 @@ jobs:
                 name: Load demo pages in test application
                 run: vendor/bin/console happycms:starter:create-demo-pages -n
                 
+#            -
+#                name: Load demo menus in test application
+#                run: vendor/bin/console happycms:starter:create-demo-menu -n
+#                
             -
                 name: Validate composer.json
                 run: composer validate --ansi --strict
