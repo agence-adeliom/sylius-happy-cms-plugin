@@ -127,11 +127,6 @@ jobs:
                 run: |
                     (vendor/bin/console doctrine:database:create -vvv)
                     (vendor/bin/console doctrine:schema:create -vvv)
-                    (vendor/bin/console doctrine:migrations:migrate -n -vvv)
-                    (vendor/bin/console doctrine:migrations:diff -n -vvv)
-                    (vendor/bin/console doctrine:migrations:migrate -n -vvv)
-                    (vendor/bin/console happycms:starter:create-demo-pages -n -vvv)
-                    (vendor/bin/console happycms:starter:create-demo-menu -n -vvv)
     
             -
                 name: Prepare test application assets
@@ -147,6 +142,18 @@ jobs:
                 name: Load fixtures in test application
                 run: vendor/bin/console sylius:fixtures:load -n
 
+            -
+                name: Update schema in test application
+                run: vendor/bin/console doctrine:schema:update --force -vvv
+
+            -
+                name: Load demo pages in test application
+                run: vendor/bin/console happycms:starter:create-demo-pages -n
+                
+            -
+                name: Load demo menus in test application
+                run: vendor/bin/console happycms:starter:create-demo-menu -n
+                
             -
                 name: Validate composer.json
                 run: composer validate --ansi --strict
