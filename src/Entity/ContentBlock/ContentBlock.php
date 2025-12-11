@@ -27,16 +27,12 @@ abstract class ContentBlock implements ContentBlockInterface
     #[Assert\Type('string')]
     protected ?string $type = null;
 
-    /**
-     * @var array<string, mixed>|null $publishedData
-     */
+    /** @var array<string, mixed>|null $publishedData */
     #[ORM\Column(name: 'published_data', type: Types::JSON, nullable: true)]
     #[Assert\Type('array')]
     protected ?array $publishedData = null;
 
-    /**
-     * @var array<string, mixed>|null $draftData
-     */
+    /** @var array<string, mixed>|null $draftData */
     #[ORM\Column(name: 'draft_data', type: Types::JSON, nullable: true)]
     #[Assert\Type('array')]
     protected ?array $draftData = null;

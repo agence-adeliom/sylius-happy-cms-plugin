@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Entity\Page;
 
+use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableInterface;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Doctrine\Common\Collections\Collection;
 use Sylius\Resource\Model\ResourceInterface;
 use Sylius\Resource\Model\TranslatableInterface;
 
-interface PageInterface extends ResourceInterface, TranslatableInterface, CmsRoutableInterface
+interface PageInterface extends ResourceInterface, TranslatableInterface, CmsRoutableInterface, ContentEditableInterface
 {
     public const HOMEPAGE = 'homepage';
 

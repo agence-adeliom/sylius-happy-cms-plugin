@@ -104,7 +104,7 @@ final class InstallDefaultFiles extends AbstractMaker
     {
         $scope = 'page';
         $files = [
-            ['prefix' => 'Entity', 'suffix' => '', 'addRepo' => true, 'addTrans' => true],
+            ['prefix' => 'Entity', 'suffix' => '', 'addRepo' => true, 'addTrans' => true, 'addContentBlocks' => true],
             ['prefix' => 'Entity', 'suffix' => 'Translation'],
             ['prefix' => 'Entity', 'suffix' => 'ContentBlock', 'templateName' => 'contentblock', 'parentClassName' => 'Page'],
             ['prefix' => 'Repository', 'suffix' => 'Repository'],
@@ -285,6 +285,7 @@ final class InstallDefaultFiles extends AbstractMaker
                             'scope' => ucfirst($scope),
                             'addRepo' => $data['addRepo'] ?? false,
                             'addTrans' => $data['addTrans'] ?? false,
+                            'addContentBlocks' => $data['addContentBlocks'] ?? false,
                             'parentClassName' => $data['parentClassName'] ?? ucfirst($scope),
                         ],
                     );

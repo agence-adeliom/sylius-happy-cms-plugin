@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock;
 
-use Sylius\Resource\Model\ResourceInterface;
-use Sylius\Resource\Model\TimestampableInterface;
-
 interface ContentBlockInterface
 {
     public function getType(): ?string;

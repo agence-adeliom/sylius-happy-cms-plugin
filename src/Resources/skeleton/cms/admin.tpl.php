@@ -72,20 +72,9 @@ final class <?= $classNameDetail->getShortName() ?>Admin extends AbstractAdmin i
     {
         $actions = parent::configureActions($pageName);
         $contentAction = Action::new('content', 'happy_cms.page.admin.action.manage_content', 'bxs:book-content')
-            ->addSubAction(
-                Action::new('en_US', 'en_US', 'bxs:book-content')
-                    ->linkToRoute('happy_cms_admin_page_update', [
-                        'context' => 'flexible_content:en_US',
-                    ])
-            )
-            //->addSubAction(
-            //    Action::new('fr_FR', 'fr_FR', 'bxs:book-content')
-            //        ->linkToRoute('happy_cms_admin_page_update', [
-            //            'context' => 'flexible_content:fr_FR',
-            //        ])
-            //)
-        ;
-
+            ->linkToRoute('happy_cms_admin_page_content_builder', [
+                'id' => '$resource.getId()',
+            ]);
         //$actions->addItemAction(Crud::PAGE_INDEX, $contentAction);
         $actions->addItemAction(Crud::PAGE_DETAIL, $contentAction);
         $actions->addItemAction(Crud::PAGE_EDIT, $contentAction);
@@ -189,20 +178,6 @@ final class <?= $classNameDetail->getShortName() ?>Admin extends AbstractAdmin i
                 )
                 ->hideOnIndex();
         }
-<?php if ($hasFlexibleContent) { ?>
-        elseif (str_starts_with($context, 'flexible_content:')) {
-            $locale = str_replace( 'flexible_content:', '', $context);
-            yield TranslationField::new('translations')
-                ->restrictToLocales([
-                    $locale
-                ])
-                ->addField(
-                    FlexibleContentField::new('content')
-                    ->hideOnIndex()
-                )
-                ->hideOnIndex();
-        }
-<?php } ?>
     }
 }
 

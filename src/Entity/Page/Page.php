@@ -9,6 +9,7 @@ use Adeliom\SyliusEasyCrudPlugin\Traits\EntityIdTrait;
 use Adeliom\SyliusEasyCrudPlugin\Traits\EntityPublishableTrait;
 use Adeliom\SyliusEasyCrudPlugin\Traits\EntityTimestampableTrait;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
+use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableTrait;
 use Adeliom\SyliusHappyCMSPlugin\Repository\Page\PageRepository;
 use Adeliom\SyliusHappyCMSPlugin\Traits\EntityRouteTrait;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -40,6 +41,7 @@ class Page implements PageInterface
     use EntityRouteTrait {
         EntityRouteTrait::__construct as private entityRouteConstruct;
     }
+    use ContentEditableTrait;
 
     /** @var Collection<int, RouteInterface> */
     #[ORM\ManyToMany(targetEntity: RouteInterface::class, cascade: ['persist', 'remove'])]
@@ -97,6 +99,7 @@ class Page implements PageInterface
     {
         $this->children = new ArrayCollection();
         $this->initializeTranslationsCollection();
+        $this->initializeContentBlocksCollection();
         $this->timestampableConstruct();
         $this->publishableConstruct();
         $this->entityRouteConstruct();

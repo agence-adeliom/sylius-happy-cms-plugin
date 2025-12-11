@@ -27,19 +27,35 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(columns: ['<?= Str::asSnakeCase($parentClassNameDetail->getShortName()) ?>_id', 'locale', 'published'], name: 'idx_<?= Str::asSnakeCase($parentClassNameDetail->getShortName()) ?>_locale_published')]
 class <?= $classNameDetail->getShortName() ?> extends ContentBlock implements ContentBlockInterface
 {
-    #[ORM\ManyToOne(targetEntity: <?= $parentClassNameDetail->getShortName() ?>Interface::class)]
+    #[ORM\ManyToOne(targetEntity: <?= $parentClassNameDetail->getShortName() ?>Interface::class, inversedBy: 'contentBlocks')]
     #[ORM\JoinColumn(name: '<?= Str::asSnakeCase($parentClassNameDetail->getShortName()) ?>_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     #[Assert\NotNull]
-    protected ?<?= $parentClassNameDetail->getShortName() ?>Interface $<?= Str::asLowerCamelCase($parentClassNameDetail->getShortName()) ?> = null;
+    protected ?<?= $parentClassNameDetail->getShortName() ?>Interface $contentOwner = null;
 
-    public function get<?= $parentClassNameDetail->getShortName() ?>(): ?<?= $parentClassNameDetail->getShortName() ?>Interface
+    public function getContentOwner(): ?<?= $parentClassNameDetail->getShortName() ?>Interface
     {
-        return $this-><?= Str::asLowerCamelCase($parentClassNameDetail->getShortName()) ?>;
+        return $this->contentOwner;
     }
 
+    public function setContentOwner(?<?= $parentClassNameDetail->getShortName() ?>Interface $contentOwner): void
+    {
+        $this->contentOwner = $contentOwner;
+    }
+
+    /**
+     * @deprecated Use getContentOwner() instead
+     */
+    public function get<?= $parentClassNameDetail->getShortName() ?>(): ?<?= $parentClassNameDetail->getShortName() ?>Interface
+    {
+        return $this->getContentOwner();
+    }
+
+    /**
+     * @deprecated Use setContentOwner() instead
+     */
     public function set<?= $parentClassNameDetail->getShortName() ?>(?<?= $parentClassNameDetail->getShortName() ?>Interface $<?= Str::asLowerCamelCase($parentClassNameDetail->getShortName()) ?>): void
     {
-        $this-><?= Str::asLowerCamelCase($parentClassNameDetail->getShortName()) ?> = $<?= Str::asLowerCamelCase($parentClassNameDetail->getShortName()) ?>;
+        $this->setContentOwner($<?= Str::asLowerCamelCase($parentClassNameDetail->getShortName()) ?>);
     }
 }
 

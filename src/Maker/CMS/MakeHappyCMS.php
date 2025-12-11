@@ -177,6 +177,7 @@ final class MakeHappyCMS extends AbstractMaker
                     'addRepo' => true,
                     'addTrans' => true,
                     'hasRouting' => $hasRouting,
+                    'hasFlexibleContent' => $hasFlexibleContent,
                     'isOwningSide' => true,
                     'relationClassNameDetail' => $taxonomyClassNameDetail,
                 ],
@@ -194,6 +195,7 @@ final class MakeHappyCMS extends AbstractMaker
                         'addRepo' => true,
                         'addTrans' => true,
                         'hasRouting' => false,
+                        'hasFlexibleContent' => $hasFlexibleContent,
                         'isOwningSide' => false,
                         'relationClassNameDetail' => $entryClassNameDetail,
                     ],
@@ -208,7 +210,6 @@ final class MakeHappyCMS extends AbstractMaker
                 [
                     'classNameDetail' => $entryClassNameTranslationDetail,
                     'scope' => ucfirst($scope),
-                    'hasFlexibleContent' => $hasFlexibleContent,
                     'extraFields' => [
                     ],
                 ],
@@ -223,7 +224,6 @@ final class MakeHappyCMS extends AbstractMaker
                     [
                         'classNameDetail' => $taxonomyClassNameTranslationDetail,
                         'scope' => ucfirst($scope),
-                        'hasFlexibleContent' => $hasFlexibleContent,
                         'extraFields' => [],
                     ],
                 );

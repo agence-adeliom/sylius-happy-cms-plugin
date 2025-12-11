@@ -5,7 +5,7 @@ use Symfony\Bundle\MakerBundle\Util\ClassNameDetails;
 
 if (
     isset($classNameDetail) && $classNameDetail instanceof ClassNameDetails &&
-    isset($scope, $hasFlexibleContent, $extraFields)
+    isset($scope, $extraFields)
 ) {
     ?>
 <?= "<?php\n" ?>
@@ -42,16 +42,6 @@ class <?= $classNameDetail->getShortName() ?> extends AbstractTranslation implem
         EntitySeoTrait::__construct as private _SEOConstruct;
     }
 
-<?php if ($hasFlexibleContent) { ?>
-    /**
-    * @var array|null
-    */
-    #[Groups('main')]
-    #[ORM\Column(name: 'content', type: Types::JSON, nullable: true)]
-    #[Assert\Type('array')]
-    protected $content = [];
-<?php }?>
-
     public function __construct()
     {
         $this->_SEOConstruct();
@@ -77,18 +67,6 @@ if (is_array($extraFields)) {
 }
     ?>
 
-<?php if ($hasFlexibleContent) { ?>
-    public function getContent(): ?array
-    {
-        return $this->content;
-    }
-
-    public function setContent(?array $content): void
-    {
-        $this->content = $content;
-    }
-
-<?php } ?>
     #[ORM\PrePersist]
     #[ORM\PreUpdate]
     public function setSeoTitle(PrePersistEventArgs|PreUpdateEventArgs $event): void

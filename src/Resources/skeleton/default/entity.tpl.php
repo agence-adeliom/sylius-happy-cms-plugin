@@ -7,6 +7,7 @@ if (
     isset($classNameDetail) && $classNameDetail instanceof ClassNameDetails &&
     isset($scope, $addRepo, $addTrans)
 ) {
+    $addContentBlocks = $addContentBlocks ?? false;
     ?>
 <?= "<?php\n" ?>
 
@@ -21,6 +22,9 @@ use Adeliom\SyliusHappyCMSPlugin\Entity\<?= $scope ?>\<?=
     $classNameDetail->getShortName() ?>TranslationInterface;<?php } ?><?php if ($addRepo === true) { ?>
 
 use <?= str_replace('Entity', 'Repository', Str::getNamespace($classNameDetail->getFullName())) ?>\<?= $classNameDetail->getShortName() ?>Repository;
+<?php } ?><?php if ($addContentBlocks === true) { ?>
+
+use Doctrine\Common\Collections\Collection;
 <?php } ?>
 
 use Doctrine\ORM\Mapping as ORM;
@@ -31,7 +35,13 @@ use Doctrine\ORM\Mapping as ORM;
 <?php } ?>
 #[ORM\Table(name: 'sylius_happy_cms__<?= Str::asSnakeCase($classNameDetail->getShortName()) ?>')]
 class <?= $classNameDetail->getShortName() ?> extends Base<?= $classNameDetail->getShortName() ?> {
-<?php if ($addTrans === true) { ?>
+<?php if ($addContentBlocks === true) { ?>
+    /** @var Collection<int, <?= $classNameDetail->getShortName() ?>ContentBlock> */
+    #[ORM\OneToMany(targetEntity: <?= $classNameDetail->getShortName() ?>ContentBlock::class, mappedBy: 'contentOwner', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OrderBy(['position' => 'ASC'])]
+    protected Collection $contentBlocks;
+
+<?php } ?>
     protected function createTranslation(): <?= $classNameDetail->getShortName() ?>TranslationInterface
     {
         return new <?= $classNameDetail->getShortName() ?>Translation();
@@ -41,6 +51,5 @@ class <?= $classNameDetail->getShortName() ?> extends Base<?= $classNameDetail->
     {
         return <?= $classNameDetail->getShortName() ?>Translation::class;
     }
-<?php } ?>
 }
 <?php } ?>

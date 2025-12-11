@@ -5,7 +5,7 @@ use Symfony\Bundle\MakerBundle\Util\ClassNameDetails;
 
 if (
     isset($classNameDetail) && $classNameDetail instanceof ClassNameDetails &&
-    isset($relationClassNameDetail, $scope,$addRepo,$addTrans,$isOwningSide,$hasRouting)
+    isset($relationClassNameDetail, $scope,$addRepo,$addTrans,$isOwningSide,$hasRouting, $hasFlexibleContent)
 ) {
     $mainClassData = [
         'singular' => mb_strtolower(Str::asSnakeCase($classNameDetail->getShortName())),
@@ -47,6 +47,10 @@ use Sylius\Resource\Model\TranslationInterface;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Adeliom\SyliusHappyCMSPlugin\Traits\EntityRouteTrait;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
+use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableInterface;
+<?php } ?>
+<?php if (true === $hasFlexibleContent) { ?>
+use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableTrait;
 <?php } ?>
 
 #[ORM\HasLifecycleCallbacks]
@@ -57,7 +61,7 @@ use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
 <?php } ?>
 #[ORM\Table(name: 'sylius_happy_cms__<?= Str::asSnakeCase($classNameDetail->getShortName()) ?>')]
 #[ORM\Index(columns: ['publishState'], name: '<?= mb_strtolower($scope) ?>__<?= $mainClassData['singular'] ?>_indexes')]
-class <?= $classNameDetail->getShortName() ?> implements ResourceInterface, TranslatableInterface<?= $hasRouting ? ', CmsRoutableInterface ' : ' ' ?>
+class <?= $classNameDetail->getShortName() ?> implements ResourceInterface, TranslatableInterface<?= $hasRouting ? ', CmsRoutableInterface' : ' ' ?><?= $hasFlexibleContent ? ', ContentEditableInterface' : ' ' ?>
 {
     use TranslatableTrait {
         TranslatableTrait::__construct as private _initializeTranslationsCollection;
@@ -73,6 +77,7 @@ class <?= $classNameDetail->getShortName() ?> implements ResourceInterface, Tran
     use EntityRouteTrait {
         EntityRouteTrait::__construct as private _entityRouteConstruct;
     }
+    use ContentEditableTrait;
 <?php } ?>
 
     use EntityIdTrait;
@@ -94,6 +99,13 @@ class <?= $classNameDetail->getShortName() ?> implements ResourceInterface, Tran
     protected Collection $routes;
 <?php } ?>
 
+<?php if (true === $hasFlexibleContent) { ?>
+    /** @var Collection<int, <?= $classNameDetail->getShortName() ?>ContentBlock> */
+    #[ORM\OneToMany(targetEntity: <?= $classNameDetail->getShortName() ?>ContentBlock::class, mappedBy: 'contentOwner', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OrderBy(['position' => 'ASC'])]
+    protected Collection $contentBlocks;
+<?php } ?>
+
     #[ORM\Column(name: 'css', type: Types::TEXT, nullable: true)]
     #[Assert\Type('string')]
     protected ?string $css = null;
@@ -109,6 +121,9 @@ class <?= $classNameDetail->getShortName() ?> implements ResourceInterface, Tran
         $this->_timestampableConstruct();
     <?php if (true === $hasRouting) { ?>
         $this->_entityRouteConstruct();
+    <?php } ?>
+    <?php if (true === $hasFlexibleContent) { ?>
+        $this->initializeContentBlocksCollection();
     <?php } ?>
     <?php if ($relationClassNameDetail instanceof ClassNameDetails) { ?>
         $this-><?= $relationClassData['plural'] ?> = new ArrayCollection();
