@@ -125,7 +125,6 @@ abstract class ContentBlock implements ContentBlockInterface
         return $this->isOnline();
     }
 
-
     public function getLayer(): ?string
     {
         return $this->layer;
