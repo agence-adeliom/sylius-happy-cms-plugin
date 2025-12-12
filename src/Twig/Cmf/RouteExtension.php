@@ -39,12 +39,12 @@ class RouteExtension extends AbstractExtension
         ];
     }
 
-    public function getPath(CmsRoutableInterface $object): ?string
+    public function getPath(CmsRoutableInterface $object, ?bool $preview = false): ?string
     {
         try {
             return $this->router->generate(RouteObjectInterface::OBJECT_BASED_ROUTE_NAME, [
                 RouteObjectInterface::ROUTE_OBJECT => $object->getOnlineRoute(),
-            ]);
+            ]) . ($preview ? '?preview=1' : '');
         } catch (NoResultException | NonUniqueResultException $e) {
             return '';
         }

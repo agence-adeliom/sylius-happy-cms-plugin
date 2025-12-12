@@ -73,6 +73,27 @@ sylius_easy_crud:
   resource: "@SyliusEasyCrudPlugin/config/routes.yaml"
 ```
 
+### 5. Configure your firewall to protect preview routes
+
+All admin users with ROLE_ALLOWED_TO_SWITCH AND ROLE_HAPPY_CMS_CONTENT_BUILDER will be able to preview CMS routable entities.
+
+In config/packages/security.yaml
+
+```yaml 
+security:
+    firewalls:
+        #... 
+        admin_happy_cms_content_builder:
+            switch_user: { role: ROLE_ALLOWED_TO_SWITCH }
+            context: admin
+            pattern: "%sylius.security.shop_regex%"
+            request_matcher: Adeliom\SyliusHappyCMSPlugin\Security\PreviewRequestMatcher
+            provider: sylius_admin_user_provider
+    #... 
+    role_hierarchy:
+        ROLE_ADMINISTRATION_ACCESS: [ ROLE_HAPPY_CMS_CONTENT_BUILDER ]
+```
+
 ### 5. Generate default files in your project (entities, repositories and admin classes) :
 
 Actually, we don't have Symfony recipes, so we created a command to generate files automatically.

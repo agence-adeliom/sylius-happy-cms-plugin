@@ -1,0 +1,18 @@
+sylius_fixtures:
+    suites:
+        default:
+            fixtures:
+                happy_cms_page:
+                    options:
+                        custom:
+                            - name: 'homepage'
+                              slug: 'homepage'
+                              template: 'homepage'
+                              publish_state: 'published'
+                              translations:
+                                  en_US:
+                                      locale: 'en_US'
+                                      name: 'Homepage'
+                                      slug: 'homepage'
+                                      metaTitle: 'Welcome to our store'
+                                      metaDescription: 'Discover our amazing products'

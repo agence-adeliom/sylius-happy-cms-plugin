@@ -37,4 +37,11 @@ services:
       class: Adeliom\SyliusHappyCMSPlugin\Menu\AdminMenuListener
       tags:
         - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addAdminMenuItems }
+
+    Tests\Adeliom\SyliusHappyCMSPlugin\Fixture\PageFixture:
+        arguments:
+            $entityManager: '@doctrine.orm.entity_manager'
+            $pageClass: 'Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Page\Page'
+        tags:
+            - { name: sylius_fixtures.fixture }
     

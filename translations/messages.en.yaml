@@ -322,3 +322,11 @@ sylius_happy_cms:
   cache:
     successfully_cleared: Cache successfully cleared
     something_went_wrong: Something went wrong while clearing the cache
+  page_builder:
+    title: Page Builder
+    back: Back
+    view_published: View published page
+    save_draft: Save draft
+    publish: Publish
+    add_block: Add a block
+    preview: Preview

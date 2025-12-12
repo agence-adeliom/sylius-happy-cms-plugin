@@ -327,3 +327,11 @@ sylius_happy_cms:
   cache:
     successfully_cleared: Le cache a été vidé avec succès
     something_went_wrong: Une erreur est survenue lors du vidage du cache
+  page_builder:
+    title: Éditeur de page
+    back: Retour
+    view_published: Voir la page publiée
+    save_draft: Enregistrer le brouillon
+    publish: Publier
+    add_block: Ajouter un bloc
+    preview: Aperçu

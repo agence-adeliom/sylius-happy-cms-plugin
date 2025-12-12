@@ -7,7 +7,6 @@ namespace Adeliom\SyliusHappyCMSPlugin\Services\Cmf;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\Route as OrmRoute;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
 use Adeliom\SyliusHappyCMSPlugin\Event\Route\RouteRenderServiceEvent;
-use Adeliom\SyliusHappyCMSPlugin\EventListener\EntityRouteIndexer;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Adeliom\SyliusHappyCMSPlugin\Security\ContentDocumentVoter;
 use Adeliom\SyliusHappyCMSPlugin\Services\Seo\BreadcrumbCollection;
@@ -23,6 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Twig\Environment;
 
 class RouteRenderService extends AbstractController
@@ -77,6 +77,17 @@ class RouteRenderService extends AbstractController
             $route = $request->attributes->get('routeDocument');
         }
 
+        /** @var bool $preview */
+        $preview = $request->get('preview') && $request->get('preview') === '1';
+
+        if ($preview) {
+            try {
+                $this->denyAccessUnlessGranted(ContentDocumentVoter::PAGE_BUILDER, $contentDocument);
+            } catch (AccessDeniedException $e) {
+                throw new \Exception('Access Denied to preview content document');
+            }
+        }
+
         if (null === $route) {
             throw new \Exception('missing route with entity');
         }
@@ -116,10 +127,6 @@ class RouteRenderService extends AbstractController
             }
         }
 
-        if (true === $route->getOption(EntityRouteIndexer::OPTION_PREVIEW)) {
-            $this->denyAccessUnlessGranted(ContentDocumentVoter::PREVIEW, $contentDocument);
-        }
-
         if (!$contentDocument->isOnline()) {
             throw $this->createNotFoundException('Document is not published');
         }
@@ -133,9 +140,6 @@ class RouteRenderService extends AbstractController
         }
 
         $this->twig->addGlobal('resource', $contentDocument);
-
-        /** @var bool $preview */
-        $preview = $route->getOption(EntityRouteIndexer::OPTION_PREVIEW) ?? false;
 
         $renderEvent = new RouteRenderServiceEvent([
              'metadata' => $metadata,

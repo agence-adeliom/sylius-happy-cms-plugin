@@ -1,0 +1,257 @@
+{% extends '@SyliusAdmin/shared/layout/base.html.twig' %}
+
+{% trans_default_domain 'SyliusHappyCMSPlugin' %}
+
+{% block page_title %}{% trans %}sylius_happy_cms.page_builder.title{% endtrans %} - {{ entity.name|default('Page') }}{% endblock %}
+
+{% block body %}
+    {% hook 'sylius_admin.happy_cms.page_builder' %}
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+
+    <style>
+        /* Page builder specific styles */
+        .content-wrapper {
+            padding: 0;
+            height: calc(100vh - 60px); /* Adjust based on Sylius header height */
+            overflow: hidden;
+        }
+
+        /* Main container layout */
+        .page-builder {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        /* Toolbar at the top */
+        .page-builder__toolbar {
+            background: #fff;
+            border-bottom: 1px solid #dee2e6;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-shrink: 0;
+            z-index: 100;
+        }
+
+        .page-builder__toolbar-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Content area with sidebar and iframe */
+        .page-builder__content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .page-builder__sidebar {
+            width: 60px;
+            background: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            overflow-y: auto;
+            overflow-x: hidden;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .page-builder__sidebar-inner {
+            padding: 16px 8px;
+        }
+
+        /* Add block button */
+        .page-builder__add-block {
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            background: #1e74fd;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 20px;
+            transition: background-color 0.2s;
+        }
+
+        .page-builder__add-block:hover {
+            background: #0056d6;
+        }
+
+        /* Block handles in sidebar */
+        .page-builder__block-handles {
+            margin-top: 20px;
+        }
+
+        .page-builder__block-handle {
+            width: 44px;
+            height: 44px;
+            margin: 8px auto;
+            background: #fff;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+        }
+
+        .page-builder__block-handle:hover {
+            border-color: #1e74fd;
+            background: #e7f1ff;
+            color: #1e74fd;
+        }
+
+        /* Preview iframe container */
+        .page-builder__preview {
+            flex: 1;
+            background: #e9ecef;
+            overflow: auto;
+            position: relative;
+        }
+
+        .page-builder__preview-inner {
+            padding: 20px;
+            min-height: 100%;
+        }
+
+        .page-builder__iframe-wrapper {
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            margin: 0 auto;
+            transition: max-width 0.3s ease;
+        }
+
+        /* Resolution modes */
+        .page-builder__iframe-wrapper.resolution-desktop {
+            max-width: 100%;
+        }
+
+        .page-builder__iframe-wrapper.resolution-tablet {
+            max-width: 768px;
+        }
+
+        .page-builder__iframe-wrapper.resolution-mobile {
+            max-width: 375px;
+        }
+
+        .page-builder__iframe {
+            width: 100%;
+            border: none;
+            display: block;
+            min-height: calc(100vh - 200px);
+        }
+
+        /* Toolbar buttons */
+        .btn-toolbar {
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+
+        /* Resolution selector */
+        .resolution-selector {
+            display: flex;
+            gap: 4px;
+            background: #f8f9fa;
+            padding: 4px;
+            border-radius: 6px;
+        }
+
+        .resolution-selector button {
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .resolution-selector button:hover {
+            background: #e9ecef;
+        }
+
+        .resolution-selector button.active {
+            background: white;
+            color: #1e74fd;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        // Basic JavaScript for resolution switching
+        document.addEventListener('DOMContentLoaded', function() {
+            const resolutionButtons = document.querySelectorAll('.resolution-selector button');
+            const iframeWrapper = document.querySelector('[data-page-builder-target="iframeWrapper"]');
+
+            if (resolutionButtons.length && iframeWrapper) {
+                resolutionButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        // Remove active class from all buttons
+                        resolutionButtons.forEach(btn => btn.classList.remove('active'));
+
+                        // Add active class to clicked button
+                        this.classList.add('active');
+
+                        // Change iframe wrapper class
+                        const resolution = this.dataset.resolution;
+                        iframeWrapper.className = 'page-builder__iframe-wrapper resolution-' + resolution;
+                    });
+                });
+            }
+
+            // Load the preview URL in the iframe
+            const iframe = document.querySelector('[data-page-builder-target="iframe"]');
+
+            if (iframe) {
+                // Prevent navigation in iframe
+                iframe.addEventListener('load', function() {
+                    try {
+                        const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+
+                        // Intercept all link clicks
+                        iframeDocument.addEventListener('click', function(e) {
+                            const target = e.target.closest('a');
+                            if (target && target.href) {
+                                e.preventDefault();
+                                console.log('Navigation blocked in preview:', target.href);
+                                return false;
+                            }
+                        }, true);
+
+                        // Intercept form submissions
+                        iframeDocument.addEventListener('submit', function(e) {
+                            e.preventDefault();
+                            console.log('Form submission blocked in preview');
+                            return false;
+                        }, true);
+
+                    } catch (error) {
+                        // Cross-origin restrictions prevent access
+                        console.log('Cannot access iframe content (cross-origin restriction)');
+                    }
+                });
+
+                // Load the preview URL
+                iframe.src = '{{ happy_cms_path(entity, true) }}';
+            }
+        });
+    </script>
+{% endblock %}

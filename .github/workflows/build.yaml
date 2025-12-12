@@ -141,15 +141,7 @@ jobs:
             -
                 name: Load fixtures in test application
                 run: vendor/bin/console sylius:fixtures:load -n
-
-            -
-                name: Load demo pages in test application
-                run: vendor/bin/console happycms:starter:create-demo-pages -n
                 
-#            -
-#                name: Load demo menus in test application
-#                run: vendor/bin/console happycms:starter:create-demo-menu -n
-#                
             -
                 name: Validate composer.json
                 run: composer validate --ansi --strict
@@ -184,3 +176,11 @@ jobs:
                     if-no-files-found: ignore
                     compression-level: 6
                     overwrite: true
+
+            -   
+                name: Load demo pages in test application
+                run: vendor/bin/console happycms:starter:create-demo-pages -n
+
+            -
+                name: Load demo menus in test application
+                run: vendor/bin/console happycms:starter:create-demo-menu -n

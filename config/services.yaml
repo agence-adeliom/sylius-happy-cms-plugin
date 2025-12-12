@@ -73,8 +73,13 @@ services:
       -   assets.package: { package: 'sylius.happy.cms.assets.package' }
 
   Adeliom\SyliusHappyCMSPlugin\Security\ContentDocumentVoter:
+    arguments:
+      - '@security.authorization_checker'
     tags:
       - "security.voter"
+
+  Adeliom\SyliusHappyCMSPlugin\Security\PreviewRequestMatcher:
+    public: true
 
   Adeliom\SyliusHappyCMSPlugin\Routing\MediaLoader:
     tags: [ routing.loader ]

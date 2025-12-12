@@ -217,3 +217,14 @@ sylius_twig_hooks:
         template: '@SyliusHappyCMSPlugin/menu_item/crud/tree/actions/dropdown/move_bottom.html.twig'
         priority: 0
 
+    'sylius_admin.happy_cms.page_builder':
+      sidebar:
+        template: '@SyliusAdmin/shared/crud/common/sidebar.html.twig'
+        priority: 200
+      navbar:
+        template: '@SyliusAdmin/shared/crud/common/navbar.html.twig'
+        priority: 100
+      content:
+        template: '@SyliusHappyCMSPlugin/admin/page_builder/content.html.twig'
+        priority: 0
+

@@ -31,3 +31,14 @@ sylius_happy_cms_admin_flexible_content_preview_block:
       data: $data
       block: $block
       permission: true
+
+sylius_happy_cms_admin_page_builder:
+  path: /admin/happy-cms-builder/{resource}/{id}
+  methods: [ GET, POST ]
+  defaults:
+    _controller: Adeliom\SyliusHappyCMSPlugin\Controller\PageBuilder\PageBuilderController::builderAction
+    _sylius:
+      template: '@SyliusHappyCMSPlugin/admin/page_builder/index.html.twig'
+      permission: false
+  requirements:
+    id: '\d+'

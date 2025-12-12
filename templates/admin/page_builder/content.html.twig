@@ -1,0 +1,97 @@
+<div class="page-wrapper page-builder" data-controller="page-builder">
+    {# Toolbar #}
+    <div class="page-builder__toolbar">
+        <div class="page-builder__toolbar-section">
+            <a href="#" class="btn btn-sm btn-outline-secondary btn-toolbar">
+                ← {% trans %}sylius_happy_cms.page_builder.back{% endtrans %}
+            </a>
+            <span class="text-muted">|</span>
+            <strong>{{ entity|default('') }}</strong>
+        </div>
+
+        <div class="page-builder__toolbar-section">
+            {# Resolution selector #}
+            <div class="resolution-selector" data-page-builder-target="resolutionSelector">
+                <button type="button" class="active" data-resolution="desktop">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M0 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H2zM5.5 14a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5z"/>
+                    </svg>
+                </button>
+                <button type="button" data-resolution="tablet">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M12 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h8zM4 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H4z"/>
+                        <path d="M8 14a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                    </svg>
+                </button>
+                <button type="button" data-resolution="mobile">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M11 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h6zM5 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H5z"/>
+                        <path d="M8 14a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="page-builder__toolbar-section">
+            {# TODO: Open in new tab link to published page #}
+            <a href="#" class="btn btn-sm btn-outline-secondary btn-toolbar" target="_blank" title="{% trans %}sylius_happy_cms.page_builder.view_published{% endtrans %}">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5z"/>
+                    <path d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0v-5z"/>
+                </svg>
+            </a>
+
+            <span class="text-muted">|</span>
+
+            {# Save button #}
+            <button type="button" class="btn btn-sm btn-outline-primary btn-toolbar">
+                {% trans %}sylius_happy_cms.page_builder.save_draft{% endtrans %}
+            </button>
+
+            {# Publish button #}
+            <button type="button" class="btn btn-sm btn-primary btn-toolbar">
+                {% trans %}sylius_happy_cms.page_builder.publish{% endtrans %}
+            </button>
+        </div>
+    </div>
+
+    {# Main content with sidebar and preview #}
+    <div class="page-builder__content">
+        {# Sidebar #}
+        <div class="page-builder__sidebar" data-page-builder-target="sidebar">
+            <div class="page-builder__sidebar-inner">
+                {# Add block button #}
+                <button type="button" class="page-builder__add-block" title="{% trans %}sylius_happy_cms.page_builder.add_block{% endtrans %}">
+                    +
+                </button>
+
+                {# Block handles will be dynamically positioned here #}
+                <div class="page-builder__block-handles" data-page-builder-target="blockHandles">
+                    {# Example block handles - will be generated dynamically #}
+                    <div class="page-builder__block-handle"
+                         data-block-id="1"
+                         title="Block 1">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Preview iframe #}
+        <div class="page-builder__preview" data-page-builder-target="preview">
+            <div class="page-builder__preview-inner">
+                <div class="page-builder__iframe-wrapper resolution-desktop" data-page-builder-target="iframeWrapper">
+                    <iframe
+                        class="page-builder__iframe"
+                        data-page-builder-target="iframe"
+                        sandbox="allow-same-origin allow-scripts allow-forms"
+                        src="about:blank"
+                        title="{% trans %}sylius_happy_cms.page_builder.preview{% endtrans %}">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

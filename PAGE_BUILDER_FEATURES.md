@@ -31,13 +31,33 @@ A. Gestion de la nouvelle entité et migration des données existantes
    - [x] Pour chaque bloc, créer une instance de ContentBlock avec les données extraites, en définissant le type, les données, la locale, la position, etc.
    - [x] Lier chaque ContentBlock à l'entité principale correspondante.
    - [x] Persister les ContentBlocks en base de données.
-4. [ ] Tester la commande de migration sur une base de données de test pour s'assurer que toutes les données sont correctement migrées.
+4. [x] Tester la commande de migration sur une base de données de test pour s'assurer que toutes les données sont correctement migrées.
 5. [x] Ecrire un readme expliquant la migration et les changements à prévoir pour les utilisateurs du plugin.
 
 B. Création du controller et de l'interface d'édition
 
-1. [ ] Créer un controller dédié pour gérer l'édition des pages avec le page builder.
-2. [ ] Ce controller peut être une route unique, mais il faut trouver le moyen de déterminer quelle entité est éditée (via des paramètres dans l'url par exemple), ainsi que permettre de vérifier les droits d'accès.
-3. [ ] En première version, cet écran devra s'intégrer dans le template sylius (garder le menu à gauche, header, footer, etc.).
-4. [ ] Et afficher une iframe qui charge l'url publique de la page en question, pour permettre une édition en contexte.
+Pour cette interface, voici comment je l'imagine :
+- Un container sur la toute la largeur qui est une zone de toolbar avec une première zone pour changer la résolution (desktop, tablette, mobile), une zone pour publier / sauvegarder le contenu, et un bouton qui permet d'activer/désactiver les interactions avec les blocs qui seront dans l'iframe, lien _blank vers la page publiée côté front.
+- Le container principal se divise en deux partie de gauche à droite.
+  - La partie de gauche est une sidebar très fine.
+  - La partie de droite est une iframe qui charge l'url publique de la page en question. Cette iframe occupe toute la hauteur disponible et la largeur restante. Elle permet de visualiser le rendu final de la page avec les blocks ajoutés.
+- L'iframe et la sidebar occupent toute la hauteur de la fenêtre et sont synchronisées en scroll. Il faudra prévoir un script pour gérer cette synchronisation.
+- Dans l'idéal, et dans l'iframe, les blocs sont identifiable via un code unique. Ce code unique permet de connaître la hauteur et la position de chaque bloc dans l'iframe. Cela permettra de positionner des "handles" dans la sidebar pour chaque bloc, afin de pouvoir les déplacer, éditer ou supprimer.
+- La sidebar est minimaliste, elle affiche un simple bouton qui s'active lorsqu'on survole un bloc dans l'iframe. En cliquant sur ce bouton, on ouvre un tooltip qui permet plusieurs actions :
+  - Supprimer le bloc.
+  - Editer le bloc (ouvrir un formulaire modal avec les champs du block type correspondant).
+  - Déplacer le bloc (via du drag & drop dans la sidebar).
+- En haut de la sidebar, il y a un bouton "Ajouter un bloc" qui ouvre un modal avec la liste des blocks types disponibles. En sélectionnant un block type, on l'ajoute à la fin de la liste des blocks. Il faudra ensuite rafraîchir l'iframe pour afficher le nouveau bloc.
+- La toolbar en haut permet de sauvegarder les modifications. L'iframe se recharge pour afficher les changements et idéalement, on reste positionné au même endroit (scroll) dans l'iframe.
+Le tout est un composant livewire ou symfony UX pour gérer les interactions en ajax.
+Le point de départ est l'entity resource sylius. La classe étend de 'ResourceInterface', 'CmsRoutableInterface' et de 'ContentEditableInterface', on peut donc créer une route dédiée pour éditer le contenu via le page builder.
+
+Voici les étapes pour cette partie B :
+
+1. [x] Créer le controller dédié pour l'édition du contenu des entités qui étendent de 'ResourceInterface', 'CmsRoutableInterface' et de 'ContentEditableInterface'. Il reste à reflechir à la meilleure façon de faire cela (qui soit compatible avec la déclartion des routes sylius pour les resources). Soit de faire un controller global à qui on passe la resource et l'id en paramètre, soit de faire un controller par resource (plus verbeux mais plus simple à gérer).
+2. [x] Créer le composant livewire ou symfony UX pour gérer l'interface d'édition décrite plus haut. On commence par la structure de base (toolbar, sidebar (sans bloc pour commencer), iframe) en front statique. L'utilisation de bootstrap est possible pour le layout pour les différentes composants.
+3. [x] Réussir à charger l'url publique de la page dans l'iframe en fonction de la resource et de l'id passés en paramètre au controller. Utilisation de la route preview.
+4. [ ] Modifier le rendu des blocs pour ajouter un identifiant unique dans le HTML de chaque bloc (data-block-id ou id html). Cela permettra de les identifier dans l'iframe. Pour le rendu on peut créer des nouveaux helper twig spécifiques au nouveau système de ContentBlock.
+5. [ ] Afficher dans la sidebar, la liste des blocs présents dans la page en question. Via la méthode getContentBlocks() de l'entité principale.
+6. [ ] Synchroniser le scroll entre l'iframe et la sidebar. Lorsqu'on scroll dans l'iframe, la sidebar doit aussi scroller pour rester alignée avec les blocs visibles.
 
