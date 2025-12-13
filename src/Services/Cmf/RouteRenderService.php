@@ -88,6 +88,10 @@ class RouteRenderService extends AbstractController
             }
         }
 
+        if (!$contentDocument->isOnline() && !$preview) {
+            throw $this->createNotFoundException('Document is not published');
+        }
+
         if (null === $route) {
             throw new \Exception('missing route with entity');
         }
@@ -125,10 +129,6 @@ class RouteRenderService extends AbstractController
             } catch (\RuntimeException $runtimeException) {
                 throw $this->createAccessDeniedException($controller . ' not exists');
             }
-        }
-
-        if (!$contentDocument->isOnline()) {
-            throw $this->createNotFoundException('Document is not published');
         }
 
         $breadcrumbItems = $contentDocument->getBreadcrumbItems();

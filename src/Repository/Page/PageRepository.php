@@ -67,7 +67,7 @@ class PageRepository extends NestedTreeRepository implements PageRepositoryInter
 
     public function getHomePage(string $locale, ?ChannelInterface $channel = null): ?PageInterface
     {
-        $qb = $this->getPublishedQuery();
+        $qb = $this->createQueryBuilder('page');
 
         $qb->addSelect('translation');
 
