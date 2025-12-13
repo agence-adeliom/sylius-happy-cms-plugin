@@ -22,6 +22,7 @@ abstract class ContentBlock implements ContentBlockInterface
     use EntityPublishableTrait {
         EntityPublishableTrait::__construct as private publishableConstruct;
     }
+    use EntityPreviewPublishableTrait;
 
     #[ORM\Column(name: 'type', type: Types::STRING, length: 255)]
     #[Assert\NotBlank]
@@ -48,6 +49,11 @@ abstract class ContentBlock implements ContentBlockInterface
     #[Assert\PositiveOrZero]
     protected int $position = 0;
 
+    #[ORM\Column(name: 'preview_position', type: Types::INTEGER, options: ['unsigned' => true, 'default' => 0])]
+    #[Assert\Type('integer')]
+    #[Assert\PositiveOrZero]
+    protected int $previewPosition = 0;
+
     #[ORM\Column(name: 'layer', type: Types::STRING, length: 100, nullable: true)]
     #[Assert\Type('string')]
     protected ?string $layer = null;
@@ -56,6 +62,7 @@ abstract class ContentBlock implements ContentBlockInterface
     {
         $this->timestampableConstruct();
         $this->publishableConstruct();
+        $this->initializePreviewPublishable();
     }
 
     public function getType(): ?string
@@ -118,6 +125,16 @@ abstract class ContentBlock implements ContentBlockInterface
     public function setPosition(int $position): void
     {
         $this->position = $position;
+    }
+
+    public function getPreviewPosition(): ?int
+    {
+        return $this->previewPosition;
+    }
+
+    public function setPreviewPosition(int $previewPosition): void
+    {
+        $this->previewPosition = $previewPosition;
     }
 
     public function isPublished(): bool

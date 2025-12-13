@@ -57,11 +57,17 @@ Voici les étapes pour cette partie B :
 1. [x] Créer le controller dédié pour l'édition du contenu des entités qui étendent de 'ResourceInterface', 'CmsRoutableInterface' et de 'ContentEditableInterface'. Il reste à reflechir à la meilleure façon de faire cela (qui soit compatible avec la déclartion des routes sylius pour les resources). Soit de faire un controller global à qui on passe la resource et l'id en paramètre, soit de faire un controller par resource (plus verbeux mais plus simple à gérer).
 2. [x] Créer le composant livewire ou symfony UX pour gérer l'interface d'édition décrite plus haut. On commence par la structure de base (toolbar, sidebar (sans bloc pour commencer), iframe) en front statique. L'utilisation de bootstrap est possible pour le layout pour les différentes composants.
 3. [x] Réussir à charger l'url publique de la page dans l'iframe en fonction de la resource et de l'id passés en paramètre au controller. Utilisation de la route preview.
-4. [ ] Dans l'interface du builder, j'aimerais ajouter une 3ème colonne à droite. Cette colonne s'affiche comme un volet venant de la droite quand on a une résolution d'écran inférieure à 1980px. A l'inverse pour les grandes résulutions, la colonne prendrait 1 tier de l'écran à droite. On pourra prévoir dans ce layer 3 choses : 
+4. [x] Dans l'interface du builder, j'aimerais ajouter une 3ème colonne à droite. Cette colonne s'affiche comme un volet venant de la droite quand on a une résolution d'écran inférieure à 1980px. A l'inverse pour les grandes résulutions, la colonne prendrait 1 tier de l'écran à droite. On pourra prévoir dans ce layer 3 choses : 
      - 1 première ligne avec deux boutons alignés à droite (plier/déplier le volet/colonne), un autre qui accueillera un menu contextuel (on peut mettre une icône avec 3 points verticaux).
      - 1 container qui prend la hauteur disponible et qui accueilera à terme le formulaire d'édition d'un bloc. Par défault on peut mettre une information qui indique à l'utilisateur de sélectionner un bloc pour l'éditer. Avec un skeleton ressemblant à un formulaire.
      - 1 ligne de bouton en bas à hauteur fixe, qui contient un bouton à droite qui permettra de sauvegarder le formulaire d'édition du block. Peut être à gauche un bouton annuler pour revenir à l'état initial (cf. message ci-dessus)
-5. [ ] Modifier le rendu des blocs pour ajouter un identifiant unique dans le HTML de chaque bloc (data-block-id ou id html). Cela permettra de les identifier dans l'iframe. Pour le rendu on peut créer des nouveaux helper twig spécifiques au nouveau système de ContentBlock.
-6. [ ] Afficher dans la sidebar, la liste des blocs présents dans la page en question. Via la méthode getContentBlocks() de l'entité principale.
-7. [ ] Synchroniser le scroll entre l'iframe et la sidebar. Lorsqu'on scroll dans l'iframe, la sidebar doit aussi scroller pour rester alignée avec les blocs visibles.
+5. [x] Modifier le rendu des blocs pour ajouter un identifiant unique dans le HTML de chaque bloc (data-block-id ou id html). Cela permettra de les identifier dans l'iframe. Pour le rendu on peut créer des nouveaux helper twig spécifiques au nouveau système de ContentBlock.
+6. [ ] Synchroniser le scroll entre l'iframe et la sidebar. Lorsqu'on scroll dans l'iframe, la sidebar doit aussi scroller pour rester alignée avec les blocs visibles.
+   Pour information les blocs, en front, en mode preview sont wrappé un par un layer spécial
+```html
+    <div data-block-id="42" data-block-layer="default" class="content-block-wrapper">
+      ...
+    </div>
+```
+7. [ ] Afficher dans la sidebar, la liste des blocs présents dans la page en question. Via la méthode getContentBlocks() de l'entité principale.
 8. [ ] Modifier la calcul des routes, en enlevant la génération des routes de preview, désormais ça reprend les routes online auxquelles on ajoute ?preview=1. Donc plus besoin d'enregistrer en base de donnée.

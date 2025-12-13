@@ -126,6 +126,22 @@ class CreateDemoPagesCommand extends AbstractContentCommand
                 'alt' => 'Happy CMS Image 1',
             ],
         );
+        $image2 = $this->createMedia(
+            'pages/home',
+            'image-2.jpg',
+            [
+                'title' => 'Happy CMS Image 2',
+                'alt' => 'Happy CMS Image 2',
+            ],
+        );
+        $image3 = $this->createMedia(
+            'pages/home',
+            'image-3.jpg',
+            [
+                'title' => 'Happy CMS Image 3',
+                'alt' => 'Happy CMS Image 3',
+            ],
+        );
 
         foreach ($locales as $locale) {
             $localeCode = $locale->getCode() ?? 'en_US';
@@ -147,6 +163,24 @@ class CreateDemoPagesCommand extends AbstractContentCommand
                     'centered' => '1',
                     'image' => $image1?->getId(),
                     'title' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+                    'wysiwyg' => '<p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>',
+                    'position' => '1',
+                    'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\TextImageCtaBlockType',
+                    'block_published' => '1',
+                ],
+                'hp-flex-2' => [
+                    'centered' => '1',
+                    'image' => $image2?->getId(),
+                    'title' => 'BBB Lorem.',
+                    'wysiwyg' => '<p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>',
+                    'position' => '1',
+                    'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\TextImageCtaBlockType',
+                    'block_published' => '1',
+                ],
+                'hp-flex-3' => [
+                    'centered' => '1',
+                    'image' => $image3?->getId(),
+                    'title' => 'CCC Lorem.',
                     'wysiwyg' => '<p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>',
                     'position' => '1',
                     'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\TextImageCtaBlockType',
