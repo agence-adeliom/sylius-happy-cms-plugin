@@ -61,7 +61,7 @@
         <div class="page-builder__sidebar" data-page-builder-target="sidebar">
             <div class="page-builder__sidebar-inner">
                 {# Add block button #}
-                <button type="button" class="page-builder__add-block" title="{% trans %}sylius_happy_cms.page_builder.add_block{% endtrans %}">
+                <button type="button" data-page-builder-target="addBlock" class="page-builder__add-block" title="{% trans %}sylius_happy_cms.page_builder.add_block{% endtrans %}">
                     +
                 </button>
 
@@ -91,6 +91,51 @@
                         title="{% trans %}sylius_happy_cms.page_builder.preview{% endtrans %}">
                     </iframe>
                 </div>
+            </div>
+        </div>
+
+        {# Right panel - Block editor #}
+        <div class="page-builder__editor-panel" data-page-builder-target="editorPanel">
+            {# Header with controls #}
+            <div class="page-builder__editor-header">
+                <button type="button"
+                        class="page-builder__editor-toggle"
+                        data-page-builder-target="editorToggle"
+                        title="{% trans %}sylius_happy_cms.page_builder.toggle_panel{% endtrans %}">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+                    </svg>
+                </button>
+
+{#                <button type="button"#}
+{#                        class="page-builder__editor-menu"#}
+{#                        title="{% trans %}sylius_happy_cms.page_builder.menu{% endtrans %}">#}
+{#                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">#}
+{#                        <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>#}
+{#                    </svg>#}
+{#                </button>#}
+            </div>
+
+            {# Content area for form editor #}
+            <div class="page-builder__editor-content" data-page-builder-target="editorContent">
+                <div class="page-builder__editor-placeholder">
+                    <div class="page-builder__editor-placeholder-icon">
+                        <svg width="48" height="48" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                        </svg>
+                    </div>
+                    <h5>{% trans %}sylius_happy_cms.page_builder.select_block{% endtrans %}</h5>
+                    <p class="text-muted">{% trans %}sylius_happy_cms.page_builder.select_block_help{% endtrans %}</p>
+
+                </div>
+            </div>
+
+            {# Footer with actions #}
+            <div class="page-builder__editor-footer">
+                <button type="button" class="btn btn-primary" disabled data-page-builder-target="saveButton">
+                    {% trans %}sylius_happy_cms.page_builder.save_block{% endtrans %}
+                </button>
             </div>
         </div>
     </div>

@@ -330,3 +330,9 @@ sylius_happy_cms:
     publish: Publish
     add_block: Add a block
     preview: Preview
+    toggle_panel: Toggle panel
+    menu: Menu
+    select_block: Select a block
+    select_block_help: Please choose a block among the following collection
+    cancel: Cancel
+    save_block: Save block

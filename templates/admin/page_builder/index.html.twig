@@ -189,6 +189,192 @@
             color: #1e74fd;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
+
+        /* Editor panel (right side) */
+        .page-builder__editor-panel {
+            background: #fff;
+            border-left: 1px solid #dee2e6;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, width 0.3s ease;
+            z-index: 50;
+        }
+
+        /* Responsive behavior */
+        @media (max-width: 1200px) {
+            /* Panel as overlay on smaller screens */
+            .page-builder__editor-panel {
+                top: 193px; /* Below toolbar */
+            }
+        }
+
+        /* Responsive behavior */
+        @media (min-width: 1200px) and (max-width: 1979px) {
+            /* Panel as overlay on smaller screens */
+            .page-builder__editor-panel {
+                top: 120px; /* Below toolbar */
+            }
+        }
+
+        /* Responsive behavior */
+        @media (max-width: 1979px) {
+            /* Panel as overlay on smaller screens */
+            .page-builder__editor-panel {
+                position: fixed;
+                right: 0;
+                bottom: 0;
+                width: 400px;
+                max-width: 90vw;
+                box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
+                transform: translateX(100%);
+            }
+
+            .page-builder__editor-panel.is-open {
+                transform: translateX(0);
+            }
+        }
+
+        @media (min-width: 1980px) {
+            /* Fixed column on large screens */
+            .page-builder__editor-panel {
+                width: 33.333%;
+                min-width: 400px;
+                max-width: 600px;
+                flex-shrink: 0;
+            }
+
+            .page-builder__editor-panel.is-collapsed {
+                width: 48px;
+                min-width: 48px;
+            }
+
+            .page-builder__editor-panel.is-collapsed .page-builder__editor-content,
+            .page-builder__editor-panel.is-collapsed .page-builder__editor-footer {
+                display: none;
+            }
+        }
+
+        /* Editor header */
+        .page-builder__editor-header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+            padding: 12px 16px;
+            border-bottom: 1px solid #dee2e6;
+            flex-shrink: 0;
+        }
+
+        .page-builder__editor-toggle,
+        .page-builder__editor-menu {
+            border: none;
+            background: transparent;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #6c757d;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-builder__editor-toggle:hover,
+        .page-builder__editor-menu:hover {
+            background: #f8f9fa;
+            color: #1e74fd;
+        }
+
+        /* Editor content */
+        .page-builder__editor-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .page-builder__editor-placeholder {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .page-builder__editor-placeholder-icon {
+            color: #dee2e6;
+            margin-bottom: 20px;
+        }
+
+        .page-builder__editor-placeholder h5 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+
+        .page-builder__editor-placeholder p {
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        /* Form skeleton animation */
+        .page-builder__editor-skeleton {
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .skeleton-line {
+            background: linear-gradient(
+                90deg,
+                #f0f0f0 0%,
+                #e0e0e0 20%,
+                #f0f0f0 40%,
+                #f0f0f0 100%
+            );
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s ease-in-out infinite;
+            border-radius: 4px;
+            margin-bottom: 12px;
+        }
+
+        .skeleton-line--label {
+            height: 16px;
+            width: 30%;
+            margin-bottom: 6px;
+        }
+
+        .skeleton-line--input {
+            height: 38px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .skeleton-line--textarea {
+            height: 100px;
+            width: 100%;
+        }
+
+        @keyframes skeleton-loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        /* Editor footer */
+        .page-builder__editor-footer {
+            padding: 16px;
+            border-top: 1px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-shrink: 0;
+            background: #f8f9fa;
+        }
+
+        .page-builder__editor-footer button {
+            flex: 1;
+        }
     </style>
 {% endblock %}
 
@@ -251,6 +437,103 @@
 
                 // Load the preview URL
                 iframe.src = '{{ happy_cms_path(entity, true) }}';
+            }
+
+            // Editor panel toggle functionality
+            const editorPanel = document.querySelector('[data-page-builder-target="editorPanel"]');
+            const editorToggle = document.querySelector('[data-page-builder-target="editorToggle"]');
+            const addBlockButton = document.querySelector('[data-page-builder-target="addBlock"]');
+
+            if (editorPanel && editorToggle) {
+                // Check screen size and initialize panel state
+                const updatePanelState = () => {
+                    const isLargeScreen = window.matchMedia('(min-width: 1980px)').matches;
+
+                    if (isLargeScreen) {
+                        // On large screens, panel is visible by default but can be collapsed
+                        editorPanel.classList.remove('is-open');
+                    } else {
+                        // On small screens, panel is hidden by default (overlay mode)
+                        editorPanel.classList.remove('is-open');
+                    }
+                };
+
+                // Initialize panel state
+                updatePanelState();
+
+                // Update on resize
+                window.addEventListener('resize', updatePanelState);
+
+                // Toggle button click handler
+                editorToggle.addEventListener('click', function() {
+                    const isLargeScreen = window.matchMedia('(min-width: 1980px)').matches;
+
+                    if (isLargeScreen) {
+                        // On large screens: toggle collapsed state
+                        editorPanel.classList.toggle('is-collapsed');
+
+                        // Update toggle button icon direction
+                        const icon = this.querySelector('svg path');
+                        if (editorPanel.classList.contains('is-collapsed')) {
+                            // Show expand icon (arrow pointing left)
+                            icon.setAttribute('d', 'M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z');
+                        } else {
+                            // Show collapse icon (arrow pointing right)
+                            icon.setAttribute('d', 'M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z');
+                        }
+                    } else {
+                        // On small screens: toggle overlay visibility
+                        editorPanel.classList.toggle('is-open');
+                    }
+                });
+
+                // Close panel when clicking outside on small screens
+                document.addEventListener('click', function(e) {
+                    const isLargeScreen = window.matchMedia('(min-width: 1980px)').matches;
+
+                    if (!isLargeScreen &&
+                        editorPanel.classList.contains('is-open') &&
+                        !editorPanel.contains(e.target) &&
+                        e.target !== editorToggle &&
+                        e.target !== addBlockButton &&
+                        !editorToggle.contains(e.target)) {
+                        editorPanel.classList.remove('is-open');
+                    }
+                });
+
+                // Escape key to close panel on small screens
+                document.addEventListener('keydown', function(e) {
+                    const isLargeScreen = window.matchMedia('(min-width: 1980px)').matches;
+
+                    if (!isLargeScreen &&
+                        e.key === 'Escape' &&
+                        editorPanel.classList.contains('is-open')) {
+                        editorPanel.classList.remove('is-open');
+                    }
+                });
+
+                // Add block button - open panel
+                if (addBlockButton) {
+                    addBlockButton.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const isLargeScreen = window.matchMedia('(min-width: 1980px)').matches;
+
+                        if (isLargeScreen) {
+                            // On large screens: expand panel if collapsed
+                            editorPanel.classList.remove('is-collapsed');
+
+                            // Update toggle button icon to show collapse icon
+                            const icon = editorToggle.querySelector('svg path');
+                            if (icon) {
+                                icon.setAttribute('d', 'M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z');
+                            }
+                        } else {
+                            console.log(editorPanel.classList);
+                            // On small screens: open overlay
+                            editorPanel.classList.toggle('is-open');
+                        }
+                    });
+                }
             }
         });
     </script>
