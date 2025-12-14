@@ -7,6 +7,7 @@ namespace Adeliom\SyliusHappyCMSPlugin\Controller\PageBuilder;
 use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableInterface;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Sylius\Component\Locale\Provider\LocaleProviderInterface;
 use Sylius\Resource\Model\ResourceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -20,6 +21,7 @@ class PageBuilderController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly ParameterBagInterface $parameterBag,
+        private readonly LocaleProviderInterface $localeProvider,
     ) {
     }
 
@@ -31,17 +33,31 @@ class PageBuilderController extends AbstractController
         // Load the entity
         $entity = $this->loadEntity($entityClass, $id);
 
-        // Get the current locale
-        $locale = $request->getLocale();
+        // Get the current locale from query parameter or use default locale
+        $locale = $request->query->get('locale', $request->getLocale());
 
-        // Get content blocks for the entity (already validated as ContentEditableInterface)
-        $contentBlocks = $entity->getContentBlocks();
+        // Ensure the locale is a string
+        if (!is_string($locale)) {
+            $locale = $this->localeProvider->getDefaultLocaleCode();
+        }
+
+        // Get available locales
+        $availableLocales = $this->localeProvider->getAvailableLocalesCodes();
+
+        // Validate that the selected locale is available
+        if (!in_array($locale, $availableLocales, true)) {
+            $locale = $request->getLocale();
+        }
+
+        // Get preview content blocks for the entity (already validated as ContentEditableInterface)
+        $contentBlocks = $entity->getPreviewContentBlocks($locale);
 
         return $this->render('@SyliusHappyCMSPlugin/admin/page_builder/index.html.twig', [
             'entity' => $entity,
             'resource' => $resource,
             'contentBlocks' => $contentBlocks,
             'locale' => $locale,
+            'availableLocales' => $availableLocales,
         ]);
     }
 

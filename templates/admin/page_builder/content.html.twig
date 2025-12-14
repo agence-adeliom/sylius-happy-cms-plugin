@@ -1,3 +1,9 @@
+{% set entity = hookable_metadata.context.entity %}
+{% set resource = hookable_metadata.context.resource %}
+{% set contentBlocks = hookable_metadata.context.contentBlocks %}
+{% set locale = hookable_metadata.context.locale %}
+{% set availableLocales = hookable_metadata.context.availableLocales %}
+
 <div class="page-wrapper page-builder" data-controller="page-builder">
     {# Toolbar #}
     <div class="page-builder__toolbar">
@@ -10,6 +16,17 @@
         </div>
 
         <div class="page-builder__toolbar-section">
+            {# Locale selector #}
+            <select class="form-select form-select-sm" id="locale-selector" data-current-locale="{{ locale }}" style="width: auto;">
+                {% for availableLocale in availableLocales %}
+                    <option value="{{ availableLocale }}" {% if availableLocale == locale %}selected{% endif %}>
+                        {{ availableLocale|upper }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <span class="text-muted">|</span>
+
             {# Resolution selector #}
             <div class="resolution-selector" data-page-builder-target="resolutionSelector">
                 <button type="button" class="active" data-resolution="desktop">
@@ -65,16 +82,19 @@
                     +
                 </button>
 
-                {# Block handles will be dynamically positioned here #}
+                {# Block handles - dynamically generated from contentBlocks #}
                 <div class="page-builder__block-handles" data-page-builder-target="blockHandles">
-                    {# Example block handles - will be generated dynamically #}
-                    <div class="page-builder__block-handle"
-                         data-block-id="1"
-                         title="Block 1">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                            <path d="M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
-                        </svg>
-                    </div>
+                    {% for contentBlock in contentBlocks %}
+                        <div class="page-builder__block-handle"
+                             data-block-id="{{ contentBlock.id }}"
+                             data-block-type="{{ contentBlock.type }}"
+                             data-block-layer="{{ contentBlock.layer|default('default') }}"
+                             title="{{ contentBlock.type }}">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                            </svg>
+                        </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>

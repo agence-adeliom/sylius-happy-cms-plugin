@@ -67,6 +67,9 @@ class PageRepository extends NestedTreeRepository implements PageRepositoryInter
 
     public function getHomePage(string $locale, ?ChannelInterface $channel = null): ?PageInterface
     {
+        // Don't need to get published object, this function is used to generate url
+        // The publish state is tested during page render
+        // If still needed, to get only publish page, add some variables to this method
         $qb = $this->createQueryBuilder('page');
 
         $qb->addSelect('translation');
@@ -144,7 +147,10 @@ class PageRepository extends NestedTreeRepository implements PageRepositoryInter
 
     public function getByTemplate(string $template, string $locale, ChannelInterface $channel): ?PageInterface
     {
-        $qb = $this->getPublishedQuery();
+        // Don't need to get published object, this function is used to generate url
+        // The publish state is tested during page render
+        // If still needed, to get only publish page, add some variables to this method
+        $qb = $this->createQueryBuilder('page');
         /** @var PageInterface|null $page */
         $page = $qb
             ->innerJoin('page.translations', 't', 'WITH', 't.locale = :locale')
@@ -162,10 +168,37 @@ class PageRepository extends NestedTreeRepository implements PageRepositoryInter
         return $page;
     }
 
+    public function getById(int $id, string $locale, ChannelInterface $channel): ?PageInterface
+    {
+        // Don't need to get published object, this function is used to generate url
+        // The publish state is tested during page render
+        // If still needed, to get only publish page, add some variables to this method
+        $qb = $this->createQueryBuilder('page');
+        /** @var PageInterface|null $page */
+        $page = $qb
+            ->innerJoin('page.translations', 't', 'WITH', 't.locale = :locale')
+            ->andWhere('page.id = :id')
+            ->andWhere($qb->expr()->orX(
+                $qb->expr()->eq('page.channel', ':channel'),
+                $qb->expr()->isNull('page.channel'),
+            ))
+            ->setParameter('id', $id)
+            ->setParameter('locale', $locale)
+            ->setParameter('channel', $channel)
+            ->getQuery()
+            ->getSingleResult();
+
+        return $page;
+    }
+
     public function getBySeoKey(string $seoKey, string $locale): ?PageInterface
     {
+        // Don't need to get published object, this function is used to generate url
+        // The publish state is tested during page render
+        // If still needed, to get only publish page, add some variables to this method
+        $qb = $this->createQueryBuilder('page');
         /** @var PageInterface|null $page */
-        $page = $this->getPublishedQuery()
+        $page = $qb
             ->innerJoin('page.translations', 't', 'WITH', 't.locale = :locale')
             ->andWhere('t.seo.key = :seo_key')
             ->setParameter('seo_key', $seoKey)

@@ -382,10 +382,39 @@
     {{ parent() }}
 
     <script>
-        // Basic JavaScript for resolution switching
+        // Basic JavaScript for resolution switching and locale management
         document.addEventListener('DOMContentLoaded', function() {
+            const localeSelector = document.getElementById('locale-selector');
             const resolutionButtons = document.querySelectorAll('.resolution-selector button');
             const iframeWrapper = document.querySelector('[data-page-builder-target="iframeWrapper"]');
+
+            // Locale selector change handler with confirmation
+            if (localeSelector) {
+                localeSelector.addEventListener('change', function(e) {
+                    const newLocale = this.value;
+                    const currentLocale = this.dataset.currentLocale;
+
+                    // If locale hasn't changed, do nothing
+                    if (newLocale === currentLocale) {
+                        return;
+                    }
+
+                    // Show confirmation dialog
+                    const confirmed = confirm(
+                        'Changing the locale will reload the page. Any unsaved changes will be lost. Do you want to continue?'
+                    );
+
+                    if (confirmed) {
+                        // Build new URL with locale parameter
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('locale', newLocale);
+                        window.location.href = url.toString();
+                    } else {
+                        // Reset to current locale
+                        this.value = currentLocale;
+                    }
+                });
+            }
 
             if (resolutionButtons.length && iframeWrapper) {
                 resolutionButtons.forEach(button => {
@@ -435,8 +464,8 @@
                     }
                 });
 
-                // Load the preview URL
-                iframe.src = '{{ happy_cms_path(entity, true) }}';
+                // Load the preview URL with locale
+                iframe.src = '{{ happy_cms_path_by_id(entity.id, resource, locale, null, true) }}';
             }
 
             // Editor panel toggle functionality
@@ -528,7 +557,6 @@
                                 icon.setAttribute('d', 'M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z');
                             }
                         } else {
-                            console.log(editorPanel.classList);
                             // On small screens: open overlay
                             editorPanel.classList.toggle('is-open');
                         }

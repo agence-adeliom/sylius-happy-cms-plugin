@@ -40,20 +40,23 @@ trait EntityRouteTrait
         return $this->routes;
     }
 
-    public function getOnlineRoute(): ?RouteInterface
+    public function getOnlineRoute(?string $locale = null): ?RouteInterface
     {
-        return $this->getRoute(false);
+        return $this->getRoute(false, $locale);
     }
 
-    public function getPreviewRoute(): ?RouteInterface
+    public function getPreviewRoute(?string $locale = null): ?RouteInterface
     {
-        return $this->getRoute(true);
+        return $this->getRoute(true, $locale);
     }
 
-    private function getRoute(bool $preview = false): ?RouteInterface
+    private function getRoute(bool $preview = false, ?string $locale = null): ?RouteInterface
     {
         foreach ($this->routes as $route) {
-            if ($preview === $route->getOption(EntityRouteIndexer::OPTION_PREVIEW)) {
+            if (
+                null === $locale || (is_string($locale) && $locale == $route->getDefault('_locale')) &&
+                $preview === $route->getOption(EntityRouteIndexer::OPTION_PREVIEW)
+            ) {
                 $route->setContent($this);
 
                 return $route;

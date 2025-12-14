@@ -36,4 +36,11 @@ interface ContentEditableInterface
      * @return Collection<int, ContentBlockInterface>
      */
     public function getPublishedContentBlocks(string $locale, ?string $layer = null): Collection;
+
+    /**
+     * Get preview content blocks for a specific locale.
+     *
+     * @return Collection<int, ContentBlockInterface>
+     */
+    public function getPreviewContentBlocks(string $locale, ?string $layer = null): Collection;
 }

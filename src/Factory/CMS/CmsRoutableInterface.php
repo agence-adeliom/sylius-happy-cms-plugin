@@ -80,7 +80,7 @@ interface CmsRoutableInterface extends ChannelAwareInterface
 
     public function getRouteController(): ?string;
 
-    public function getOnlineRoute(): ?RouteObjectInterface;
+    public function getOnlineRoute(?string $locale = null): ?RouteObjectInterface;
 
     public function getPreviewRoute(): ?RouteObjectInterface;
 

@@ -21,6 +21,8 @@ interface RouteInterface extends ResourceInterface, RouteObjectInterface
 
     public function isPreview(): bool;
 
+    public function getDefault(string $name): mixed;
+
     public function getOption(string $name): mixed;
 
     /**
