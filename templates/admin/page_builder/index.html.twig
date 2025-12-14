@@ -122,7 +122,8 @@
             pointer-events: all;
         }
 
-        .page-builder__block-handle-button:hover {
+        .page-builder__block-handle-button:hover,
+        .page-builder__block-handle-button.is-hovered {
             border-color: #1e74fd;
             background: #e7f1ff;
             color: #1e74fd;
@@ -504,6 +505,20 @@
                             return false;
                         }, true);
 
+                        // Inject CSS for hover effect in iframe
+                        const style = iframeDocument.createElement('style');
+                        style.textContent = `
+                            .content-block-wrapper.is-hovered {
+                                outline: 3px solid #1e74fd !important;
+                                outline-offset: -3px !important;
+                                background: rgba(30, 116, 253, 0.05) !important;
+                                box-shadow: 0 0 0 3px rgba(30, 116, 253, 0.2) !important;
+                                position: relative !important;
+                                z-index: 100 !important;
+                            }
+                        `;
+                        iframeDocument.head.appendChild(style);
+
                         // Synchronize block handles positions with iframe scroll
                         const blockHandles = document.querySelectorAll('.page-builder__block-handle');
                         const blockHandlesContainer = document.querySelector('[data-page-builder-target="blockHandles"]');
@@ -586,6 +601,62 @@
 
                         // Initial positioning
                         setTimeout(updateBlockHandlesPositions, 100);
+
+                        // Add hover effect on handles to highlight blocks in iframe
+                        blockHandles.forEach(handle => {
+                            const handleButton = handle.querySelector('.page-builder__block-handle-button');
+                            if (!handleButton) return;
+
+                            handleButton.addEventListener('mouseenter', function() {
+                                const blockId = handle.dataset.blockId;
+                                const block = iframeDocument.querySelector(`.content-block-wrapper[data-block-id="${blockId}"]`);
+                                if (block) {
+                                    block.classList.add('is-hovered');
+                                }
+                            });
+
+                            handleButton.addEventListener('mouseleave', function() {
+                                const blockId = handle.dataset.blockId;
+                                const block = iframeDocument.querySelector(`.content-block-wrapper[data-block-id="${blockId}"]`);
+                                if (block) {
+                                    block.classList.remove('is-hovered');
+                                }
+                            });
+
+                            handleButton.addEventListener('click', function() {
+
+                            });
+                        });
+
+                        // Add hover effect on blocks in iframe to highlight handles in sidebar (reverse)
+                        const contentBlocks = iframeDocument.querySelectorAll('.content-block-wrapper[data-block-id]');
+                        contentBlocks.forEach(block => {
+                            block.addEventListener('mouseenter', function() {
+                                const blockId = this.dataset.blockId;
+                                const handle = document.querySelector(`.page-builder__block-handle[data-block-id="${blockId}"]`);
+                                if (handle) {
+                                    const handleButton = handle.querySelector('.page-builder__block-handle-button');
+                                    if (handleButton) {
+                                        handleButton.classList.add('is-hovered');
+                                    }
+                                    // Also highlight the block itself
+                                    this.classList.add('is-hovered');
+                                }
+                            });
+
+                            block.addEventListener('mouseleave', function() {
+                                const blockId = this.dataset.blockId;
+                                const handle = document.querySelector(`.page-builder__block-handle[data-block-id="${blockId}"]`);
+                                if (handle) {
+                                    const handleButton = handle.querySelector('.page-builder__block-handle-button');
+                                    if (handleButton) {
+                                        handleButton.classList.remove('is-hovered');
+                                    }
+                                    // Remove highlight from block
+                                    this.classList.remove('is-hovered');
+                                }
+                            });
+                        });
 
                     } catch (error) {
                         console.error('Cannot access iframe:', error);
