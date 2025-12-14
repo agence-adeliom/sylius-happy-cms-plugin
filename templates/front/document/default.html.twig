@@ -14,7 +14,7 @@
     {% if resource.contentBlocks is defined and resource.contentBlocks|length > 0 %}
         {% if preview is defined and preview %}
             {# In preview mode, get blocks sorted by preview position with preview publish state #}
-            {% set contentBlocks = resource.getPreviewContentBlocks(app.request.locale) %}
+            {% set contentBlocks = resource.getContentBlocks(app.request.locale) %}
         {% else %}
             {# In production mode, get only published blocks sorted by position #}
             {% set contentBlocks = resource.getPublishedContentBlocks(app.request.locale) %}

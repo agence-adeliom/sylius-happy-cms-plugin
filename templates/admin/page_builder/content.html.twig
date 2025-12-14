@@ -101,11 +101,12 @@
                 {# Block handles - dynamically generated from contentBlocks #}
                 <div class="page-builder__block-handles" data-page-builder-target="blockHandles">
                     {% for contentBlock in contentBlocks %}
-                        <div class="page-builder__block-handle"
+                        <div class="page-builder__block-handle{% if not contentBlock.published %} is-unpublished{% endif %}"
                              data-block-id="{{ contentBlock.id }}"
                              data-block-type="{{ contentBlock.type }}"
                              data-block-layer="{{ contentBlock.layer|default('default') }}"
-                             title="{{ contentBlock.type }}">
+                             data-published="{{ contentBlock.published ? 'true' : 'false' }}"
+                             title="{{ contentBlock.type }}{% if not contentBlock.published %} (Unpublished){% endif %}">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                                 <path d="M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
                             </svg>

@@ -49,8 +49,9 @@ class PageBuilderController extends AbstractController
             $locale = $request->getLocale();
         }
 
-        // Get preview content blocks for the entity (already validated as ContentEditableInterface)
-        $contentBlocks = $entity->getPreviewContentBlocks($locale);
+        // Get all content blocks for the entity (already validated as ContentEditableInterface)
+        // In preview mode, we show all blocks (published and unpublished) for the given locale
+        $contentBlocks = $entity->getContentBlocks($locale);
 
         return $this->render('@SyliusHappyCMSPlugin/admin/page_builder/index.html.twig', [
             'entity' => $entity,

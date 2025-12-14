@@ -54,6 +54,8 @@ interface ContentBlockInterface
 
     public function setPreviewPublishState(?string $state): void;
 
+    public function isPreviewPublished(): bool;
+
     public function getLayer(): ?string;
 
     public function setLayer(?string $layer): void;

@@ -95,10 +95,12 @@ class Helper
      */
     public function renderContentBlock(ContentBlockInterface $contentBlock, bool $preview = false, array $extra = []): ?Markup
     {
-        // Check if block is published (unless in preview mode)
+        // Check if block is published (unless in preview mode where we show all blocks)
         if (!$contentBlock->isPublished() && !$preview) {
             return null;
         }
+
+        $isPreviewPublished = $contentBlock->isPreviewPublished();
 
         // Get the block type
         $blockType = $contentBlock->getType();
@@ -176,16 +178,33 @@ class Helper
             'settings' => $blockData,
         ], $extra));
 
-        // In preview mode, wrap the content with a container that has data-block-id and data-block-layer attributes
+        // In preview mode, wrap the content with a container that has data-block-id, data-block-layer, and data-published attributes
         if ($preview) {
             $layer = $contentBlock->getLayer();
             $layerAttr = $layer ? sprintf(' data-block-layer="%s"', htmlspecialchars($layer, \ENT_QUOTES, 'UTF-8')) : '';
+            $publishedAttr = sprintf(' data-published="%s"', $isPreviewPublished ? 'true' : 'false');
+
+            // Add overlay for unpublished blocks with inline styles
+            $overlayHtml = '';
+            if (!$isPreviewPublished) {
+                $overlayHtml = '<div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(200, 200, 200, 0.5); pointer-events: none; z-index: 10; display: flex; align-items: center; justify-content: center;">'
+                    . '<div style="background: rgba(255, 255, 255, 0.95); color: #6c757d; padding: 12px 20px; border-radius: 6px; font-size: 14px; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">'
+                    . '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: text-bottom; margin-right: 6px;">'
+                    . '<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>'
+                    . '<path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>'
+                    . '</svg>'
+                    . 'Unpublished Block'
+                    . '</div>'
+                    . '</div>';
+            }
 
             $wrappedContent = sprintf(
-                '<div data-block-id="%d"%s class="content-block-wrapper">%s</div>',
+                '<div data-block-id="%d"%s%s class="content-block-wrapper" style="position: relative;">%s%s</div>',
                 $blockId,
                 $layerAttr,
+                $publishedAttr,
                 $renderedContent,
+                $overlayHtml,
             );
 
             return new Markup($wrappedContent, 'UTF-8');

@@ -175,7 +175,7 @@ class CreateDemoPagesCommand extends AbstractContentCommand
                     'wysiwyg' => '<p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>',
                     'position' => '1',
                     'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\TextImageCtaBlockType',
-                    'block_published' => '1',
+                    'block_published' => '0',
                 ],
                 'hp-flex-3' => [
                     'centered' => '1',
