@@ -62,12 +62,13 @@ Voici les étapes pour cette partie B :
      - 1 container qui prend la hauteur disponible et qui accueilera à terme le formulaire d'édition d'un bloc. Par défault on peut mettre une information qui indique à l'utilisateur de sélectionner un bloc pour l'éditer. Avec un skeleton ressemblant à un formulaire.
      - 1 ligne de bouton en bas à hauteur fixe, qui contient un bouton à droite qui permettra de sauvegarder le formulaire d'édition du block. Peut être à gauche un bouton annuler pour revenir à l'état initial (cf. message ci-dessus)
 5. [x] Modifier le rendu des blocs pour ajouter un identifiant unique dans le HTML de chaque bloc (data-block-id ou id html). Cela permettra de les identifier dans l'iframe. Pour le rendu on peut créer des nouveaux helper twig spécifiques au nouveau système de ContentBlock.
-6. [ ] Synchroniser le scroll entre l'iframe et la sidebar. Lorsqu'on scroll dans l'iframe, la sidebar doit aussi scroller pour rester alignée avec les blocs visibles.
+6. [ ] Afficher dans la sidebar, la liste des blocs présents dans la page en question (cf. layer blockHandles). Via la méthode getContentBlocks() de l'entité principale. En utilisant getPreviewContentBlock(). Prévoir d'ajouter dans l'interface, dans la barre supérieure un select pour modifier la locale en cours. Au changement de valeur de la locale afficher une confirmation avant de recharger la page. Utiliser un get pour la locale souhaitée. La prendre en compte dans le controller. La liste des locales doit être celles définies dans l'entités locales de sylius.
+7. [ ] Maintenant nous avons 3 blocs dans la page, essayons de synchroniser le scroll entre l'iframe et la sidebar. Lorsqu'on scroll dans l'iframe, la sidebar doit aussi scroller pour rester alignée avec les blocs visibles.
    Pour information les blocs, en front, en mode preview sont wrappé un par un layer spécial
 ```html
     <div data-block-id="42" data-block-layer="default" class="content-block-wrapper">
       ...
     </div>
 ```
-7. [ ] Afficher dans la sidebar, la liste des blocs présents dans la page en question. Via la méthode getContentBlocks() de l'entité principale.
-8. [ ] Modifier la calcul des routes, en enlevant la génération des routes de preview, désormais ça reprend les routes online auxquelles on ajoute ?preview=1. Donc plus besoin d'enregistrer en base de donnée.
+8. [ ] Revoir le système ContentBlock pour ajouter une entité séparée pour le contenu + locale. Cela permettra d'avoir une liste de block commune entre toutes les langues. Et de gérer un contenu de fallback avec la langue par défaut de sylius.
+9. [ ] Modifier la calcul des routes, en enlevant la génération des routes de preview, désormais ça reprend les routes online auxquelles on ajoute ?preview=1. Donc plus besoin d'enregistrer en base de donnée.

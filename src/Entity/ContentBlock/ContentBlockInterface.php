@@ -8,6 +8,8 @@ use Sylius\Resource\Model\ResourceInterface;
 
 interface ContentBlockInterface
 {
+    public function getId(): ?int;
+
     public function setContentOwner(?ResourceInterface $contentOwner): void;
 
     public function getContentOwner(): ?ResourceInterface;

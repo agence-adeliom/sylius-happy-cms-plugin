@@ -79,34 +79,12 @@ trait EntityPreviewPublishableTrait
         return $this;
     }
 
-    public function isPreviewOnline(): bool
+    /**
+     * Check if preview version is published.
+     */
+    public function isPreviewPublished(): bool
     {
-        return $this->hasPreviewState(ThreeStateStatusEnum::PUBLISHED()->getValue()) && $this->isPreviewDatePublished();
-    }
-
-    public function previewPreviewIsAvailable(): bool
-    {
-        return !$this->hasPreviewState(ThreeStateStatusEnum::UNPUBLISHED()->getValue());
-    }
-
-    public function isPreviewStatePublished(): bool
-    {
-        return $this->hasPreviewState(ThreeStateStatusEnum::PUBLISHED()->getValue());
-    }
-
-    public function isPreviewStateUnpublished(): bool
-    {
-        return null === $this->previewPublishState || $this->hasPreviewState(ThreeStateStatusEnum::UNPUBLISHED()->getValue());
-    }
-
-    public function isPreviewStatePending(): bool
-    {
-        return $this->hasPreviewState(ThreeStateStatusEnum::PENDING()->getValue());
-    }
-
-    public function hasPreviewState(?string $state): bool
-    {
-        return null !== $this->previewPublishState && strtolower($this->previewPublishState) === strtolower($state);
+        return $this->previewPublishState === ThreeStateStatusEnum::PUBLISHED && $this->isPreviewDatePublished();
     }
 
     public function isPreviewDatePublished(): bool
@@ -120,13 +98,5 @@ trait EntityPreviewPublishableTrait
         return
             (null === $this->getPreviewUnpublishDate() && $this->getPreviewPublishDate() <= $now) ||
             ($now <= $this->getPreviewUnpublishDate() && $this->getPreviewPublishDate() <= $now);
-    }
-
-    /**
-     * Check if preview version is published.
-     */
-    public function isPreviewPublished(): bool
-    {
-        return $this->isPreviewOnline();
     }
 }
