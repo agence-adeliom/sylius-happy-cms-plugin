@@ -64,12 +64,21 @@ Voici les étapes pour cette partie B :
 5. [x] Modifier le rendu des blocs pour ajouter un identifiant unique dans le HTML de chaque bloc (data-block-id ou id html). Cela permettra de les identifier dans l'iframe. Pour le rendu on peut créer des nouveaux helper twig spécifiques au nouveau système de ContentBlock.
 6. [x] Afficher dans la sidebar, la liste des blocs présents dans la page en question (cf. layer blockHandles). Via la méthode getContentBlocks() de l'entité principale. En utilisant getPreviewContentBlock(). Prévoir d'ajouter dans l'interface, dans la barre supérieure un select pour modifier la locale en cours. Au changement de valeur de la locale afficher une confirmation avant de recharger la page. Utiliser un get pour la locale souhaitée. La prendre en compte dans le controller. La liste des locales doit être celles définies dans l'entités locales de sylius.
 7. [x] Ajuster les liste des blocks dans la page + sidebar. Il ne faudrait plus se baser sur getPreviewContentBlock(), en réalité il faut qu'on affiche tous les blocs, et en mode preview, nous devons ajouter un attribut autour du bloc, pour indiquer qu'un block est inactif. On pourra alors appliquer un style différent dans la sidebar pour indiquer ceux qui sont disabled. Et même aller plus loin si possible, ajouter un layer par dessus le block qui montre son état inactif, directement dans l'iframe (pour cela il faut mettre des styles en html car on ne pourra pas avoir de feuille de style, donc  à prévoir dans le heplper twig 'happy_cms_content_block_render')
-8. [ ] Maintenant nous avons 3 blocs dans la page, essayons de synchroniser le scroll entre l'iframe et la sidebar. Lorsqu'on scroll dans l'iframe, la sidebar doit aussi scroller pour rester alignée avec les blocs visibles.
+8. [x] Maintenant nous avons 3 blocs dans la page, essayons de synchroniser le scroll entre l'iframe et la sidebar. Lorsqu'on scroll dans l'iframe, la sidebar doit aussi scroller pour rester alignée avec les blocs visibles.
    Pour information les blocs, en front, en mode preview sont wrappé un par un layer spécial
 ```html
     <div data-block-id="42" data-block-layer="default" class="content-block-wrapper">
       ...
     </div>
 ```
-8. [ ] Revoir le système ContentBlock pour ajouter une entité séparée pour le contenu + locale. Cela permettra d'avoir une liste de block commune entre toutes les langues. Et de gérer un contenu de fallback avec la langue par défaut de sylius.
-9. [ ] Modifier la calcul des routes, en enlevant la génération des routes de preview, désormais ça reprend les routes online auxquelles on ajoute ?preview=1. Donc plus besoin d'enregistrer en base de donnée.
+8. [x] Pour le formulaire d'édition d'un block je pensais faire un composant symfony live basé sur le form type du bloc. Il faudrait, par un jeu d'event, que le composant live se charge
+   via la fonction edit bloc. Pour le composant live, il est soit lié à un block existant alors on charge le formulaire dans sa zone centrale et dans le bouton on a le bouton submit.
+   A l'inverse, dans le cas où aucun block type est lié, cela signifie qu'on vient de cliquer sur le bouton d'ajout d'un block. Dans ce cas on affiche un bouton centré en hauteur pour
+   permet de "parcourir les blocks existant" (on verra plus tard pour l'interface de choix des blocs existants).
+9. [ ] Pour terminer les actions sur le composant bloc éditor, il faudra :
+   1. Gérer le bouton "Add Block" pour appeler editBlock(null)
+   2. Implémenter l'interface de sélection des blocs (pour le mode création)
+   3. Gérer l'événement block:saved pour recharger l'iframe après sauvegarde
+   4. Ajouter les traductions manquantes
+10. [ ] Revoir le système ContentBlock pour ajouter une entité séparée pour le contenu + locale. Cela permettra d'avoir une liste de block commune entre toutes les langues. Et de gérer un contenu de fallback avec la langue par défaut de sylius.
+11. [ ] Modifier la calcul des routes, en enlevant la génération des routes de preview, désormais ça reprend les routes online auxquelles on ajoute ?preview=1. Donc plus besoin d'enregistrer en base de donnée.

@@ -1,0 +1,47 @@
+{% trans_default_domain 'SyliusHappyCMSPlugin' %}
+
+<div {{ attributes }}>
+    {% if this.hasBlock %}
+        {# Edit mode: Show form for existing block #}
+        <div class="page-builder__editor-content">
+            {{ form_start(form, {
+                attr: {
+                    'data-action': 'live#action',
+                    'data-live-action-param': 'save'
+                }
+            }) }}
+                {{ form_widget(form) }}
+            {{ form_end(form) }}
+        </div>
+
+        <div class="page-builder__editor-footer">
+            <button type="button" class="btn btn-secondary" data-action="live#action" data-live-action-param="prevent|cancel">
+                {% trans %}sylius_happy_cms.page_builder.cancel{% endtrans %}
+            </button>
+            <button
+                type="submit"
+                class="btn btn-primary"
+                data-action="live#action"
+                data-live-action-param="prevent|save"
+            >
+                {% trans %}sylius_happy_cms.page_builder.save{% endtrans %}
+            </button>
+        </div>
+    {% else %}
+        {# Create mode: Show block selector #}
+        <div class="page-builder__editor-content">
+            <div style="display: flex; align-items: center; justify-content: center; min-height: 400px;">
+                <button
+                    type="button"
+                    class="btn btn-primary btn-lg"
+                    style="padding: 16px 32px; font-size: 16px;"
+                >
+                    <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 8px; vertical-align: text-bottom;">
+                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                    </svg>
+                    {% trans %}sylius_happy_cms.page_builder.browse_blocks{% endtrans %}
+                </button>
+            </div>
+        </div>
+    {% endif %}
+</div>

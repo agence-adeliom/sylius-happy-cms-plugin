@@ -624,8 +624,22 @@
 
                             const editorPanel = document.querySelector('[data-page-builder-target="editorPanel"]');
                             const editorToggle = document.querySelector('[data-page-builder-target="editorToggle"]');
+                            const editorContent = document.querySelector('[data-page-builder-target="editorContent"]');
 
                             if (!editorPanel) return;
+
+                            // Find the Live Component element
+                            const liveComponent = editorContent?.querySelector('[data-controller*="live"]');
+
+                            if (liveComponent) {
+                                // Update the blockId prop on the Live Component
+                                const component = window.LiveComponents?.getComponent(liveComponent);
+                                if (component) {
+                                    component.set('blockId', blockId ? parseInt(blockId) : null);
+                                } else {
+                                    console.warn('Live Component not found or not initialized');
+                                }
+                            }
 
                             const isLargeScreen = window.matchMedia('(min-width: 1980px)').matches;
 
@@ -645,7 +659,6 @@
                                 editorPanel.classList.add('is-open');
                             }
 
-                            // TODO: Load block edit form with AJAX
                             console.log('Panel opened for block:', blockId);
                         }
 
