@@ -44,9 +44,13 @@ interface ContentBlockInterface
 
     public function setPosition(int $position): void;
 
+    public function setPreviewPosition(int $previewPosition): void;
+
     public function isPublished(): bool;
 
     public function setPublishState(?string $state): void;
+
+    public function setPreviewPublishState(?string $state): void;
 
     public function getLayer(): ?string;
 

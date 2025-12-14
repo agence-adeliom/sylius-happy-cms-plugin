@@ -307,7 +307,9 @@ class MigrateContentToBlocksCommand extends Command
         $contentBlock->setType($blockType);
         $contentBlock->setLocale($locale ?? 'en');
         $contentBlock->setPosition($position);
+        $contentBlock->setPreviewPosition($position);
         $contentBlock->setPublishState($published ? ThreeStateStatusEnum::PUBLISHED : ThreeStateStatusEnum::UNPUBLISHED);
+        $contentBlock->setPreviewPublishState($published ? ThreeStateStatusEnum::PUBLISHED : ThreeStateStatusEnum::UNPUBLISHED);
         $contentBlock->setLayer(null);
 
         // Set data

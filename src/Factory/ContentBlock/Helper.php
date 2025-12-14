@@ -136,7 +136,7 @@ class Helper
 
         $event = $this->eventDispatcher->dispatch(
             new BlockRender($block, $eventData, $defaultAssets),
-            'happy_cms_block.render_block'
+            'happy_cms_block.render_block',
         );
 
         $block = $event->getBlock();
@@ -179,13 +179,13 @@ class Helper
         // In preview mode, wrap the content with a container that has data-block-id and data-block-layer attributes
         if ($preview) {
             $layer = $contentBlock->getLayer();
-            $layerAttr = $layer ? sprintf(' data-block-layer="%s"', htmlspecialchars($layer, ENT_QUOTES, 'UTF-8')) : '';
+            $layerAttr = $layer ? sprintf(' data-block-layer="%s"', htmlspecialchars($layer, \ENT_QUOTES, 'UTF-8')) : '';
 
             $wrappedContent = sprintf(
                 '<div data-block-id="%d"%s class="content-block-wrapper">%s</div>',
                 $blockId,
                 $layerAttr,
-                $renderedContent
+                $renderedContent,
             );
 
             return new Markup($wrappedContent, 'UTF-8');
