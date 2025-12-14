@@ -91,12 +91,25 @@
         /* Block handles in sidebar */
         .page-builder__block-handles {
             margin-top: 20px;
+            position: relative;
+            height: calc(100vh - 200px);
+            overflow: hidden;
         }
 
         .page-builder__block-handle {
+            width: 43px;
+            position: absolute;
+            left: 0;
+            transition: top 0.025s linear;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        .page-builder__block-handle-button {
             width: 44px;
             height: 44px;
-            margin: 8px auto;
             background: #fff;
             border: 2px solid #dee2e6;
             border-radius: 6px;
@@ -106,27 +119,39 @@
             align-items: center;
             justify-content: center;
             color: #6c757d;
+            pointer-events: all;
         }
 
-        .page-builder__block-handle:hover {
+        .page-builder__block-handle-button:hover {
             border-color: #1e74fd;
             background: #e7f1ff;
             color: #1e74fd;
         }
 
+        /* Active block handle (visible in viewport) */
+        .page-builder__block-handle.is-active .page-builder__block-handle-button {
+            border-color: #1e74fd;
+            background: #e7f1ff;
+        }
+
         /* Unpublished block handles */
-        .page-builder__block-handle.is-unpublished {
+        .page-builder__block-handle.is-unpublished .page-builder__block-handle-button {
             background: #f8f9fa;
             border-color: #dee2e6;
             border-style: dashed;
             opacity: 0.6;
         }
 
-        .page-builder__block-handle.is-unpublished:hover {
+        .page-builder__block-handle.is-unpublished .page-builder__block-handle-button:hover {
             opacity: 0.8;
             border-color: #ffc107;
             background: #fff3cd;
             color: #856404;
+        }
+
+        .page-builder__block-handle.is-unpublished.is-active .page-builder__block-handle-button {
+            border-color: #ffc107;
+            box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.2);
         }
 
         /* Preview iframe container */
@@ -456,8 +481,11 @@
             if (iframe) {
                 // Prevent navigation in iframe
                 iframe.addEventListener('load', function() {
+                    console.log('Iframe loaded. URL:', iframe.src);
+                    console.log('Iframe location:', iframe.contentWindow?.location?.href);
                     try {
                         const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+                        console.log('Successfully accessed iframe document');
 
                         // Intercept all link clicks
                         iframeDocument.addEventListener('click', function(e) {
@@ -476,7 +504,92 @@
                             return false;
                         }, true);
 
+                        // Synchronize block handles positions with iframe scroll
+                        const blockHandles = document.querySelectorAll('.page-builder__block-handle');
+                        const blockHandlesContainer = document.querySelector('[data-page-builder-target="blockHandles"]');
+                        const sidebar = document.querySelector('[data-page-builder-target="sidebar"]');
+                        const iframeWindow = iframe.contentWindow;
+
+                        function updateBlockHandlesPositions() {
+                            if (!blockHandlesContainer) return;
+
+                            // Get all content blocks in the iframe
+                            const contentBlocks = iframeDocument.querySelectorAll('.content-block-wrapper[data-block-id]');
+
+                            if (contentBlocks.length === 0) return;
+
+                            const viewportHeight = iframeWindow.innerHeight;
+
+                            // Get the offset of the handles container to compensate for the add block button
+                            const addBlockButton = document.querySelector('[data-page-builder-target="addBlock"]');
+                            let offset = 0;
+                            if (addBlockButton) {
+                                // Calculate total height including margins
+                                const addBlockStyles = window.getComputedStyle(addBlockButton);
+                                const addBlockHeight = addBlockButton.offsetHeight;
+                                const addBlockMarginBottom = parseFloat(addBlockStyles.marginBottom);
+                                const handlesContainerMarginTop = parseFloat(window.getComputedStyle(blockHandlesContainer).marginTop);
+                                offset = addBlockHeight + addBlockMarginBottom + handlesContainerMarginTop;
+                            }
+
+                            // Position each handle based on its corresponding block in the iframe
+                            contentBlocks.forEach(contentBlock => {
+                                const blockId = contentBlock.dataset.blockId;
+                                const handle = document.querySelector(`.page-builder__block-handle[data-block-id="${blockId}"]`);
+
+                                if (handle) {
+                                    // Get block position and dimensions in iframe (relative to viewport)
+                                    const blockRect = contentBlock.getBoundingClientRect();
+
+                                    // Use the position relative to the iframe viewport, compensating for the offset
+                                    const blockTop = blockRect.top - offset;
+                                    const blockHeight = blockRect.height;
+
+                                    // Set handle position and height
+                                    handle.style.top = blockTop + 'px';
+                                    handle.style.height = blockHeight + 'px';
+
+                                    // Check if block is visible in viewport
+                                    // A block is considered visible if any part of it is in the viewport
+                                    const isVisible = blockRect.top < viewportHeight && blockRect.bottom > 0;
+
+                                    // Add/remove active class
+                                    if (isVisible) {
+                                        handle.classList.add('is-active');
+                                    } else {
+                                        handle.classList.remove('is-active');
+                                    }
+                                }
+                            });
+                        }
+
+                        // Throttle function to limit scroll event frequency
+                        function throttle(func, limit) {
+                            let inThrottle;
+                            return function() {
+                                const args = arguments;
+                                const context = this;
+                                if (!inThrottle) {
+                                    func.apply(context, args);
+                                    inThrottle = true;
+                                    setTimeout(() => inThrottle = false, limit);
+                                }
+                            }
+                        }
+
+                        // Update positions on iframe scroll (throttled)
+                        const throttledUpdate = throttle(updateBlockHandlesPositions, 50);
+                        iframeWindow.addEventListener('scroll', throttledUpdate);
+
+                        // Update positions on iframe resize
+                        iframeWindow.addEventListener('resize', throttledUpdate);
+
+                        // Initial positioning
+                        setTimeout(updateBlockHandlesPositions, 100);
+
                     } catch (error) {
+                        console.error('Cannot access iframe:', error);
+                        console.log('Iframe src:', iframe.src);
                         // Cross-origin restrictions prevent access
                         console.log('Cannot access iframe content (cross-origin restriction)');
                     }
