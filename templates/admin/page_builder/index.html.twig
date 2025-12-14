@@ -508,13 +508,29 @@
                         // Inject CSS for hover effect in iframe
                         const style = iframeDocument.createElement('style');
                         style.textContent = `
+                            /* Show outline and shadow on hover */
                             .content-block-wrapper.is-hovered {
                                 outline: 3px solid #1e74fd !important;
                                 outline-offset: -3px !important;
-                                background: rgba(30, 116, 253, 0.05) !important;
                                 box-shadow: 0 0 0 3px rgba(30, 116, 253, 0.2) !important;
-                                position: relative !important;
                                 z-index: 100 !important;
+                            }
+
+                            /* Show hover overlay when hovering */
+                            .content-block-wrapper.is-hovered .content-block-hover-overlay {
+                                display: flex !important;
+                            }
+
+                            /* Hide hover overlay for unpublished blocks (they have their own overlay) */
+                            .content-block-wrapper[data-published="false"] .content-block-hover-overlay {
+                                display: none !important;
+                            }
+
+                            /* Button hover effect */
+                            .content-block-edit-button:hover {
+                                background: #0056d6 !important;
+                                transform: translateY(-2px) !important;
+                                box-shadow: 0 6px 16px rgba(30, 116, 253, 0.5) !important;
                             }
                         `;
                         iframeDocument.head.appendChild(style);
@@ -602,6 +618,37 @@
                         // Initial positioning
                         setTimeout(updateBlockHandlesPositions, 100);
 
+                        // Common function to handle block editing
+                        function editBlock(blockId) {
+                            console.log('Edit block:', blockId);
+
+                            const editorPanel = document.querySelector('[data-page-builder-target="editorPanel"]');
+                            const editorToggle = document.querySelector('[data-page-builder-target="editorToggle"]');
+
+                            if (!editorPanel) return;
+
+                            const isLargeScreen = window.matchMedia('(min-width: 1980px)').matches;
+
+                            if (isLargeScreen) {
+                                // On large screens: expand panel if collapsed
+                                editorPanel.classList.remove('is-collapsed');
+
+                                // Update toggle button icon to show collapse icon
+                                if (editorToggle) {
+                                    const icon = editorToggle.querySelector('svg path');
+                                    if (icon) {
+                                        icon.setAttribute('d', 'M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z');
+                                    }
+                                }
+                            } else {
+                                // On small screens: open overlay
+                                editorPanel.classList.add('is-open');
+                            }
+
+                            // TODO: Load block edit form with AJAX
+                            console.log('Panel opened for block:', blockId);
+                        }
+
                         // Add hover effect on handles to highlight blocks in iframe
                         blockHandles.forEach(handle => {
                             const handleButton = handle.querySelector('.page-builder__block-handle-button');
@@ -623,8 +670,12 @@
                                 }
                             });
 
-                            handleButton.addEventListener('click', function() {
-
+                            // Add click handler for sidebar buttons
+                            handleButton.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                const blockId = handle.dataset.blockId;
+                                editBlock(blockId);
                             });
                         });
 
@@ -655,6 +706,17 @@
                                     // Remove highlight from block
                                     this.classList.remove('is-hovered');
                                 }
+                            });
+                        });
+
+                        // Add click handler for edit buttons in iframe (both hover overlay and unpublished overlay)
+                        const editButtons = iframeDocument.querySelectorAll('.content-block-edit-button');
+                        editButtons.forEach(button => {
+                            button.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                const blockId = this.dataset.blockId;
+                                editBlock(blockId);
                             });
                         });
 
