@@ -384,35 +384,38 @@
     <script>
         // Basic JavaScript for resolution switching and locale management
         document.addEventListener('DOMContentLoaded', function() {
-            const localeSelector = document.getElementById('locale-selector');
+            const localeDropdown = document.getElementById('localeDropdown');
+            const localeItems = document.querySelectorAll('.dropdown-item[data-locale]');
             const resolutionButtons = document.querySelectorAll('.resolution-selector button');
             const iframeWrapper = document.querySelector('[data-page-builder-target="iframeWrapper"]');
 
-            // Locale selector change handler with confirmation
-            if (localeSelector) {
-                localeSelector.addEventListener('change', function(e) {
-                    const newLocale = this.value;
-                    const currentLocale = this.dataset.currentLocale;
+            // Locale dropdown item click handler with confirmation
+            if (localeItems.length > 0 && localeDropdown) {
+                const currentLocale = localeDropdown.dataset.currentLocale;
 
-                    // If locale hasn't changed, do nothing
-                    if (newLocale === currentLocale) {
-                        return;
-                    }
+                localeItems.forEach(item => {
+                    item.addEventListener('click', function(e) {
+                        e.preventDefault();
 
-                    // Show confirmation dialog
-                    const confirmed = confirm(
-                        'Changing the locale will reload the page. Any unsaved changes will be lost. Do you want to continue?'
-                    );
+                        const newLocale = this.dataset.locale;
 
-                    if (confirmed) {
-                        // Build new URL with locale parameter
-                        const url = new URL(window.location.href);
-                        url.searchParams.set('locale', newLocale);
-                        window.location.href = url.toString();
-                    } else {
-                        // Reset to current locale
-                        this.value = currentLocale;
-                    }
+                        // If locale hasn't changed, do nothing
+                        if (newLocale === currentLocale) {
+                            return;
+                        }
+
+                        // Show confirmation dialog
+                        const confirmed = confirm(
+                            'Changing the locale will reload the page. Any unsaved changes will be lost. Do you want to continue?'
+                        );
+
+                        if (confirmed) {
+                            // Build new URL with locale parameter
+                            const url = new URL(window.location.href);
+                            url.searchParams.set('locale', newLocale);
+                            window.location.href = url.toString();
+                        }
+                    });
                 });
             }
 
