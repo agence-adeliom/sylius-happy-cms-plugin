@@ -1,23 +1,134 @@
+{% form_theme form '@SyliusAdmin/shared/form_theme.html.twig' %}
 
-
-<div {{ attributes.defaults(stimulus_controller('@agence-adeliom/sylius-happy-cms-plugin/builder-block-editor', {})) }}>
+<div {{ attributes.defaults(stimulus_controller('@agence-adeliom/sylius-happy-cms-plugin/builder-block-editor', {})) }}
+     style="display: flex; flex-direction: column; height: 100%;">
     {% if this.hasBlock %}
         {# Edit mode: Show form for existing block #}
-        <div class="page-builder__editor-content" data-loading="hide">
-            {{ form_start(form, {
-                attr: {
-                    'data-action': 'live#action',
-                    'data-live-action-param': 'save'
-                }
-            }) }}
-                {{ form_widget(form) }}
-            {{ form_end(form) }}
+        <div class="page-builder__editor-content" data-loading="hide" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; max-height: calc(100% - 150px)">
+            {# Block toolbar #}
+            <div class="page-builder__block-toolbar">
+                {# Left: Block name #}
+                <div class="page-builder__block-toolbar-left">
+                    <strong>{{ this.blockName }}</strong>
+                </div>
+
+                {# Middle: Visibility and position dropdowns #}
+                <div class="page-builder__block-toolbar-middle">
+                    {# Visibility dropdown #}
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                type="button"
+                                id="visibilityDropdown"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                            {% if this.block.isPreviewPublished %}
+                                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 4px;">
+                                    <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                                    <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                                </svg>
+                                {% trans %}sylius_happy_cms.page_builder.published{% endtrans %}
+                            {% else %}
+                                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 4px;">
+                                    <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"/>
+                                    <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829z"/>
+                                    <path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12-.708.708z"/>
+                                </svg>
+                                {% trans %}sylius_happy_cms.page_builder.unpublished{% endtrans %}
+                            {% endif %}
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="visibilityDropdown">
+                            <li>
+                                <a class="dropdown-item{% if this.block.isPreviewPublished %} active{% endif %}"
+                                   href="#"
+                                   data-action="live#action"
+                                   data-live-action-param="prevent|togglePublished">
+                                    {% trans %}sylius_happy_cms.page_builder.publish_block{% endtrans %}
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item{% if not this.block.published %} active{% endif %}"
+                                   href="#"
+                                   data-action="live#action"
+                                   data-live-action-param="prevent|togglePublished">
+                                    {% trans %}sylius_happy_cms.page_builder.unpublish_block{% endtrans %}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    {# Position dropdown #}
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                type="button"
+                                id="positionDropdown"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                            {% trans with {'%position%': this.blockPosition + 1, '%total%': this.totalBlocks} %}sylius_happy_cms.page_builder.position{% endtrans %}
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="positionDropdown">
+                            <li>
+                                <a class="dropdown-item"
+                                   href="#"
+                                   data-action="live#action"
+                                   data-live-action-param="prevent|moveBlock"
+                                   data-live-position-param="0">
+                                    {% trans %}sylius_happy_cms.page_builder.move_first{% endtrans %}
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item"
+                                   href="#"
+                                   data-action="live#action"
+                                   data-live-action-param="prevent|moveBlock"
+                                   data-live-position-param="{{ this.totalBlocks - 1 }}">
+                                    {% trans %}sylius_happy_cms.page_builder.move_last{% endtrans %}
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            {% for i in 0..this.totalBlocks - 1 %}
+                                <li>
+                                    <a class="dropdown-item{% if i == this.blockPosition %} active{% endif %}"
+                                       href="#"
+                                       data-action="live#action"
+                                       data-live-action-param="prevent|moveBlock"
+                                       data-live-position-param="{{ i }}">
+                                        {% trans with {'%position%': i + 1} %}sylius_happy_cms.page_builder.move_to_position{% endtrans %}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                {# Right: Delete button #}
+                <div class="page-builder__block-toolbar-right">
+                    <button type="button"
+                            class="btn btn-sm btn-outline-danger"
+                            onclick="if(confirm('{% trans %}sylius_happy_cms.page_builder.confirm_delete{% endtrans %}')) { this.dispatchEvent(new CustomEvent('live#action', { detail: { name: 'deleteBlock' }, bubbles: true })); }">
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                        </svg>
+                        {% trans %}sylius_happy_cms.page_builder.delete{% endtrans %}
+                    </button>
+                </div>
+            </div>
+
+            {# Form section with title #}
+            <div style="flex: 1; overflow-y: auto; padding: 1rem; height: calc(100% - 47px)">
+                <h5 class="mb-3">{% trans %}sylius_happy_cms.page_builder.edit_block_title{% endtrans %}</h5>
+                {{ form_start(form, {
+                    attr: {
+                        'data-action': 'live#action',
+                        'data-live-action-param': 'save'
+                    }
+                }) }}
+                    {{ form_widget(form) }}
+                {{ form_end(form) }}
+            </div>
         </div>
 
         <div class="page-builder__editor-footer" data-loading="hide">
-            <button type="button" class="btn btn-secondary" data-action="live#action" data-live-action-param="prevent|cancel">
-                {% trans %}sylius_happy_cms.page_builder.cancel{% endtrans %}
-            </button>
             <button
                 type="submit"
                 class="btn btn-primary"
@@ -29,8 +140,8 @@
         </div>
     {% else %}
         {# Create mode: Show block selector #}
-        <div class="page-builder__editor-content" data-loading="hide">
-            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100%;">
+        <div class="page-builder__editor-content" data-loading="hide" style="flex: 1; display: flex;">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100%; width: 100%;">
 
                 <p class="h3">{% trans %}sylius_happy_cms.page_builder.add_block{% endtrans %}</p>
 

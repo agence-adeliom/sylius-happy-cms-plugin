@@ -338,3 +338,14 @@ sylius_happy_cms:
     cancel: Cancel
     save_block: Save block
     browse_blocks: Browse block list
+    published: Published
+    unpublished: Unpublished
+    publish_block: Publish block
+    unpublish_block: Unpublish block
+    position: "Position %position%/%total%"
+    move_first: Move to first
+    move_last: Move to last
+    move_to_position: "Move to position %position%"
+    delete: Delete
+    confirm_delete: Are you sure you want to delete this block?
+    edit_block_title: Fill out the form to edit the block

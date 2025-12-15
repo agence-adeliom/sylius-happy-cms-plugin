@@ -78,7 +78,7 @@ Voici les étapes pour cette partie B :
 9. [x] Pour terminer les actions entre les boutons d'édition ou ajout des blocks sur le composant bloc "BlockEditor" éditor, il faudra :
    1. Gérer le bouton "Add Block" pour appeler editBlock(null), Et editBlock(id) pour l'édition.
    2. Le composant live affichera dans un premier temps en fonction de si on est en mode ajout au modification : Ajout => Bouton browse déjà existant ; Modification => Zone de formulaire vide pour l'instant + bouton save dans le footer.
-10. [ ] Dans le pannel d'édition du bloc. J'aimerai ajuster l'UI.
+10. [x] Dans le pannel d'édition du bloc. J'aimerai ajuster l'UI.
     - Quand l'éditeur est en mode édition, ajouter un layer de toolbar liée au bloc, dans le layer page-builder__editor-content. Y ajouter quelques éléments statiques pour l'instant :
       - A gauche le nom du bloc (fin du formType)
       - au milieu 2 dropdowns :
@@ -89,6 +89,7 @@ Voici les étapes pour cette partie B :
     - Le layer page-builder__editor-footer devrait être aligné tout en bas pour que la zone page-builder__editor-content prennent toute la hauteur disponible.
     - Dans le layer page-builder__editor-content, quand le form est actif, avant le formulaire nous allons ajouter un titre pour indiquer qu'il faut renseigner le formulaire pour éditer le bloc.
     - Penser aux traductions.
-11. [ ] Revoir le système ContentBlock pour ajouter une entité séparée pour le contenu + locale. Cela permettra d'avoir une liste de block commune entre toutes les langues. Et de gérer un contenu de fallback avec la langue par défaut de sylius.
+11. [ ] Chaque block peut avoir des form theme, il faudrait les charger dynamiquement. Cf la méthode configureAdminFormThemes d'AbstractBlock. Dans templates/admin/page_builder/_block_editor.html.twig il faut ensuite charger tous les form theme. On peut prendre exemple sur la method getViewVars du fichier vendor/agence-adeliom/sylius-easy-crud-plugin/src/CrudFactory/CrudAdminFactory.php
+12. [ ] Revoir le système ContentBlock pour ajouter une entité séparée pour le contenu + locale. Cela permettra d'avoir une liste de block commune entre toutes les langues. Et de gérer un contenu de fallback avec la langue par défaut de sylius.
     - On va créer une entité src/Entity/ContentBlock/ContentBlockTranslation.php + son inte
-12. [ ] Modifier la calcul des routes, en enlevant la génération des routes de preview, désormais ça reprend les routes online auxquelles on ajoute ?preview=1. Donc plus besoin d'enregistrer en base de donnée.
+13. [ ] Modifier la calcul des routes, en enlevant la génération des routes de preview, désormais ça reprend les routes online auxquelles on ajoute ?preview=1. Donc plus besoin d'enregistrer en base de donnée.
