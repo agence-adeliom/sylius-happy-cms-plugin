@@ -32,6 +32,12 @@
         "webpackMode": "lazy",
         "fetch": "lazy",
         "enabled": true
+      },
+      "builder-block-editor": {
+        "main": "controllers/BlockEditor.js",
+        "webpackMode": "lazy",
+        "fetch": "lazy",
+        "enabled": true
       }
     }
   },

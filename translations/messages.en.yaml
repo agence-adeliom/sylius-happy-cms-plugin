@@ -331,8 +331,10 @@ sylius_happy_cms:
     add_block: Add a block
     preview: Preview
     toggle_panel: Toggle panel
+    close_panel: Close
     menu: Menu
     select_block: Select a block
     select_block_help: Please choose a block among the following collection
     cancel: Cancel
     save_block: Save block
+    browse_blocks: Browse block list

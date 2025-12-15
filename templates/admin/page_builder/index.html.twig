@@ -242,7 +242,7 @@
             position: fixed;
             right: 0;
             bottom: 0;
-            width: 400px;
+            width: 640px;
             max-width: 90vw;
             box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
             transform: translateX(100%);
@@ -509,23 +509,62 @@
             let initialIframeUrl = null; // Store the initial URL to protect against navigation
             let iframeEventsInitialized = false; // Track if events are currently initialized
 
-            if (iframe) {
-                /**
-                 * Check if the current iframe URL matches the initial URL
-                 * Returns true if valid, false otherwise
-                 */
-                function isCurrentIframeUrlValid() {
-                    if (!initialIframeUrl) return true; // Allow during first load
+            // Editor panel elements (used by editBlock function)
+            const editorPanel = document.querySelector('[data-page-builder-target="editorPanel"]');
+            const editorToggle = document.querySelector('[data-page-builder-target="editorToggle"]');
+            const editorContent = document.querySelector('[data-page-builder-target="editorContent"]');
 
-                    try {
-                        const currentUrl = new URL(iframe.contentWindow.location.href);
-                        const currentPath = currentUrl.origin + currentUrl.pathname;
-                        return currentPath === initialIframeUrl;
-                    } catch (error) {
-                        console.error('Cannot check iframe URL:', error);
-                        return false;
-                    }
+            /**
+             * Check if the current iframe URL matches the initial URL
+             * Returns true if valid, false otherwise
+             */
+            function isCurrentIframeUrlValid() {
+                if (!initialIframeUrl) return true; // Allow during first load
+
+                try {
+                    const currentUrl = new URL(iframe.contentWindow.location.href);
+                    const currentPath = currentUrl.origin + currentUrl.pathname;
+                    return currentPath === initialIframeUrl;
+                } catch (error) {
+                    console.error('Cannot check iframe URL:', error);
+                    return false;
                 }
+            }
+
+            /**
+             * Common function to handle block editing
+             * Accessible globally for all buttons (sidebar, iframe, add block)
+             */
+            function editBlock(blockId) {
+                console.log('Edit block:', blockId);
+
+                // Security check: only allow editing if iframe URL hasn't changed (skip for create mode)
+                if (blockId !== null && !isCurrentIframeUrlValid()) {
+                    console.error('Cannot edit block - iframe URL has changed');
+                    alert('The page has changed. Please reload the page builder to continue editing.');
+                    return;
+                }
+
+                if (!editorPanel) return;
+
+                // Dispatch custom event to the BlockEditor Stimulus controller
+                const pageBuilderElement = document.querySelector('[data-controller*="agence-adeliom--sylius-happy-cms-plugin--builder-block-editor"]');
+                if (pageBuilderElement) {
+                    const event = new CustomEvent('block-editor:edit', {
+                        detail: { blockId: blockId }
+                    });
+                    pageBuilderElement.dispatchEvent(event);
+                } else {
+                    console.warn('Page builder element not found');
+                }
+
+                // Open the overlay panel
+                editorPanel.classList.add('is-open');
+
+                console.log('Panel opened for block:', blockId);
+            }
+
+            if (iframe) {
 
                 // Prevent navigation in iframe and re-initialize events on reload
                 iframe.addEventListener('load', function() {
@@ -781,42 +820,6 @@
                         // Initial positioning
                         setTimeout(updateBlockHandlesPositions, 100);
 
-                        // Common function to handle block editing
-                        function editBlock(blockId) {
-                            console.log('Edit block:', blockId);
-
-                            // Security check: only allow editing if iframe URL hasn't changed
-                            if (!isIframeUrlValid()) {
-                                console.error('Cannot edit block - iframe URL has changed');
-                                alert('The page has changed. Please reload the page builder to continue editing.');
-                                return;
-                            }
-
-                            const editorPanel = document.querySelector('[data-page-builder-target="editorPanel"]');
-                            const editorToggle = document.querySelector('[data-page-builder-target="editorToggle"]');
-                            const editorContent = document.querySelector('[data-page-builder-target="editorContent"]');
-
-                            if (!editorPanel) return;
-
-                            // Find the Live Component element
-                            const liveComponent = editorContent?.querySelector('[data-controller*="live"]');
-
-                            if (liveComponent) {
-                                // Update the blockId prop on the Live Component
-                                const component = window.LiveComponents?.getComponent(liveComponent);
-                                if (component) {
-                                    component.set('blockId', blockId ? parseInt(blockId) : null);
-                                } else {
-                                    console.warn('Live Component not found or not initialized');
-                                }
-                            }
-
-                            // Open the overlay panel
-                            editorPanel.classList.add('is-open');
-
-                            console.log('Panel opened for block:', blockId);
-                        }
-
                         // Add hover effect on handles to highlight blocks in iframe
                         blockHandles.forEach(handle => {
                             const handleButton = handle.querySelector('.page-builder__block-handle-button');
@@ -901,8 +904,6 @@
             }
 
             // Editor panel toggle functionality - Overlay behavior for all screen sizes
-            const editorPanel = document.querySelector('[data-page-builder-target="editorPanel"]');
-            const editorToggle = document.querySelector('[data-page-builder-target="editorToggle"]');
             const addBlockButton = document.querySelector('[data-page-builder-target="addBlock"]');
 
             if (editorPanel && editorToggle) {
@@ -929,11 +930,12 @@
                     }
                 });
 
-                // Add block button - open panel
+                // Add block button - open panel in create mode
                 if (addBlockButton) {
                     addBlockButton.addEventListener('click', function(e) {
                         e.preventDefault();
-                        editorPanel.classList.toggle('is-open');
+                        // Call editBlock with null to enter "create mode"
+                        editBlock(null);
                     });
                 }
             }

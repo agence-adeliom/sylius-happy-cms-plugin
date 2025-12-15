@@ -199,6 +199,8 @@ services:
       arguments:
           - "@sylius.happy_cms.block_collection"
           - "@doctrine.orm.entity_manager"
+          - "@parameter_bag"
       tags:
           - { name: sylius.live_component.admin, key: happycms-builder-block-editor, template: '@SyliusHappyCMSPlugin/admin/page_builder/_block_editor.html.twig' }
-  
+      calls:
+          - setLiveResponder: ['@ux.live_component.live_responder']

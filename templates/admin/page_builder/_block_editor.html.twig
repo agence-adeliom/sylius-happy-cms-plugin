@@ -1,9 +1,9 @@
-{% trans_default_domain 'SyliusHappyCMSPlugin' %}
 
-<div {{ attributes }}>
+
+<div {{ attributes.defaults(stimulus_controller('@agence-adeliom/sylius-happy-cms-plugin/builder-block-editor', {})) }}>
     {% if this.hasBlock %}
         {# Edit mode: Show form for existing block #}
-        <div class="page-builder__editor-content">
+        <div class="page-builder__editor-content" data-loading="hide">
             {{ form_start(form, {
                 attr: {
                     'data-action': 'live#action',
@@ -14,7 +14,7 @@
             {{ form_end(form) }}
         </div>
 
-        <div class="page-builder__editor-footer">
+        <div class="page-builder__editor-footer" data-loading="hide">
             <button type="button" class="btn btn-secondary" data-action="live#action" data-live-action-param="prevent|cancel">
                 {% trans %}sylius_happy_cms.page_builder.cancel{% endtrans %}
             </button>
@@ -24,13 +24,16 @@
                 data-action="live#action"
                 data-live-action-param="prevent|save"
             >
-                {% trans %}sylius_happy_cms.page_builder.save{% endtrans %}
+                {% trans %}sylius_happy_cms.page_builder.save_block{% endtrans %}
             </button>
         </div>
     {% else %}
         {# Create mode: Show block selector #}
-        <div class="page-builder__editor-content">
-            <div style="display: flex; align-items: center; justify-content: center; min-height: 400px;">
+        <div class="page-builder__editor-content" data-loading="hide">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100%;">
+
+                <p class="h3">{% trans %}sylius_happy_cms.page_builder.add_block{% endtrans %}</p>
+
                 <button
                     type="button"
                     class="btn btn-primary btn-lg"

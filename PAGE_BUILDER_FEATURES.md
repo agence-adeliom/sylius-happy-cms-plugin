@@ -75,10 +75,20 @@ Voici les étapes pour cette partie B :
    via la fonction edit bloc. Pour le composant live, il est soit lié à un block existant alors on charge le formulaire dans sa zone centrale et dans le bouton on a le bouton submit.
    A l'inverse, dans le cas où aucun block type est lié, cela signifie qu'on vient de cliquer sur le bouton d'ajout d'un block. Dans ce cas on affiche un bouton centré en hauteur pour
    permet de "parcourir les blocks existant" (on verra plus tard pour l'interface de choix des blocs existants).
-9. [ ] Pour terminer les actions sur le composant bloc éditor, il faudra :
-   1. Gérer le bouton "Add Block" pour appeler editBlock(null)
-   2. Implémenter l'interface de sélection des blocs (pour le mode création)
-   3. Gérer l'événement block:saved pour recharger l'iframe après sauvegarde
-   4. Ajouter les traductions manquantes
-10. [ ] Revoir le système ContentBlock pour ajouter une entité séparée pour le contenu + locale. Cela permettra d'avoir une liste de block commune entre toutes les langues. Et de gérer un contenu de fallback avec la langue par défaut de sylius.
-11. [ ] Modifier la calcul des routes, en enlevant la génération des routes de preview, désormais ça reprend les routes online auxquelles on ajoute ?preview=1. Donc plus besoin d'enregistrer en base de donnée.
+9. [x] Pour terminer les actions entre les boutons d'édition ou ajout des blocks sur le composant bloc "BlockEditor" éditor, il faudra :
+   1. Gérer le bouton "Add Block" pour appeler editBlock(null), Et editBlock(id) pour l'édition.
+   2. Le composant live affichera dans un premier temps en fonction de si on est en mode ajout au modification : Ajout => Bouton browse déjà existant ; Modification => Zone de formulaire vide pour l'instant + bouton save dans le footer.
+10. [ ] Dans le pannel d'édition du bloc. J'aimerai ajuster l'UI.
+    - Quand l'éditeur est en mode édition, ajouter un layer de toolbar liée au bloc, dans le layer page-builder__editor-content. Y ajouter quelques éléments statiques pour l'instant :
+      - A gauche le nom du bloc (fin du formType)
+      - au milieu 2 dropdowns :
+        - 1 pour gérer la visilité du bloc, publié / non publié
+        - 1 autre pour gérer le déplacement. Ex: "Position 1/X". Et dans les valeurs on pourrait avoir "Déplacer en premier", "Déplacer en dernier", "Déplacer en position 1/X", etc.. en allant de 1 à X.
+      - A droite un bouton supprimer avec une confirmation.
+    Pour rappel nous sommes dans le context du component Live BlockEditor.
+    - Le layer page-builder__editor-footer devrait être aligné tout en bas pour que la zone page-builder__editor-content prennent toute la hauteur disponible.
+    - Dans le layer page-builder__editor-content, quand le form est actif, avant le formulaire nous allons ajouter un titre pour indiquer qu'il faut renseigner le formulaire pour éditer le bloc.
+    - Penser aux traductions.
+11. [ ] Revoir le système ContentBlock pour ajouter une entité séparée pour le contenu + locale. Cela permettra d'avoir une liste de block commune entre toutes les langues. Et de gérer un contenu de fallback avec la langue par défaut de sylius.
+    - On va créer une entité src/Entity/ContentBlock/ContentBlockTranslation.php + son inte
+12. [ ] Modifier la calcul des routes, en enlevant la génération des routes de preview, désormais ça reprend les routes online auxquelles on ajoute ?preview=1. Donc plus besoin d'enregistrer en base de donnée.

@@ -13,6 +13,7 @@
     "@agence-adeliom/sylius-happy-cms-assets" : "file:./assets"
   },
   "devDependencies": {
+    "autoprefixer": "^10.4.23",
     "@symfony/webpack-encore": "^2.0",
     "buffer": "^6.0.3",
     "eslint": "^8.56.0",
@@ -78,6 +79,12 @@
       },
       "menu-item-tree-delete": {
         "main": "controllers/DeleteMenuItemController.js",
+        "webpackMode": "lazy",
+        "fetch": "lazy",
+        "enabled": true
+      },
+      "builder-block-editor": {
+        "main": "controllers/BlockEditor.js",
         "webpackMode": "lazy",
         "fetch": "lazy",
         "enabled": true
