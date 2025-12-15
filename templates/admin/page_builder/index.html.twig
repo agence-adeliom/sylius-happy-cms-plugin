@@ -11,6 +11,26 @@
 {% block stylesheets %}
     {{ parent() }}
 
+    {# Inject block-specific CSS assets #}
+    {% if blockAssets is defined %}
+        {% for cssAsset in blockAssets.css %}
+            {% if cssAsset.getPackageName is defined %}
+                <link rel="stylesheet" href="{{ asset(cssAsset.value, cssAsset.getPackageName) }}">
+            {% else %}
+                <link rel="stylesheet" href="{{ asset(cssAsset) }}">
+            {% endif %}
+        {% endfor %}
+
+        {# Inject block-specific Webpack Encore assets (CSS) #}
+        {% for webpackAsset in blockAssets.webpack %}
+            {% if webpackAsset.getWebpackPackageName is defined %}
+                {{ encore_entry_link_tags(webpackAsset.value, webpackAsset.getWebpackPackageName) }}
+            {% else %}
+                {{ encore_entry_link_tags(webpackAsset) }}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
     <style>
         /* Page builder specific styles */
         .content-wrapper {
@@ -431,6 +451,26 @@
 
 {% block javascripts %}
     {{ parent() }}
+
+    {# Inject block-specific JS assets #}
+    {% if blockAssets is defined %}
+        {% for jsAsset in blockAssets.js %}
+            {% if jsAsset.getPackageName is defined %}
+                <script src="{{ asset(jsAsset.value, jsAsset.getPackageName) }}"></script>
+            {% else %}
+                <script src="{{ asset(jsAsset) }}"></script>
+            {% endif %}
+        {% endfor %}
+
+        {# Inject block-specific Webpack Encore assets (JS) #}
+        {% for webpackAsset in blockAssets.webpack %}
+            {% if webpackAsset.getWebpackPackageName is defined %}
+                {{ encore_entry_script_tags(webpackAsset.value, webpackAsset.getWebpackPackageName) }}
+            {% else %}
+                {{ encore_entry_script_tags(webpackAsset) }}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
 
     <script>
         /**

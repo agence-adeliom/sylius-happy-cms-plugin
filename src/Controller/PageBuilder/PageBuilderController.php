@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Controller\PageBuilder;
 
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\AssetDto;
+use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentBlockInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableInterface;
+use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockCollection;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Sylius\Component\Locale\Provider\LocaleProviderInterface;
@@ -22,6 +25,7 @@ class PageBuilderController extends AbstractController
         private readonly EntityManagerInterface $entityManager,
         private readonly ParameterBagInterface $parameterBag,
         private readonly LocaleProviderInterface $localeProvider,
+        private readonly BlockCollection $blockCollection,
     ) {
     }
 
@@ -53,13 +57,78 @@ class PageBuilderController extends AbstractController
         // In preview mode, we show all blocks (published and unpublished) for the given locale
         $contentBlocks = $entity->getContentBlocks($locale);
 
+        // Collect all assets from all blocks in the page
+        $assets = $this->collectBlockAssets($contentBlocks);
+
         return $this->render('@SyliusHappyCMSPlugin/admin/page_builder/index.html.twig', [
             'entity' => $entity,
             'resource' => $resource,
             'contentBlocks' => $contentBlocks,
             'locale' => $locale,
             'availableLocales' => $availableLocales,
+            'blockAssets' => $assets,
         ]);
+    }
+
+    /**
+     * Collect all assets from all blocks in the page.
+     *
+     * @param iterable<ContentBlockInterface> $contentBlocks
+     *
+     * @return array{css: array<string|AssetDto>, js: array<string|AssetDto>, webpack: array<string|AssetDto>}
+     */
+    private function collectBlockAssets(iterable $contentBlocks): array
+    {
+        $assets = [
+            'css' => [],
+            'js' => [],
+            'webpack' => [],
+        ];
+
+        $blocks = $this->blockCollection->getBlocks();
+
+        foreach ($contentBlocks as $contentBlock) {
+            $blockType = $contentBlock->getType();
+            if (null === $blockType || !isset($blocks[$blockType])) {
+                continue;
+            }
+
+            $blockConfig = $blocks[$blockType];
+
+            // Get assets from the block type
+            if (method_exists($blockConfig, 'configureAdminAssets')) {
+                $blockAssets = $blockConfig->configureAdminAssets();
+
+                // Merge CSS assets
+                if (isset($blockAssets['css']) && is_array($blockAssets['css'])) {
+                    foreach ($blockAssets['css'] as $asset) {
+                        // Use asset value as key to avoid duplicates
+                        $key = is_object($asset) && method_exists($asset, 'getValue') ? $asset->getValue() : (string) $asset;
+                        $assets['css'][$key] = $asset->getAsDto();
+                    }
+                }
+
+                // Merge JS assets
+                if (isset($blockAssets['js']) && is_array($blockAssets['js'])) {
+                    foreach ($blockAssets['js'] as $asset) {
+                        $key = is_object($asset) && method_exists($asset, 'getValue') ? $asset->getValue() : (string) $asset;
+                        $assets['js'][$key] = $asset->getAsDto();
+                    }
+                }
+
+                // Merge Webpack assets
+                if (isset($blockAssets['webpack']) && is_array($blockAssets['webpack'])) {
+                    foreach ($blockAssets['webpack'] as $asset) {
+                        $key = is_object($asset) && method_exists($asset, 'getValue') ? $asset->getValue() : (string) $asset;
+                        $assets['webpack'][$key] = $asset->getAsDto();
+                    }
+                }
+            }
+        }
+
+        dump($assets);
+
+        return $assets;
     }
 
     /**

@@ -1,6 +1,8 @@
 {% form_theme form with this.formThemes %}
 
-<div {{ attributes.defaults(stimulus_controller('@agence-adeliom/sylius-happy-cms-plugin/builder-block-editor', {})) }}
+<div {{ attributes.defaults(stimulus_controller('@agence-adeliom/sylius-happy-cms-plugin/builder-block-editor', {
+    blockId: this.blockId
+})) }}
      style="display: flex; flex-direction: column; height: 100%;">
     {% if this.hasBlock %}
         {# Edit mode: Show form for existing block #}
