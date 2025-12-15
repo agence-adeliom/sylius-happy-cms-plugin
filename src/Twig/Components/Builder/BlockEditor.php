@@ -41,6 +41,11 @@ class BlockEditor extends AbstractController
 
     public ContentEditableInterface $entity;
 
+    /**
+     * @var string[]
+     */
+    private array $formThemes = [];
+
     public function __construct(
         private readonly BlockCollection $blockCollection,
         private readonly EntityManagerInterface $entityManager,
@@ -256,12 +261,31 @@ class BlockEditor extends AbstractController
         ]);
     }
 
+    /**
+     * Get form themes for the current block type.
+     *
+     * @return string[]
+     */
+    public function getFormThemes(): array
+    {
+        return array_values(
+            array_unique(
+                array_merge(
+                    ['@SyliusAdmin/shared/form_theme.html.twig'],
+                    $this->formThemes,
+                ),
+            ),
+        );
+    }
+
     protected function instantiateForm(): FormInterface
     {
         $block = $this->getBlock();
 
         if (null === $block) {
             // Create mode: return empty form (will show "Browse Blocks" button)
+            $this->formThemes = [];
+
             return $this->createForm(EmptyBlockType::class, []);
         }
 
@@ -278,6 +302,13 @@ class BlockEditor extends AbstractController
 
         $blockConfig = $blocks[$blockType];
         $formClass = $blockConfig::class;
+
+        // Get form themes from the block type
+        if (method_exists($blockConfig, 'configureAdminFormThemes')) {
+            $this->formThemes = $blockConfig->configureAdminFormThemes();
+        } else {
+            $this->formThemes = [];
+        }
 
         // Use draft data for the form
         $draftData = $block->getDraftData() ?? [];
