@@ -65,3 +65,13 @@ if (document.readyState == 'loading') {
   loadMediaManager();
 }
 
+// When render in the page builder
+window.addEventListener('happy-cms:block-editor:form-loaded', (event) => {
+  console.log('happy-cms:block-editor:form-loaded');
+  var vueElements = document.querySelectorAll(".happy-cms-media-widget");
+  vueElements.forEach(vueElement => {
+    if(vueElement && !vueElement.__vue__ && window.Vue){
+      new window.Vue({ el: vueElement });
+    }
+  })
+});

@@ -30,4 +30,12 @@ Encore
     .addEntry('accordion-block-type', './assets/blocks/accordion-block-type.js')
 ;
 
-module.exports = Encore.getWebpackConfig();
+const webpackConfig = Encore.getWebpackConfig();
+
+// Configure webpack to use browser build for plyr instead of ES module sources
+webpackConfig.resolve.alias = {
+    ...webpackConfig.resolve.alias,
+    'plyr': path.resolve(__dirname, 'node_modules/plyr/dist/plyr.min.js')
+};
+
+module.exports = webpackConfig;

@@ -1,14 +1,14 @@
 .modal{
-  @apply hidden items-center overflow-hidden fixed justify-center inset-0;
+  @apply hidden items-start overflow-hidden fixed inset-0;
   z-index: 10000050;
   &-background {
-    @apply fixed inset-0 bg-black bg-opacity-90;
+    @apply fixed inset-0 bg-black bg-opacity-50;
   }
   &.is-active {
     @apply flex p-3 pb-0;
   }
   &-close{
-    @apply select-none cursor-pointer pointer-events-auto inline-block flex-grow-0 flex-shrink-0 h-12 w-12 outline-none fixed top-3 right-3 align-top appearance-none bg-theme-75 bg-opacity-20 rounded-full border-none;
+    @apply select-none cursor-pointer pointer-events-auto inline-block flex-grow-0 flex-shrink-0 h-8 w-8 outline-none fixed top-3 right-3 align-top appearance-none bg-theme-75 bg-opacity-20 rounded-full border-none;
     font-size: 0;
 
     &:before,
@@ -38,7 +38,7 @@
     -ms-overflow-y: visible;
 
     @screen sm{
-      margin: 0 auto;
+      margin: 0;
       width: 640px;
     }
 
@@ -194,10 +194,10 @@
 
 .modal-manager__Inmodal {
   > .modal-content {
-    width: 95%;
+    width: calc(100% - 45px);
 
     @screen md{
-      width: 85%;
+      width: calc(100% - 45px);
     }
   }
 

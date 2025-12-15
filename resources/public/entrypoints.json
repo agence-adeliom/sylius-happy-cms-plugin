@@ -5,25 +5,25 @@
         "/bundles/syliushappycmsplugin/flexible-content.4e7e726a.css"
       ],
       "js": [
-        "/bundles/syliushappycmsplugin/flexible-content.77bc2056.js"
+        "/bundles/syliushappycmsplugin/flexible-content.26e202f1.js"
       ]
     },
     "media-form": {
       "css": [
-        "/bundles/syliushappycmsplugin/media-form.293b8a4e.css"
+        "/bundles/syliushappycmsplugin/media-form.1c02ab1e.css"
       ],
       "js": [
-        "/bundles/syliushappycmsplugin/media-form.c42b0270.js"
+        "/bundles/syliushappycmsplugin/media-form.4389a4df.js"
       ]
     },
     "seo-block-type": {
       "js": [
-        "/bundles/syliushappycmsplugin/seo-block-type.33f33775.js"
+        "/bundles/syliushappycmsplugin/seo-block-type.e8940e1c.js"
       ]
     },
     "accordion-block-type": {
       "js": [
-        "/bundles/syliushappycmsplugin/accordion-block-type.63a6620c.js"
+        "/bundles/syliushappycmsplugin/accordion-block-type.961856ec.js"
       ]
     }
   }

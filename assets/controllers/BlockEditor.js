@@ -15,8 +15,6 @@ export default class extends Controller {
   connect() {
     console.log('BlockEditor controller connected');
 
-    console.log(this.element);
-
     // Listen for block:saved event from Live Component
     this.element.addEventListener('block:saved', this.onBlockSaved.bind(this));
 
@@ -25,6 +23,12 @@ export default class extends Controller {
 
     // Listen for Live Component render finished event to dispatch form loaded event
     this.element.addEventListener('live:render:finished', this.onRenderFinished.bind(this));
+
+    // Trigger form loaded event on initial load
+    // Use requestAnimationFrame to ensure DOM is fully ready
+    requestAnimationFrame(() => {
+      this.onRenderFinished();
+    });
   }
 
   disconnect() {
@@ -40,6 +44,7 @@ export default class extends Controller {
     console.log('dsds');
     const { blockId } = event.detail;
     await this.setBlockId(blockId);
+    this.onRenderFinished();
   }
 
   /**

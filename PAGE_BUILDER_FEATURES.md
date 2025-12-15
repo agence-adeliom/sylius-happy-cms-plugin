@@ -91,9 +91,10 @@ Voici les étapes pour cette partie B :
     - Penser aux traductions.
 11. [x] Chaque block peut avoir des form theme, il faudrait les charger dynamiquement. Cf la méthode configureAdminFormThemes d'AbstractBlock. Dans templates/admin/page_builder/_block_editor.html.twig il faut ensuite charger tous les form theme. On peut prendre exemple sur la method getViewVars du fichier vendor/agence-adeliom/sylius-easy-crud-plugin/src/CrudFactory/CrudAdminFactory.php
 12. [x] Chaque block peut avoir des assets spécifiques, il faudrait les charger dynamiquement. Comme pour les form theme, il faudrait les charger dynamiquement. Voir manageFieldAssets du fichier vendor/agence-adeliom/sylius-easy-crud-plugin/src/CrudFactory/CrudAdminFactory.php, puis getViewVars pour l'injection dans les vues.
-13. [ ] Revoir le système ContentBlock pour ajouter une entité séparée pour le contenu + locale. Cela permettra d'avoir une liste de block commune entre toutes les langues. Et de gérer un contenu de fallback avec la langue par défaut de sylius.
+13. [x] L'event live:render:finished du BlockEditor.js n'est jamais appelé, il faudrait aussi l'appeler au premier chargement.
+14. [ ] Revoir le système ContentBlock pour ajouter une entité séparée pour le contenu + locale. Cela permettra d'avoir une liste de block commune entre toutes les langues. Et de gérer un contenu de fallback avec la langue par défaut de sylius.
     - On va créer une entité src/Entity/ContentBlock/ContentBlockTranslation.php + son inte
-14. [ ] Modifier la calcul des routes, en enlevant la génération des routes de preview, désormais ça reprend les routes online auxquelles on ajoute ?preview=1. Donc plus besoin d'enregistrer en base de donnée.
+15. [ ] Modifier la calcul des routes, en enlevant la génération des routes de preview, désormais ça reprend les routes online auxquelles on ajoute ?preview=1. Donc plus besoin d'enregistrer en base de donnée.
 
 
 Todo :
