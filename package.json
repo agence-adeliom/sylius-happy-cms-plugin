@@ -41,7 +41,7 @@
     "lottie-web": "^5.7.11",
     "music-metadata-browser": "^2.2.6",
     "notie": "^4.3.1",
-    "plyr": "^3.6.8",
+    "plyr": "^3.7.8",
     "postcss-loader": "^6.2.1",
     "tailwindcss": "^2.2.4",
     "vue": "^2.6.14",
