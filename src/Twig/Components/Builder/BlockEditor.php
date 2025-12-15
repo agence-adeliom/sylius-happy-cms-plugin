@@ -10,24 +10,19 @@ use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableInterface;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockCollection;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Adeliom\SyliusHappyCMSPlugin\Form\Block\EmptyBlockType;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\PersistentCollection;
 use Sylius\Resource\Model\ResourceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\ComponentToolsTrait;
 use Symfony\UX\LiveComponent\ComponentWithFormTrait;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
-use Symfony\UX\TwigComponent\Attribute\PostMount;
 
 class BlockEditor extends AbstractController
 {
@@ -50,7 +45,6 @@ class BlockEditor extends AbstractController
         private readonly BlockCollection $blockCollection,
         private readonly EntityManagerInterface $entityManager,
         private readonly ParameterBagInterface $parameterBag,
-
     ) {
     }
 
@@ -84,7 +78,7 @@ class BlockEditor extends AbstractController
 
         return $blocks->filter(function (ContentBlockInterface $block) {
             return $block->getId() === $this->blockId;
-        })->first();;
+        })->first();
     }
 
     public function hasBlock(): bool
@@ -149,7 +143,7 @@ class BlockEditor extends AbstractController
         }
 
         $block->setPreviewPublishState(
-            $block->isPreviewPublished() ? ThreeStateStatusEnum::UNPUBLISHED : ThreeStateStatusEnum::PUBLISHED
+            $block->isPreviewPublished() ? ThreeStateStatusEnum::UNPUBLISHED : ThreeStateStatusEnum::PUBLISHED,
         );
         $this->entityManager->flush();
 
