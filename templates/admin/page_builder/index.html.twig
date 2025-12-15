@@ -231,67 +231,37 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        /* Editor panel (right side) */
+        /* Editor panel (right side) - Overlay behavior for all screen sizes */
         .page-builder__editor-panel {
             background: #fff;
             border-left: 1px solid #dee2e6;
             display: flex;
             flex-direction: column;
-            transition: transform 0.3s ease, width 0.3s ease;
+            transition: transform 0.3s ease;
             z-index: 50;
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            width: 400px;
+            max-width: 90vw;
+            box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
+            transform: translateX(100%);
         }
 
-        /* Responsive behavior */
+        .page-builder__editor-panel.is-open {
+            transform: translateX(0);
+        }
+
+        /* Adjust top position based on header height */
         @media (max-width: 1200px) {
-            /* Panel as overlay on smaller screens */
             .page-builder__editor-panel {
-                top: 193px; /* Below toolbar */
+                top: 193px; /* Below toolbar on small screens */
             }
         }
 
-        /* Responsive behavior */
-        @media (min-width: 1200px) and (max-width: 1979px) {
-            /* Panel as overlay on smaller screens */
+        @media (min-width: 1200px) {
             .page-builder__editor-panel {
-                top: 120px; /* Below toolbar */
-            }
-        }
-
-        /* Responsive behavior */
-        @media (max-width: 1979px) {
-            /* Panel as overlay on smaller screens */
-            .page-builder__editor-panel {
-                position: fixed;
-                right: 0;
-                bottom: 0;
-                width: 400px;
-                max-width: 90vw;
-                box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
-                transform: translateX(100%);
-            }
-
-            .page-builder__editor-panel.is-open {
-                transform: translateX(0);
-            }
-        }
-
-        @media (min-width: 1980px) {
-            /* Fixed column on large screens */
-            .page-builder__editor-panel {
-                width: 33.333%;
-                min-width: 400px;
-                max-width: 600px;
-                flex-shrink: 0;
-            }
-
-            .page-builder__editor-panel.is-collapsed {
-                width: 48px;
-                min-width: 48px;
-            }
-
-            .page-builder__editor-panel.is-collapsed .page-builder__editor-content,
-            .page-builder__editor-panel.is-collapsed .page-builder__editor-footer {
-                display: none;
+                top: 120px; /* Below toolbar on larger screens */
             }
         }
 
@@ -423,7 +393,65 @@
     {{ parent() }}
 
     <script>
-        // Basic JavaScript for resolution switching and locale management
+        /**
+         * =========================================================================
+         * PAGE BUILDER - JavaScript Architecture
+         * =========================================================================
+         *
+         * This script manages the interactive page builder interface with an iframe
+         * preview system and real-time block editing capabilities.
+         *
+         * ARCHITECTURE OVERVIEW:
+         * ----------------------
+         *
+         * 1. TOOLBAR CONTROLS (Lines ~430-477)
+         *    - Locale switching with confirmation dialog
+         *    - Resolution selector (desktop/tablet/mobile)
+         *    - Iframe wrapper responsive classes
+         *
+         * 2. IFRAME SECURITY & INITIALIZATION (Lines ~479-525)
+         *    - Initial URL storage for navigation protection
+         *    - URL validation system to prevent editing wrong pages
+         *    - Load event handler with authorization checks
+         *
+         * 3. IFRAME BLOCK EVENTS (Lines ~528-623)
+         *    Function: initIframeBlockEvents()
+         *    - Reinitializable event handlers for elements INSIDE the iframe
+         *    - Navigation blocking (links and forms)
+         *    - CSS injection for hover effects
+         *    - Block hover events (iframe → sidebar sync)
+         *    - Edit button click handlers
+         *    ⚠️ These events are RE-ATTACHED when returning to authorized URL
+         *
+         * 4. SIDEBAR SYNCHRONIZATION (Lines ~628-828)
+         *    - Block handle positioning based on iframe scroll
+         *    - URL validation wrapper: isIframeUrlValid()
+         *    - Real-time position updates (throttled)
+         *    - Viewport visibility detection
+         *    - Block handle hover events (sidebar → iframe sync)
+         *    - Edit block function with URL protection
+         *    ⚠️ These events are INITIALIZED ONCE (no duplication)
+         *
+         * 5. URL MONITORING (Lines ~840-867)
+         *    - Active surveillance every 500ms
+         *    - Detects navigation away from authorized URL
+         *    - Auto-reinitializes events when returning to authorized URL
+         *    - Triggers iframe 'load' event to refresh handlers
+         *
+         * 6. EDITOR PANEL (Lines ~904-940)
+         *    - Simple overlay toggle for ALL screen sizes
+         *    - Close on outside click / Escape key
+         *    - Add block button integration
+         *
+         * SECURITY MODEL:
+         * ---------------
+         * - initialIframeUrl: Stores the authorized page URL (origin + pathname)
+         * - isCurrentIframeUrlValid(): Validates URL before any iframe operation
+         * - isIframeUrlValid(): Validates URL before DOM manipulations
+         * - All interactive features are disabled if URL doesn't match
+         *
+         * =========================================================================
+         */
         document.addEventListener('DOMContentLoaded', function() {
             const localeDropdown = document.getElementById('localeDropdown');
             const localeItems = document.querySelectorAll('.dropdown-item[data-locale]');
@@ -478,70 +506,205 @@
 
             // Load the preview URL in the iframe
             const iframe = document.querySelector('[data-page-builder-target="iframe"]');
+            let initialIframeUrl = null; // Store the initial URL to protect against navigation
+            let iframeEventsInitialized = false; // Track if events are currently initialized
 
             if (iframe) {
-                // Prevent navigation in iframe
+                /**
+                 * Check if the current iframe URL matches the initial URL
+                 * Returns true if valid, false otherwise
+                 */
+                function isCurrentIframeUrlValid() {
+                    if (!initialIframeUrl) return true; // Allow during first load
+
+                    try {
+                        const currentUrl = new URL(iframe.contentWindow.location.href);
+                        const currentPath = currentUrl.origin + currentUrl.pathname;
+                        return currentPath === initialIframeUrl;
+                    } catch (error) {
+                        console.error('Cannot check iframe URL:', error);
+                        return false;
+                    }
+                }
+
+                // Prevent navigation in iframe and re-initialize events on reload
                 iframe.addEventListener('load', function() {
                     console.log('Iframe loaded. URL:', iframe.src);
                     console.log('Iframe location:', iframe.contentWindow?.location?.href);
+
                     try {
                         const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-                        console.log('Successfully accessed iframe document');
+                        const iframeWindow = iframe.contentWindow;
 
-                        // Intercept all link clicks
-                        iframeDocument.addEventListener('click', function(e) {
-                            const target = e.target.closest('a');
-                            if (target && target.href) {
+                        // Store initial URL on first load (without query params and hash for comparison)
+                        if (!initialIframeUrl) {
+                            const url = new URL(iframeWindow.location.href);
+                            // Store pathname only (ignore query params and hash)
+                            initialIframeUrl = url.origin + url.pathname;
+                            console.log('Initial iframe URL stored:', initialIframeUrl);
+                        }
+
+                        // Check if the loaded URL is the authorized one
+                        if (!isCurrentIframeUrlValid()) {
+                            console.warn('Iframe loaded with unauthorized URL, skipping event initialization');
+                            iframeEventsInitialized = false;
+                            return;
+                        }
+
+                        console.log('Successfully accessed iframe document - initializing events');
+
+                        /**
+                         * Initialize events on elements INSIDE the iframe
+                         * This function can be called multiple times when returning to the authorized URL
+                         */
+                        function initIframeBlockEvents() {
+                            if (!iframeDocument) return;
+
+                            console.log('Initializing iframe block events...');
+
+                            // Intercept all link clicks
+                            iframeDocument.addEventListener('click', function(e) {
+                                const target = e.target.closest('a');
+                                if (target && target.href) {
+                                    e.preventDefault();
+                                    console.log('Navigation blocked in preview:', target.href);
+                                    return false;
+                                }
+                            }, true);
+
+                            // Intercept form submissions
+                            iframeDocument.addEventListener('submit', function(e) {
                                 e.preventDefault();
-                                console.log('Navigation blocked in preview:', target.href);
+                                console.log('Form submission blocked in preview');
                                 return false;
-                            }
-                        }, true);
+                            }, true);
 
-                        // Intercept form submissions
-                        iframeDocument.addEventListener('submit', function(e) {
-                            e.preventDefault();
-                            console.log('Form submission blocked in preview');
-                            return false;
-                        }, true);
 
-                        // Inject CSS for hover effect in iframe
-                        const style = iframeDocument.createElement('style');
-                        style.textContent = `
-                            /* Show outline and shadow on hover */
-                            .content-block-wrapper.is-hovered {
-                                outline: 3px solid #1e74fd !important;
-                                outline-offset: -3px !important;
-                                box-shadow: 0 0 0 3px rgba(30, 116, 253, 0.2) !important;
-                                z-index: 100 !important;
+                            // Inject CSS for hover effect in iframe (only if not already present)
+                            if (!iframeDocument.getElementById('page-builder-styles')) {
+                                const style = iframeDocument.createElement('style');
+                                style.id = 'page-builder-styles';
+                                style.textContent = `
+                                    /* Show outline and shadow on hover */
+                                    .content-block-wrapper.is-hovered {
+                                        outline: 3px solid #1e74fd !important;
+                                        outline-offset: -3px !important;
+                                        box-shadow: 0 0 0 3px rgba(30, 116, 253, 0.2) !important;
+                                        z-index: 100 !important;
+                                    }
+
+                                    /* Show hover overlay when hovering */
+                                    .content-block-wrapper.is-hovered .content-block-hover-overlay {
+                                        display: flex !important;
+                                    }
+
+                                    /* Hide hover overlay for unpublished blocks (they have their own overlay) */
+                                    .content-block-wrapper[data-published="false"] .content-block-hover-overlay {
+                                        display: none !important;
+                                    }
+
+                                    /* Button hover effect */
+                                    .content-block-edit-button:hover {
+                                        background: #0056d6 !important;
+                                        transform: translateY(-2px) !important;
+                                        box-shadow: 0 6px 16px rgba(30, 116, 253, 0.5) !important;
+                                    }
+                                `;
+                                iframeDocument.head.appendChild(style);
                             }
 
-                            /* Show hover overlay when hovering */
-                            .content-block-wrapper.is-hovered .content-block-hover-overlay {
-                                display: flex !important;
-                            }
+                            // Add hover effect on blocks in iframe to highlight handles in sidebar (reverse)
+                            const contentBlocks = iframeDocument.querySelectorAll('.content-block-wrapper[data-block-id]');
+                            contentBlocks.forEach(block => {
+                                block.addEventListener('mouseenter', function() {
+                                    // Security check: only apply hover if iframe URL hasn't changed
+                                    if (!isIframeUrlValid()) {
+                                        return;
+                                    }
 
-                            /* Hide hover overlay for unpublished blocks (they have their own overlay) */
-                            .content-block-wrapper[data-published="false"] .content-block-hover-overlay {
-                                display: none !important;
-                            }
+                                    const blockId = this.dataset.blockId;
+                                    const handle = document.querySelector(`.page-builder__block-handle[data-block-id="${blockId}"]`);
+                                    if (handle) {
+                                        const handleButton = handle.querySelector('.page-builder__block-handle-button');
+                                        if (handleButton) {
+                                            handleButton.classList.add('is-hovered');
+                                        }
+                                        // Also highlight the block itself
+                                        this.classList.add('is-hovered');
+                                    }
+                                });
 
-                            /* Button hover effect */
-                            .content-block-edit-button:hover {
-                                background: #0056d6 !important;
-                                transform: translateY(-2px) !important;
-                                box-shadow: 0 6px 16px rgba(30, 116, 253, 0.5) !important;
-                            }
-                        `;
-                        iframeDocument.head.appendChild(style);
+                                block.addEventListener('mouseleave', function() {
+                                    // Security check: only apply hover if iframe URL hasn't changed
+                                    if (!isIframeUrlValid()) {
+                                        return;
+                                    }
+
+                                    const blockId = this.dataset.blockId;
+                                    const handle = document.querySelector(`.page-builder__block-handle[data-block-id="${blockId}"]`);
+                                    if (handle) {
+                                        const handleButton = handle.querySelector('.page-builder__block-handle-button');
+                                        if (handleButton) {
+                                            handleButton.classList.remove('is-hovered');
+                                        }
+                                        // Remove highlight from block
+                                        this.classList.remove('is-hovered');
+                                    }
+                                });
+                            });
+
+                            // Add click handler for edit buttons in iframe (both hover overlay and unpublished overlay)
+                            const editButtons = iframeDocument.querySelectorAll('.content-block-edit-button');
+                            editButtons.forEach(button => {
+                                button.addEventListener('click', function(e) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    const blockId = this.dataset.blockId;
+                                    editBlock(blockId);
+                                });
+                            });
+
+                            iframeEventsInitialized = true;
+                            console.log('Iframe block events initialized');
+                        }
+
+                        // Initialize iframe events for the first time
+                        initIframeBlockEvents();
 
                         // Synchronize block handles positions with iframe scroll
                         const blockHandles = document.querySelectorAll('.page-builder__block-handle');
                         const blockHandlesContainer = document.querySelector('[data-page-builder-target="blockHandles"]');
                         const sidebar = document.querySelector('[data-page-builder-target="sidebar"]');
-                        const iframeWindow = iframe.contentWindow;
+
+                        /**
+                         * Check if the iframe URL has changed from the initial URL
+                         * Returns true if the URL is still the same (safe to operate), false otherwise
+                         */
+                        function isIframeUrlValid() {
+                            if (!initialIframeUrl) return true; // Allow during initialization
+
+                            try {
+                                const currentUrl = new URL(iframe.contentWindow.location.href);
+                                const currentPath = currentUrl.origin + currentUrl.pathname;
+
+                                if (currentPath !== initialIframeUrl) {
+                                    console.warn('Iframe URL has changed! Expected:', initialIframeUrl, 'Got:', currentPath);
+                                    return false;
+                                }
+                                return true;
+                            } catch (error) {
+                                // Cannot access URL (cross-origin), assume it's invalid
+                                console.error('Cannot check iframe URL:', error);
+                                return false;
+                            }
+                        }
 
                         function updateBlockHandlesPositions() {
+                            // Security check: only update if iframe URL hasn't changed
+                            if (!isIframeUrlValid()) {
+                                console.warn('Skipping block handles update - iframe URL has changed');
+                                return;
+                            }
                             if (!blockHandlesContainer) return;
 
                             // Get all content blocks in the iframe
@@ -622,6 +785,13 @@
                         function editBlock(blockId) {
                             console.log('Edit block:', blockId);
 
+                            // Security check: only allow editing if iframe URL hasn't changed
+                            if (!isIframeUrlValid()) {
+                                console.error('Cannot edit block - iframe URL has changed');
+                                alert('The page has changed. Please reload the page builder to continue editing.');
+                                return;
+                            }
+
                             const editorPanel = document.querySelector('[data-page-builder-target="editorPanel"]');
                             const editorToggle = document.querySelector('[data-page-builder-target="editorToggle"]');
                             const editorContent = document.querySelector('[data-page-builder-target="editorContent"]');
@@ -641,23 +811,8 @@
                                 }
                             }
 
-                            const isLargeScreen = window.matchMedia('(min-width: 1980px)').matches;
-
-                            if (isLargeScreen) {
-                                // On large screens: expand panel if collapsed
-                                editorPanel.classList.remove('is-collapsed');
-
-                                // Update toggle button icon to show collapse icon
-                                if (editorToggle) {
-                                    const icon = editorToggle.querySelector('svg path');
-                                    if (icon) {
-                                        icon.setAttribute('d', 'M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z');
-                                    }
-                                }
-                            } else {
-                                // On small screens: open overlay
-                                editorPanel.classList.add('is-open');
-                            }
+                            // Open the overlay panel
+                            editorPanel.classList.add('is-open');
 
                             console.log('Panel opened for block:', blockId);
                         }
@@ -668,6 +823,11 @@
                             if (!handleButton) return;
 
                             handleButton.addEventListener('mouseenter', function() {
+                                // Security check: only apply hover if iframe URL hasn't changed
+                                if (!isIframeUrlValid()) {
+                                    return;
+                                }
+
                                 const blockId = handle.dataset.blockId;
                                 const block = iframeDocument.querySelector(`.content-block-wrapper[data-block-id="${blockId}"]`);
                                 if (block) {
@@ -676,6 +836,11 @@
                             });
 
                             handleButton.addEventListener('mouseleave', function() {
+                                // Security check: only apply hover if iframe URL hasn't changed
+                                if (!isIframeUrlValid()) {
+                                    return;
+                                }
+
                                 const blockId = handle.dataset.blockId;
                                 const block = iframeDocument.querySelector(`.content-block-wrapper[data-block-id="${blockId}"]`);
                                 if (block) {
@@ -692,46 +857,7 @@
                             });
                         });
 
-                        // Add hover effect on blocks in iframe to highlight handles in sidebar (reverse)
-                        const contentBlocks = iframeDocument.querySelectorAll('.content-block-wrapper[data-block-id]');
-                        contentBlocks.forEach(block => {
-                            block.addEventListener('mouseenter', function() {
-                                const blockId = this.dataset.blockId;
-                                const handle = document.querySelector(`.page-builder__block-handle[data-block-id="${blockId}"]`);
-                                if (handle) {
-                                    const handleButton = handle.querySelector('.page-builder__block-handle-button');
-                                    if (handleButton) {
-                                        handleButton.classList.add('is-hovered');
-                                    }
-                                    // Also highlight the block itself
-                                    this.classList.add('is-hovered');
-                                }
-                            });
-
-                            block.addEventListener('mouseleave', function() {
-                                const blockId = this.dataset.blockId;
-                                const handle = document.querySelector(`.page-builder__block-handle[data-block-id="${blockId}"]`);
-                                if (handle) {
-                                    const handleButton = handle.querySelector('.page-builder__block-handle-button');
-                                    if (handleButton) {
-                                        handleButton.classList.remove('is-hovered');
-                                    }
-                                    // Remove highlight from block
-                                    this.classList.remove('is-hovered');
-                                }
-                            });
-                        });
-
-                        // Add click handler for edit buttons in iframe (both hover overlay and unpublished overlay)
-                        const editButtons = iframeDocument.querySelectorAll('.content-block-edit-button');
-                        editButtons.forEach(button => {
-                            button.addEventListener('click', function(e) {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                const blockId = this.dataset.blockId;
-                                editBlock(blockId);
-                            });
-                        });
+                        // Note: Events on blocks INSIDE iframe (hover, click on edit buttons) are handled by initIframeBlockEvents()
 
                     } catch (error) {
                         console.error('Cannot access iframe:', error);
@@ -741,64 +867,53 @@
                     }
                 });
 
+                // Monitor iframe URL changes and re-initialize events when returning to authorized URL
+                let lastKnownUrl = null;
+                let urlCheckInterval = setInterval(function() {
+                    try {
+                        const currentUrl = iframe.contentWindow.location.href;
+
+                        // Check if URL has changed
+                        if (currentUrl !== lastKnownUrl) {
+                            console.log('Iframe URL changed from', lastKnownUrl, 'to', currentUrl);
+                            lastKnownUrl = currentUrl;
+
+                            // Check if we're back on the authorized URL
+                            const url = new URL(currentUrl);
+                            const currentPath = url.origin + url.pathname;
+
+                            if (currentPath === initialIframeUrl && !iframeEventsInitialized) {
+                                console.log('Returned to authorized URL - triggering re-initialization');
+                                // Manually trigger the load event handler
+                                iframe.dispatchEvent(new Event('load'));
+                            } else if (currentPath !== initialIframeUrl && iframeEventsInitialized) {
+                                console.log('Navigated away from authorized URL - events will be disabled');
+                                iframeEventsInitialized = false;
+                            }
+                        }
+                    } catch (error) {
+                        // Cross-origin error - ignore
+                    }
+                }, 500); // Check every 500ms
+
                 // Load the preview URL with locale
                 iframe.src = '{{ happy_cms_path_by_id(entity.id, resource, locale, null, true) }}';
             }
 
-            // Editor panel toggle functionality
+            // Editor panel toggle functionality - Overlay behavior for all screen sizes
             const editorPanel = document.querySelector('[data-page-builder-target="editorPanel"]');
             const editorToggle = document.querySelector('[data-page-builder-target="editorToggle"]');
             const addBlockButton = document.querySelector('[data-page-builder-target="addBlock"]');
 
             if (editorPanel && editorToggle) {
-                // Check screen size and initialize panel state
-                const updatePanelState = () => {
-                    const isLargeScreen = window.matchMedia('(min-width: 1980px)').matches;
-
-                    if (isLargeScreen) {
-                        // On large screens, panel is visible by default but can be collapsed
-                        editorPanel.classList.remove('is-open');
-                    } else {
-                        // On small screens, panel is hidden by default (overlay mode)
-                        editorPanel.classList.remove('is-open');
-                    }
-                };
-
-                // Initialize panel state
-                updatePanelState();
-
-                // Update on resize
-                window.addEventListener('resize', updatePanelState);
-
-                // Toggle button click handler
+                // Toggle button click handler - simple toggle overlay visibility
                 editorToggle.addEventListener('click', function() {
-                    const isLargeScreen = window.matchMedia('(min-width: 1980px)').matches;
-
-                    if (isLargeScreen) {
-                        // On large screens: toggle collapsed state
-                        editorPanel.classList.toggle('is-collapsed');
-
-                        // Update toggle button icon direction
-                        const icon = this.querySelector('svg path');
-                        if (editorPanel.classList.contains('is-collapsed')) {
-                            // Show expand icon (arrow pointing left)
-                            icon.setAttribute('d', 'M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z');
-                        } else {
-                            // Show collapse icon (arrow pointing right)
-                            icon.setAttribute('d', 'M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z');
-                        }
-                    } else {
-                        // On small screens: toggle overlay visibility
-                        editorPanel.classList.toggle('is-open');
-                    }
+                    editorPanel.classList.toggle('is-open');
                 });
 
-                // Close panel when clicking outside on small screens
+                // Close panel when clicking outside
                 document.addEventListener('click', function(e) {
-                    const isLargeScreen = window.matchMedia('(min-width: 1980px)').matches;
-
-                    if (!isLargeScreen &&
-                        editorPanel.classList.contains('is-open') &&
+                    if (editorPanel.classList.contains('is-open') &&
                         !editorPanel.contains(e.target) &&
                         e.target !== editorToggle &&
                         e.target !== addBlockButton &&
@@ -807,13 +922,9 @@
                     }
                 });
 
-                // Escape key to close panel on small screens
+                // Escape key to close panel
                 document.addEventListener('keydown', function(e) {
-                    const isLargeScreen = window.matchMedia('(min-width: 1980px)').matches;
-
-                    if (!isLargeScreen &&
-                        e.key === 'Escape' &&
-                        editorPanel.classList.contains('is-open')) {
+                    if (e.key === 'Escape' && editorPanel.classList.contains('is-open')) {
                         editorPanel.classList.remove('is-open');
                     }
                 });
@@ -822,21 +933,7 @@
                 if (addBlockButton) {
                     addBlockButton.addEventListener('click', function(e) {
                         e.preventDefault();
-                        const isLargeScreen = window.matchMedia('(min-width: 1980px)').matches;
-
-                        if (isLargeScreen) {
-                            // On large screens: expand panel if collapsed
-                            editorPanel.classList.remove('is-collapsed');
-
-                            // Update toggle button icon to show collapse icon
-                            const icon = editorToggle.querySelector('svg path');
-                            if (icon) {
-                                icon.setAttribute('d', 'M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z');
-                            }
-                        } else {
-                            // On small screens: open overlay
-                            editorPanel.classList.toggle('is-open');
-                        }
+                        editorPanel.classList.toggle('is-open');
                     });
                 }
             }
