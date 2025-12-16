@@ -311,32 +311,52 @@ class BlockEditor extends AbstractController
             $this->formThemes = [];
         }
 
-        // Use draft data for the form
-        $draftData = $block->getDraftData() ?? [];
+        // Use draft data for the form, fallback to published data if draft is empty
+        $draftData = $block->getDraftData();
 
-        // Create and return the form with draft data
-        return $this->createForm($formClass, $draftData);
+        // If draft data is null or empty, use published data as fallback
+        if (null === $draftData || empty($draftData)) {
+            $draftData = $block->getPublishedData() ?? [];
+        }
+
+        // Store initial data for debugging and access in template
+        $this->formValues = $draftData;
+        // Create and return the form with draft data as the initial data
+        // For Live Components, we must pass data via the 'data' option
+        return $this->createForm($formClass, null);
     }
 
     #[LiveAction]
     public function save(): void
     {
+        // Submit the form
         $this->submitForm();
 
+        // Get the form instance
+        $form = $this->getForm();
+
+        // Check if the form is valid
+        if (!$form->isValid()) {
+            // If form is not valid, the component will re-render with errors
+            return;
+        }
+
+        // Get the block
         $block = $this->getBlock();
         if (null === $block) {
             return;
         }
 
         /** @var array<string, mixed> $formData */
-        $formData = $this->getForm()->getData();
+        $formData = $form->getData();
 
         // Save to draft data
-        //$block->setDraftData($formData);
+        $block->setDraftData($formData);
 
-        //$this->entityManager->flush();
+        // Persist changes to database
+        $this->entityManager->flush();
 
-        // Dispatch event to reload iframe or show success message
+        // Dispatch event to reload iframe to show the updated block
         $this->dispatchBrowserEvent('block:saved', [
             'blockId' => $this->blockId,
         ]);

@@ -135,8 +135,8 @@
         });
         console.log('sss');
         // When render in the page builder
-        window.addEventListener('happy-cms:block-editor:form-loaded', (event) => {
-            console.log('happy-cms:block-editor:form-loaded');
+        window.addEventListener('on-load-builder', (event) => {
+            console.log('on-load-builder');
             var vueElement = document.querySelector(".happy-cms-media-widget[data-widget='{{ form.vars.id }}']");
             if(vueElement && !vueElement.__vue__ && window.Vue){
                 new window.Vue({ el: vueElement });

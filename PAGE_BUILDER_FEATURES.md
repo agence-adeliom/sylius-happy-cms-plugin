@@ -92,9 +92,11 @@ Voici les étapes pour cette partie B :
 11. [x] Chaque block peut avoir des form theme, il faudrait les charger dynamiquement. Cf la méthode configureAdminFormThemes d'AbstractBlock. Dans templates/admin/page_builder/_block_editor.html.twig il faut ensuite charger tous les form theme. On peut prendre exemple sur la method getViewVars du fichier vendor/agence-adeliom/sylius-easy-crud-plugin/src/CrudFactory/CrudAdminFactory.php
 12. [x] Chaque block peut avoir des assets spécifiques, il faudrait les charger dynamiquement. Comme pour les form theme, il faudrait les charger dynamiquement. Voir manageFieldAssets du fichier vendor/agence-adeliom/sylius-easy-crud-plugin/src/CrudFactory/CrudAdminFactory.php, puis getViewVars pour l'injection dans les vues.
 13. [x] L'event live:render:finished du BlockEditor.js n'est jamais appelé, il faudrait aussi l'appeler au premier chargement.
-14. [ ] Dans le BlockEditor, en mode ajout. J'aimerais ajuster le contenu et ajouter une option en plus de browser de bloc. Qui serait que si aucun bloc n'existe dans la page pou la locale en cours, de proposer d'aller récupérer les blocs d'une autre locale. Et à validation, via le composant live, aller vérifier la configuration de la locale, récupérer les blocs et les injecter à l'identique. Ensuite le block s'ajoute automatique, l'interface s'actualise et l'utilisateur voit le mode édition directement chargé.
-15. [ ] Renommer l'event happy-cms:block-editor:form-loaded, pour le rendre plus générique 'on-load-builder', renommer les différents fichiers
-16. 
+14. [x] Dans le BlockEditor, en mode ajout. J'aimerais ajuster le contenu et ajouter une option en plus de browser de bloc. Qui serait que si aucun bloc n'existe dans la page pou la locale en cours, de proposer d'aller récupérer les blocs d'une autre locale. Et à validation, via le composant live, aller vérifier la configuration de la locale, récupérer les blocs et les injecter à l'identique. Ensuite le block s'ajoute automatique, l'interface s'actualise et l'utilisateur voit le mode édition directement chargé.
+15. [x] Renommer l'event happy-cms:block-editor:form-loaded, pour le rendre plus générique 'on-load-builder', renommer les différents fichiers
+16. [x] Le Field TinyMCEField, charge le tinymce en js, hors cela ne fonctionne pas lorsqu'on a le rendu des blocs en ajax; Il faudrait voir pour déporter les scripts et la configuration dynamique dans un fichier d'asset à part. Le template du form theme est ici field/tinymce/form.html.twig. J'ai commencé à créé un fichier assets/tinymce/field.js. Le bundle utilisé est emileperron/tinymce-bundle.
+17. [ ] Désormais, nous allons travailler sur le remplissage du formulaire avec les données d'un contentBlock à injecter. Puis gérer, la validation et l'enregistrement du formulaire.
+18. [ ]
 
 Todo :
 - Déporter la doc USAGE IN BLOCK-SPECIFIC SCRIPTS dans la doc de création d'un bloc

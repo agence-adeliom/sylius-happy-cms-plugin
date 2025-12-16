@@ -28,6 +28,7 @@ Encore
     .addEntry('media-form', './assets/media/js/app.js')
     .addEntry('seo-block-type', './assets/blocks/seo-block-type.js')
     .addEntry('accordion-block-type', './assets/blocks/accordion-block-type.js')
+    .addEntry('tiny-mce', './assets/tinymce/field.js')
 ;
 
 const webpackConfig = Encore.getWebpackConfig();

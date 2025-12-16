@@ -84,7 +84,7 @@ export default class extends Controller {
    * USAGE IN BLOCK-SPECIFIC SCRIPTS:
    *
    * // Listen for the form loaded event on window
-   * window.addEventListener('happy-cms:block-editor:form-loaded', (event) => {
+   * window.addEventListener('on-load-builder', (event) => {
    *   const { blockId, scope, formElement } = event.detail;
    *
    *   // Example: Initialize a date picker within the form scope
@@ -101,7 +101,7 @@ export default class extends Controller {
    * });
    *
    * // Or listen for a specific block type by checking blockId
-   * window.addEventListener('happy-cms:block-editor:form-loaded', (event) => {
+   * window.addEventListener('on-load-builder', (event) => {
    *   const { blockId, scope } = event.detail;
    *
    *   // Only initialize for specific block type
@@ -118,10 +118,10 @@ export default class extends Controller {
 
     // Only dispatch if we have a valid blockId (form is loaded)
     if (blockId) {
-      console.log('Dispatching block-editor:form-loaded event for block:', blockId);
+      console.log('Dispatching on-load-builder event for block:', blockId);
 
       // Dispatch custom event with blockId and element scope
-      const customEvent = new CustomEvent('happy-cms:block-editor:form-loaded', {
+      const customEvent = new CustomEvent('on-load-builder', {
         detail: {
           blockId: blockId,
           scope: this.element,
@@ -134,7 +134,7 @@ export default class extends Controller {
       this.element.dispatchEvent(customEvent);
 
       // Also dispatch on window for global listeners
-      window.dispatchEvent(new CustomEvent('happy-cms:block-editor:form-loaded', {
+      window.dispatchEvent(new CustomEvent('on-load-builder', {
         detail: {
           blockId: blockId,
           scope: this.element,

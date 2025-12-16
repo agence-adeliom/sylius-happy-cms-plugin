@@ -163,7 +163,6 @@ class CreateDemoPagesCommand extends AbstractContentCommand
 
             $flexContent = [
                 'hp-flex-1' => [
-                    'centered' => '1',
                     'image' => $image1?->getId(),
                     'title' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
                     'wysiwyg' => '<p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>',
@@ -172,7 +171,6 @@ class CreateDemoPagesCommand extends AbstractContentCommand
                     'block_published' => '1',
                 ],
                 'hp-flex-2' => [
-                    'centered' => '1',
                     'image' => $image2?->getId(),
                     'title' => 'BBB Lorem.',
                     'wysiwyg' => '<p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>',
@@ -181,7 +179,6 @@ class CreateDemoPagesCommand extends AbstractContentCommand
                     'block_published' => '0',
                 ],
                 'hp-flex-3' => [
-                    'centered' => '1',
                     'image' => $image3?->getId(),
                     'title' => 'CCC Lorem.',
                     'wysiwyg' => '<p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>',

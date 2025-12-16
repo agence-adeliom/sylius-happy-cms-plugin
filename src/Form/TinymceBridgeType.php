@@ -6,6 +6,7 @@ namespace Adeliom\SyliusHappyCMSPlugin\Form;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
 use Adeliom\SyliusEasyCrudPlugin\Form\AdminFormTypeInterface;
+use Adeliom\SyliusHappyCMSPlugin\Asset\AssetHappyCMSPackage;
 use EmilePerron\TinymceBundle\Form\Type\TinymceType as BaseTinymceType;
 
 class TinymceBridgeType extends BaseTinymceType implements AdminFormTypeInterface
@@ -22,6 +23,7 @@ class TinymceBridgeType extends BaseTinymceType implements AdminFormTypeInterfac
     {
         return [
             'js' => [
+                (Asset::new('tiny-mce.js'))->package(AssetHappyCMSPackage::PACKAGE_NAME),
             ],
             'css' => [
             ],
