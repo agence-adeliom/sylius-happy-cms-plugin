@@ -98,9 +98,14 @@ class RouteRenderService extends AbstractController
 
         $cacheEnabled = $contentDocument->isHttpCacheEnabled($this->kernel->getEnvironment(), $route);
 
+        // In preview mode we don't want http cache
+        if ($preview) {
+            $cacheEnabled = false;
+        }
+
         $response = $contentDocument->renderResponse($request, new Response(null), $route, $cacheEnabled);
 
-        if ($response->isNotModified($request)) {
+        if (!$preview && $response->isNotModified($request)) {
             // return the 304 Response
             return $response;
         }

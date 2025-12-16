@@ -86,20 +86,12 @@ trait ContentEditableTrait
      *
      * @return Collection<int, ContentBlockInterface>
      */
-    public function getPreviewContentBlocks(string $locale, ?string $layer = null): Collection
+    public function getContentBlocksForPreview(string $locale, ?string $layer = null): Collection
     {
         // Filter by locale and layer, include blocks based on preview publish state
         $filtered = $this->contentBlocks->filter(function (ContentBlockInterface $contentBlock) use ($locale, $layer): bool {
             if (method_exists($contentBlock, 'getLocale') && $contentBlock->getLocale() !== $locale) {
                 return false;
-            }
-
-            // In preview mode, check preview publish state if available
-            if (method_exists($contentBlock, 'isPreviewPublished')) {
-                // Include blocks that are published in preview mode
-                if (!$contentBlock->isPreviewPublished()) {
-                    return false;
-                }
             }
 
             if (null !== $layer && method_exists($contentBlock, 'getLayer') && $contentBlock->getLayer() !== $layer) {

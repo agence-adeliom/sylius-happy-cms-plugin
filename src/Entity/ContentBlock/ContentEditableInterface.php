@@ -42,5 +42,5 @@ interface ContentEditableInterface
      *
      * @return Collection<int, ContentBlockInterface>
      */
-    public function getPreviewContentBlocks(string $locale, ?string $layer = null): Collection;
+    public function getContentBlocksForPreview(string $locale, ?string $layer = null): Collection;
 }

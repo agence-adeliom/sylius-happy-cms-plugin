@@ -174,11 +174,6 @@ trait EntityRouteTrait
             return $response;
         }
 
-        // No cache in preview mode
-        if ($route->getOption('preview_behavior') === true) {
-            return $response;
-        }
-
         // This timestamp is update on every persist of the entity
         // It's store into the route option 'last_modification_timestamp'
         // This allow to simply check the last modification date of the entity and before rendering all page
