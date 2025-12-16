@@ -11,7 +11,6 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action\Action;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Actions;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\Field;
-use Sylius\Bundle\GridBundle\Builder\Filter\BooleanFilter;
 use Sylius\Bundle\GridBundle\Builder\Filter\DateFilter;
 use Sylius\Bundle\GridBundle\Builder\Filter\StringFilter;
 

@@ -321,6 +321,7 @@ class BlockEditor extends AbstractController
 
         // Store initial data for debugging and access in template
         $this->formValues = $draftData;
+
         // Create and return the form with draft data as the initial data
         // For Live Components, we must pass data via the 'data' option
         return $this->createForm($formClass, null);

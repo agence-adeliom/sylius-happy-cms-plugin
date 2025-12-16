@@ -6,7 +6,6 @@ namespace Adeliom\SyliusHappyCMSPlugin\Traits;
 
 use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Page\PageInterface;
-use Adeliom\SyliusHappyCMSPlugin\EventListener\EntityRouteIndexer;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
