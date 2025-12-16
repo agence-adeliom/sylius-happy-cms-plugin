@@ -15,7 +15,6 @@ class CalculateRouteStaticPrefixEvent extends Event
     public function __construct(
         protected CmsRoutableInterface $entity,
         protected TranslationInterface $translation,
-        protected ?bool $isPreview = false,
     ) {
     }
 
@@ -27,11 +26,6 @@ class CalculateRouteStaticPrefixEvent extends Event
     public function getTranslation(): TranslationInterface
     {
         return $this->translation;
-    }
-
-    public function isPreview(): bool
-    {
-        return $this->isPreview ?: false;
     }
 
     public function getRouteStaticPrefix(): string

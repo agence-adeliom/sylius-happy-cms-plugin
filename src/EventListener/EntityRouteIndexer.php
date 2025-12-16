@@ -76,13 +76,7 @@ class EntityRouteIndexer
     {
         $routesChanges = [];
 
-        if ($entity->isOnline()) {
-            $this->computeRoutes($routesChanges, $entity, self::ROUTE_ONLINE, $objectManager);
-        }
-
-        if ($entity->previewIsAvailable()) {
-            $this->computeRoutes($routesChanges, $entity, self::ROUTE_PREVIEW, $objectManager);
-        }
+        $this->computeRoutes($routesChanges, $entity, self::ROUTE_ONLINE, $objectManager);
 
         foreach ($entity->getRoutes() as $route) {
             $this->manager->persist($route);
@@ -160,7 +154,7 @@ class EntityRouteIndexer
             $otherEntityPath = $event->getRouteStaticPrefix();
 
             // Get current entity path
-            $currentEntityPath = $entity->getRouteStaticPrefix($translation, $routeNamePrefix === self::ROUTE_PREVIEW);
+            $currentEntityPath = $entity->getRouteStaticPrefix($translation);
 
             // Set all complete path for the current entity route
             $route->setStaticPrefix(
@@ -180,12 +174,10 @@ class EntityRouteIndexer
             );
 
             $route->setVariablePattern(
-                $entity->getVariablePattern($translation, $routeNamePrefix === self::ROUTE_PREVIEW),
+                $entity->getVariablePattern($translation),
             );
 
             $route->setLastModification(new \DateTime());
-            $route->setPreview($routeNamePrefix === self::ROUTE_PREVIEW);
-            $route->setOption(self::OPTION_PREVIEW, $routeNamePrefix === self::ROUTE_PREVIEW);
             $route->setDefault(RouteObjectInterface::CONTENT_ID, $this->contentRepository->getContentId($entity));
 
             $entity->addRoute($route);

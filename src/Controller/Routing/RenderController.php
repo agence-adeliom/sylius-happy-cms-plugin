@@ -21,6 +21,13 @@ class RenderController extends AbstractController
         CmsRoutableInterface $contentDocument,
         Request $request,
     ): Response {
+        // Get locale from route parameter and set it in the request
+        // This is necessary because the LocaleListener hasn't run yet
+        $locale = $request->attributes->get('_locale', $request->getLocale());
+        $request->setLocale($locale);
+
+        $contentDocument->setCurrentLocale($locale);
+
         return $this->routeRenderService->renderAction($contentDocument, $request);
     }
 }

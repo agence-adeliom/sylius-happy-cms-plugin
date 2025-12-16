@@ -72,9 +72,9 @@ interface CmsRoutableInterface extends ChannelAwareInterface
 
     public function getRouteHost(TranslationInterface $translation): ?string;
 
-    public function getRouteStaticPrefix(TranslationInterface $translation, bool $isPreview): string;
+    public function getRouteStaticPrefix(TranslationInterface $translation): string;
 
-    public function getVariablePattern(TranslationInterface $translation, bool $isPreview): string;
+    public function getVariablePattern(TranslationInterface $translation): string;
 
     public function getRouteTemplate(): ?string;
 

@@ -354,3 +354,7 @@ sylius_happy_cms:
     delete: Supprimer
     confirm_delete: Êtes-vous sûr de vouloir supprimer ce bloc ?
     edit_block_title: Remplissez le formulaire pour éditer le bloc
+    no_blocks_for_locale: Aucun bloc n'existe encore pour cette langue
+    copy_from_locale_title: Copier les blocs depuis une autre langue
+    copy_from_locale: "Copier depuis %locale%"
+    or_add_new_block: Ou ajouter un nouveau bloc à partir de zéro

@@ -349,3 +349,7 @@ sylius_happy_cms:
     delete: Delete
     confirm_delete: Are you sure you want to delete this block?
     edit_block_title: Fill out the form to edit the block
+    no_blocks_for_locale: No blocks exist for this language yet
+    copy_from_locale_title: Copy blocks from another language
+    copy_from_locale: "Copy from %locale%"
+    or_add_new_block: Or add a new block from scratch

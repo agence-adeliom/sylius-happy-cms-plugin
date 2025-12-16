@@ -24,9 +24,6 @@ class Route extends RouteModel implements RouteInterface
     #[ORM\Column(type: Types::INTEGER)]
     protected int $position = 0;
 
-    #[ORM\Column(type: Types::BOOLEAN, nullable: true)]
-    protected bool $preview = false;
-
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     protected ?\DateTimeInterface $lastModification = null;
 
@@ -68,16 +65,6 @@ class Route extends RouteModel implements RouteInterface
     public function getPosition(): int
     {
         return $this->position;
-    }
-
-    public function isPreview(): bool
-    {
-        return $this->preview;
-    }
-
-    public function setPreview(bool $preview): void
-    {
-        $this->preview = $preview;
     }
 
     public function getLastModification(): ?\DateTimeInterface

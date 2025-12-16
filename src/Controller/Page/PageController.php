@@ -29,13 +29,19 @@ class PageController extends AbstractController
 
     public function indexAction(Request $request): Response
     {
+        // Get locale from route parameter and set it in the request
+        // This is necessary because the LocaleListener hasn't run yet
+        $locale = $request->attributes->get('_locale', $request->getLocale());
+        $request->setLocale($locale);
+
         /** @var ?PageRepositoryInterface $pageRepository */
         $pageRepository = $this->entityManager->getRepository(PageInterface::class);
         if ($pageRepository instanceof PageRepositoryInterface) {
             $page = $pageRepository
-                ->getHomePage($request->getLocale());
+                ->getHomePage($locale);
+            $page->setCurrentLocale($locale);
             if (null !== $page) {
-                $onlineRoute = $page->getOnlineRoute();
+                $onlineRoute = $page->getOnlineRoute($locale);
                 if ($onlineRoute instanceof RouteInterface) {
                     return $this->routeRenderService->renderAction(
                         $page,

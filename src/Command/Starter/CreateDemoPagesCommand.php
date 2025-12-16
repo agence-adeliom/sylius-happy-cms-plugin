@@ -143,12 +143,15 @@ class CreateDemoPagesCommand extends AbstractContentCommand
             ],
         );
 
+        $this->manager->persist($page);
+
         foreach ($locales as $locale) {
             $localeCode = $locale->getCode() ?? 'en_US';
+            // Important to not get fallback translation and create new instances
+            $page->setFallbackLocale($localeCode);
             $pageTranslation = $page->getTranslation($localeCode);
             $pageTranslation->setName('Homepage');
             $pageTranslation->setSlug(uniqid());
-            $page->addTranslation($pageTranslation);
 
             // SEO
             $seo = new Seo();

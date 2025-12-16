@@ -55,7 +55,7 @@ class PageBuilderController extends AbstractController
 
         // Get all content blocks for the entity (already validated as ContentEditableInterface)
         // In preview mode, we show all blocks (published and unpublished) for the given locale
-        $contentBlocks = $entity->getContentBlocks($locale);
+        $contentBlocks = $entity->getContentBlocksForPreview($locale);
 
         // Collect all assets from all blocks in the page
         $assets = $this->collectBlockAssets($contentBlocks);
@@ -125,8 +125,6 @@ class PageBuilderController extends AbstractController
                 }
             }
         }
-
-        dump($assets);
 
         return $assets;
     }

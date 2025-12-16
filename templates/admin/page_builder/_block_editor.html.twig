@@ -141,10 +141,55 @@
             </button>
         </div>
     {% else %}
-        {# Create mode: Show block selector #}
+        {# Create mode: Show block selector or copy from locale option #}
         <div class="page-builder__editor-content" data-loading="hide" style="flex: 1; display: flex;">
-            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100%; width: 100%;">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100%; width: 100%; padding: 2rem;">
 
+                {% set hasBlocksForCurrentLocale = this.hasBlocksForCurrentLocale %}
+                {% set availableLocalesWithBlocks = this.availableLocalesWithBlocks %}
+
+                {% if not hasBlocksForCurrentLocale and availableLocalesWithBlocks|length > 0 %}
+                    {# No blocks in current locale but other locales have blocks - show copy option #}
+                    <div class="alert alert-info mb-4" style="max-width: 600px;">
+                        <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 8px; vertical-align: text-bottom;">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                            <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                        </svg>
+                        {% trans %}sylius_happy_cms.page_builder.no_blocks_for_locale{% endtrans %}
+                    </div>
+
+                    <p class="h4 mb-4">{% trans %}sylius_happy_cms.page_builder.copy_from_locale_title{% endtrans %}</p>
+
+                    <div class="list-group mb-4" style="max-width: 400px; width: 100%;">
+                        {% for localeCode, localeLabel in availableLocalesWithBlocks %}
+                            <button
+                                type="button"
+                                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                                data-action="live#action"
+                                data-live-action-param="prevent|copyBlocksFromLocale"
+                                data-live-source-locale-param="{{ localeCode }}"
+                            >
+                                <span>
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 8px;">
+                                        <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+                                        <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+                                    </svg>
+                                    {% trans with {'%locale%': localeLabel} %}sylius_happy_cms.page_builder.copy_from_locale{% endtrans %}
+                                </span>
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+                                </svg>
+                            </button>
+                        {% endfor %}
+                    </div>
+
+                    <div class="text-center">
+                        <hr style="max-width: 400px; margin: 2rem auto;">
+                        <p class="text-muted mb-3">{% trans %}sylius_happy_cms.page_builder.or_add_new_block{% endtrans %}</p>
+                    </div>
+                {% endif %}
+
+                {# Always show browse blocks button #}
                 <p class="h3">{% trans %}sylius_happy_cms.page_builder.add_block{% endtrans %}</p>
 
                 <button

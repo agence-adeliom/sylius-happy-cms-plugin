@@ -21,4 +21,6 @@ interface PageRepositoryInterface
     public function getByTemplate(string $template, string $locale, ChannelInterface $channel): ?PageInterface;
 
     public function getHomePage(string $locale, ?ChannelInterface $channel = null): ?PageInterface;
+
+    public function getBySeoKey(string $seoKey, string $locale): ?PageInterface;
 }

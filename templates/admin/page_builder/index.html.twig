@@ -297,6 +297,7 @@
         }
         .w-editor-content {
             height: 100%;
+            min-height: 100%;
         }
 
         .page-builder__editor-toggle,
@@ -1019,6 +1020,19 @@
                     });
                 }
             }
+
+            // Listen for blocks:copied event to reload the page
+            document.addEventListener('blocks:copied', function(event) {
+                console.log('Blocks copied from locale:', event.detail.sourceLocale, 'to', event.detail.targetLocale);
+
+                // Reload the page to show the newly copied blocks
+                if (event.detail.reload) {
+                    // Small delay to ensure the database transaction is committed
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 300);
+                }
+            });
         });
     </script>
 {% endblock %}

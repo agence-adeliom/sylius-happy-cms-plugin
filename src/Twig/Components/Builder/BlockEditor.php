@@ -39,11 +39,12 @@ class BlockEditor extends AbstractController
     #[LiveProp(writable: true)]
     public int $entityId;
 
+    #[LiveProp(writable: true)]
+    public string $locale;
+
     public ContentEditableInterface $entity;
 
-    /**
-     * @var string[]
-     */
+    /** @var string[] */
     private array $formThemes = [];
 
     public function __construct(
@@ -338,6 +339,127 @@ class BlockEditor extends AbstractController
         // Dispatch event to reload iframe or show success message
         $this->dispatchBrowserEvent('block:saved', [
             'blockId' => $this->blockId,
+        ]);
+    }
+
+    /**
+     * Check if the current locale has blocks.
+     */
+    public function hasBlocksForCurrentLocale(): bool
+    {
+        // Resolve the entity class from the resource name (validates interfaces)
+        $entityClass = $this->resolveEntityClass($this->resourceName);
+
+        // Load the entity
+        $this->entity = $this->loadEntity($entityClass, $this->entityId);
+
+        $blocks = $this->entity->getContentBlocks();
+
+        $blocksForLocale = $blocks->filter(function (ContentBlockInterface $block) {
+            return $block->getLocale() === $this->locale;
+        });
+
+        return $blocksForLocale->count() > 0;
+    }
+
+    /**
+     * Get available locales that have blocks.
+     *
+     * @return array<string, string> Associative array with locale codes as keys and labels as values
+     */
+    public function getAvailableLocalesWithBlocks(): array
+    {
+        // Resolve the entity class from the resource name (validates interfaces)
+        $entityClass = $this->resolveEntityClass($this->resourceName);
+
+        // Load the entity
+        $this->entity = $this->loadEntity($entityClass, $this->entityId);
+
+        $blocks = $this->entity->getContentBlocks();
+
+        // Get all unique locales from content blocks
+        $localesWithBlocks = [];
+        foreach ($blocks as $block) {
+            $blockLocale = $block->getLocale();
+            if ($blockLocale !== $this->locale && !isset($localesWithBlocks[$blockLocale])) {
+                $localesWithBlocks[$blockLocale] = $blockLocale;
+            }
+        }
+
+        return $localesWithBlocks;
+    }
+
+    /**
+     * Copy blocks from another locale to the current locale.
+     */
+    #[LiveAction]
+    public function copyBlocksFromLocale(#[LiveArg('sourceLocale')] string $sourceLocale): void
+    {
+        // Resolve the entity class from the resource name (validates interfaces)
+        $entityClass = $this->resolveEntityClass($this->resourceName);
+
+        // Load the entity
+        $this->entity = $this->loadEntity($entityClass, $this->entityId);
+
+        $blocks = $this->entity->getContentBlocks();
+
+        // Get blocks from source locale
+        $sourceBlocks = $blocks->filter(function (ContentBlockInterface $block) use ($sourceLocale) {
+            return $block->getLocale() === $sourceLocale;
+        })->toArray();
+
+        // Sort by position
+        usort($sourceBlocks, function (ContentBlockInterface $a, ContentBlockInterface $b) {
+            return $a->getPosition() <=> $b->getPosition();
+        });
+
+        // Get the entity class name for creating new blocks
+        $blockClass = get_class($sourceBlocks[0] ?? null);
+        if (!$blockClass) {
+            return;
+        }
+
+        // Copy each block
+        foreach ($sourceBlocks as $index => $sourceBlock) {
+            $newBlock = new $blockClass();
+
+            if (!$newBlock instanceof ContentBlockInterface) {
+                continue;
+            }
+
+            // Copy properties
+            $newBlock->setLocale($this->locale);
+            $newBlock->setType($sourceBlock->getType());
+            $newBlock->setPosition($index);
+            $newBlock->setLayer($sourceBlock->getLayer());
+
+            // Copy draft data (will be used as preview)
+            $draftData = $sourceBlock->getDraftData();
+            if (null !== $draftData) {
+                $newBlock->setDraftData($draftData);
+            }
+
+            // Copy published data
+            $publishedData = $sourceBlock->getPublishedData();
+            if (null !== $publishedData) {
+                $newBlock->setPublishedData($publishedData);
+            }
+
+            // Copy publish state
+            $newBlock->setPreviewPublishState($sourceBlock->getPreviewPublishState());
+
+            // Add to entity
+            $this->entity->addContentBlock($newBlock);
+            $this->entityManager->persist($newBlock);
+        }
+
+        $this->entityManager->flush();
+
+        // Dispatch event to reload the entire page to show new blocks
+        $this->dispatchBrowserEvent('blocks:copied', [
+            'sourceLocale' => $sourceLocale,
+            'targetLocale' => $this->locale,
+            'reload' => true,
         ]);
     }
 

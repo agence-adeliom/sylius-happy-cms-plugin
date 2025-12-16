@@ -225,11 +225,11 @@ class <?= $classNameDetail->getShortName() ?> implements ResourceInterface, Tran
         return 'happy_cms_<?= mb_strtolower($scope) ?>_' . $this->getId();
     }
 
-    public function getRouteStaticPrefix(TranslationInterface $translation, bool $isPreview): string
+    public function getRouteStaticPrefix(TranslationInterface $translation): string
     {
         $slug = (method_exists($translation, 'getSlug') ? $translation->getSlug() : '');
         $locale = $translation->getLocale();
-        return sprintf('/%s/<?= mb_strtolower($scope) ?>/%s%s', $locale, $slug, ($isPreview ? '-preview': ''));
+        return sprintf('/%s/<?= mb_strtolower($scope) ?>/%s%s', $locale, $slug, '');
     }
 <?php } ?>
 
