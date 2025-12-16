@@ -23,6 +23,7 @@ export default class extends Controller {
 
     // Listen for custom editBlock event from the page builder script
     this.element.addEventListener('block-editor:edit', this.onEditBlock.bind(this));
+    this.element.addEventListener('block-editor:close', this.onCloseBlock.bind(this));
   }
 
   disconnect() {
@@ -38,7 +39,14 @@ export default class extends Controller {
     console.log('Edit block event received');
     const { blockId } = event.detail;
     await this.setBlockId(blockId);
-    this.onRenderFinished();
+  }
+
+  /**
+   * Handle custom editBlock event from page builder script
+   */
+  async onCloseBlock(event) {
+    console.log('Close block event received');
+    await this.component.action('cancel', {} );
   }
 
   /**
@@ -46,7 +54,6 @@ export default class extends Controller {
    * Called from the page builder script when editing a block
    */
   async setBlockId(blockId) {
-
     try {
       await this.component.action('changeBlock', { blockId: blockId ? parseInt(blockId) : null} );
       console.log('Block ID updated in Live Component:', blockId);
@@ -83,36 +90,5 @@ export default class extends Controller {
 
     // Dispatch custom event for other parts of the page to listen
     this.dispatch('blockSaved', { detail: { blockId } });
-  }
-
-  onRenderFinished(event) {
-    console.log('Block editor rendered');
-
-    const blockId = this.blockIdValue;
-
-    // Only dispatch if we have a valid blockId (form is loaded)
-    if (blockId) {
-      console.log('Dispatching on-load-builder event for block:', blockId);
-
-      // Dispatch custom event with blockId and element scope
-      const customEvent = new CustomEvent('on-load-builder', {
-        detail: {
-          blockId: blockId,
-          scope: this.element,
-        },
-        bubbles: true,
-        cancelable: false
-      });
-
-      this.element.dispatchEvent(customEvent);
-
-      // Also dispatch on window for global listeners
-      window.dispatchEvent(new CustomEvent('on-load-builder', {
-        detail: {
-          blockId: blockId,
-          scope: this.element,
-        }
-      }));
-    }
   }
 }

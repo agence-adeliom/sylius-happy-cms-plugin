@@ -176,15 +176,12 @@ class BlockEditorForm extends AbstractController
     #[LiveAction]
     public function save(): void
     {
-        dump('save');
-        dump($this->formValues);
         // Submit the form
         $this->submitForm();
 
         // Get the form instance
         $form = $this->getForm();
 
-        dump($form);
         // Check if the form is valid
         if (!$form->isValid()) {
             // If form is not valid, the component will re-render with errors
@@ -197,10 +194,10 @@ class BlockEditorForm extends AbstractController
             return;
         }
 
+        // IMPORTANT: Use $form->getData() instead of $this->formValues
+        // because $this->formValues doesn't capture values controlled by JavaScript (like Vue.js v-model in MediaType)
         /** @var array<string, mixed> $formData */
         $formData = $form->getData();
-
-        dump($formData);
 
         // Save to draft data
         $block->setDraftData($formData);

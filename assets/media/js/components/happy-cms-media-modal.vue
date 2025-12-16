@@ -45,10 +45,20 @@ export default {
   },
   watch: {
     media: function (val) {
+      const element = this.$root.$el.querySelector('input[class*="form-control"]');
+      if (element) {
+          try {
+              const component = element.__component;
+              component.mode = 'editing';
+          } catch (e) {
+              console.log(e);
+          }
+          const event = new Event('change', { 'bubbles': true })
+          element.value = val ? val : 0;
+          element.dispatchEvent(event);
+      }
       if(val){
-        const event = new Event('change', { 'bubbles': true })
-        this.$root.$el.querySelector('input[class*="form-control"]')?.dispatchEvent(event);
-        this.getInfos(val);
+            this.getInfos(val);
       }
     },
   },

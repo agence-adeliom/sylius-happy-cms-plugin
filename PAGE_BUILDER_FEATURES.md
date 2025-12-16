@@ -104,6 +104,16 @@ Voici les étapes pour cette partie B :
    - [x] Mis à jour _block_editor.html.twig pour utiliser le composant BlockEditorForm en mode édition
    - [x] Mis à jour BlockEditor.js pour écouter l'événement form:saved et recharger l'iframe
    - [x] Les deux composants communiquent via l'événement form:saved qui remonte du formulaire vers le parent
-19. [ ] Il faudrait que lorsqu'on ferme le panneau editorPanel, on supprime le formulaire, c'est à dire revenir à l'état initial.
+19. [x] Dans le fichier templates/admin/page_builder/index.html.twig, nous avons à partir de la ligne 992, plusieurs scripts qui ferment le panneau, il faudrait appeler la fonction editBlock(null) quand il se ferme.
+   - [x] Créé la fonction `closeBlock()` (ligne 654-669) qui déclenche l'événement custom 'block-editor:close'
+   - [x] Modifié BlockEditor.js pour intercepter l'événement 'block-editor:close' et appeler l'action cancel()
+   - [x] Remplacé tous les appels à editBlock(null) par closeBlock() dans les handlers de fermeture :
+     - Handler du bouton editorToggle (ligne 1022)
+     - Handler de fermeture par clic à l'extérieur (ligne 1035)
+     - Handler de fermeture par touche Escape (ligne 1044)
+   - [x] La fonction closeBlock() dispatch l'événement 'block-editor:close' au composant BlockEditor
+   - [x] Le composant BlockEditor exécute l'action cancel() qui réinitialise le formulaire
+   - [x] Quand le formulaire est réinitialisé, le template affiche le mode "add block"
+20. [ ] Dans le BlockEditorForm, et le fichier templates/admin/page_builder/_block_editor_form.html.twig, on a un soucis pour le post. Par exemple le champ image reste à null. Le form Type du block est src/Block/TextImageCtaBlockType.php
 Todo :
 - Déporter la doc USAGE IN BLOCK-SPECIFIC SCRIPTS dans la doc de création d'un bloc

@@ -647,6 +647,27 @@
                 console.log('Panel opened for block:', blockId);
             }
 
+            /**
+             * Common function to close the block editor panel
+             * Resets the form and closes the panel
+             */
+            function closeBlock() {
+                console.log('Close block editor');
+
+                if (!editorPanel) return;
+
+                // Dispatch custom event to the BlockEditor Stimulus controller
+                const pageBuilderElement = document.querySelector('[data-controller*="agence-adeliom--sylius-happy-cms-plugin--builder-block-editor"]');
+                if (pageBuilderElement) {
+                    const event = new CustomEvent('block-editor:close');
+                    pageBuilderElement.dispatchEvent(event);
+                } else {
+                    console.warn('Page builder element not found');
+                }
+
+                console.log('Block editor closed');
+            }
+
             if (iframe) {
 
                 // Prevent navigation in iframe and re-initialize events on reload
@@ -990,9 +1011,16 @@
             const addBlockButton = document.querySelector('[data-page-builder-target="addBlock"]');
 
             if (editorPanel && editorToggle) {
-                // Toggle button click handler - simple toggle overlay visibility
-                editorToggle.addEventListener('click', function() {
-                    editorPanel.classList.toggle('is-open');
+                // Toggle button click handler - close panel and reset form
+                editorToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    // If panel is open, close it and reset the form
+                    if (editorPanel.classList.contains('is-open')) {
+                        editorPanel.classList.remove('is-open');
+                        // Reset the form by calling closeBlock()
+                        closeBlock();
+                    }
                 });
 
                 // Close panel when clicking outside
@@ -1003,6 +1031,8 @@
                         e.target !== addBlockButton &&
                         !editorToggle.contains(e.target)) {
                         editorPanel.classList.remove('is-open');
+                        // Reset the form by calling closeBlock()
+                        closeBlock();
                     }
                 });
 
@@ -1010,6 +1040,8 @@
                 document.addEventListener('keydown', function(e) {
                     if (e.key === 'Escape' && editorPanel.classList.contains('is-open')) {
                         editorPanel.classList.remove('is-open');
+                        // Reset the form by calling closeBlock()
+                        closeBlock();
                     }
                 });
 

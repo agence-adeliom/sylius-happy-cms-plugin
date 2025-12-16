@@ -57,20 +57,7 @@ export default class extends Controller {
 
     // Only dispatch if we have a valid blockId (form is loaded)
     if (blockId) {
-      console.log('Dispatching on-load-builder event for block:', blockId);
-
-      // Dispatch custom event with blockId and element scope
-      const customEvent = new CustomEvent('on-load-builder', {
-        detail: {
-          blockId: blockId,
-          scope: this.element,
-          formElement: this.element.querySelector('form')
-        },
-        bubbles: true,
-        cancelable: false
-      });
-
-      this.element.dispatchEvent(customEvent);
+      console.log('Dispatching on-load-builder event');
 
       // Also dispatch on window for global listeners
       window.dispatchEvent(new CustomEvent('on-load-builder', {
