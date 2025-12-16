@@ -1,0 +1,32 @@
+{% form_theme form with this.formThemes %}
+
+<div {{ attributes.defaults(stimulus_controller('@agence-adeliom/sylius-happy-cms-plugin/builder-block-editor-form', {
+    blockId: this.blockId
+})) }}
+     style="display: flex; flex-direction: column; height: 100%;">
+
+    {# Form section with title #}
+    <div class="page-builder__form-content" style="flex: 1; overflow-y: auto; padding: 1rem;">
+        <h5 class="mb-3">{% trans %}sylius_happy_cms.page_builder.edit_block_title{% endtrans %}</h5>
+        {{ form_start(form, {
+            attr: {
+                'data-action': 'live#action',
+                'data-live-action-param': 'save'
+            }
+        }) }}
+            {{ form_widget(form) }}
+        {{ form_end(form) }}
+    </div>
+
+    {# Footer with save button #}
+    <div class="page-builder__editor-footer" data-loading="hide" style="padding: 1rem; border-top: 1px solid #dee2e6;">
+        <button
+            type="submit"
+            class="btn btn-primary"
+            data-action="live#action"
+            data-live-action-param="prevent|save"
+        >
+            {% trans %}sylius_happy_cms.page_builder.save_block{% endtrans %}
+        </button>
+    </div>
+</div>

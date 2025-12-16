@@ -96,7 +96,14 @@ Voici les étapes pour cette partie B :
 15. [x] Renommer l'event happy-cms:block-editor:form-loaded, pour le rendre plus générique 'on-load-builder', renommer les différents fichiers
 16. [x] Le Field TinyMCEField, charge le tinymce en js, hors cela ne fonctionne pas lorsqu'on a le rendu des blocs en ajax; Il faudrait voir pour déporter les scripts et la configuration dynamique dans un fichier d'asset à part. Le template du form theme est ici field/tinymce/form.html.twig. J'ai commencé à créé un fichier assets/tinymce/field.js. Le bundle utilisé est emileperron/tinymce-bundle.
 17. [x] Désormais, nous allons travailler sur le remplissage du formulaire avec les données d'un contentBlock à injecter. Puis gérer, la validation et l'enregistrement du formulaire.
-18. [ ]
-
+18. [x] Le formulaire ne persist pas et j'ai compris pourquoi. C'est par qu'on change son formType selon qu'on soit en mode édition ou en mode ajout. Le premier form type EmptyBlockType::class reste en mémoire. Pour solution on va devoir découper le BlockEditor en 2 composants différents. Le parent qui gère uniquement la partie ajout sans formulaire, le fait qu'on puisse passer d'un mode ajout au mode édit avec le blockId. Et dans le deuxième composant on va uniquement gérer la partie formulaire avec le formType du block en cours d'édition. Les 2 blocks pourront communiquer ensemble. On peut par exemple créer le composant BlockEditorForm.
+   - [x] Créé BlockEditorForm.php qui gère uniquement le formulaire du bloc
+   - [x] Créé _block_editor_form.html.twig pour le template du formulaire avec footer
+   - [x] Créé BlockEditorForm.js pour gérer les événements et dispatcher form:saved
+   - [x] Refactorisé BlockEditor pour retirer ComponentWithFormTrait et toutes les méthodes liées au formulaire
+   - [x] Mis à jour _block_editor.html.twig pour utiliser le composant BlockEditorForm en mode édition
+   - [x] Mis à jour BlockEditor.js pour écouter l'événement form:saved et recharger l'iframe
+   - [x] Les deux composants communiquent via l'événement form:saved qui remonte du formulaire vers le parent
+19. [ ] Il faudrait que lorsqu'on ferme le panneau editorPanel, on supprime le formulaire, c'est à dire revenir à l'état initial.
 Todo :
 - Déporter la doc USAGE IN BLOCK-SPECIFIC SCRIPTS dans la doc de création d'un bloc

@@ -15,33 +15,27 @@ export default class extends Controller {
   connect() {
     console.log('BlockEditor controller connected');
 
-    // Listen for block:saved event from Live Component
+    // Listen for block:saved event from Live Component (for toolbar actions)
     this.element.addEventListener('block:saved', this.onBlockSaved.bind(this));
+
+    // Listen for form:saved event from BlockEditorForm component
+    this.element.addEventListener('form:saved', this.onFormSaved.bind(this));
 
     // Listen for custom editBlock event from the page builder script
     this.element.addEventListener('block-editor:edit', this.onEditBlock.bind(this));
-
-    // Listen for Live Component render finished event to dispatch form loaded event
-    this.element.addEventListener('live:render:finished', this.onRenderFinished.bind(this));
-
-    // Trigger form loaded event on initial load
-    // Use requestAnimationFrame to ensure DOM is fully ready
-    requestAnimationFrame(() => {
-      this.onRenderFinished();
-    });
   }
 
   disconnect() {
     this.element.removeEventListener('block:saved', this.onBlockSaved.bind(this));
+    this.element.removeEventListener('form:saved', this.onFormSaved.bind(this));
     this.element.removeEventListener('block-editor:edit', this.onEditBlock.bind(this));
-    this.element.removeEventListener('live:render:finished', this.onRenderFinished.bind(this));
   }
 
   /**
    * Handle custom editBlock event from page builder script
    */
   async onEditBlock(event) {
-    console.log('dsds');
+    console.log('Edit block event received');
     const { blockId } = event.detail;
     await this.setBlockId(blockId);
     this.onRenderFinished();
@@ -62,10 +56,10 @@ export default class extends Controller {
   }
 
   /**
-   * Handle block:saved event from Live Component
+   * Handle block:saved event from Live Component (for toolbar actions like publish, move, delete)
    */
   onBlockSaved(event) {
-    console.log('Block saved event received:', event.detail);
+    console.log('Block saved event received from toolbar:', event.detail);
 
     const { blockId } = event.detail;
 
@@ -77,42 +71,22 @@ export default class extends Controller {
   }
 
   /**
-   * Handle Live Component render finished event
-   * Dispatches a custom event when the form is loaded/updated
-   * This allows block-specific JavaScript to initialize with the correct scope
-   *
-   * USAGE IN BLOCK-SPECIFIC SCRIPTS:
-   *
-   * // Listen for the form loaded event on window
-   * window.addEventListener('on-load-builder', (event) => {
-   *   const { blockId, scope, formElement } = event.detail;
-   *
-   *   // Example: Initialize a date picker within the form scope
-   *   const dateInputs = scope.querySelectorAll('.datepicker');
-   *   dateInputs.forEach(input => {
-   *     // Initialize your date picker library here
-   *   });
-   *
-   *   // Example: Initialize a rich text editor for a specific field
-   *   const textArea = formElement.querySelector('textarea.wysiwyg');
-   *   if (textArea) {
-   *     // Initialize your editor here
-   *   }
-   * });
-   *
-   * // Or listen for a specific block type by checking blockId
-   * window.addEventListener('on-load-builder', (event) => {
-   *   const { blockId, scope } = event.detail;
-   *
-   *   // Only initialize for specific block type
-   *   const blockTypeField = scope.querySelector('[name*="[type]"]');
-   *   if (blockTypeField && blockTypeField.value === 'my_custom_block') {
-   *     // Initialize your custom block's JavaScript here
-   *   }
-   * });
+   * Handle form:saved event from BlockEditorForm component
    */
+  onFormSaved(event) {
+    console.log('Form saved event received from BlockEditorForm:', event.detail);
+
+    const { blockId } = event.detail;
+
+    console.log('Reloading iframe to show updated content');
+    document.querySelector('[data-page-builder-target="iframe"]').contentWindow.location.reload();
+
+    // Dispatch custom event for other parts of the page to listen
+    this.dispatch('blockSaved', { detail: { blockId } });
+  }
+
   onRenderFinished(event) {
-    console.log('Block editor form rendered');
+    console.log('Block editor rendered');
 
     const blockId = this.blockIdValue;
 
@@ -125,7 +99,6 @@ export default class extends Controller {
         detail: {
           blockId: blockId,
           scope: this.element,
-          formElement: this.element.querySelector('form')
         },
         bubbles: true,
         cancelable: false
@@ -138,7 +111,6 @@ export default class extends Controller {
         detail: {
           blockId: blockId,
           scope: this.element,
-          formElement: this.element.querySelector('form')
         }
       }));
     }

@@ -9,25 +9,21 @@ use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentBlockInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableInterface;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockCollection;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
-use Adeliom\SyliusHappyCMSPlugin\Form\Block\EmptyBlockType;
 use Doctrine\ORM\EntityManagerInterface;
 use Sylius\Resource\Model\ResourceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\ComponentToolsTrait;
-use Symfony\UX\LiveComponent\ComponentWithFormTrait;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 
 class BlockEditor extends AbstractController
 {
     use DefaultActionTrait;
-    use ComponentWithFormTrait;
     use ComponentToolsTrait;
 
     #[LiveProp(writable: true, onUpdated: 'getBlock')]
@@ -44,13 +40,6 @@ class BlockEditor extends AbstractController
 
     public ContentEditableInterface $entity;
 
-    /** @var string[] */
-    private array $formThemes = [];
-
-    /** Track if form has been initialized to prevent overwriting user data */
-    #[LiveProp]
-    public bool $isFormInitialized = false;
-
     public function __construct(
         private readonly BlockCollection $blockCollection,
         private readonly EntityManagerInterface $entityManager,
@@ -62,7 +51,6 @@ class BlockEditor extends AbstractController
     public function changeBlock(#[LiveArg('blockId')] ?int $blockId = null): void
     {
         $this->blockId = $blockId;
-        $this->isFormInitialized = false; // Reset form initialization when changing blocks
         $this->getBlock();
     }
 
@@ -262,117 +250,6 @@ class BlockEditor extends AbstractController
         ]);
 
         // Dispatch event to reload iframe
-        $this->dispatchBrowserEvent('block:saved', [
-            'blockId' => $this->blockId,
-        ]);
-    }
-
-    /**
-     * Get form themes for the current block type.
-     *
-     * @return string[]
-     */
-    public function getFormThemes(): array
-    {
-        return array_values(
-            array_unique(
-                array_merge(
-                    ['@SyliusAdmin/shared/form_theme.html.twig'],
-                    $this->formThemes,
-                ),
-            ),
-        );
-    }
-
-    protected function instantiateForm(): FormInterface
-    {
-        $block = $this->getBlock();
-
-        if (null === $block) {
-            // Create mode: return empty form (will show "Browse Blocks" button)
-            $this->formThemes = [];
-            return $this->createForm(EmptyBlockType::class, [], [
-                'csrf_protection' => false,
-            ]);
-        }
-
-        // Edit mode: Get the block type configuration
-        $blockType = $block->getType();
-        if (null === $blockType) {
-            throw new \LogicException('Block has no type');
-        }
-
-        $blocks = $this->blockCollection->getBlocks();
-        if (!isset($blocks[$blockType])) {
-            throw new \LogicException(sprintf('Unknown block type: %s', $blockType));
-        }
-
-        $blockConfig = $blocks[$blockType];
-        $formClass = $blockConfig::class;
-
-        // Get form themes from the block type
-        if (method_exists($blockConfig, 'configureAdminFormThemes')) {
-            $this->formThemes = $blockConfig->configureAdminFormThemes();
-        } else {
-            $this->formThemes = [];
-        }
-
-        // Use draft data for the form, fallback to published data if draft is empty
-        $draftData = $block->getDraftData();
-
-        // If draft data is null or empty, use published data as fallback
-        if (null === $draftData || empty($draftData)) {
-            $draftData = $block->getPublishedData() ?? [];
-        }
-
-        // Only set initial values on first load, not on subsequent re-renders
-        // This prevents overwriting user modifications
-        if (!$this->isFormInitialized) {
-            $this->formValues = $draftData;
-            $this->isFormInitialized = true;
-        }
-
-        // Create and return the form without passing data (handled by ComponentWithFormTrait via formValues)
-        // Disable CSRF protection as Live Components have their own security mechanism
-        return $this->createForm($formClass, $draftData, [
-            'csrf_protection' => false,
-        ]);
-    }
-
-    #[LiveAction]
-    public function save(): void
-    {
-        // Submit the form
-        $this->submitForm();
-
-        // Get the form instance
-        $form = $this->getForm();
-
-        // Check if the form is valid
-        if (!$form->isValid()) {
-            // If form is not valid, the component will re-render with errors
-            return;
-        }
-
-        // Get the block
-        $block = $this->getBlock();
-        if (null === $block) {
-            return;
-        }
-
-        /** @var array<string, mixed> $formData */
-        $formData = $form->getData();
-
-        dump($formData);
-
-        // Save to draft data
-        $block->setDraftData($formData);
-        dump($block);
-
-        // Persist changes to database
-        $this->entityManager->flush();
-
-        // Dispatch event to reload iframe to show the updated block
         $this->dispatchBrowserEvent('block:saved', [
             'blockId' => $this->blockId,
         ]);

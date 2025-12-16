@@ -67,9 +67,12 @@ if (document.readyState == 'loading') {
 
 // When render in the page builder
 window.addEventListener('on-load-builder', (event) => {
+  console.log('Media Field: Reinitializing after AJAX load');
   var vueElements = document.querySelectorAll(".happy-cms-media-widget");
   vueElements.forEach(vueElement => {
-    if(vueElement && !vueElement.__vue__ && window.Vue){
+    if(vueElement && vueElement.__vue__ && window.Vue){
+      vueElement.$forceUpdate();
+    } else if(vueElement && !vueElement.__vue__ && window.Vue) {
       new window.Vue({ el: vueElement });
     }
   })
