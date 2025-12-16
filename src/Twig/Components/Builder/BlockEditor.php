@@ -47,6 +47,10 @@ class BlockEditor extends AbstractController
     /** @var string[] */
     private array $formThemes = [];
 
+    /** Track if form has been initialized to prevent overwriting user data */
+    #[LiveProp]
+    public bool $isFormInitialized = false;
+
     public function __construct(
         private readonly BlockCollection $blockCollection,
         private readonly EntityManagerInterface $entityManager,
@@ -58,6 +62,7 @@ class BlockEditor extends AbstractController
     public function changeBlock(#[LiveArg('blockId')] ?int $blockId = null): void
     {
         $this->blockId = $blockId;
+        $this->isFormInitialized = false; // Reset form initialization when changing blocks
         $this->getBlock();
     }
 
@@ -286,8 +291,9 @@ class BlockEditor extends AbstractController
         if (null === $block) {
             // Create mode: return empty form (will show "Browse Blocks" button)
             $this->formThemes = [];
-
-            return $this->createForm(EmptyBlockType::class, []);
+            return $this->createForm(EmptyBlockType::class, [], [
+                'csrf_protection' => false,
+            ]);
         }
 
         // Edit mode: Get the block type configuration
@@ -319,12 +325,18 @@ class BlockEditor extends AbstractController
             $draftData = $block->getPublishedData() ?? [];
         }
 
-        // Store initial data for debugging and access in template
-        $this->formValues = $draftData;
+        // Only set initial values on first load, not on subsequent re-renders
+        // This prevents overwriting user modifications
+        if (!$this->isFormInitialized) {
+            $this->formValues = $draftData;
+            $this->isFormInitialized = true;
+        }
 
-        // Create and return the form with draft data as the initial data
-        // For Live Components, we must pass data via the 'data' option
-        return $this->createForm($formClass, null);
+        // Create and return the form without passing data (handled by ComponentWithFormTrait via formValues)
+        // Disable CSRF protection as Live Components have their own security mechanism
+        return $this->createForm($formClass, $draftData, [
+            'csrf_protection' => false,
+        ]);
     }
 
     #[LiveAction]
@@ -351,8 +363,11 @@ class BlockEditor extends AbstractController
         /** @var array<string, mixed> $formData */
         $formData = $form->getData();
 
+        dump($formData);
+
         // Save to draft data
         $block->setDraftData($formData);
+        dump($block);
 
         // Persist changes to database
         $this->entityManager->flush();
