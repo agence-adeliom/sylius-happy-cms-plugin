@@ -80,7 +80,7 @@ class BlockEditor extends AbstractController
 
         return $blocks->filter(function (ContentBlockInterface $block) {
             return $block->getId() === $this->blockId;
-        })->first();
+        })->first() ?: null;
     }
 
     public function hasBlock(): bool
