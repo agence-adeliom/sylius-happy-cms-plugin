@@ -165,6 +165,10 @@ class BlockEditorForm extends AbstractController
         if (!$this->isFormInitialized) {
             $this->formValues = $draftData;
             $this->isFormInitialized = true;
+        } else {
+            $this->dispatchBrowserEvent('sylius-crud:dynamic:reload', [
+                'blockId' => $this->blockId,
+            ]);
         }
 
         // Create and return the form without passing data (handled by ComponentWithFormTrait via formValues)

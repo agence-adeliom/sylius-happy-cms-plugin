@@ -41,7 +41,6 @@ function setupLiveComponentCallback(editor) {
             // Add change listener to update live component
             editor._editor.on('Change Input Undo Redo', () => {
                 // Update the value and dispatch change event
-                const content = editor._editor.getContent();
                 const event = new Event('change', { 'bubbles': true });
                 editor.dispatchEvent(event);
 

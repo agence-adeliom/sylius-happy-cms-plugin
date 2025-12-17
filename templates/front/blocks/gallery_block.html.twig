@@ -16,10 +16,12 @@
         {% if images is not empty %}
             <div class="col-span-full grid grid-cols-1 md:grid-cols-3 gap-6">
                 {% for img in images %}
-                    {{ happy_cms_media(img, 'reference', {
-                        'class': 'aspect-[4/3] col-span-1 object-cover w-full h-full',
-                        'alt': 'sylius.homepage.banner_content'|trans
-                    }) }}
+                    {% if img %}
+                        {{ happy_cms_media(img, 'reference', {
+                            'class': 'aspect-[4/3] col-span-1 object-cover w-full h-full',
+                            'alt': 'sylius.homepage.banner_content'|trans
+                        }) }}
+                    {% endif %}
                 {% endfor %}
             </div>
         {% endif %}

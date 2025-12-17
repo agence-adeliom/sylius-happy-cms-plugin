@@ -70,6 +70,10 @@ window.addEventListener('sylius-crud:dynamic:reload', (event) => {
   console.log('Media Field: Reinitializing after AJAX load');
   var vueElements = document.querySelectorAll(".happy-cms-media-widget");
   vueElements.forEach(vueElement => {
+    // If the element has a similar widget, we first remove it.
+    if (vueElement.previousElementSibling && vueElement.previousElementSibling.classList.contains('happy-cms-media-widget')) {
+      vueElement.previousElementSibling.remove();
+    }
     if(vueElement && !vueElement.__vue__ && window.Vue) {
       new window.Vue({ el: vueElement });
     }

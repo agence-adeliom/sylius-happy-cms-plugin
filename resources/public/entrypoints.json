@@ -13,7 +13,7 @@
         "/bundles/syliushappycmsplugin/media-form.1c02ab1e.css"
       ],
       "js": [
-        "/bundles/syliushappycmsplugin/media-form.3aa9c3ae.js"
+        "/bundles/syliushappycmsplugin/media-form.2e8a5c24.js"
       ]
     },
     "seo-block-type": {
@@ -28,7 +28,7 @@
     },
     "tiny-mce": {
       "js": [
-        "/bundles/syliushappycmsplugin/tiny-mce.8fc826fb.js"
+        "/bundles/syliushappycmsplugin/tiny-mce.7fcba24e.js"
       ]
     }
   }
