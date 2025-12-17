@@ -183,7 +183,7 @@ class CreateDemoPagesCommand extends AbstractContentCommand
                     'wysiwyg' => '<p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>',
                     'cta_one' => [
                         'label' => 'CTA 1',
-                        'link' => '/'
+                        'link' => '/',
                     ],
                     'position' => '3',
                     'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\CtaBlockType',
@@ -196,8 +196,8 @@ class CreateDemoPagesCommand extends AbstractContentCommand
                         [
                             'key' => '1',
                             'text' => '1',
-                            'icon' => 'star'
-                        ]
+                            'icon' => 'star',
+                        ],
                     ],
                     'position' => '4',
                     'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\KeyFeaturesBlockType',
@@ -215,7 +215,7 @@ class CreateDemoPagesCommand extends AbstractContentCommand
                     'wysiwyg' => '<p>Sed do eiusmod tempor incididunt ut labore et dolore magna <b>aliqua</b>.</p>',
                     'cta' => [
                         'label' => 'CTA 1',
-                        'link' => '/'
+                        'link' => '/',
                     ],
                     'items' => [
                         [
@@ -225,7 +225,7 @@ class CreateDemoPagesCommand extends AbstractContentCommand
                         [
                             'title' => 'Accordion 2',
                             'content' => '<p>Text 2.</p>',
-                        ]
+                        ],
                     ],
                     'position' => '6',
                     'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\AccordionBlockType',

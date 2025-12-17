@@ -40,6 +40,7 @@ class BlockEditorForm extends AbstractController
     public string $locale;
 
     private ?ContentEditableInterface $entity = null;
+
     private ?ContentBlockInterface $block = null;
 
     /** @var string[] */
@@ -199,11 +200,11 @@ class BlockEditorForm extends AbstractController
         /** @var array<string, mixed> $formData */
         $formData = $form->getData();
 
-        if(isset($formData['block_type'])) {
+        if (isset($formData['block_type'])) {
             unset($formData['block_type']);
         }
 
-        if(isset($formData['block_published'])) {
+        if (isset($formData['block_published'])) {
             unset($formData['block_published']);
         }
 
