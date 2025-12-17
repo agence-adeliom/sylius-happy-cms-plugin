@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Block;
 
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
 use Adeliom\SyliusEasyCrudPlugin\Form\SortableCollectionType;
 use Adeliom\SyliusHappyCMSPlugin\Asset\AssetHappyCMSPackage;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\AbstractBlock;
@@ -33,6 +34,24 @@ class GalleryBlockType extends AbstractBlock
                 'allow_delete' => true,
                 'allow_drag' => true,
             ]);
+    }
+
+    /**
+     * @return array<string, array<int,string|Asset>>
+     */
+    public function configureAdminAssets(): array
+    {
+        // Sub formType asset has to be declared manually
+        return array_merge(MediaType::configureAdminAssets(), parent::configureAdminAssets());
+    }
+
+    /**
+     * @return array<string, array<int,string|Asset>>
+     */
+    public function configureAdminFormThemes(): array
+    {
+        // Sub formType asset has to be declared manually
+        return array_merge(MediaType::configureAdminFormThemes(), parent::configureAdminFormThemes());
     }
 
     public function getName(): string

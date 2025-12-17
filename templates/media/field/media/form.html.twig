@@ -140,7 +140,7 @@
         });
 
         // When render in the page builder
-        window.addEventListener('on-load-builder', (event) => {
+        window.addEventListener('sylius-crud:dynamic:reload', (event) => {
             var vueElement = document.querySelector(".happy-cms-media-widget[data-widget='{{ form.vars.id }}']");
             initVueMediaWidget(vueElement);
         });

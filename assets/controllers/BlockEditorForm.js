@@ -57,10 +57,10 @@ export default class extends Controller {
 
     // Only dispatch if we have a valid blockId (form is loaded)
     if (blockId) {
-      console.log('Dispatching on-load-builder event');
+      console.log('Dispatching sylius-crud:dynamic:reload event');
 
       // Also dispatch on window for global listeners
-      window.dispatchEvent(new CustomEvent('on-load-builder', {
+      window.dispatchEvent(new CustomEvent('sylius-crud:dynamic:reload', {
         detail: {
           blockId: blockId,
           scope: this.element,

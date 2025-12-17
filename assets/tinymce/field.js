@@ -32,6 +32,33 @@ function loadScriptIfNeeded(url, checkGlobal = null) {
 }
 
 /**
+ * Setup callback to update live component when TinyMCE content changes
+ */
+function setupLiveComponentCallback(editor) {
+    // Wait for the TinyMCE instance to be ready
+    const checkEditorReady = () => {
+        if (editor._editor) {
+            // Add change listener to update live component
+            editor._editor.on('Change Input Undo Redo', () => {
+                // Update the value and dispatch change event
+                const content = editor._editor.getContent();
+                const event = new Event('change', { 'bubbles': true });
+                editor.dispatchEvent(event);
+
+                console.log('TinyMCE: Live component updated with new content');
+            });
+
+            console.log('TinyMCE: Live component callback registered successfully');
+        } else {
+            // Retry if editor not ready yet
+            setTimeout(checkEditorReady, 50);
+        }
+    };
+
+    checkEditorReady();
+}
+
+/**
  * Inject custom CSS into TinyMCE shadow DOM
  */
 function injectTinyMCEStyles(editor) {
@@ -89,12 +116,6 @@ function initializeTinyMCE() {
             console.log(`TinyMCE: Found ${editors.length} editor(s) to initialize`);
 
             editors.forEach(editor => {
-                console.log('TinyMCE: Processing editor element', editor);
-                console.log('TinyMCE: editor._status =', editor._status);
-                console.log('TinyMCE: editor._editor exists?', !!editor._editor);
-
-                // NEW APPROACH: Instead of trying to reset the webcomponent state,
-                // we completely replace it with a fresh clone
 
                 const parent = editor.parentNode;
                 if (!parent) {
@@ -138,6 +159,9 @@ function initializeTinyMCE() {
                 setTimeout(() => {
                     console.log('TinyMCE: Checking clone status - _status =', clone._status);
                     injectTinyMCEStyles(clone);
+
+                    // Step 6: Add change callback to update live component
+                    setupLiveComponentCallback(clone);
                 }, 500);
             });
         })
@@ -158,9 +182,7 @@ if (document.readyState === 'loading') {
 /**
  * Reinitialize when loaded in the page builder or other AJAX contexts
  */
-window.addEventListener('on-load-builder', (event) => {
-    console.log('TinyMCE: Reinitializing after AJAX load', event.detail);
-
+window.addEventListener('sylius-crud:dynamic:reload', () => {
     // Give the DOM a moment to settle after AJAX update
     setTimeout(() => {
         initializeTinyMCE();

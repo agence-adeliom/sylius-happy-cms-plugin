@@ -66,7 +66,7 @@ if (document.readyState == 'loading') {
 }
 
 // When render in the page builder
-window.addEventListener('on-load-builder', (event) => {
+window.addEventListener('sylius-crud:dynamic:reload', (event) => {
   console.log('Media Field: Reinitializing after AJAX load');
   var vueElements = document.querySelectorAll(".happy-cms-media-widget");
   vueElements.forEach(vueElement => {

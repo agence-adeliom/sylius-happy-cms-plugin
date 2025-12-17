@@ -164,26 +164,71 @@ class CreateDemoPagesCommand extends AbstractContentCommand
             $flexContent = [
                 'hp-flex-1' => [
                     'image' => $image1?->getId(),
-                    'title' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+                    'title' => 'TextImageCtaBlockType, consectetur adipiscing elit.',
                     'wysiwyg' => '<p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>',
                     'position' => '1',
                     'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\TextImageCtaBlockType',
                     'block_published' => '1',
                 ],
                 'hp-flex-2' => [
-                    'image' => $image2?->getId(),
-                    'title' => 'BBB Lorem.',
+                    'title' => 'GalleryBlockType',
                     'wysiwyg' => '<p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>',
-                    'position' => '1',
-                    'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\TextImageCtaBlockType',
-                    'block_published' => '0',
+                    'images' => [$image1?->getId(), $image2?->getId(), $image3?->getId()],
+                    'position' => '2',
+                    'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\GalleryBlockType',
+                    'block_published' => '1',
                 ],
                 'hp-flex-3' => [
-                    'image' => $image3?->getId(),
-                    'title' => 'CCC Lorem.',
+                    'title' => 'CtaBlockType',
                     'wysiwyg' => '<p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>',
-                    'position' => '1',
-                    'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\TextImageCtaBlockType',
+                    'cta_one' => [
+                        'label' => 'CTA 1',
+                        'link' => '/'
+                    ],
+                    'position' => '3',
+                    'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\CtaBlockType',
+                    'block_published' => '1',
+                ],
+                'hp-flex-4' => [
+                    'title' => 'KeyFeaturesBlockType',
+                    'wysiwyg' => '<p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>',
+                    'features' => [
+                        [
+                            'key' => '1',
+                            'text' => '1',
+                            'icon' => 'star'
+                        ]
+                    ],
+                    'position' => '4',
+                    'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\KeyFeaturesBlockType',
+                    'block_published' => '1',
+                ],
+                'hp-flex-5' => [
+                    'title' => 'WysiwygBlockType',
+                    'wysiwyg' => '<p>Sed do eiusmod tempor incididunt ut labore et dolore magna <b>aliqua</b>.</p>',
+                    'position' => '5',
+                    'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\WysiwygBlockType',
+                    'block_published' => '1',
+                ],
+                'hp-flex-6' => [
+                    'title' => 'AccordionBlockType',
+                    'wysiwyg' => '<p>Sed do eiusmod tempor incididunt ut labore et dolore magna <b>aliqua</b>.</p>',
+                    'cta' => [
+                        'label' => 'CTA 1',
+                        'link' => '/'
+                    ],
+                    'items' => [
+                        [
+                            'title' => 'Accordion 1',
+                            'content' => '<p>Text 1.</p>',
+                        ],
+                        [
+                            'title' => 'Accordion 2',
+                            'content' => '<p>Text 2.</p>',
+                        ]
+                    ],
+                    'position' => '6',
+                    'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\AccordionBlockType',
                     'block_published' => '1',
                 ],
             ];
