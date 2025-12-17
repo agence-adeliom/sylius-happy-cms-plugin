@@ -97,23 +97,9 @@ Voici les étapes pour cette partie B :
 16. [x] Le Field TinyMCEField, charge le tinymce en js, hors cela ne fonctionne pas lorsqu'on a le rendu des blocs en ajax; Il faudrait voir pour déporter les scripts et la configuration dynamique dans un fichier d'asset à part. Le template du form theme est ici field/tinymce/form.html.twig. J'ai commencé à créé un fichier assets/tinymce/field.js. Le bundle utilisé est emileperron/tinymce-bundle.
 17. [x] Désormais, nous allons travailler sur le remplissage du formulaire avec les données d'un contentBlock à injecter. Puis gérer, la validation et l'enregistrement du formulaire.
 18. [x] Le formulaire ne persist pas et j'ai compris pourquoi. C'est par qu'on change son formType selon qu'on soit en mode édition ou en mode ajout. Le premier form type EmptyBlockType::class reste en mémoire. Pour solution on va devoir découper le BlockEditor en 2 composants différents. Le parent qui gère uniquement la partie ajout sans formulaire, le fait qu'on puisse passer d'un mode ajout au mode édit avec le blockId. Et dans le deuxième composant on va uniquement gérer la partie formulaire avec le formType du block en cours d'édition. Les 2 blocks pourront communiquer ensemble. On peut par exemple créer le composant BlockEditorForm.
-   - [x] Créé BlockEditorForm.php qui gère uniquement le formulaire du bloc
-   - [x] Créé _block_editor_form.html.twig pour le template du formulaire avec footer
-   - [x] Créé BlockEditorForm.js pour gérer les événements et dispatcher form:saved
-   - [x] Refactorisé BlockEditor pour retirer ComponentWithFormTrait et toutes les méthodes liées au formulaire
-   - [x] Mis à jour _block_editor.html.twig pour utiliser le composant BlockEditorForm en mode édition
-   - [x] Mis à jour BlockEditor.js pour écouter l'événement form:saved et recharger l'iframe
-   - [x] Les deux composants communiquent via l'événement form:saved qui remonte du formulaire vers le parent
+
 19. [x] Dans le fichier templates/admin/page_builder/index.html.twig, nous avons à partir de la ligne 992, plusieurs scripts qui ferment le panneau, il faudrait appeler la fonction editBlock(null) quand il se ferme.
-   - [x] Créé la fonction `closeBlock()` (ligne 654-669) qui déclenche l'événement custom 'block-editor:close'
-   - [x] Modifié BlockEditor.js pour intercepter l'événement 'block-editor:close' et appeler l'action cancel()
-   - [x] Remplacé tous les appels à editBlock(null) par closeBlock() dans les handlers de fermeture :
-     - Handler du bouton editorToggle (ligne 1022)
-     - Handler de fermeture par clic à l'extérieur (ligne 1035)
-     - Handler de fermeture par touche Escape (ligne 1044)
-   - [x] La fonction closeBlock() dispatch l'événement 'block-editor:close' au composant BlockEditor
-   - [x] Le composant BlockEditor exécute l'action cancel() qui réinitialise le formulaire
-   - [x] Quand le formulaire est réinitialisé, le template affiche le mode "add block"
+
 20. [x] On va tester une nouvelle approche pour le formulaire d'édition d'un bloc :
     - Au lieu de passer par un composant live BlockEditorForm
     - On va remplacer la layer par une iframe qui va occuper la hauteur disponible.
@@ -123,19 +109,14 @@ Voici les étapes pour cette partie B :
     - Au post, on va effectuer les mêmes actions sur l'entité ContentBlock, celles qu'on avait dans la méthode save().
     - Une fois le form validé et enregistré, on pourra ajouter un event pour recharger l'autre iframe de preview.
 21. [x] Dans le fichier templates/admin/page_builder/_block_editor.html.twig, dans le cas où on propose de copier des contenu venant d'une autre languue, cf. availableLocalesWithBlocks. J'aimerais ajouter un checkbox en dessous des choix. Une checkbox qui permettrait de traduire automatiquement via un agent IA (non configuré encore pour l'instant) dans la langue en cours. L'option IA sera à terme activable dans ce bundle avec le plugin symfony ia. Peut être trouver le moyen de donner à l'utilisateur d'en savoir plus en redirigeant vers la doc. https://github.com/agence-adeliom/sylius-happy-cms-plugin/blob/2.x/docs/CONFIGURE_IA_AGENT.md. Cette fonctionnalité sera implémentée plus tard.
-   - [x] Ajouté la checkbox de traduction IA dans le template _block_editor.html.twig (ligne 177-198)
-   - [x] Ajouté un lien vers la documentation CONFIGURE_IA_AGENT.md avec une icône d'ouverture externe
-   - [x] Ajouté les traductions en français et anglais dans messages.fr.yaml et messages.en.yaml :
-     - ai_translate_blocks: "Traduire automatiquement les blocs avec l'IA" / "Automatically translate blocks with AI"
-     - ai_translate_blocks_help: "Cette fonctionnalité nécessite la configuration d'un agent IA." / "This feature requires AI agent configuration."
-     - ai_translate_learn_more: "En savoir plus" / "Learn more"
-   - [x] Ajouté la propriété LiveProp `aiTranslateEnabled` dans BlockEditor.php pour gérer l'état de la checkbox
-   - [x] Préparé la méthode copyBlocksFromLocale() avec des commentaires TODO pour l'implémentation future de la traduction IA
-   - [x] Lié la checkbox au composant Live via data-model="aiTranslateEnabled"
-   - [x] L'événement 'blocks:copied' inclut maintenant l'état aiTranslateEnabled pour les futures implémentations
-22. [ ] Dans le fichier templates/admin/page_builder/content.html.twig, j'ai ajouté un lien pour publier la page. L'idée est de recharger la page en passant des GET :
-    - Au clic sur le bouton j'aimerai afficher une modale ou dropdown qui demande à l'utilisateur de choisir les langues à publier parmis celles disponibles.
-    - A la validation on envoi les get puis
-    - Dans le fichier src/Controller/PageBuilder/PageBuilderController.php, method indexAction, il faut détecter les get : ?publish=1. Puis appeler une méthode private pour publier les contenus de la page pour le ou les langues sélectionnées. On transfert les données draft vers leur équivalent.
+
+22. [x] Dans le fichier templates/admin/page_builder/content.html.twig, j'ai ajouté un lien pour publier la page. L'idée est de recharger la page en passant des GET :
+ 
+23. [ ] Alimenter l'interface browse package.
+24. [ ] Bouton retour vers la page d'édition, trouver un moyen de dynamiser le retour vers la route edit
+25. [ ] Dans PageAdmin, voir pour remplacer l'action "manage content" par le lien vers le nouveau page builder.
+26. [ ] Voir pour le bundle IA, pour l'intégrer et l'invoquer optionnement si le bundle est installé.
+27. [ ] Déplacer les styles et scripts dans des assets
+
 Todo :
 - Déporter la doc USAGE IN BLOCK-SPECIFIC SCRIPTS dans la doc de création d'un bloc

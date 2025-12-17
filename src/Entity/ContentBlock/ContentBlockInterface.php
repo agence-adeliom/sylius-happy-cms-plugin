@@ -52,9 +52,29 @@ interface ContentBlockInterface
 
     public function isPublished(): bool;
 
+    public function getPublishState(): ?string;
+
     public function setPublishState(?string $state): void;
 
+    public function getPublishDate(): ?\DateTimeInterface;
+
+    public function setPublishDate(?\DateTimeInterface $publishDate): self;
+
+    public function getUnpublishDate(): ?\DateTimeInterface;
+
+    public function setUnpublishDate(?\DateTimeInterface $unpublishDate): self;
+
     public function setPreviewPublishState(?string $state): void;
+
+    public function getPreviewPublishState(): ?string;
+
+    public function getPreviewPublishDate(): ?\DateTimeInterface;
+
+    public function setPreviewPublishDate(?\DateTimeInterface $publishDate): self;
+
+    public function getPreviewUnpublishDate(): ?\DateTimeInterface;
+
+    public function setPreviewUnpublishDate(?\DateTimeInterface $unpublishDate): self;
 
     public function isPreviewPublished(): bool;
 

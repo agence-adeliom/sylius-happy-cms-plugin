@@ -39,6 +39,24 @@ class PageBuilderController extends AbstractController
         // Load the entity
         $entity = $this->loadEntity($entityClass, $id);
 
+        // Check if we need to publish content
+        if ($request->query->has('publish') && '1' === $request->query->get('publish')) {
+            $localesToPublish = $request->query->all('locales') ?? [];
+
+            if (!empty($localesToPublish)) {
+                $this->publishContent($entity, $localesToPublish);
+
+                $this->addFlash('success', $this->translator->trans('sylius_happy_cms.page_builder.content_published_successfully'));
+
+                // Redirect to remove the publish parameter from URL
+                return $this->redirectToRoute('sylius_happy_cms_admin_page_builder', [
+                    'resource' => $resource,
+                    'id' => $id,
+                    'locale' => $request->query->get('locale', $request->getLocale()),
+                ]);
+            }
+        }
+
         // Get the current locale from query parameter or use default locale
         $locale = $request->query->get('locale', $request->getLocale());
 
@@ -249,6 +267,47 @@ class PageBuilderController extends AbstractController
         }
 
         return $assets;
+    }
+
+    /**
+     * Publish content for the specified locales.
+     * Copies draft data to published data for all blocks in the selected locales.
+     *
+     * @param array<string> $locales
+     */
+    private function publishContent(ContentEditableInterface $entity, array $locales): void
+    {
+        $allBlocks = $entity->getContentBlocks();
+
+        $publishedCount = 0;
+
+        foreach ($allBlocks as $block) {
+            // Check if block belongs to one of the selected locales
+            if (in_array($block->getLocale(), $locales, true)) {
+                $draftData = $block->getDraftData();
+
+                // Only publish if there's draft data
+                if (null !== $draftData) {
+                    // Copy draft data to published data
+                    $block->setPublishedData($draftData);
+
+                    // Copy preview position to published state
+                    $block->setPosition($block->getPosition());
+
+                    // Copy preview state to published state
+                    $block->setPublishState($block->getPreviewPublishState());
+
+                    // Copy preview published date to published data
+                    $block->setPublishDate($block->getPreviewPublishDate());
+
+                    // Copy preview published date to published data
+                    $block->setUnpublishDate($block->getPreviewUnpublishDate());
+                }
+            }
+        }
+
+        // Flush changes to database
+        $this->entityManager->flush();
     }
 
     /**

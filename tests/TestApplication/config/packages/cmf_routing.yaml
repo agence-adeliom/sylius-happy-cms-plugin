@@ -4,4 +4,3 @@ cmf_routing:
             - "en_GB"
             - "fr_FR"
             - "de_DE"
-        match_implicit_locale: false
