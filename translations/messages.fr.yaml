@@ -358,3 +358,14 @@ sylius_happy_cms:
     copy_from_locale_title: Copier les blocs depuis une autre langue
     copy_from_locale: "Copier depuis %locale%"
     or_add_new_block: Ou ajouter un nouveau bloc à partir de zéro
+    edit_block: 'Éditer le bloc'
+    block_saved: 'Bloc enregistré'
+    block_saved_successfully: 'Bloc enregistré avec succès'
+    form_contain_errors: 'Le formulaire contient des erreurs'
+    reloading_preview: 'Actualisation de l''aperçu...'
+    visibility_managed_in_parent: 'La visibilité est gérée dans la page parente'
+    position_managed_in_parent: 'La position est gérée dans la page parente'
+    delete_managed_in_parent: 'La suppression est gérée dans la page parente'
+    ai_translate_blocks: 'Traduire automatiquement les blocs avec l''IA'
+    ai_translate_blocks_help: 'Cette fonctionnalité nécessite la configuration d''un agent IA.'
+    ai_translate_learn_more: 'En savoir plus'

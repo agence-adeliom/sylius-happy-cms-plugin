@@ -11,26 +11,6 @@
 {% block stylesheets %}
     {{ parent() }}
 
-    {# Inject block-specific CSS assets #}
-    {% if blockAssets is defined %}
-        {% for cssAsset in blockAssets.css %}
-            {% if cssAsset.getPackageName is defined %}
-                <link rel="stylesheet" href="{{ asset(cssAsset.value, cssAsset.getPackageName) }}">
-            {% else %}
-                <link rel="stylesheet" href="{{ asset(cssAsset) }}">
-            {% endif %}
-        {% endfor %}
-
-        {# Inject block-specific Webpack Encore assets (CSS) #}
-        {% for webpackAsset in blockAssets.webpack %}
-            {% if webpackAsset.getWebpackPackageName is defined %}
-                {{ encore_entry_link_tags(webpackAsset.value, webpackAsset.getWebpackPackageName) }}
-            {% else %}
-                {{ encore_entry_link_tags(webpackAsset) }}
-            {% endif %}
-        {% endfor %}
-    {% endif %}
-
     <style>
         /* TinyMCE fullscreen styles are now injected directly into the shadow DOM via assets/tinymce/field.js */
 
@@ -454,26 +434,6 @@
 
 {% block javascripts %}
     {{ parent() }}
-
-    {# Inject block-specific JS assets #}
-    {% if blockAssets is defined %}
-        {% for jsAsset in blockAssets.js %}
-            {% if jsAsset.getPackageName is defined %}
-                <script src="{{ asset(jsAsset.value, jsAsset.getPackageName) }}"></script>
-            {% else %}
-                <script src="{{ asset(jsAsset) }}"></script>
-            {% endif %}
-        {% endfor %}
-
-        {# Inject block-specific Webpack Encore assets (JS) #}
-        {% for webpackAsset in blockAssets.webpack %}
-            {% if webpackAsset.getWebpackPackageName is defined %}
-                {{ encore_entry_script_tags(webpackAsset.value, webpackAsset.getWebpackPackageName) }}
-            {% else %}
-                {{ encore_entry_script_tags(webpackAsset) }}
-            {% endif %}
-        {% endfor %}
-    {% endif %}
 
     <script>
         /**
@@ -1065,6 +1025,26 @@
                     setTimeout(function() {
                         window.location.reload();
                     }, 300);
+                }
+            });
+
+            // Listen for postMessage from block edit iframe
+            window.addEventListener('message', function(event) {
+                // Security: verify origin if needed
+                // if (event.origin !== window.location.origin) return;
+
+                const data = event.data;
+
+                // Handle block:saved message from the form iframe
+                if (data && data.type === 'block:saved') {
+                    console.log('Block saved with ID:', data.blockId);
+
+                    // Reload the preview iframe to show the updated block
+                    const previewIframe = document.querySelector('[data-page-builder-target="iframe"]');
+                    if (previewIframe) {
+                        console.log('Reloading preview iframe to show updated block');
+                        previewIframe.contentWindow.location.reload();
+                    }
                 }
             });
         });

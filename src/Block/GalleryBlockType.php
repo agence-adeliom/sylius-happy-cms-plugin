@@ -42,7 +42,7 @@ class GalleryBlockType extends AbstractBlock
     public function configureAdminAssets(): array
     {
         // Sub formType asset has to be declared manually
-        return array_merge(MediaType::configureAdminAssets(), parent::configureAdminAssets());
+        return array_merge_recursive(parent::configureAdminAssets(), MediaType::configureAdminAssets());
     }
 
     /**

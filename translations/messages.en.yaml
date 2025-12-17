@@ -353,3 +353,14 @@ sylius_happy_cms:
     copy_from_locale_title: Copy blocks from another language
     copy_from_locale: "Copy from %locale%"
     or_add_new_block: Or add a new block from scratch
+    edit_block: 'Edit Block'
+    block_saved: 'Block Saved'
+    block_saved_successfully: 'Block saved successfully'
+    form_contain_errors: 'The form contain some errors'
+    reloading_preview: 'Reloading preview...'
+    visibility_managed_in_parent: 'Visibility is managed in the parent page'
+    position_managed_in_parent: 'Position is managed in the parent page'
+    delete_managed_in_parent: 'Delete is managed in the parent page'
+    ai_translate_blocks: 'Automatically translate blocks with AI'
+    ai_translate_blocks_help: 'This feature requires AI agent configuration.'
+    ai_translate_learn_more: 'Learn more'

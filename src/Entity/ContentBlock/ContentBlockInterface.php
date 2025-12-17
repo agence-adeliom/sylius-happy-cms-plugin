@@ -46,6 +46,8 @@ interface ContentBlockInterface
 
     public function setPosition(int $position): void;
 
+    public function getPreviewPosition(): ?int;
+
     public function setPreviewPosition(int $previewPosition): void;
 
     public function isPublished(): bool;

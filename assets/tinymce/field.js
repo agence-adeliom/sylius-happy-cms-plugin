@@ -145,22 +145,22 @@ function initializeTinyMCE() {
                     }
                 }
 
-                // Step 3: Create a completely new webcomponent by cloning the original
-                console.log('TinyMCE: Creating fresh clone of webcomponent');
-                const clone = editor.cloneNode(true);
-
-                // Step 4: Replace the old element with the fresh clone
-                console.log('TinyMCE: Replacing old element with clone');
-                parent.replaceChild(clone, editor);
+                // // Step 3: Create a completely new webcomponent by cloning the original
+                // console.log('TinyMCE: Creating fresh clone of webcomponent');
+                // const clone = editor.cloneNode(true);
+                //
+                // // Step 4: Replace the old element with the fresh clone
+                // console.log('TinyMCE: Replacing old element with clone');
+                // parent.replaceChild(clone, editor);
 
                 // Step 5: The new element should auto-initialize via its connectedCallback
                 // Wait a bit and inject custom styles
                 setTimeout(() => {
-                    console.log('TinyMCE: Checking clone status - _status =', clone._status);
-                    injectTinyMCEStyles(clone);
+                    console.log('TinyMCE: Checking clone status - _status =', editor._status);
+                    injectTinyMCEStyles(editor);
 
                     // Step 6: Add change callback to update live component
-                    setupLiveComponentCallback(clone);
+                    setupLiveComponentCallback(editor);
                 }, 500);
             });
         })
@@ -173,9 +173,17 @@ function initializeTinyMCE() {
  * Initialize on DOM ready
  */
 if (document.readyState === 'loading') {
-    window.addEventListener('DOMContentLoaded', initializeTinyMCE);
+    window.addEventListener('DOMContentLoaded', () => {
+      // Give the DOM a moment to settle after AJAX update
+      setTimeout(() => {
+        initializeTinyMCE();
+      }, 100);
+    });
 } else {
+  // Give the DOM a moment to settle after AJAX update
+  setTimeout(() => {
     initializeTinyMCE();
+  }, 100);
 }
 
 /**

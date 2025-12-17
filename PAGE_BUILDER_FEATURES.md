@@ -114,6 +114,28 @@ Voici les étapes pour cette partie B :
    - [x] La fonction closeBlock() dispatch l'événement 'block-editor:close' au composant BlockEditor
    - [x] Le composant BlockEditor exécute l'action cancel() qui réinitialise le formulaire
    - [x] Quand le formulaire est réinitialisé, le template affiche le mode "add block"
-20. [ ] Dans le BlockEditorForm, et le fichier templates/admin/page_builder/_block_editor_form.html.twig, on a un soucis pour le post. Par exemple le champ image reste à null. Le form Type du block est src/Block/TextImageCtaBlockType.php
+20. [x] On va tester une nouvelle approche pour le formulaire d'édition d'un bloc :
+    - Au lieu de passer par un composant live BlockEditorForm
+    - On va remplacer la layer par une iframe qui va occuper la hauteur disponible.
+    - On va créer une nouvelle route comme fait pour 'sylius_happy_cms_admin_page_builder' mais dédiée uniquement au formulaire.
+    - Cette route va passer via le controller PageBuilderController. On va reprendre la logique qu'on avait dans le BlockEditorForm.
+    - Sauf qu'on va faire un formulaire standard, et non live.
+    - Au post, on va effectuer les mêmes actions sur l'entité ContentBlock, celles qu'on avait dans la méthode save().
+    - Une fois le form validé et enregistré, on pourra ajouter un event pour recharger l'autre iframe de preview.
+21. [x] Dans le fichier templates/admin/page_builder/_block_editor.html.twig, dans le cas où on propose de copier des contenu venant d'une autre languue, cf. availableLocalesWithBlocks. J'aimerais ajouter un checkbox en dessous des choix. Une checkbox qui permettrait de traduire automatiquement via un agent IA (non configuré encore pour l'instant) dans la langue en cours. L'option IA sera à terme activable dans ce bundle avec le plugin symfony ia. Peut être trouver le moyen de donner à l'utilisateur d'en savoir plus en redirigeant vers la doc. https://github.com/agence-adeliom/sylius-happy-cms-plugin/blob/2.x/docs/CONFIGURE_IA_AGENT.md. Cette fonctionnalité sera implémentée plus tard.
+   - [x] Ajouté la checkbox de traduction IA dans le template _block_editor.html.twig (ligne 177-198)
+   - [x] Ajouté un lien vers la documentation CONFIGURE_IA_AGENT.md avec une icône d'ouverture externe
+   - [x] Ajouté les traductions en français et anglais dans messages.fr.yaml et messages.en.yaml :
+     - ai_translate_blocks: "Traduire automatiquement les blocs avec l'IA" / "Automatically translate blocks with AI"
+     - ai_translate_blocks_help: "Cette fonctionnalité nécessite la configuration d'un agent IA." / "This feature requires AI agent configuration."
+     - ai_translate_learn_more: "En savoir plus" / "Learn more"
+   - [x] Ajouté la propriété LiveProp `aiTranslateEnabled` dans BlockEditor.php pour gérer l'état de la checkbox
+   - [x] Préparé la méthode copyBlocksFromLocale() avec des commentaires TODO pour l'implémentation future de la traduction IA
+   - [x] Lié la checkbox au composant Live via data-model="aiTranslateEnabled"
+   - [x] L'événement 'blocks:copied' inclut maintenant l'état aiTranslateEnabled pour les futures implémentations
+22. [ ] Dans le fichier templates/admin/page_builder/content.html.twig, j'ai ajouté un lien pour publier la page. L'idée est de recharger la page en passant des GET :
+    - Au clic sur le bouton j'aimerai afficher une modale ou dropdown qui demande à l'utilisateur de choisir les langues à publier parmis celles disponibles.
+    - A la validation on envoi les get puis
+    - Dans le fichier src/Controller/PageBuilder/PageBuilderController.php, method indexAction, il faut détecter les get : ?publish=1. Puis appeler une méthode private pour publier les contenus de la page pour le ou les langues sélectionnées. On transfert les données draft vers leur équivalent.
 Todo :
 - Déporter la doc USAGE IN BLOCK-SPECIFIC SCRIPTS dans la doc de création d'un bloc

@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PageBuilderController extends AbstractController
 {
@@ -26,6 +27,7 @@ class PageBuilderController extends AbstractController
         private readonly ParameterBagInterface $parameterBag,
         private readonly LocaleProviderInterface $localeProvider,
         private readonly BlockCollection $blockCollection,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -57,16 +59,136 @@ class PageBuilderController extends AbstractController
         // In preview mode, we show all blocks (published and unpublished) for the given locale
         $contentBlocks = $entity->getContentBlocksForPreview($locale);
 
-        // Collect all assets from all blocks in the page
-        $assets = $this->collectBlockAssets($contentBlocks);
-
         return $this->render('@SyliusHappyCMSPlugin/admin/page_builder/index.html.twig', [
             'entity' => $entity,
             'resource' => $resource,
             'contentBlocks' => $contentBlocks,
             'locale' => $locale,
             'availableLocales' => $availableLocales,
+        ]);
+    }
+
+    public function blockEditAction(Request $request, string $resource, int $id, int $blockId): Response
+    {
+        // Resolve the entity class from the resource name (validates interfaces)
+        $entityClass = $this->resolveEntityClass($resource);
+
+        // Load the entity
+        $entity = $this->loadEntity($entityClass, $id);
+
+        // Get the current locale from query parameter or use default locale
+        $locale = $request->query->get('locale', $request->getLocale());
+
+        // Load the block
+        $block = $this->loadBlock($entity, $blockId, $locale);
+
+        // Ensure the locale is a string
+        if (!is_string($locale)) {
+            $locale = $this->localeProvider->getDefaultLocaleCode();
+        }
+
+        $formChanged = false;
+
+        // Get the block type configuration
+        $blockType = $block->getType();
+        if (null === $blockType) {
+            throw new \LogicException('Block has no type');
+        }
+
+        $blocks = $this->blockCollection->getBlocks();
+        if (!isset($blocks[$blockType])) {
+            throw new \LogicException(sprintf('Unknown block type: %s', $blockType));
+        }
+
+        $blockConfig = $blocks[$blockType];
+        $formClass = $blockConfig::class;
+
+        // Get form themes from the block type
+        $formThemes = ['@SyliusAdmin/shared/form_theme.html.twig'];
+        if (method_exists($blockConfig, 'configureAdminFormThemes')) {
+            $formThemes = array_values(
+                array_unique(
+                    array_merge($formThemes, $blockConfig->configureAdminFormThemes()),
+                ),
+            );
+        }
+
+        // Get block name
+        $className = (new \ReflectionClass($formClass))->getShortName();
+        $blockName = trim(preg_replace('/([A-Z])/', ' $1', str_replace('BlockType', '', $className)));
+
+        // Use draft data for the form, fallback to published data if draft is empty
+        $draftData = $block->getDraftData();
+        if (null === $draftData || empty($draftData)) {
+            $draftData = $block->getPublishedData() ?? [];
+        }
+
+        // Create the form
+        $form = $this->createForm($formClass, $draftData, [
+            'action' => $this->generateUrl('sylius_happy_cms_admin_page_builder_block_edit', [
+                'resource' => $resource,
+                'id' => $id,
+                'blockId' => $blockId,
+                'locale' => $locale,
+            ]),
+            'method' => 'POST',
+        ]);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Get form data
+            $formData = $form->getData();
+
+            // Remove metadata fields if they exist
+            if (isset($formData['block_type'])) {
+                unset($formData['block_type']);
+            }
+            if (isset($formData['block_published'])) {
+                unset($formData['block_published']);
+            }
+
+            // Save to draft data
+            $block->setDraftData($formData);
+
+            // Persist changes to database
+            $this->entityManager->flush();
+
+            $this->addFlash('success', $this->translator->trans('sylius_happy_cms.page_builder.block_saved_successfully'));
+            $formChanged = true;
+        } elseif ($form->isSubmitted() && !$form->isValid()) {
+            $this->addFlash('warning', $this->translator->trans('sylius_happy_cms.page_builder.form_contain_errors'));
+        }
+
+        // Get block position and total blocks for the toolbar
+        $contentBlocks = $entity->getContentBlocksForPreview($locale);
+        $blockPosition = 0;
+        $totalBlocks = count($contentBlocks);
+
+        foreach ($contentBlocks as $index => $cb) {
+            if ($cb->getId() === $blockId) {
+                $blockPosition = $index;
+
+                break;
+            }
+        }
+
+        // Collect assets from the block being edited
+        $assets = $this->collectBlockAssets([$block]);
+
+        return $this->render('@SyliusHappyCMSPlugin/admin/page_builder/block_edit.html.twig', [
+            'form' => $form->createView(),
+            'formThemes' => $formThemes,
+            'block' => $block,
+            'blockName' => $blockName,
+            'blockPosition' => $blockPosition,
+            'totalBlocks' => $totalBlocks,
+            'resource' => $resource,
+            'entityId' => $id,
+            'blockId' => $blockId,
+            'locale' => $locale,
             'blockAssets' => $assets,
+            'sendMessageToParent' => $formChanged,
         ]);
     }
 
@@ -214,5 +336,25 @@ class PageBuilderController extends AbstractController
         }
 
         return $entity;
+    }
+
+    /**
+     * Load a content block by its ID from an entity.
+     */
+    private function loadBlock(ContentEditableInterface $entity, int $blockId, string $locale): ContentBlockInterface
+    {
+        $blocks = $entity->getContentBlocksForPreview($locale);
+
+        $block = $blocks->filter(function (ContentBlockInterface $block) use ($blockId) {
+            return $block->getId() === $blockId;
+        })->first();
+
+        if (false === $block) {
+            throw new NotFoundHttpException(
+                sprintf('Block with ID "%d" not found', $blockId),
+            );
+        }
+
+        return $block;
     }
 }

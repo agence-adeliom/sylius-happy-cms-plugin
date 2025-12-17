@@ -38,6 +38,9 @@ class BlockEditor extends AbstractController
     #[LiveProp(writable: true)]
     public string $locale;
 
+    #[LiveProp(writable: true)]
+    public bool $aiTranslateEnabled = false;
+
     public ContentEditableInterface $entity;
 
     public function __construct(
@@ -121,7 +124,7 @@ class BlockEditor extends AbstractController
             return null;
         }
 
-        return $block->getPosition();
+        return $block->getPreviewPosition();
     }
 
     public function getTotalBlocks(): int
@@ -130,7 +133,7 @@ class BlockEditor extends AbstractController
             return 0;
         }
 
-        return $this->entity->getContentBlocks()->count();
+        return $this->entity->getContentBlocksForPreview($this->locale)->count();
     }
 
     #[LiveAction]
@@ -167,10 +170,10 @@ class BlockEditor extends AbstractController
             return;
         }
 
-        $currentPosition = $block->getPosition();
+        $currentPosition = $block->getPreviewPosition();
 
         // Get all blocks for this entity and locale
-        $blocks = $this->entity->getContentBlocks()
+        $blocks = $this->entity->getContentBlocksForPreview($this->locale)
             ->filter(function (ContentBlockInterface $b) use ($block) {
                 return $b->getLocale() === $block->getLocale();
             })
@@ -178,7 +181,7 @@ class BlockEditor extends AbstractController
 
         // Sort by position
         usort($blocks, function (ContentBlockInterface $a, ContentBlockInterface $b) {
-            return $a->getPosition() <=> $b->getPosition();
+            return $a->getPreviewPosition() <=> $b->getPreviewPosition();
         });
 
         // Move the block
@@ -191,7 +194,7 @@ class BlockEditor extends AbstractController
 
             // Update all positions
             foreach ($blocks as $index => $b) {
-                $b->setPosition($index);
+                $b->setPreviewPosition($index);
             }
 
             $this->entityManager->flush();
@@ -225,7 +228,7 @@ class BlockEditor extends AbstractController
         $this->entityManager->remove($block);
 
         // Reindex remaining blocks
-        $remainingBlocks = $this->entity->getContentBlocks()
+        $remainingBlocks = $this->entity->getContentBlocksForPreview($this->locale)
             ->filter(function (ContentBlockInterface $b) use ($locale) {
                 return $b->getLocale() === $locale;
             })
@@ -266,11 +269,7 @@ class BlockEditor extends AbstractController
         // Load the entity
         $this->entity = $this->loadEntity($entityClass, $this->entityId);
 
-        $blocks = $this->entity->getContentBlocks();
-
-        $blocksForLocale = $blocks->filter(function (ContentBlockInterface $block) {
-            return $block->getLocale() === $this->locale;
-        });
+        $blocksForLocale = $this->entity->getContentBlocksForPreview($this->locale);
 
         return $blocksForLocale->count() > 0;
     }
@@ -304,6 +303,7 @@ class BlockEditor extends AbstractController
 
     /**
      * Copy blocks from another locale to the current locale.
+     * If AI translation is enabled, the content will be automatically translated.
      */
     #[LiveAction]
     public function copyBlocksFromLocale(#[LiveArg('sourceLocale')] string $sourceLocale): void
@@ -344,17 +344,26 @@ class BlockEditor extends AbstractController
             $newBlock->setLocale($this->locale);
             $newBlock->setType($sourceBlock->getType());
             $newBlock->setPosition($index);
+            $newBlock->setPreviewPosition($index);
             $newBlock->setLayer($sourceBlock->getLayer());
 
             // Copy draft data (will be used as preview)
             $draftData = $sourceBlock->getDraftData();
             if (null !== $draftData) {
+                // TODO: Implement AI translation when enabled
+                // if ($this->aiTranslateEnabled) {
+                //     $draftData = $this->translateBlockData($draftData, $sourceLocale, $this->locale);
+                // }
                 $newBlock->setDraftData($draftData);
             }
 
             // Copy published data
             $publishedData = $sourceBlock->getPublishedData();
             if (null !== $publishedData) {
+                // TODO: Implement AI translation when enabled
+                // if ($this->aiTranslateEnabled) {
+                //     $publishedData = $this->translateBlockData($publishedData, $sourceLocale, $this->locale);
+                // }
                 $newBlock->setPublishedData($publishedData);
             }
 
@@ -372,6 +381,7 @@ class BlockEditor extends AbstractController
         $this->dispatchBrowserEvent('blocks:copied', [
             'sourceLocale' => $sourceLocale,
             'targetLocale' => $this->locale,
+            'aiTranslateEnabled' => $this->aiTranslateEnabled,
             'reload' => true,
         ]);
     }

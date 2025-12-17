@@ -205,13 +205,3 @@ services:
       calls:
           - setLiveResponder: ['@ux.live_component.live_responder']
 
-  sylius.happy_cms.admin.builder.block_editor_form:
-      class: Adeliom\SyliusHappyCMSPlugin\Twig\Components\Builder\BlockEditorForm
-      arguments:
-          - "@sylius.happy_cms.block_collection"
-          - "@doctrine.orm.entity_manager"
-          - "@parameter_bag"
-      tags:
-          - { name: sylius.live_component.admin, key: happycms-builder-block-editor-form, template: '@SyliusHappyCMSPlugin/admin/page_builder/_block_editor_form.html.twig' }
-      calls:
-          - setLiveResponder: ['@ux.live_component.live_responder']

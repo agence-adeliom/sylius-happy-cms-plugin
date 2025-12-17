@@ -36,12 +36,6 @@
         "webpackMode": "lazy",
         "fetch": "lazy",
         "enabled": true
-      },
-      "builder-block-editor-form": {
-        "main": "controllers/BlockEditorForm.js",
-        "webpackMode": "lazy",
-        "fetch": "lazy",
-        "enabled": true
       }
     }
   },

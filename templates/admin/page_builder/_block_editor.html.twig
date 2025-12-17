@@ -4,7 +4,7 @@
      style="display: flex; flex-direction: column; height: 100%;">
     {% if this.hasBlock %}
         {# Edit mode: Show form for existing block #}
-        <div class="page-builder__editor-content" data-loading="hide" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; max-height: calc(100% - 150px)">
+        <div class="page-builder__editor-content" data-loading="hide" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; max-height: calc(100% - 61px)">
             {# Block toolbar #}
             <div class="page-builder__block-toolbar">
                 {# Left: Block name #}
@@ -114,13 +114,20 @@
                 </div>
             </div>
 
-            {# Block Form Editor Component #}
-            {{ component('happycms-builder-block-editor-form', {
-                blockId: this.blockId,
-                resourceName: this.resourceName,
-                entityId: this.entityId,
-                locale: this.locale
-            }) }}
+            {# Block Form Editor Iframe #}
+            <iframe
+                class="block-editor-form-iframe"
+                data-page-builder-target="blockFormIframe"
+                sandbox="allow-same-origin allow-scripts allow-forms allow-modals allow-popups"
+                src="{{ path('sylius_happy_cms_admin_page_builder_block_edit', {
+                    resource: this.resourceName,
+                    id: this.entityId,
+                    blockId: this.blockId,
+                    locale: this.locale
+                }) }}"
+                style="width: 100%; height: 100%; border: none; flex: 1; max-height: calc(100% - 46px)"
+                title="{% trans %}sylius_happy_cms.page_builder.edit_block{% endtrans %}">
+            </iframe>
         </div>
 
         {# Footer with save button is now handled by BlockEditorForm #}
@@ -165,6 +172,29 @@
                                 </svg>
                             </button>
                         {% endfor %}
+                    </div>
+
+                    {# AI Translation option #}
+                    <div class="form-check mb-3" style="max-width: 400px; width: 100%;">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            id="aiTranslateBlocks"
+                            data-model="aiTranslateEnabled"
+                        >
+                        <label class="form-check-label" for="aiTranslateBlocks">
+                            {% trans %}sylius_happy_cms.page_builder.ai_translate_blocks{% endtrans %}
+                        </label>
+                        <div class="form-text">
+                            {% trans %}sylius_happy_cms.page_builder.ai_translate_blocks_help{% endtrans %}
+                            <a href="https://github.com/agence-adeliom/sylius-happy-cms-plugin/blob/2.x/docs/CONFIGURE_IA_AGENT.md" target="_blank" rel="noopener noreferrer">
+                                {% trans %}sylius_happy_cms.page_builder.ai_translate_learn_more{% endtrans %}
+                                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: baseline;">
+                                    <path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5z"/>
+                                    <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0v-5z"/>
+                                </svg>
+                            </a>
+                        </div>
                     </div>
 
                     <div class="text-center">

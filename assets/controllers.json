@@ -20,10 +20,6 @@
       "builder-block-editor": {
         "enabled": true,
         "fetch": "lazy"
-      },
-      "builder-block-editor-form": {
-        "enabled": true,
-        "fetch": "lazy"
       }
     },
     "@symfony/ux-autocomplete": {
