@@ -2,7 +2,7 @@
 {% set wysiwyg_more = settings.wysiwyg_more|default(false) %}
 
 {% if wysiwyg %}
-<div class="container py-4 position-relative" js-seo-block-content>
+<div class="container py-6 position-relative" js-seo-block-content>
     <div class="seo-content-wrapper" style="max-height: 151px; overflow: hidden; transition: max-height 0.3s ease;">
         <div class="mb-3">
             {{ wysiwyg|default('')|raw }}
@@ -11,12 +11,16 @@
     <div class="seo-gradient position-absolute bottom-0 start-0 w-100 pointer-events-none"
          style="height: 74px; background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0.8), rgba(255,255,255,1)); transition: opacity 0.3s ease;"></div>
     <div class="d-flex justify-content-center align-items-center py-2">
-        <i js-seo-block-opener
-           class="fa-sharp fa-solid fa-chevron-down cursor-pointer"
-           role="button"
-           aria-label="Toggle content"
-           style="transition: transform 0.3s ease; cursor: pointer;"></i>
-        {{ wysiwyg_more|default('')|raw }}
+        <svg js-seo-block-opener
+             width="24"
+             height="24"
+             viewBox="0 0 16 16"
+             fill="currentColor"
+             role="button"
+             aria-label="Toggle content"
+             style="transition: transform 0.3s ease; cursor: pointer;">
+            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+        </svg>
     </div>
 </div>
 {% endif %}

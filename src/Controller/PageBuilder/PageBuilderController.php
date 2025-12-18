@@ -77,13 +77,67 @@ class PageBuilderController extends AbstractController
         // In preview mode, we show all blocks (published and unpublished) for the given locale
         $contentBlocks = $entity->getContentBlocksForPreview($locale);
 
+        // Generate back route to edit page
+        $backRoute = $this->generateBackRoute($resource);
+
         return $this->render('@SyliusHappyCMSPlugin/admin/page_builder/index.html.twig', [
             'entity' => $entity,
             'resource' => $resource,
             'contentBlocks' => $contentBlocks,
             'locale' => $locale,
             'availableLocales' => $availableLocales,
+            'backRoute' => $backRoute,
         ]);
+    }
+
+    /**
+     * Generate the back route name from the resource key.
+     * Tries to find the update route for the given resource.
+     */
+    private function generateBackRoute(string $resource): ?string
+    {
+        // Get Sylius resources configuration
+        $resources = $this->parameterBag->get('sylius.resources');
+
+        if (!is_array($resources) || !isset($resources[$resource])) {
+            return null;
+        }
+
+        $resourceConfig = $resources[$resource];
+
+        // Try to get the route prefix from resource configuration
+        // Sylius routes usually follow the pattern: {prefix}_{resource_name}_{action}
+        // For example: sylius_admin_page_update, sylius_shop_page_show
+
+        // Extract the resource name (part after the last dot)
+        // Example: sylius_happy_cms.page => page
+        $resourceParts = explode('.', $resource);
+        $resourceName = end($resourceParts);
+
+        // Build possible route names (try most common patterns)
+        $possibleRoutes = [
+            'app_' . $resourceName . '_update',  // Standard Sylius admin pattern
+        ];
+
+        // If the resource has a driver prefix, try that too
+        if (count($resourceParts) > 1) {
+            $prefix = $resourceParts[0];
+            $possibleRoutes[] = $prefix . '_admin_' . $resourceName . '_update';
+        }
+
+        // Try each possible route name and return the first one that exists
+        foreach ($possibleRoutes as $routeName) {
+            try {
+                $this->generateUrl($routeName, ['id' => 1]); // Test route exists
+
+                return $routeName;
+            } catch (\Exception $e) {
+                // Route doesn't exist, try next one
+                continue;
+            }
+        }
+
+        return null;
     }
 
     public function blockEditAction(Request $request, string $resource, int $id, int $blockId): Response

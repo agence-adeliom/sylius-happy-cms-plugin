@@ -120,11 +120,10 @@ Voici les étapes pour cette partie B :
     - Il y avait une liste des blocs ainsi qu'un moteur de filtre
     - Je le te laisse libre pour l'UI dans la modal bootstrap.
     - On verra plus tard pour les actions d'ajout et comment les gérer.
-25. [ ] La fonction supprimer un bloc est manquante dans le fichier templates/admin/page_builder/_block_editor.html.twig, on peut passer par une action du live component BlockEditor
-26. [ ] Bouton retour vers la page d'édition, trouver un moyen de dynamiser le retour vers la route edit
-29. [ ] Retravailler le IconType pour se baser sur les icônes bootstrap par défaut.
-27. [ ] Dans easy crud, ajouter les contextes de la resource dans les actions. Afin de metDans PageAdmin, voir pour remplacer l'action "manage content" par le lien vers le nouveau page builder.
-28. [ ] Voir pour le bundle IA, pour l'intégrer et l'invoquer optionnement si le bundle est installé.
+25. [x] La fonction supprimer un bloc est manquante dans le fichier templates/admin/page_builder/_block_editor.html.twig, on peut passer par une action du live component BlockEditor
+27. [ ] Bouton retour vers la page d'édition, trouver un moyen de dynamiser le retour vers la route edit. La resource Sylius a des routes pour son CRUD, il faudrait voir si on peut récupérer le nom de la route 'edit' ou 'update.'
+28. [ ] Dans easy crud, ajouter les contextes de la resource dans les actions. Afin de metDans PageAdmin, voir pour remplacer l'action "manage content" par le lien vers le nouveau page builder.
+29. [ ] Voir pour le bundle IA, pour l'intégrer et l'invoquer optionnement si le bundle est installé.
 30. [ ] Déplacer les styles et scripts dans des assets
 
 Todo :

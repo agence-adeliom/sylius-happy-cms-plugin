@@ -17,8 +17,11 @@
       ]
     },
     "seo-block-type": {
+      "css": [
+        "/bundles/syliushappycmsplugin/seo-block-type.f13b7af5.css"
+      ],
       "js": [
-        "/bundles/syliushappycmsplugin/seo-block-type.e8940e1c.js"
+        "/bundles/syliushappycmsplugin/seo-block-type.874b6111.js"
       ]
     },
     "accordion-block-type": {

@@ -279,7 +279,7 @@ class CreateDemoPagesCommand extends AbstractContentCommand
                     'wysiwyg' => '<p>Our state-of-the-art page builder transforms content creation. With real-time preview, blocks configurator, and an intuitive interface, you can design stunning pages without writing a single line of code.</p><ul><li><strong>Live Preview:</strong> See your changes instantly as you build</li><li><strong>Pre-built Blocks:</strong> Choose from a rich library of content blocks</li><li><strong>Responsive Design:</strong> Preview on desktop, tablet, and mobile</li><li><strong>Version Control:</strong> Save drafts and publish when ready</li></ul>',
                     'cta_one' => [
                         'label' => 'Learn More',
-                        'link' => '/',
+                        'link' => 'https://github.com/agence-adeliom/sylius-happy-cms-plugin',
                     ],
                     'position' => '6',
                     'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\TextImageCtaBlockType',
@@ -295,7 +295,7 @@ class CreateDemoPagesCommand extends AbstractContentCommand
                     'wysiwyg' => '<p>Our built-in media manager makes organizing images, documents, and media files effortless. With features like smart folders, batch uploads, and SEO metadata management, you have complete control over your digital assets.</p>',
                     'cta_one' => [
                         'label' => 'Learn More',
-                        'link' => '/',
+                        'link' => 'https://github.com/agence-adeliom/sylius-happy-cms-plugin',
                     ],
                     'position' => '7',
                     'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\TextImageCtaBlockType',
@@ -339,7 +339,7 @@ class CreateDemoPagesCommand extends AbstractContentCommand
                     'wysiwyg' => '<p>Join hundreds of Sylius stores already using Happy CMS to create exceptional content experiences. Get started today and see the difference a purpose-built CMS can make.</p>',
                     'cta_one' => [
                         'label' => 'Get Started Now',
-                        'link' => '/',
+                        'link' => 'https://github.com/agence-adeliom/sylius-happy-cms-plugin',
                     ],
                     'position' => '9',
                     'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\CtaBlockType',
@@ -348,8 +348,7 @@ class CreateDemoPagesCommand extends AbstractContentCommand
 
                 // SEO Text
                 'hp-flex-10' => [
-                    'wysiwyg' => '<p>Happy CMS for Sylius - The complete content management solution designed specifically for Sylius e-commerce platforms...</p>',
-                    'wysiwyg_more' => '<p><strong>Happy CMS for Sylius</strong> is the complete content management solution designed specifically for Sylius e-commerce platforms. With its revolutionary visual page builder, advanced media management, multi-language support, and SEO optimization tools, Happy CMS empowers merchants to create stunning content experiences that drive conversions. Built by <strong>Agence Adeliom</strong>, Happy CMS seamlessly integrates with Sylius\'s architecture while providing an intuitive interface for content creators. Whether you\'re building product landing pages, managing blog content, or creating marketing campaigns, Happy CMS delivers the flexibility and power you need to succeed in e-commerce.</p>',
+                    'wysiwyg' => '<p><strong>Happy CMS for Sylius</strong> is the complete content management solution designed specifically for Sylius e-commerce platforms. With its revolutionary visual page builder, advanced media management, multi-language support, and SEO optimization tools, Happy CMS empowers merchants to create stunning content experiences that drive conversions. Built by <strong>Agence Adeliom</strong>, Happy CMS seamlessly integrates with Sylius\'s architecture while providing an intuitive interface for content creators. Whether you\'re building product landing pages, managing blog content, or creating marketing campaigns, Happy CMS delivers the flexibility and power you need to succeed in e-commerce.</p>',
                     'position' => '10',
                     'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\SeoBlockType',
                     'block_published' => '1',
