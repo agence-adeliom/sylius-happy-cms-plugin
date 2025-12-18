@@ -15,6 +15,7 @@ install:
 	@make init
 	@make install-database
 	@make frontend-clear
+	@make configure-preview-mode
 	echo "Setup completed! You can now access the application at http://localhost"
 
 install-database:
@@ -40,9 +41,6 @@ init:
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php composer require symfony/maker-bundle --dev --no-interaction --no-scripts
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm nodejs || true
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) up -d
-	# Set up Sylius Test Application with preview route firewall
-	rm vendor/sylius/test-application/config/packages/security.yaml || true
-	cp config/packages/tpl/_security.yaml vendor/sylius/test-application/config/packages/security.yaml
 
 frontend-clear:
 	cp -R assets/controllers/* vendor/sylius/test-application/node_modules/@agence-adeliom/sylius-happy-cms-plugin/controllers
@@ -51,6 +49,10 @@ frontend-clear:
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console assets:install
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php ln -sf /srv/sylius/public/bundles vendor/sylius/test-application/public
 
+configure-preview-mode:
+	# Set up Sylius Test Application with preview route firewall
+	rm vendor/sylius/test-application/config/packages/security.yaml || true
+	cp config/packages/tpl/_security.yaml vendor/sylius/test-application/config/packages/security.yaml
 
 plugin-asset-watch:
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console assets:install --symlink
@@ -98,8 +100,8 @@ database-init:
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console doctrine:database:create -n
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm -i php rm vendor/sylius/test-application/migrations/*.php || true
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console doctrine:migrations:migrate -n
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console doctrine:migrations:diff -n
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console doctrine:migrations:migrate -n
+	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console doctrine:migrations:diff -n || true
+	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console doctrine:migrations:migrate -n || true
 
 database-reset:
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console doctrine:database:drop -n --force --if-exists

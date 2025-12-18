@@ -226,7 +226,7 @@ class CreateDemoPagesCommand extends AbstractContentCommand
                             'key' => 'SEO',
                             'text' => 'Pre-build SEO features',
                             'icon' => 'bi bi-graph-up',
-                        ]
+                        ],
                     ],
                     'position' => '2',
                     'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\KeyFeaturesBlockType',

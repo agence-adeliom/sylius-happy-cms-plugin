@@ -346,7 +346,7 @@ class PageBuilderController extends AbstractController
                     $block->setPublishedData($draftData);
 
                     // Copy preview position to published state
-                    $block->setPosition($block->getPosition());
+                    $block->setPosition($block->getPreviewPosition());
 
                     // Copy preview state to published state
                     $block->setPublishState($block->getPreviewPublishState());

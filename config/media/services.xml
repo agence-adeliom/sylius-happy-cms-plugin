@@ -19,6 +19,7 @@
             <argument key="$em" type="service" id="doctrine.orm.entity_manager"/>
             <argument key="$parameters" type="service" id="parameter_bag"/>
             <argument key="$translator" type="service" id="translator"/>
+            <argument key="$eventDispatcher" type="service" id="event_dispatcher"/>
         </service>
         <service id="Adeliom\SyliusHappyCMSPlugin\Services\Media\MediaManager" alias="happy.cms.media.manager" public="true"/>
 
