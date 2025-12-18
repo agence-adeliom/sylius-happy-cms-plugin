@@ -30,6 +30,7 @@ export default class extends Controller {
     this.element.removeEventListener('block:saved', this.onBlockSaved.bind(this));
     this.element.removeEventListener('form:saved', this.onFormSaved.bind(this));
     this.element.removeEventListener('block-editor:edit', this.onEditBlock.bind(this));
+    this.element.removeEventListener('block-editor:close', this.onCloseBlock.bind(this));
   }
 
   /**

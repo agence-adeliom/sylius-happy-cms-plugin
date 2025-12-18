@@ -41,6 +41,15 @@ class BlockEditor extends AbstractController
     #[LiveProp(writable: true)]
     public bool $aiTranslateEnabled = false;
 
+    #[LiveProp(writable: true)]
+    public bool $showBlockBrowser = false;
+
+    #[LiveProp(writable: true)]
+    public string $blockFilterText = '';
+
+    #[LiveProp(writable: true)]
+    public string $blockFilterCategory = 'all_blocks';
+
     public ContentEditableInterface $entity;
 
     public function __construct(
@@ -471,5 +480,201 @@ class BlockEditor extends AbstractController
         }
 
         return $entity;
+    }
+
+    /**
+     * Get all available blocks organized by tabs.
+     *
+     * @return array{blocks: array<string, array{block: BlockTypeInterface, type: string, tab: string, tabKey: string}>, tabs: array<string>}
+     */
+    public function getAvailableBlocks(): array
+    {
+        // Resolve the entity class from the resource name (validates interfaces)
+        $entityClass = $this->resolveEntityClass($this->resourceName);
+
+        // Load the entity
+        $this->entity = $this->loadEntity($entityClass, $this->entityId);
+
+        // Get all blocks from collection
+        $allBlocks = $this->blockCollection->getBlocks();
+
+        $blocks = [];
+        $tabs = [];
+
+        foreach ($allBlocks as $type => $block) {
+            // Check if block supports this entity
+            if (!$block->supports($this->entity)) {
+                continue;
+            }
+
+            // Get block tab
+            $tab = $block->getTab();
+            $tabKey = str_replace(' ', '_', strtolower($tab));
+
+            if (!in_array($tab, $tabs)) {
+                $tabs[] = $tab;
+            }
+
+            $blocks[$type] = [
+                'block' => $block,
+                'type' => $type,
+                'tab' => $tab,
+                'tabKey' => $tabKey,
+            ];
+        }
+
+        return [
+            'blocks' => $blocks,
+            'tabs' => $tabs,
+        ];
+    }
+
+    /**
+     * Toggle the block browser visibility.
+     */
+    #[LiveAction]
+    public function toggleBlockBrowser(): void
+    {
+        $this->showBlockBrowser = !$this->showBlockBrowser;
+
+        // Reset filters when opening
+        if ($this->showBlockBrowser) {
+            $this->blockFilterText = '';
+            $this->blockFilterCategory = 'all_blocks';
+        }
+    }
+
+    /**
+     * Open the block browser.
+     */
+    #[LiveAction]
+    public function openBlockBrowser(): void
+    {
+        $this->showBlockBrowser = true;
+        $this->blockFilterText = '';
+        $this->blockFilterCategory = 'all_blocks';
+    }
+
+    /**
+     * Close the block browser.
+     */
+    #[LiveAction]
+    public function closeBlockBrowser(): void
+    {
+        $this->showBlockBrowser = false;
+        $this->blockFilterText = '';
+        $this->blockFilterCategory = 'all_blocks';
+    }
+
+    /**
+     * Get filtered blocks based on search text and category.
+     *
+     * @return array{blocks: array<string, array{block: BlockTypeInterface, type: string, tab: string, tabKey: string}>, tabs: array<string>}
+     */
+    public function getFilteredBlocks(): array
+    {
+        $allBlocksData = $this->getAvailableBlocks();
+
+        // If no filters applied, return all blocks
+        if (empty($this->blockFilterText) && $this->blockFilterCategory === 'all_blocks') {
+            return $allBlocksData;
+        }
+
+        $filteredBlocks = [];
+        $searchText = strtolower($this->blockFilterText);
+
+        foreach ($allBlocksData['blocks'] as $type => $blockData) {
+            $blockName = strtolower($blockData['block']->getName());
+            $blockCategory = $blockData['tabKey'];
+
+            // Check if matches text filter
+            $matchesText = empty($searchText) || str_contains($blockName, $searchText);
+
+            // Check if matches category filter
+            $matchesCategory = $this->blockFilterCategory === 'all_blocks' || $blockCategory === $this->blockFilterCategory;
+
+            if ($matchesText && $matchesCategory) {
+                $filteredBlocks[$type] = $blockData;
+            }
+        }
+
+        return [
+            'blocks' => $filteredBlocks,
+            'tabs' => $allBlocksData['tabs'],
+        ];
+    }
+
+    /**
+     * Add a new block of the specified type.
+     */
+    #[LiveAction]
+    public function addBlock(#[LiveArg('blockType')] string $blockType): void
+    {
+        // Resolve the entity class from the resource name (validates interfaces)
+        $entityClass = $this->resolveEntityClass($this->resourceName);
+
+        // Load the entity
+        $this->entity = $this->loadEntity($entityClass, $this->entityId);
+
+        // Determine the ContentBlock class to use
+        $contentBlockClass = null;
+
+        // Try to get the class from an existing block
+        $existingBlock = $this->entity->getContentBlocks()->first();
+        if ($existingBlock) {
+            $contentBlockClass = get_class($existingBlock);
+        } else {
+            // Fallback to the default ContentBlock class from this plugin
+            $contentBlockClass = \Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentBlock::class;
+
+            // If the default class doesn't exist, throw an error
+            if (!class_exists($contentBlockClass)) {
+                throw new \RuntimeException('Cannot determine ContentBlock class. No existing blocks found and default class not available.');
+            }
+        }
+
+        // Create a new content block
+        $newBlock = new $contentBlockClass();
+
+        if (!$newBlock instanceof ContentBlockInterface) {
+            throw new \RuntimeException(
+                sprintf('Block class "%s" must implement ContentBlockInterface', $contentBlockClass),
+            );
+        }
+
+        // Get the next position for this locale
+        $existingBlocks = $this->entity->getContentBlocksForPreview($this->locale);
+        $nextPosition = $existingBlocks->count();
+
+        // Configure the new block
+        $newBlock->setLocale($this->locale);
+        $newBlock->setType($blockType);
+        $newBlock->setPosition($nextPosition);
+        $newBlock->setPreviewPosition($nextPosition);
+        $newBlock->setDraftData([]);
+        $newBlock->setPublishedData([]);
+        $newBlock->setPreviewPublishState(ThreeStateStatusEnum::PUBLISHED);
+
+        // Add to entity
+        $this->entity->addContentBlock($newBlock);
+        $this->entityManager->persist($newBlock);
+        $this->entityManager->flush();
+
+        // Set the blockId to the newly created block so the editor opens it
+        $this->blockId = $newBlock->getId();
+
+        // Close the block browser
+        $this->showBlockBrowser = false;
+
+        // Dispatch event to reload iframe
+        $this->dispatchBrowserEvent('block:added', [
+            'blockId' => $this->blockId,
+            'blockType' => $blockType,
+        ]);
+
+        // Dispatch event to reload iframe
+        $this->dispatchBrowserEvent('block:saved', [
+            'blockId' => $this->blockId,
+        ]);
     }
 }

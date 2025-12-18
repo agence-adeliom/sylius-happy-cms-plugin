@@ -114,16 +114,18 @@ Voici les étapes pour cette partie B :
 
 23. [x] Dans le dossier src/Block/, j'ai plusieurs Blocks. Chaque bloc a un fichier template twig équivalent. On peut retrouver le fichier avec la méthode 'getFrontEndTemplatePath'. J'aimerai retravailler les templates front avec bootstrap avec une UI propre et pertinente par rapport au bloc. Tu peux t'aider du formulaire construit via la méthode buildBlock pour connaitre les propriétés disponibles. L'idée est d'ajuster le template front pour l'améliorer avec l'ui bootstrap.
 
-24. [ ] Alimenter l'interface browse package, depuis le bouton présent ici templates/admin/page_builder/_block_editor.html.twig :
+24. [x] Alimenter l'interface browse package, depuis le bouton présent ici templates/admin/page_builder/_block_editor.html.twig :
     - Au clic sur le bouton browse packages, ouvrir une modal qui va lister les blocs.
     - Dans cette modal, reprendre les fonctionnalités qu'on trouve dans le block 'flexible_content_collection_widget' du fichier templates/field/flexible_content/form.html.twig, il s'agit de l'ancienne version.
     - Il y avait une liste des blocs ainsi qu'un moteur de filtre
     - Je le te laisse libre pour l'UI dans la modal bootstrap.
     - On verra plus tard pour les actions d'ajout et comment les gérer.
-25. [ ] Bouton retour vers la page d'édition, trouver un moyen de dynamiser le retour vers la route edit
-26. [ ] Dans PageAdmin, voir pour remplacer l'action "manage content" par le lien vers le nouveau page builder.
-27. [ ] Voir pour le bundle IA, pour l'intégrer et l'invoquer optionnement si le bundle est installé.
-28. [ ] Déplacer les styles et scripts dans des assets
+25. [ ] La fonction supprimer un bloc est manquante dans le fichier templates/admin/page_builder/_block_editor.html.twig, on peut passer par une action du live component BlockEditor
+26. [ ] Bouton retour vers la page d'édition, trouver un moyen de dynamiser le retour vers la route edit
+27. [ ] Dans PageAdmin, voir pour remplacer l'action "manage content" par le lien vers le nouveau page builder.
+28. [ ] Voir pour le bundle IA, pour l'intégrer et l'invoquer optionnement si le bundle est installé.
+29. [ ] Retravailler le IconType pour se baser sur les icônes bootstrap par défaut.
+30. [ ] Déplacer les styles et scripts dans des assets
 
 Todo :
 - Déporter la doc USAGE IN BLOCK-SPECIFIC SCRIPTS dans la doc de création d'un bloc
