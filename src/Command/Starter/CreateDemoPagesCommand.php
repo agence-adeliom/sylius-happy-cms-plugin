@@ -162,105 +162,187 @@ class CreateDemoPagesCommand extends AbstractContentCommand
             $pageTranslation->setSeo($seo);
 
             $flexContent = [
+                // Hero Section
                 'hp-flex-1' => [
                     'image' => $image1?->getId(),
-                    'title' => 'TextImageCtaBlockType, consectetur adipiscing elit.',
-                    'wysiwyg' => '<p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>',
+                    'title' => 'Happy CMS: A new Content Management Solution for Sylius',
+                    'headline' => 'Powerful & Flexible',
+                    'wysiwyg' => '<p>Seamlessly integrated with Sylius e-commerce, Happy CMS brings enterprise-grade content management to your online store. Build beautiful pages with our intuitive visual editor and manage your content like never before.</p>',
+                    'cta_one' => [
+                        'label' => 'Discover the Page Builder',
+                        'link' => '/',
+                    ],
                     'position' => '1',
                     'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\TextImageCtaBlockType',
                     'block_published' => '1',
                 ],
+
+                // Key Features
                 'hp-flex-2' => [
-                    'title' => 'GalleryBlockType',
-                    'wysiwyg' => '<p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>',
-                    'images' => [$image1?->getId(), $image2?->getId(), $image3?->getId()],
-                    'position' => '2',
-                    'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\GalleryBlockType',
-                    'block_published' => '1',
-                ],
-                'hp-flex-3' => [
-                    'title' => 'CtaBlockType',
-                    'wysiwyg' => '<p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>',
-                    'cta_one' => [
-                        'label' => 'CTA 1',
-                        'link' => '/',
-                    ],
-                    'position' => '3',
-                    'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\CtaBlockType',
-                    'block_published' => '1',
-                ],
-                'hp-flex-4' => [
-                    'title' => 'KeyFeaturesBlockType',
-                    'wysiwyg' => '<p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>',
+                    'title' => 'Why Choose Happy CMS?',
+                    'headline' => 'Everything you need',
+                    'wysiwyg' => '<p>Designed specifically for Sylius, Happy CMS combines powerful features with an exceptional user experience. Create, manage, and publish content effortlessly.</p>',
                     'features' => [
                         [
-                            'text' => 'Coffee by hour',
-                            'icon' => 'as fa-coffee',
-                            'key' => '10',
+                            'text' => 'Visual Page Builder',
+                            'icon' => 'bi bi-layout-text-window-reverse',
+                            'key' => 'Preview mode',
                         ],
                         [
-                            'text' => 'IA token by minute',
-                            'icon' => 'as fa-coffee',
-                            'key' => '5000',
+                            'text' => 'Multi-language Support',
+                            'icon' => 'bi bi-translate',
+                            'key' => 'i18n Ready',
                         ],
                         [
-                            'text' => 'Idea by second',
-                            'icon' => 'as fa-coffee',
-                            'key' => '3',
+                            'text' => 'SEO Optimized',
+                            'icon' => 'bi bi-graph-up',
+                            'key' => 'Built-in',
+                        ],
+                        [
+                            'text' => 'Media Management',
+                            'icon' => 'bi bi-images',
+                            'key' => 'Advanced',
                         ],
                     ],
-                    'position' => '4',
+                    'position' => '2',
                     'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\KeyFeaturesBlockType',
                     'block_published' => '1',
                 ],
-                'hp-flex-5' => [
-                    'title' => 'WysiwygBlockType',
-                    'content' => '<p>Sed do eiusmod tempor incididunt ut labore et dolore magna <b>aliqua</b>.</p>',
-                    'position' => '5',
-                    'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\WysiwygBlockType',
+
+                // Page Builder Presentation
+                'hp-flex-3' => [
+                    'title' => 'Revolutionary Visual Page Builder',
+                    'headline' => 'Build Pages Visually',
+                    'wysiwyg' => '<p>Our state-of-the-art page builder transforms content creation. With real-time preview, drag-and-drop blocks, and an intuitive interface, you can design stunning pages without writing a single line of code.</p><ul><li><strong>Live Preview:</strong> See your changes instantly as you build</li><li><strong>Pre-built Blocks:</strong> Choose from a rich library of content blocks</li><li><strong>Responsive Design:</strong> Preview on desktop, tablet, and mobile</li><li><strong>Version Control:</strong> Save drafts and publish when ready</li></ul>',
+                    'cta_one' => [
+                        'label' => 'Explore Features',
+                        'link' => '/',
+                    ],
+                    'cta_two' => [
+                        'label' => 'View Documentation',
+                        'link' => '/',
+                    ],
+                    'position' => '3',
+                    'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\TextCtaBlockType',
                     'block_published' => '1',
                 ],
+
+                // Gallery Showcase
+                'hp-flex-4' => [
+                    'title' => 'See Happy CMS in Action',
+                    'wysiwyg' => '<p>Discover the power and flexibility of Happy CMS through these interface screenshots. From content editing to media management, every feature is designed with you in mind.</p>',
+                    'images' => [$image1?->getId(), $image2?->getId(), $image3?->getId()],
+                    'position' => '4',
+                    'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\GalleryBlockType',
+                    'block_published' => '1',
+                ],
+
+                // Content Management Features
+                'hp-flex-5' => [
+                    'title' => 'Advanced Content Management',
+                    'headline' => 'Professional Tools',
+                    'wysiwyg' => '<p>Happy CMS provides everything you need to manage your content professionally. Create pages, manage menus, handle redirections, and optimize for search engines—all from one intuitive dashboard.</p>',
+                    'features' => [
+                        [
+                            'text' => 'Dynamic Routing, Http cache',
+                            'icon' => 'bi bi-signpost-2',
+                            'key' => 'Flexible',
+                        ],
+                        [
+                            'text' => 'Menu Builder',
+                            'icon' => 'bi bi-list-nested',
+                            'key' => 'Intuitive',
+                        ],
+                        [
+                            'text' => 'SEO Fields, sitemap, ...',
+                            'icon' => 'bi bi-arrow-left-right',
+                            'key' => 'SEO-Friendly',
+                        ],
+                        [
+                            'text' => 'Extensible',
+                            'icon' => 'bi bi-arrow-left-right',
+                            'key' => 'Custom routable resources',
+                        ],
+                    ],
+                    'position' => '5',
+                    'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\KeyFeaturesBlockType',
+                    'block_published' => '1',
+                ],
+
+                // FAQ Section
                 'hp-flex-6' => [
-                    'title' => 'AccordionBlockType',
-                    'wysiwyg' => '<p>Sed do eiusmod tempor incididunt ut labore et dolore magna <b>aliqua</b>.</p>',
+                    'title' => 'Frequently Asked Questions',
+                    'wysiwyg' => '<p>Learn more about Happy CMS and how it can transform your Sylius store into a powerful content platform.</p>',
                     'cta' => [
-                        'label' => 'CTA 1',
+                        'label' => 'View Full Documentation',
                         'link' => '/',
                     ],
                     'items' => [
                         [
-                            'title' => 'Accordion 1',
-                            'content' => '<p>Text 1.</p>',
+                            'title' => 'Is Happy CMS compatible with all Sylius versions?',
+                            'content' => '<p>Happy CMS is designed to work seamlessly with Sylius 2+. We maintain compatibility with the latest Sylius releases and provide upgrade guides for smooth transitions.</p>',
                         ],
                         [
-                            'title' => 'Accordion 2',
-                            'content' => '<p>Text 2.</p>',
+                            'title' => 'Can I customize the available content blocks?',
+                            'content' => '<p>Absolutely! Happy CMS is highly extensible. You can create custom blocks to match your specific needs, integrate third-party services, and extend the page builder with your own components.</p>',
+                        ],
+                        [
+                            'title' => 'Does Happy CMS support multi-language content?',
+                            'content' => '<p>Yes! Multi-language support is built into the core of Happy CMS. Manage translations effortlessly, copy content between languages, and even use AI-powered translation features.</p>',
+                        ],
+                        [
+                            'title' => 'How does the visual page builder work?',
+                            'content' => '<p>Our visual page builder provides a real-time preview of your pages alongside an intuitive editing interface. Add, edit, and arrange content blocks with drag-and-drop simplicity while seeing your changes instantly.</p>',
                         ],
                     ],
                     'position' => '6',
                     'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\AccordionBlockType',
                     'block_published' => '1',
                 ],
+
+                // Sylius Integration
                 'hp-flex-7' => [
-                    'title' => 'TextCtaBlockType',
-                    'headline' => 'Lorem Ipsum',
-                    'wysiwyg' => '<p>Sed do eiusmod tempor incididunt ut labore et dolore magna <b>aliqua</b>.</p>',
-                    'cta_one' => [
-                        'label' => 'CTA 1',
-                        'link' => '/',
-                    ],
-                    'cta_two' => [
-                        'label' => 'CTA 2',
-                        'link' => '/',
-                    ],
-                    'position' => '5',
-                    'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\TextCtaBlockType',
+                    'title' => 'Perfect Sylius Integration',
+                    'content' => '<p>Happy CMS is <strong>built specifically for Sylius</strong>, ensuring perfect compatibility and native integration. Leverage Sylius\'s powerful e-commerce features while managing your content with ease.</p><p>Whether you\'re creating product landing pages, blog posts, or marketing campaigns, Happy CMS seamlessly integrates with your Sylius store\'s channels, locales, and taxonomies. Take advantage of familiar Sylius conventions while enjoying a superior content management experience.</p><p>From simple pages to complex layouts, Happy CMS gives you the flexibility to create exactly what your business needs.</p>',
+                    'position' => '7',
+                    'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\WysiwygBlockType',
                     'block_published' => '1',
                 ],
+
+                // Media Management Section
                 'hp-flex-8' => [
-                    'wysiwyg' => '<p>Sed do eiusmod tempor incididunt ut ...</p>',
-                    'wysiwyg_more' => '<p>Sed do eiusmod tempor incididunt ut labore et dolore magna <b>aliqua</b>.</p>',
-                    'position' => '5',
+                    'image' => $image2?->getId(),
+                    'img_right' => true,
+                    'title' => 'Advanced Media Management',
+                    'headline' => 'Organize Your Assets',
+                    'wysiwyg' => '<p>Our built-in media manager makes organizing images, documents, and media files effortless. With features like smart folders, batch uploads, and SEO metadata management, you have complete control over your digital assets.</p>',
+                    'cta_one' => [
+                        'label' => 'Learn More',
+                        'link' => '/',
+                    ],
+                    'position' => '8',
+                    'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\TextImageCtaBlockType',
+                    'block_published' => '1',
+                ],
+
+                // Final CTA
+                'hp-flex-9' => [
+                    'title' => 'Ready to Transform Your Content Management?',
+                    'wysiwyg' => '<p>Join hundreds of Sylius stores already using Happy CMS to create exceptional content experiences. Get started today and see the difference a purpose-built CMS can make.</p>',
+                    'cta_one' => [
+                        'label' => 'Get Started Now',
+                        'link' => '/',
+                    ],
+                    'position' => '9',
+                    'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\CtaBlockType',
+                    'block_published' => '1',
+                ],
+
+                // SEO Text
+                'hp-flex-10' => [
+                    'wysiwyg' => '<p>Happy CMS for Sylius - The complete content management solution designed specifically for Sylius e-commerce platforms...</p>',
+                    'wysiwyg_more' => '<p><strong>Happy CMS for Sylius</strong> is the complete content management solution designed specifically for Sylius e-commerce platforms. With its revolutionary visual page builder, advanced media management, multi-language support, and SEO optimization tools, Happy CMS empowers merchants to create stunning content experiences that drive conversions. Built by <strong>Agence Adeliom</strong>, Happy CMS seamlessly integrates with Sylius\'s architecture while providing an intuitive interface for content creators. Whether you\'re building product landing pages, managing blog content, or creating marketing campaigns, Happy CMS delivers the flexibility and power you need to succeed in e-commerce.</p>',
+                    'position' => '10',
                     'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\SeoBlockType',
                     'block_published' => '1',
                 ],
