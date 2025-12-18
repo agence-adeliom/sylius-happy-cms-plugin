@@ -23,11 +23,11 @@
         "ext-json": "*",
         "ext-intl": "*",
         "ext-exif": "*",
-        "sylius/sylius": "^v2.0",
+        "sylius/sylius": "^2.0.0 || ^2.1.0",
         "symfony-cmf/routing-bundle": "^3.0",
-        "symfony/filesystem": "^6.4 || ^7.0",
-        "symfony/options-resolver": "^6.4 || ^7.0",
-        "symfony/property-access": "^6.4 || ^7.0",
+        "symfony/filesystem": "^6.4 || ^7.4",
+        "symfony/options-resolver": "^6.4 || ^7.4",
+        "symfony/property-access": "^6.4 || ^7.4",
         "league/flysystem-bundle": "^2.4.0 || ^3.0",
         "liip/imagine-bundle": "^2.8",
         "maennchen/zipstream-php": "^2.1.0",
@@ -59,14 +59,14 @@
         "sylius-labs/suite-tags-extension": "~0.2",
         "sylius/sylius-rector": "^2.0",
         "sylius/test-application": "^2.0.0@alpha",
-        "symfony/browser-kit": "^6.4 || ^7.1",
-        "symfony/debug-bundle": "^6.4 || ^7.1",
-        "symfony/dotenv": "^6.4 || ^7.1",
-        "symfony/http-client": "^6.4 || ^7.1",
-        "symfony/intl": "^6.4 || ^7.1",
+        "symfony/browser-kit": "^6.4 || ^7.4",
+        "symfony/debug-bundle": "^6.4 || ^7.4",
+        "symfony/dotenv": "^6.4 || ^7.4",
+        "symfony/http-client": "^6.4 || ^7.4",
+        "symfony/intl": "^6.4 || ^7.4",
         "symfony/maker-bundle": "^1.65",
-        "symfony/runtime": "^6.4 || ^7.1",
-        "symfony/web-profiler-bundle": "^6.4 || ^7.1",
+        "symfony/runtime": "^6.4 || ^7.4",
+        "symfony/web-profiler-bundle": "^6.4 || ^7.4",
         "symfony/webpack-encore-bundle": "^1.12 || ^2.0"
     },
     "config": {
@@ -84,7 +84,7 @@
             "dev-master": "2.0-dev"
         },
         "symfony": {
-            "require": "^6.4 || ^7.1"
+            "require": "^6.4 || ^7.4"
         },
         "public-dir": "vendor/sylius/test-application/public"
     },
