@@ -272,7 +272,7 @@ class CreateDemoPagesCommand extends AbstractContentCommand
 
                 // Content Management Section
                 'hp-flex-5' => [
-                    'image' => $imageMediaManager?->getId(),
+                    'image' => $imageContentManager?->getId(),
                     'img_right' => false,
                     'title' => 'Advanced Page Builder',
                     'headline' => 'Organize Your Content',
