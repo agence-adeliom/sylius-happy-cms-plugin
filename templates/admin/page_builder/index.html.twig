@@ -984,17 +984,17 @@
                 });
 
                 // Close panel when clicking outside
-                document.addEventListener('click', function(e) {
-                    if (editorPanel.classList.contains('is-open') &&
-                        !editorPanel.contains(e.target) &&
-                        e.target !== editorToggle &&
-                        e.target !== addBlockButton &&
-                        !editorToggle.contains(e.target)) {
-                        editorPanel.classList.remove('is-open');
-                        // Reset the form by calling closeBlock()
-                        closeBlock();
-                    }
-                });
+                // document.addEventListener('click', function(e) {
+                //     if (editorPanel.classList.contains('is-open') &&
+                //         !editorPanel.contains(e.target) &&
+                //         e.target !== editorToggle &&
+                //         e.target !== addBlockButton &&
+                //         !editorToggle.contains(e.target)) {
+                //         editorPanel.classList.remove('is-open');
+                //         // Reset the form by calling closeBlock()
+                //         closeBlock();
+                //     }
+                // });
 
                 // Escape key to close panel
                 document.addEventListener('keydown', function(e) {

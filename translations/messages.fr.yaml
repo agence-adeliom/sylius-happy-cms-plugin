@@ -353,6 +353,7 @@ sylius_happy_cms:
     move_to_position: "Déplacer en position %position%"
     delete: Supprimer
     confirm_delete: Êtes-vous sûr de vouloir supprimer ce bloc ?
+    confirm_delete_action: Confirmer la suppression
     edit_block_title: Remplissez le formulaire pour éditer le bloc
     no_blocks_for_locale: Aucun bloc n'existe encore pour cette langue
     copy_from_locale_title: Copier les blocs depuis une autre langue

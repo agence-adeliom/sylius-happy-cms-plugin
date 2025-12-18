@@ -122,9 +122,9 @@ Voici les étapes pour cette partie B :
     - On verra plus tard pour les actions d'ajout et comment les gérer.
 25. [ ] La fonction supprimer un bloc est manquante dans le fichier templates/admin/page_builder/_block_editor.html.twig, on peut passer par une action du live component BlockEditor
 26. [ ] Bouton retour vers la page d'édition, trouver un moyen de dynamiser le retour vers la route edit
-27. [ ] Dans PageAdmin, voir pour remplacer l'action "manage content" par le lien vers le nouveau page builder.
-28. [ ] Voir pour le bundle IA, pour l'intégrer et l'invoquer optionnement si le bundle est installé.
 29. [ ] Retravailler le IconType pour se baser sur les icônes bootstrap par défaut.
+27. [ ] Dans easy crud, ajouter les contextes de la resource dans les actions. Afin de metDans PageAdmin, voir pour remplacer l'action "manage content" par le lien vers le nouveau page builder.
+28. [ ] Voir pour le bundle IA, pour l'intégrer et l'invoquer optionnement si le bundle est installé.
 30. [ ] Déplacer les styles et scripts dans des assets
 
 Todo :
