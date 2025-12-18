@@ -244,7 +244,7 @@ class PageBuilderController extends AbstractController
                     foreach ($blockAssets['css'] as $asset) {
                         // Use asset value as key to avoid duplicates
                         $key = is_object($asset) && method_exists($asset, 'getValue') ? $asset->getValue() : (string) $asset;
-                        $assets['css'][$key] = $asset->getAsDto();
+                        $assets['css'][$key] = is_object($asset) && method_exists($asset, 'getAsDto') ? $asset->getAsDto() : (string) $asset;
                     }
                 }
 
@@ -252,7 +252,7 @@ class PageBuilderController extends AbstractController
                 if (isset($blockAssets['js']) && is_array($blockAssets['js'])) {
                     foreach ($blockAssets['js'] as $asset) {
                         $key = is_object($asset) && method_exists($asset, 'getValue') ? $asset->getValue() : (string) $asset;
-                        $assets['js'][$key] = $asset->getAsDto();
+                        $assets['js'][$key] = is_object($asset) && method_exists($asset, 'getAsDto') ? $asset->getAsDto() : (string) $asset;
                     }
                 }
 
@@ -260,7 +260,7 @@ class PageBuilderController extends AbstractController
                 if (isset($blockAssets['webpack']) && is_array($blockAssets['webpack'])) {
                     foreach ($blockAssets['webpack'] as $asset) {
                         $key = is_object($asset) && method_exists($asset, 'getValue') ? $asset->getValue() : (string) $asset;
-                        $assets['webpack'][$key] = $asset->getAsDto();
+                        $assets['webpack'][$key] = is_object($asset) && method_exists($asset, 'getAsDto') ? $asset->getAsDto() : (string) $asset;
                     }
                 }
             }

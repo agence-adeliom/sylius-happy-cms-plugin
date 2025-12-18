@@ -4,25 +4,31 @@
 {% set cta_two = settings.cta_two|default(false) %}
 
 {% if title or wysiwyg or cta_one or cta_two %}
-<section class="bg-neutral-100">
-    <div class="container my-10 lg:my-20">
-        <div class="py-10 flex gap-6 justify-between items-center flex-wrap">
-            <div>
-                {% if title %}<h2 class="heading-4">{{ title }}</h2>{% endif %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row g-4 align-items-center">
+            <div class="col-12 col-lg-8">
+                {% if title %}
+                    <h2 class="h4 mb-3">{{ title }}</h2>
+                {% endif %}
                 {% if wysiwyg %}
-                    <div class="wysiwyg mt-4 pb-0">
+                    <div>
                         {{ wysiwyg|raw }}
                     </div>
                 {% endif %}
             </div>
-            <div class="flex flex-wrap items-center gap-2">
-                {% if cta_one is iterable and cta_one.link and cta_one.label %}
-                    <a href="{{ cta_one.link }}" class="btn btn-primary">{{ cta_one.label }}</a>
-                {% endif %}
-                {% if cta_two is iterable and cta_two.link and cta_two.label %}
-                    <a href="{{ cta_two.link }}" class="btn btn-outline">{{ cta_two.label }}</a>
-                {% endif %}
-            </div>
+            {% if (cta_one is iterable and cta_one.link and cta_one.label) or (cta_two is iterable and cta_two.link and cta_two.label) %}
+                <div class="col-12 col-lg-4 text-lg-end">
+                    <div class="d-flex flex-wrap gap-2 justify-content-lg-end">
+                        {% if cta_one is iterable and cta_one.link and cta_one.label %}
+                            <a href="{{ cta_one.link }}" class="btn btn-primary">{{ cta_one.label }}</a>
+                        {% endif %}
+                        {% if cta_two is iterable and cta_two.link and cta_two.label %}
+                            <a href="{{ cta_two.link }}" class="btn btn-outline-secondary">{{ cta_two.label }}</a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </div>
 </section>

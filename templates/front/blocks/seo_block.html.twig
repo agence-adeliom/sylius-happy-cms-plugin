@@ -1,8 +1,22 @@
-<div class="container relative py-10" js-seo-block-content>
-    <div class="max-h-[151px] is-open:max-h-[100%] overflow-hidden">
-        <p class="font-bold text-xl">{{ 'app.footer.pre_footer.title'|trans }}</p>
-        <div>{{ 'app.footer.pre_footer.content'|trans }}</div>
+{% set wysiwyg = settings.wysiwyg|default(false) %}
+{% set wysiwyg_more = settings.wysiwyg_more|default(false) %}
+
+{% if wysiwyg %}
+<div class="container py-4 position-relative" js-seo-block-content>
+    <div class="seo-content-wrapper" style="max-height: 151px; overflow: hidden; transition: max-height 0.3s ease;">
+        <div class="mb-3">
+            {{ wysiwyg|default('')|raw }}
+        </div>
     </div>
-    <div class="is-open:opacity-0 transition-all left-0 w-full pointer-events-none bottom-16 bg-gradient-to-b absolute h-[74px] z-2 from-white/0 via-white/80 to-white/100"></div>
-    <div class="flex items-center justify-center h-6"><i js-seo-block-opener class="fa-sharp fa-solid fa-chevron-down is-open:rotate-180 transition-all cursor-pointer"></i></div>
+    <div class="seo-gradient position-absolute bottom-0 start-0 w-100 pointer-events-none"
+         style="height: 74px; background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0.8), rgba(255,255,255,1)); transition: opacity 0.3s ease;"></div>
+    <div class="d-flex justify-content-center align-items-center py-2">
+        <i js-seo-block-opener
+           class="fa-sharp fa-solid fa-chevron-down cursor-pointer"
+           role="button"
+           aria-label="Toggle content"
+           style="transition: transform 0.3s ease; cursor: pointer;"></i>
+        {{ wysiwyg_more|default('')|raw }}
+    </div>
 </div>
+{% endif %}

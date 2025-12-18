@@ -111,12 +111,19 @@ Voici les étapes pour cette partie B :
 21. [x] Dans le fichier templates/admin/page_builder/_block_editor.html.twig, dans le cas où on propose de copier des contenu venant d'une autre languue, cf. availableLocalesWithBlocks. J'aimerais ajouter un checkbox en dessous des choix. Une checkbox qui permettrait de traduire automatiquement via un agent IA (non configuré encore pour l'instant) dans la langue en cours. L'option IA sera à terme activable dans ce bundle avec le plugin symfony ia. Peut être trouver le moyen de donner à l'utilisateur d'en savoir plus en redirigeant vers la doc. https://github.com/agence-adeliom/sylius-happy-cms-plugin/blob/2.x/docs/CONFIGURE_IA_AGENT.md. Cette fonctionnalité sera implémentée plus tard.
 
 22. [x] Dans le fichier templates/admin/page_builder/content.html.twig, j'ai ajouté un lien pour publier la page. L'idée est de recharger la page en passant des GET :
- 
-23. [ ] Alimenter l'interface browse package.
-24. [ ] Bouton retour vers la page d'édition, trouver un moyen de dynamiser le retour vers la route edit
-25. [ ] Dans PageAdmin, voir pour remplacer l'action "manage content" par le lien vers le nouveau page builder.
-26. [ ] Voir pour le bundle IA, pour l'intégrer et l'invoquer optionnement si le bundle est installé.
-27. [ ] Déplacer les styles et scripts dans des assets
+
+23. [x] Dans le dossier src/Block/, j'ai plusieurs Blocks. Chaque bloc a un fichier template twig équivalent. On peut retrouver le fichier avec la méthode 'getFrontEndTemplatePath'. J'aimerai retravailler les templates front avec bootstrap avec une UI propre et pertinente par rapport au bloc. Tu peux t'aider du formulaire construit via la méthode buildBlock pour connaitre les propriétés disponibles. L'idée est d'ajuster le template front pour l'améliorer avec l'ui bootstrap.
+
+24. [ ] Alimenter l'interface browse package, depuis le bouton présent ici templates/admin/page_builder/_block_editor.html.twig :
+    - Au clic sur le bouton browse packages, ouvrir une modal qui va lister les blocs.
+    - Dans cette modal, reprendre les fonctionnalités qu'on trouve dans le block 'flexible_content_collection_widget' du fichier templates/field/flexible_content/form.html.twig, il s'agit de l'ancienne version.
+    - Il y avait une liste des blocs ainsi qu'un moteur de filtre
+    - Je le te laisse libre pour l'UI dans la modal bootstrap.
+    - On verra plus tard pour les actions d'ajout et comment les gérer.
+25. [ ] Bouton retour vers la page d'édition, trouver un moyen de dynamiser le retour vers la route edit
+26. [ ] Dans PageAdmin, voir pour remplacer l'action "manage content" par le lien vers le nouveau page builder.
+27. [ ] Voir pour le bundle IA, pour l'intégrer et l'invoquer optionnement si le bundle est installé.
+28. [ ] Déplacer les styles et scripts dans des assets
 
 Todo :
 - Déporter la doc USAGE IN BLOCK-SPECIFIC SCRIPTS dans la doc de création d'un bloc

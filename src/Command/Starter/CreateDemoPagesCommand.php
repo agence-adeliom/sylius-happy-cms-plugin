@@ -194,9 +194,19 @@ class CreateDemoPagesCommand extends AbstractContentCommand
                     'wysiwyg' => '<p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>',
                     'features' => [
                         [
-                            'key' => '1',
-                            'text' => '1',
-                            'icon' => 'star',
+                            'text' => 'Coffee by hour',
+                            'icon' => 'as fa-coffee',
+                            'key' => '10',
+                        ],
+                        [
+                            'text' => 'IA token by minute',
+                            'icon' => 'as fa-coffee',
+                            'key' => '5000',
+                        ],
+                        [
+                            'text' => 'Idea by second',
+                            'icon' => 'as fa-coffee',
+                            'key' => '3',
                         ],
                     ],
                     'position' => '4',
@@ -205,7 +215,7 @@ class CreateDemoPagesCommand extends AbstractContentCommand
                 ],
                 'hp-flex-5' => [
                     'title' => 'WysiwygBlockType',
-                    'wysiwyg' => '<p>Sed do eiusmod tempor incididunt ut labore et dolore magna <b>aliqua</b>.</p>',
+                    'content' => '<p>Sed do eiusmod tempor incididunt ut labore et dolore magna <b>aliqua</b>.</p>',
                     'position' => '5',
                     'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\WysiwygBlockType',
                     'block_published' => '1',
@@ -229,6 +239,29 @@ class CreateDemoPagesCommand extends AbstractContentCommand
                     ],
                     'position' => '6',
                     'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\AccordionBlockType',
+                    'block_published' => '1',
+                ],
+                'hp-flex-7' => [
+                    'title' => 'TextCtaBlockType',
+                    'headline' => 'Lorem Ipsum',
+                    'wysiwyg' => '<p>Sed do eiusmod tempor incididunt ut labore et dolore magna <b>aliqua</b>.</p>',
+                    'cta_one' => [
+                        'label' => 'CTA 1',
+                        'link' => '/',
+                    ],
+                    'cta_two' => [
+                        'label' => 'CTA 2',
+                        'link' => '/',
+                    ],
+                    'position' => '5',
+                    'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\TextCtaBlockType',
+                    'block_published' => '1',
+                ],
+                'hp-flex-8' => [
+                    'wysiwyg' => '<p>Sed do eiusmod tempor incididunt ut ...</p>',
+                    'wysiwyg_more' => '<p>Sed do eiusmod tempor incididunt ut labore et dolore magna <b>aliqua</b>.</p>',
+                    'position' => '5',
+                    'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\SeoBlockType',
                     'block_published' => '1',
                 ],
             ];
