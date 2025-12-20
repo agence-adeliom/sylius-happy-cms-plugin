@@ -15,7 +15,6 @@ install:
 	@make init
 	@make install-database
 	@make frontend-clear
-	@make configure-preview-mode
 	echo "Setup completed! You can now access the application at http://localhost"
 
 install-database:
@@ -39,6 +38,7 @@ init:
 	fi
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php composer install --no-interaction --no-scripts
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php composer require symfony/maker-bundle --dev --no-interaction --no-scripts
+	@make configure-preview-mode
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm nodejs || true
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) up -d
 
