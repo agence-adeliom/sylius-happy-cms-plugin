@@ -19,7 +19,7 @@
     ],
     "require": {
         "php": "~8.2|~8.3|~8.4",
-        "agence-adeliom/sylius-easy-crud-plugin": "^2.0",
+        "agence-adeliom/sylius-easy-crud-plugin": "^2.0.4",
         "ext-json": "*",
         "ext-intl": "*",
         "ext-exif": "*",

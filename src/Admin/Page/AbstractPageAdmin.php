@@ -53,19 +53,20 @@ abstract class AbstractPageAdmin extends AbstractAdmin implements PageAdminInter
         $clearCacheAction = Action::new('cache', 'sylius_happy_cms.page.admin.action.clear_cache', 'tabler:world-check')
             ->linkToRoute('sylius_happy_cms_admin_page_clear_cache');
 
-        $contentAction = Action::new('content', 'sylius_happy_cms.page.admin.action.manage_content', 'bxs:book-content');
-        foreach ($locales as $locale) {
-            $contentAction->addSubAction(
-                Action::new($locale->getCode(), $locale->getCode(), 'bxs:book-content')
-                    ->linkToRoute('sylius_happy_cms_admin_page_update', [
-                        'context' => 'flexible_content:' . $locale->getCode(),
-                    ]),
-            );
-        }
+        if ($this->getResource()) {
+            $contentAction = Action::new(
+                'content',
+                'sylius_happy_cms.page.admin.action.manage_content',
+                'bxs:book-content'
+            )->linkToRoute('sylius_happy_cms_admin_page_builder', [
+                'resource' => $this->getResourceAlias(),
+                'id' => $this->getResource()->getId(),
+            ]);
 
-        $actions->addItemAction(Crud::PAGE_INDEX, $contentAction);
-        $actions->addItemAction(Crud::PAGE_DETAIL, $contentAction);
-        $actions->addItemAction(Crud::PAGE_EDIT, $contentAction);
+            $actions->addItemAction(Crud::PAGE_INDEX, $contentAction);
+            $actions->addItemAction(Crud::PAGE_DETAIL, $contentAction);
+            $actions->addItemAction(Crud::PAGE_EDIT, $contentAction);
+        }
 
         $actions->addGlobalAction(Crud::PAGE_INDEX, $clearCacheAction);
 
