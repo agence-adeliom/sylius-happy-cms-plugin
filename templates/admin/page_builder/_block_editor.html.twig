@@ -100,37 +100,52 @@
                     </div>
                 </div>
 
-                {# Right: Delete button with confirmation dropdown #}
+                {# Right: Delete/Restore button #}
                 <div class="page-builder__block-toolbar-right">
-                    <div class="dropdown">
+                    {% if this.block.isDeleted %}
+                        {# Restore button for deleted blocks #}
                         <button type="button"
-                                class="btn btn-sm btn-outline-danger dropdown-toggle"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false">
-                            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
-                                <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                class="btn btn-sm btn-success"
+                                data-action="live#action"
+                                data-live-action-param="prevent|restoreBlock">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 4px;">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                <path d="M12.354 5.854a.5.5 0 0 0-.708-.708L8 8.793 5.354 6.146a.5.5 0 1 0-.708.708L7.293 9.5l-2.647 2.646a.5.5 0 0 0 .708.708L8 10.207l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 9.5l2.647-2.646z"/>
                             </svg>
-                            {% trans %}sylius_happy_cms.page_builder.delete{% endtrans %}
+                            {% trans %}sylius_happy_cms.page_builder.restore{% endtrans %}
                         </button>
-                        <div class="dropdown-menu dropdown-menu-end p-3" style="min-width: 280px;">
-                            <p class="mb-3 text-muted" style="font-size: 0.875rem;">
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" class="text-warning" style="margin-right: 4px; vertical-align: text-bottom;">
-                                    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-                                </svg>
-                                {% trans %}sylius_happy_cms.page_builder.confirm_delete{% endtrans %}
-                            </p>
+                    {% else %}
+                        {# Delete button with confirmation dropdown #}
+                        <div class="dropdown">
                             <button type="button"
-                                    class="btn btn-danger btn-sm w-100"
-                                    data-action="live#action"
-                                    data-live-action-param="prevent|deleteBlock">
-                                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 4px;">
-                                    <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/>
+                                    class="btn btn-sm btn-outline-danger dropdown-toggle"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                    <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
                                 </svg>
-                                {% trans %}sylius_happy_cms.page_builder.confirm_delete_action{% endtrans %}
+                                {% trans %}sylius_happy_cms.page_builder.delete{% endtrans %}
                             </button>
+                            <div class="dropdown-menu dropdown-menu-end p-3" style="min-width: 280px;">
+                                <p class="mb-3 text-muted" style="font-size: 0.875rem;">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" class="text-warning" style="margin-right: 4px; vertical-align: text-bottom;">
+                                        <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                                    </svg>
+                                    {% trans %}sylius_happy_cms.page_builder.confirm_delete{% endtrans %}
+                                </p>
+                                <button type="button"
+                                        class="btn btn-danger btn-sm w-100"
+                                        data-action="live#action"
+                                        data-live-action-param="prevent|deleteBlock">
+                                    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 4px;">
+                                        <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/>
+                                    </svg>
+                                    {% trans %}sylius_happy_cms.page_builder.confirm_delete_action{% endtrans %}
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    {% endif %}
                 </div>
             </div>
 

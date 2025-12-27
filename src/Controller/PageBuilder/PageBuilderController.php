@@ -326,6 +326,7 @@ class PageBuilderController extends AbstractController
     /**
      * Publish content for the specified locales.
      * Copies draft data to published data for all blocks in the selected locales.
+     * Also permanently deletes blocks that are marked as deleted.
      *
      * @param array<string> $locales
      */
@@ -334,10 +335,17 @@ class PageBuilderController extends AbstractController
         $allBlocks = $entity->getContentBlocks();
 
         $publishedCount = 0;
+        $blocksToDelete = [];
 
         foreach ($allBlocks as $block) {
             // Check if block belongs to one of the selected locales
             if (in_array($block->getLocale(), $locales, true)) {
+                // Check if block is marked as deleted - schedule for permanent deletion
+                if ($block->isDeleted()) {
+                    $blocksToDelete[] = $block;
+                    continue;
+                }
+
                 $draftData = $block->getDraftData();
 
                 // Only publish if there's draft data
@@ -358,6 +366,12 @@ class PageBuilderController extends AbstractController
                     $block->setUnpublishDate($block->getPreviewUnpublishDate());
                 }
             }
+        }
+
+        // Permanently delete blocks marked as deleted
+        foreach ($blocksToDelete as $block) {
+            $entity->removeContentBlock($block);
+            $this->entityManager->remove($block);
         }
 
         // Flush changes to database

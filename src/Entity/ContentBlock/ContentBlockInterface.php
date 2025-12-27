@@ -91,4 +91,24 @@ interface ContentBlockInterface
      * Check if there are unpublished changes.
      */
     public function hasUnpublishedChanges(): bool;
+
+    /**
+     * Check if the block is marked as deleted.
+     */
+    public function isDeleted(): bool;
+
+    /**
+     * Set the deleted state of the block.
+     */
+    public function setDeleted(bool $deleted): void;
+
+    /**
+     * Mark the block as deleted (soft delete).
+     */
+    public function delete(): void;
+
+    /**
+     * Restore a deleted block.
+     */
+    public function restore(): void;
 }

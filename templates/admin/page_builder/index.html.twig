@@ -157,6 +157,27 @@
             box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.2);
         }
 
+        /* Deleted block handles */
+        .page-builder__block-handle.is-deleted .page-builder__block-handle-button {
+            background: #f8d7da;
+            border-color: #dc3545;
+            border-style: dashed;
+            opacity: 0.6;
+            color: #dc3545;
+        }
+
+        .page-builder__block-handle.is-deleted .page-builder__block-handle-button:hover {
+            opacity: 0.9;
+            border-color: #dc3545;
+            background: #f8d7da;
+            color: #dc3545;
+        }
+
+        .page-builder__block-handle.is-deleted.is-active .page-builder__block-handle-button {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2);
+        }
+
         /* Preview iframe container */
         .page-builder__preview {
             flex: 1;
@@ -703,6 +724,11 @@
 
                                     /* Hide hover overlay for unpublished blocks (they have their own overlay) */
                                     .content-block-wrapper[data-published="false"] .content-block-hover-overlay {
+                                        display: none !important;
+                                    }
+
+                                    /* Hide hover overlay for deleted blocks (they have their own overlay) */
+                                    .content-block-wrapper[data-deleted="true"] .content-block-hover-overlay {
                                         display: none !important;
                                     }
 

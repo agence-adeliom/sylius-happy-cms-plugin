@@ -178,15 +178,34 @@ class Helper
             'settings' => $blockData,
         ], $extra));
 
-        // In preview mode, wrap the content with a container that has data-block-id, data-block-layer, and data-published attributes
+        // In preview mode, wrap the content with a container that has data-block-id, data-block-layer, data-published, and data-deleted attributes
         if ($preview) {
             $layer = $contentBlock->getLayer();
             $layerAttr = $layer ? sprintf(' data-block-layer="%s"', htmlspecialchars($layer, \ENT_QUOTES, 'UTF-8')) : '';
             $publishedAttr = sprintf(' data-published="%s"', $isPreviewPublished ? 'true' : 'false');
+            $deletedAttr = sprintf(' data-deleted="%s"', $contentBlock->isDeleted() ? 'true' : 'false');
 
-            // Add overlay for unpublished blocks with inline styles and edit button
+            // Add overlay for deleted blocks with inline styles (takes priority)
             $overlayHtml = '';
-            if (!$isPreviewPublished) {
+            if ($contentBlock->isDeleted()) {
+                $overlayHtml = '<div class="content-block-deleted-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(220, 53, 69, 0.5); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;">'
+                    . '<div style="background: rgba(255, 255, 255, 0.95); color: #dc3545; padding: 12px 20px; border-radius: 6px; font-size: 14px; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.15); pointer-events: none;">'
+                    . '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: text-bottom; margin-right: 6px;">'
+                    . '<path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>'
+                    . '<path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>'
+                    . '</svg>'
+                    . 'Deleted Block'
+                    . '</div>'
+                    . '<button class="content-block-edit-button" data-block-id="' . $blockId . '" style="padding: 12px 24px; background: #6c757d; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); transition: all 0.2s; display: flex; align-items: center; gap: 8px;">'
+                    . '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">'
+                    . '<path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>'
+                    . '<path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>'
+                    . '</svg>'
+                    . 'Edit Block'
+                    . '</button>'
+                    . '</div>';
+            } elseif (!$isPreviewPublished) {
+                // Add overlay for unpublished blocks with inline styles and edit button
                 $overlayHtml = '<div class="content-block-unpublished-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(200, 200, 200, 0.5); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;">'
                     . '<div style="background: rgba(255, 255, 255, 0.95); color: #6c757d; padding: 12px 20px; border-radius: 6px; font-size: 14px; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.15); pointer-events: none;">'
                     . '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: text-bottom; margin-right: 6px;">'
@@ -217,10 +236,11 @@ class Helper
                 . '</div>';
 
             $wrappedContent = sprintf(
-                '<div data-block-id="%d"%s%s class="content-block-wrapper" style="position: relative;">%s%s%s</div>',
+                '<div data-block-id="%d"%s%s%s class="content-block-wrapper" style="position: relative;">%s%s%s</div>',
                 $blockId,
                 $layerAttr,
                 $publishedAttr,
+                $deletedAttr,
                 $renderedContent,
                 $overlayHtml,
                 $hoverOverlayHtml,

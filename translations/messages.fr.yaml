@@ -352,6 +352,7 @@ sylius_happy_cms:
     move_last: Déplacer en dernier
     move_to_position: "Déplacer en position %position%"
     delete: Supprimer
+    restore: Restaurer
     confirm_delete: Êtes-vous sûr de vouloir supprimer ce bloc ?
     confirm_delete_action: Confirmer la suppression
     edit_block_title: Remplissez le formulaire pour éditer le bloc

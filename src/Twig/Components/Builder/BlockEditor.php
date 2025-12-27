@@ -230,27 +230,9 @@ class BlockEditor extends AbstractController
         }
 
         $blockId = $this->blockId;
-        $locale = $block->getLocale();
 
-        // Remove the block
-        $this->entity->removeContentBlock($block);
-        $this->entityManager->remove($block);
-
-        // Reindex remaining blocks
-        $remainingBlocks = $this->entity->getContentBlocksForPreview($this->locale)
-            ->filter(function (ContentBlockInterface $b) use ($locale) {
-                return $b->getLocale() === $locale;
-            })
-            ->toArray();
-
-        usort($remainingBlocks, function (ContentBlockInterface $a, ContentBlockInterface $b) {
-            return $a->getPosition() <=> $b->getPosition();
-        });
-
-        foreach ($remainingBlocks as $index => $b) {
-            $b->setPosition($index);
-        }
-
+        // Mark the block as deleted (soft delete)
+        $block->delete();
         $this->entityManager->flush();
 
         // Reset blockId to exit edit mode
@@ -259,6 +241,29 @@ class BlockEditor extends AbstractController
         // Dispatch event to reload iframe
         $this->dispatchBrowserEvent('block:deleted', [
             'blockId' => $blockId,
+        ]);
+
+        // Dispatch event to reload iframe
+        $this->dispatchBrowserEvent('block:saved', [
+            'blockId' => $this->blockId,
+        ]);
+    }
+
+    #[LiveAction]
+    public function restoreBlock(): void
+    {
+        $block = $this->getBlock();
+        if (null === $block) {
+            return;
+        }
+
+        // Restore the block
+        $block->restore();
+        $this->entityManager->flush();
+
+        // Dispatch event to reload iframe
+        $this->dispatchBrowserEvent('block:restored', [
+            'blockId' => $this->blockId,
         ]);
 
         // Dispatch event to reload iframe

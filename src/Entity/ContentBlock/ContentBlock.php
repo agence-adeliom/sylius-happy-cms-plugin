@@ -58,6 +58,10 @@ abstract class ContentBlock implements ContentBlockInterface
     #[Assert\Type('string')]
     protected ?string $layer = null;
 
+    #[ORM\Column(name: 'deleted', type: Types::BOOLEAN, options: ['default' => false])]
+    #[Assert\Type('bool')]
+    protected bool $deleted = false;
+
     public function __construct()
     {
         $this->timestampableConstruct();
@@ -161,5 +165,25 @@ abstract class ContentBlock implements ContentBlockInterface
     public function hasUnpublishedChanges(): bool
     {
         return $this->draftData !== $this->publishedData;
+    }
+
+    public function isDeleted(): bool
+    {
+        return $this->deleted;
+    }
+
+    public function setDeleted(bool $deleted): void
+    {
+        $this->deleted = $deleted;
+    }
+
+    public function delete(): void
+    {
+        $this->deleted = true;
+    }
+
+    public function restore(): void
+    {
+        $this->deleted = false;
     }
 }
