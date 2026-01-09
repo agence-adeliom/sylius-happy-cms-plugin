@@ -14,15 +14,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-class SharedBlockType extends AbstractBlock implements ServiceSubscriberInterface, BlockTypeInterface
+class SharedBlockType extends AbstractBlock implements BlockTypeInterface
 {
-    public static function getSubscribedServices(): array
-    {
-        return [
-            ParameterBagInterface::class,
-        ];
-    }
-
     public function buildBlock(FormBuilderInterface $builder, array $options): void
     {
         global $allowedSharedBlockTypesForResource;

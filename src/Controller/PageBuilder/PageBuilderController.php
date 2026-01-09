@@ -9,6 +9,7 @@ use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentBlockInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableInterface;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockCollection;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
+use Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock\SharedBlockCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Sylius\Component\Locale\Provider\LocaleProviderInterface;
 use Sylius\Resource\Model\ResourceInterface;
@@ -28,6 +29,7 @@ class PageBuilderController extends AbstractController
         private readonly LocaleProviderInterface $localeProvider,
         private readonly BlockCollection $blockCollection,
         private readonly TranslatorInterface $translator,
+        private readonly SharedBlockCollection $sharedBlockCollection,
     ) {
     }
 
@@ -151,6 +153,9 @@ class PageBuilderController extends AbstractController
         // Get the current locale from query parameter or use default locale
         $locale = $request->query->get('locale', $request->getLocale());
 
+        // Get all shared blocks
+        $this->getSharedBlockList($entity);
+
         // Load the block
         $block = $this->loadBlock($entity, $blockId, $locale);
 
@@ -262,6 +267,21 @@ class PageBuilderController extends AbstractController
             'blockAssets' => $assets,
             'sendMessageToParent' => $formChanged,
         ]);
+    }
+
+    private function getSharedBlockList(ContentEditableInterface $entity): void
+    {
+        global $allowedSharedBlockTypesForResource;
+        if ($entity instanceof ResourceInterface && empty($allowedSharedBlockTypesForResource)) {
+            // Get all shared allowed blocks type for current resource
+            // Then put as global variable to be used in sub files (shared block type)
+            $sharedBlocksCollection = $this->sharedBlockCollection->enabledSupportFilter();
+            $sharedBlocks = $sharedBlocksCollection->getAllowedBlocks(
+                $entity,
+            );
+            $allowedSharedBlockTypesForResource = array_keys($sharedBlocks);
+            dump($allowedSharedBlockTypesForResource);
+        }
     }
 
     /**
