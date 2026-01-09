@@ -280,7 +280,6 @@ class PageBuilderController extends AbstractController
                 $entity,
             );
             $allowedSharedBlockTypesForResource = array_keys($sharedBlocks);
-            dump($allowedSharedBlockTypesForResource);
         }
     }
 
