@@ -101,7 +101,7 @@ abstract class AbstractMenuItemAdmin extends AbstractAdmin implements MenuItemAd
 
         if ($menuId) {
             $actions->remove(Crud::PAGE_INDEX, Action::NEW);
-            $newMenuItem = Action::new('menu_items.new', 'sylius_happy_cms.menu_item.admin.action.create', 'plus')
+            $newMenuItem = Action::new('menu_items.new', 'sylius_happy_cms.menu_item.admin.action.create', 'bxs:plus')
                 ->linkToRoute('sylius_happy_cms_admin_menu_item_create', ['menu_id' => $menuId])
                 ->addCssClass('primary');
             $actions->addGlobalAction(Crud::PAGE_INDEX, $newMenuItem);
