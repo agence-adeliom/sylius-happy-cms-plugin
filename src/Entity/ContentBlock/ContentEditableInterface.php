@@ -16,6 +16,13 @@ interface ContentEditableInterface
     public function getContentBlocks(): Collection;
 
     /**
+     * Get entity content block class.
+     *
+     * @return class-string<ContentBlockInterface>
+     */
+    public static function getContentBlockClass(): string;
+
+    /**
      * Add a content block.
      */
     public function addContentBlock(ContentBlockInterface $contentBlock): void;

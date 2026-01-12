@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Page;
 
+use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentBlockInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Page\Page as BasePage;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Page\PageTranslationInterface;
 use Doctrine\Common\Collections\Collection;
@@ -18,6 +19,15 @@ class Page extends BasePage
     #[ORM\OneToMany(targetEntity: PageContentBlock::class, mappedBy: 'contentOwner', cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[ORM\OrderBy(['position' => 'ASC'])]
     protected Collection $contentBlocks;
+
+    /**
+     * @return class-string<ContentBlockInterface>
+     */
+    public static function getContentBlockClass(): string
+    {
+        return PageContentBlock::class;
+    }
+
 
     protected function createTranslation(): PageTranslationInterface
     {

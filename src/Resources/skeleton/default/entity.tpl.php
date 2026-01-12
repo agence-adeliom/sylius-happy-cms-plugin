@@ -25,6 +25,7 @@ use <?= str_replace('Entity', 'Repository', Str::getNamespace($classNameDetail->
 <?php } ?><?php if ($addContentBlocks === true) { ?>
 
 use Doctrine\Common\Collections\Collection;
+use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentBlockInterface;
 <?php } ?>
 
 use Doctrine\ORM\Mapping as ORM;
@@ -41,6 +42,13 @@ class <?= $classNameDetail->getShortName() ?> extends Base<?= $classNameDetail->
     #[ORM\OrderBy(['position' => 'ASC'])]
     protected Collection $contentBlocks;
 
+    /**
+     * @return class-string<ContentBlockInterface>
+     */
+    public static function getContentBlockClass(): string
+    {
+        return <?= $classNameDetail->getShortName() ?>ContentBlock::class;
+    }
 <?php } ?>
     protected function createTranslation(): <?= $classNameDetail->getShortName() ?>TranslationInterface
     {

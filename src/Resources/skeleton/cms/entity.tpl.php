@@ -51,6 +51,7 @@ use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableInterface;
 <?php } ?>
 <?php if (true === $hasFlexibleContent) { ?>
 use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableTrait;
+use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentBlockInterface;
 <?php } ?>
 
 #[ORM\HasLifecycleCallbacks]
@@ -106,6 +107,15 @@ class <?= $classNameDetail->getShortName() ?> implements ResourceInterface, Tran
     #[ORM\OneToMany(targetEntity: <?= $classNameDetail->getShortName() ?>ContentBlock::class, mappedBy: 'contentOwner', cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[ORM\OrderBy(['position' => 'ASC'])]
     protected Collection $contentBlocks;
+
+    /**
+     * @return class-string<ContentBlockInterface>
+     */
+    public static function getContentBlockClass(): string
+    {
+        return <?= $classNameDetail->getShortName() ?>ContentBlock::class;
+    }
+
 <?php } ?>
 
     #[ORM\Column(name: 'css', type: Types::TEXT, nullable: true)]

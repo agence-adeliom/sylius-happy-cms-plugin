@@ -630,7 +630,7 @@ class BlockEditor extends AbstractController
             $contentBlockClass = get_class($existingBlock);
         } else {
             // Fallback to the default ContentBlock class from this plugin
-            $contentBlockClass = \Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentBlock::class;
+            $contentBlockClass = $this->entity->getContentBlockClass();
 
             // If the default class doesn't exist, throw an error
             if (!class_exists($contentBlockClass)) {
