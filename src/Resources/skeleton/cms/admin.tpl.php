@@ -71,7 +71,7 @@ final class <?= $classNameDetail->getShortName() ?>Admin extends AbstractAdmin i
     public function configureActions(string $pageName): Actions
     {
         $actions = parent::configureActions($pageName);
-        $contentAction = Action::new('content', 'happy_cms.page.admin.action.manage_content', 'bxs:book-content')
+        $contentAction = Action::new('content', 'happy_cms.page.admin.action.manage_content', 'bi:book')
             ->linkToRoute('happy_cms_admin_page_content_builder', [
                 'id' => '$resource.getId()',
             ]);

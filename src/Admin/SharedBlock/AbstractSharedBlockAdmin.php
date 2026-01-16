@@ -75,7 +75,7 @@ abstract class AbstractSharedBlockAdmin extends AbstractAdmin implements Service
         $actions->remove(Crud::PAGE_INDEX, Action::NEW);
         $actions->addGlobalAction(
             Crud::PAGE_INDEX,
-            Action::new('shared_block.select', 'sylius_happy_cms.shared_block.admin.action.create', 'bxs:plus')
+            Action::new('shared_block.select', 'sylius_happy_cms.shared_block.admin.action.create', 'bi:plus')
                 ->linkToRoute('sylius_happy_cms_admin_shared_block_select')
                 ->addCssClass('primary'),
         );
