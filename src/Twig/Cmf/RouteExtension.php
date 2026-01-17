@@ -44,7 +44,7 @@ class RouteExtension extends AbstractExtension
         try {
             return $this->router->generate(RouteObjectInterface::OBJECT_BASED_ROUTE_NAME, [
                 RouteObjectInterface::ROUTE_OBJECT => $object->getOnlineRoute($locale),
-            ]) . ($preview ? '?preview=1' : '');
+            ]) . ($preview ? '?happy_cms_preview=1' : '');
         } catch (NoResultException | NonUniqueResultException $e) {
             return '';
         }
@@ -127,7 +127,7 @@ class RouteExtension extends AbstractExtension
             if (null !== $object) {
                 return $this->router->generate(RouteObjectInterface::OBJECT_BASED_ROUTE_NAME, [
                     RouteObjectInterface::ROUTE_OBJECT => $object->getOnlineRoute($locale),
-                ]) . ($preview ? '?preview=1' : '');
+                ]) . ($preview ? '?happy_cms_preview=1' : '');
             }
 
             return '';
@@ -179,7 +179,7 @@ class RouteExtension extends AbstractExtension
             if (null !== $object) {
                 return $this->router->generate(RouteObjectInterface::OBJECT_BASED_ROUTE_NAME, [
                     RouteObjectInterface::ROUTE_OBJECT => $object->getOnlineRoute($locale),
-                ]) . ($preview ? '?preview=1' : '');
+                ]) . ($preview ? '?happy_cms_preview=1' : '');
             }
 
             return '';
@@ -232,7 +232,7 @@ class RouteExtension extends AbstractExtension
             if (null !== $object) {
                 return $this->router->generate(RouteObjectInterface::OBJECT_BASED_ROUTE_NAME, [
                     RouteObjectInterface::ROUTE_OBJECT => $object->getOnlineRoute($locale),
-                ]) . ($preview ? '?preview=1' : '');
+                ]) . ($preview ? '?happy_cms_preview=1' : '');
             }
 
             return '';

@@ -132,7 +132,7 @@ Voici les étapes pour cette partie B :
 33. [ ] Erreurs php stan
 34. [x] Sylius 2.2+ => Attendre le test application version 2.2
 35. [x] Ajouter un paramètre au bundle qui permet de forcer le template de page utilisé pour le preview dans l'iframe. Par défaut on utilise le template de la page. Mais dans certains cas, on peut vouloir utiliser un template spécifique pour le preview (sans header/footer par exemple).
-36. [ ] Renommer la variable de preview. ?preview=1 => ?happy_cms_preview=1.
+36. [x] Renommer la variable de preview. ?preview=1 => ?happy_cms_preview=1.
 
 Todo :
 - Déporter la doc USAGE IN BLOCK-SPECIFIC SCRIPTS dans la doc de création d'un bloc

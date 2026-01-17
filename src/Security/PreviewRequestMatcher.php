@@ -11,7 +11,7 @@ final class PreviewRequestMatcher implements RequestMatcherInterface
 {
     public function matches(Request $request): bool
     {
-        // Match if the 'preview' parameter is set to '1'
-        return $request->query->get('preview') === '1';
+        // Match if the 'happy_cms_preview' parameter is set to '1'
+        return $request->query->get('happy_cms_preview') === '1';
     }
 }
