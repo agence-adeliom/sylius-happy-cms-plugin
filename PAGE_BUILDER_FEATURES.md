@@ -122,15 +122,16 @@ Voici les étapes pour cette partie B :
     - On verra plus tard pour les actions d'ajout et comment les gérer.
 25. [x] La fonction supprimer un bloc est manquante dans le fichier templates/admin/page_builder/_block_editor.html.twig, on peut passer par une action du live component BlockEditor
 27. [x] Bouton retour vers la page d'édition, trouver un moyen de dynamiser le retour vers la route edit. La resource Sylius a des routes pour son CRUD, il faudrait voir si on peut récupérer le nom de la route 'edit' ou 'update.'
-28. [ ] Dans contentBlock, il faudrait ajouter un boolean pour une fonctionnalité de soft delete. Lorsqu'on supprime un bloc, cocher le boolean. Lors de la publication du contenu, supprimer le bloc à ce moment là. En mode preview, le bloc doit rester visible. Mais à la manière des blocs non publiés, il faudrait ajouter un layer au dessus du bloc pour indiquer qu'il est supprimé, en rouge. Un bloc supprimé peut être restauré dans le panneau d'édition. L'îcone de suppression sera remplacée par une icône de restauration.
-29. [ ] Soucis pour lister blocs partagés
+28. [x] Dans contentBlock, il faudrait ajouter un boolean pour une fonctionnalité de soft delete. Lorsqu'on supprime un bloc, cocher le boolean. Lors de la publication du contenu, supprimer le bloc à ce moment là. En mode preview, le bloc doit rester visible. Mais à la manière des blocs non publiés, il faudrait ajouter un layer au dessus du bloc pour indiquer qu'il est supprimé, en rouge. Un bloc supprimé peut être restauré dans le panneau d'édition. L'îcone de suppression sera remplacée par une icône de restauration.
+29. [x] Soucis pour lister blocs partagés
 30. [x] Dans easy crud, ajouter les contextes de la resource dans les actions. Afin de metDans PageAdmin, voir pour remplacer l'action "manage content" par le lien vers le nouveau page builder.
 31. [ ] Voir pour le bundle IA, pour l'intégrer et l'invoquer optionnement si le bundle est installé.
 32. [ ] Déplacer les styles et scripts dans des assets :
     - styles/page_builder.css => assets/styles/page_builder/page_builder.css
     - scripts/page_builder.js => assets/scripts/page_builder/page_builder.js
 33. [ ] Erreurs php stan
-34. [ ] Sylius 2.2+ => Attendre le test application version 2.2
+34. [x] Sylius 2.2+ => Attendre le test application version 2.2
+35. [ ] Ajouter un paramètre au bundle qui permet de forcer le template de page utilisé pour le preview dans l'iframe. Par défaut on utilise le template de la page. Mais dans certains cas, on peut vouloir utiliser un template spécifique pour le preview (sans header/footer par exemple).
 
 Todo :
 - Déporter la doc USAGE IN BLOCK-SPECIFIC SCRIPTS dans la doc de création d'un bloc
