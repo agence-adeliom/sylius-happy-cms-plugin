@@ -27,6 +27,7 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
         $config = $this->processConfiguration($configuration, $configs);
 
         $this->processPageConfiguration($config['page'], $container);
+        $this->processPageBuilderConfiguration($config['page_builder'], $container);
         $this->processSeoConfiguration($config['seo'], $container);
         $this->processConfigConfiguration($config['config'], $container);
         $this->processMenuConfiguration($config['menu'], $container);
@@ -60,6 +61,17 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
         foreach ($config as $key => $value) {
             /** @phpstan-ignore-next-line */
             $container->setParameter('sylius_happy_cms.page.' . $key, $value);
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $config
+     */
+    private function processPageBuilderConfiguration(array $config, ContainerBuilder $container): void
+    {
+        foreach ($config as $key => $value) {
+            /** @phpstan-ignore-next-line */
+            $container->setParameter('sylius_happy_cms.page_builder.' . $key, $value);
         }
     }
 

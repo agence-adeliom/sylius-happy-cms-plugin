@@ -1,0 +1,31 @@
+{% extends '@SyliusShop/shared/layout/base.html.twig' %}
+
+{% block title %}{% endblock %}
+
+{% block metatags %}{% endblock %}
+
+{% block body %}
+    {# New ContentBlock system - check if entity has contentBlocks #}
+    {% if resource.contentBlocks is defined and resource.contentBlocks|length > 0 %}
+        {% if preview is defined and preview %}
+            {# In preview mode, get blocks sorted by preview position with preview publish state #}
+            {% set contentBlocks = resource.getContentBlocksForPreview(app.request.locale) %}
+        {% else %}
+            {# In production mode, get only published blocks sorted by position #}
+            {% set contentBlocks = resource.getPublishedContentBlocks(app.request.locale) %}
+        {% endif %}
+
+        {% for contentBlock in contentBlocks %}
+            {{ happy_cms_content_block_render(contentBlock, preview|default(false)) }}
+        {% endfor %}
+        {{ happy_cms_content_block_assets() }}
+    {% else %}
+        {# Legacy system - fallback to old content field in translations #}
+        {% for block in (resource.translation(app.request.locale)|default({content: []})).content %}
+            {{ happy_cms_block_render(block, preview) }}
+        {% endfor %}
+        {{ happy_cms_block_assets() }}
+    {% endif %}
+
+    {{ happy_cms_shared_block_assets() }}
+{% endblock %}

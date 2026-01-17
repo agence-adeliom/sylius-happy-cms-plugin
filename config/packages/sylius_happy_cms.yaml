@@ -1,4 +1,8 @@
 sylius_happy_cms:
+  # Use a specific template for page builder preview (example without header/footer)
+  page_builder:
+    preview_template: '@SyliusHappyCMSPlugin/front/document/preview.html.twig'
+
   page:
     page_model: Adeliom\SyliusHappyCMSPlugin\Entity\Page\Page
     page_repository: Adeliom\SyliusHappyCMSPlugin\Repository\Page\PageRepository

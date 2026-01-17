@@ -120,6 +120,19 @@ class RouteRenderService extends AbstractController
         }
 
         $template = $contentDocument->getRouteTemplate();
+
+        // In preview mode, use custom template if configured
+        if ($preview) {
+            try {
+                $previewTemplate = $this->parameterBag->get('sylius_happy_cms.page_builder.preview_template');
+                if (is_string($previewTemplate) && !empty($previewTemplate)) {
+                    $template = $previewTemplate;
+                }
+            } catch (\Exception $e) {
+                // If parameter is not set or invalid, continue with default template
+            }
+        }
+
         if (null === $template) {
             $template = '@SyliusHappyCMSPlugin/front/document/default.html.twig';
         }

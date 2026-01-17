@@ -110,6 +110,16 @@ class Configuration implements ConfigurationInterface
             ->end()
             ->end()
 
+            ->arrayNode('page_builder')
+            ->addDefaultsIfNotSet()
+            ->children()
+            ->scalarNode('preview_template')
+            ->defaultValue(null)
+            ->info('Custom template to use for page builder preview. If not set, the default page template will be used.')
+            ->end()
+            ->end()
+            ->end()
+
             ->arrayNode('seo')
             ->addDefaultsIfNotSet()
             ->children()

@@ -362,6 +362,7 @@ class PageBuilderController extends AbstractController
                 // Check if block is marked as deleted - schedule for permanent deletion
                 if ($block->isDeleted()) {
                     $blocksToDelete[] = $block;
+
                     continue;
                 }
 

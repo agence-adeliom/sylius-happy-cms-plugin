@@ -10,9 +10,7 @@ use Adeliom\SyliusHappyCMSPlugin\Asset\AssetHappyCMSPackage;
 use Adeliom\SyliusHappyCMSPlugin\Entity\SharedBlock\SharedBlock;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\AbstractBlock;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockTypeInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 class SharedBlockType extends AbstractBlock implements BlockTypeInterface
 {

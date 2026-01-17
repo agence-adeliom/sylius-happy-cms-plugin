@@ -57,7 +57,7 @@ abstract class AbstractPageAdmin extends AbstractAdmin implements PageAdminInter
             $contentAction = Action::new(
                 'content',
                 'sylius_happy_cms.page.admin.action.manage_content',
-                'bi:book'
+                'bi:book',
             )->linkToRoute('sylius_happy_cms_admin_page_builder', [
                 'resource' => $this->getResourceAlias(),
                 'id' => $this->getResource()->getId(),

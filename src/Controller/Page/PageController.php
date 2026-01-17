@@ -74,22 +74,4 @@ class PageController extends AbstractController
 
         return new RedirectResponse($this->router->generate('sylius_happy_cms_admin_page_index'));
     }
-
-    public function blockPreviewAction(Request $request): Response
-    {
-        $data = [];
-        $blocks = [
-            'block-demo-1' => array_merge([
-                                              'position' => '1',
-                                              'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\AccordionBlockType',
-                                              'block_published' => '1',
-                                          ], $data),
-        ];
-
-        return $this->render('@SyliusHappyCMSPlugin/front/blocks/preview.html.twig', [
-            'blocks' => $blocks,
-            'preview' => true,
-            'data' => $request->get('data'),
-        ]);
-    }
 }
