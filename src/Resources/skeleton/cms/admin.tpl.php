@@ -88,7 +88,8 @@ final class <?= $classNameDetail->getShortName() ?>Admin extends AbstractAdmin i
         if (is_null($context)) {
 
             yield TabField::new('<?= $classNameDetail->getShortName() ?>', 'happy_cms.<?= $scope ?>.admin.tab.<?=
-        mb_strtolower($classNameDetail->getShortName()) ?>');
+        mb_strtolower($classNameDetail->getShortName()) ?>')
+                ->renderHorizontal();
 
             yield ColumnField::new('happy_cms.<?= $scope ?>.admin.panel.metadata')
                 ->setSize(ColumnSizeEnum::WIDE_6_OF_12);

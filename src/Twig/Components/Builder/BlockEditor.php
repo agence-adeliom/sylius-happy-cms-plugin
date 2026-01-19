@@ -122,7 +122,7 @@ class BlockEditor extends AbstractController
         $className = (new \ReflectionClass($formClass))->getShortName();
 
         // Convert from CamelCase to readable format (e.g., "AccordionBlockType" -> "Accordion Block")
-        return trim(preg_replace('/([A-Z])/', ' $1', str_replace('BlockType', '', $className)));
+        return trim(preg_replace('/([A-Z])/', ' $1', str_replace('BlockType', '', $className)) ?: '');
     }
 
     public function getBlockPosition(): ?int
@@ -179,7 +179,7 @@ class BlockEditor extends AbstractController
             return;
         }
 
-        $currentPosition = $block->getPreviewPosition();
+        $currentPosition = $block->getPreviewPosition() ?: 0;
 
         // Get all blocks for this entity and locale
         $blocks = $this->entity->getContentBlocksForPreview($this->locale)
@@ -307,7 +307,7 @@ class BlockEditor extends AbstractController
         $localesWithBlocks = [];
         foreach ($blocks as $block) {
             $blockLocale = $block->getLocale();
-            if ($blockLocale !== $this->locale && !isset($localesWithBlocks[$blockLocale])) {
+            if ($blockLocale && $blockLocale !== $this->locale && !isset($localesWithBlocks[$blockLocale])) {
                 $localesWithBlocks[$blockLocale] = $blockLocale;
             }
         }
