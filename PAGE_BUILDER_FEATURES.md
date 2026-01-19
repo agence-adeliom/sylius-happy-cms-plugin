@@ -134,8 +134,10 @@ Voici les étapes pour cette partie B :
 34. [x] Sylius 2.2+ => Attendre le test application version 2.2
 35. [x] Ajouter un paramètre au bundle qui permet de forcer le template de page utilisé pour le preview dans l'iframe. Par défaut on utilise le template de la page. Mais dans certains cas, on peut vouloir utiliser un template spécifique pour le preview (sans header/footer par exemple).
 36. [x] Renommer la variable de preview. ?preview=1 => ?happy_cms_preview=1.
-37. [ ] Ajouter un bouton à côté des actions de redimension (desktop, tablette, mobile) pour modifier l'alignement de l'iframe. Par défault elle est centrée. Le bouton agit comme un toggle. Si on clique dessus, l'iframe s'aligne à gauche. Un second clic l'aligne à droite. Un troisième clic la remet au centre.
-38. [ ] Ajouter des dépréciations pour les anciennes méthodes liées à l'ancien système de page builder (champ content JSON). Mais aussi le field src/Admin/Field/FlexibleContentField.php
+37. [x] Ajouter un bouton à côté des actions de redimension (desktop, tablette, mobile) pour modifier l'alignement de l'iframe. Par défault elle est centrée. Le bouton agit comme un toggle. Si on clique dessus, l'iframe s'aligne à gauche. Un second clic l'aligne à droite. Un troisième clic la remet au centre.
+38. [ ] En publiant une page, appeler le service de vidage de cache.
+39. [ ] Déplacer l'action de vidage de cache dans l'interface du page builder. Ajouter un bouton dans la toolbar pour vider le cache manuellement. Et l'enlever de l'interface des pages (grid)
+40. [ ] Ajouter des dépréciations pour les anciennes méthodes liées à l'ancien système de page builder (champ content JSON). Mais aussi le field src/Admin/Field/FlexibleContentField.php
         Ce système sera supprimé dans la version 3.x du plugin.
 
 Todo :

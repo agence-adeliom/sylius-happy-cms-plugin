@@ -377,3 +377,4 @@ sylius_happy_cms:
     confirm_publish: 'Publier'
     select_at_least_one_locale: 'Veuillez sélectionner au moins une langue'
     content_published_successfully: 'Le contenu a été publié avec succès pour les langues sélectionnées'
+    toggle_alignment: 'Aligner la zone de prévisualisation à gauche ou droite'

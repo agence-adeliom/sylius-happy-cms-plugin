@@ -53,6 +53,24 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  // Alignment toggle functionality
+  const alignmentToggle = document.querySelector('[data-page-builder-target="alignmentToggle"]');
+
+  if (alignmentToggle && iframeWrapper) {
+    // Cycle through alignments: center → left → right → center
+    alignmentToggle.addEventListener('click', function() {
+      this.classList.toggle('btn-outline-primary');
+      this.classList.toggle('btn-outline-secondary');
+
+      if (iframeWrapper.style.margin === '0px auto') {
+        iframeWrapper.style.margin = '0px';
+      } else {
+        iframeWrapper.style.margin = '0px auto';
+      }
+
+    });
+  }
+
   // Load the preview URL in the iframe
   const iframe = document.querySelector('[data-page-builder-target="iframe"]');
   let initialIframeUrl = null; // Store the initial URL to protect against navigation

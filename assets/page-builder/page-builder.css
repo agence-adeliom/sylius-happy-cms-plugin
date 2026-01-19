@@ -195,6 +195,22 @@
     max-width: 375px;
 }
 
+/* Alignment modes */
+.page-builder__preview-inner.align-center {
+    display: flex;
+    justify-content: center;
+}
+
+.page-builder__preview-inner.align-left {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.page-builder__preview-inner.align-right {
+    display: flex;
+    justify-content: flex-end;
+}
+
 .page-builder__iframe {
     width: 100%;
     border: none;
