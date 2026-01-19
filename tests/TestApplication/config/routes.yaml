@@ -5,7 +5,7 @@ sylius_happy_cms:
     resource: "@SyliusHappyCMSPlugin/config/routes.yaml"
 
 sylius_shop_homepage:
-    path: /{_locale}/
+    path: /{_locale}
     methods: [GET]
     controller: Adeliom\SyliusHappyCMSPlugin\Controller\Page\PageController::indexAction
 

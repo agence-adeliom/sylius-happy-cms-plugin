@@ -33,6 +33,14 @@
       "js": [
         "/bundles/syliushappycmsplugin/tiny-mce.8a757ac5.js"
       ]
+    },
+    "page-builder": {
+      "css": [
+        "/bundles/syliushappycmsplugin/page-builder.bd221d81.css"
+      ],
+      "js": [
+        "/bundles/syliushappycmsplugin/page-builder.60754760.js"
+      ]
     }
   }
 }

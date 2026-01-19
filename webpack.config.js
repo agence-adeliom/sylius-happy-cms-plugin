@@ -29,6 +29,7 @@ Encore
     .addEntry('seo-block-type', './assets/blocks/seo-block-type.js')
     .addEntry('accordion-block-type', './assets/blocks/accordion-block-type.js')
     .addEntry('tiny-mce', './assets/tinymce/field.js')
+    .addEntry('page-builder', './assets/page-builder/entrypoint.js')
 ;
 
 const webpackConfig = Encore.getWebpackConfig();

@@ -126,13 +126,16 @@ Voici les étapes pour cette partie B :
 29. [x] Soucis pour lister blocs partagés
 30. [x] Dans easy crud, ajouter les contextes de la resource dans les actions. Afin de metDans PageAdmin, voir pour remplacer l'action "manage content" par le lien vers le nouveau page builder.
 31. [ ] Voir pour le bundle IA, pour l'intégrer et l'invoquer optionnement si le bundle est installé.
-32. [ ] Déplacer les styles et scripts dans des assets :
-    - styles/page_builder.css => assets/styles/page_builder/page_builder.css
-    - scripts/page_builder.js => assets/scripts/page_builder/page_builder.js
+32. [x] Déplacer les styles et scripts dans des assets :
+    - assets/admin/page-builder/page-builder.css (12KB - styles du page builder)
+    - assets/admin/page-builder/page-builder.js (35KB - logique modulaire)
+    - assets/admin/page-builder/entrypoint.js (point d'entrée Webpack)
 33. [ ] Erreurs php stan
 34. [x] Sylius 2.2+ => Attendre le test application version 2.2
 35. [x] Ajouter un paramètre au bundle qui permet de forcer le template de page utilisé pour le preview dans l'iframe. Par défaut on utilise le template de la page. Mais dans certains cas, on peut vouloir utiliser un template spécifique pour le preview (sans header/footer par exemple).
 36. [x] Renommer la variable de preview. ?preview=1 => ?happy_cms_preview=1.
+37. [ ] Ajouter des dépréciations pour les anciennes méthodes liées à l'ancien système de page builder (champ content JSON). Mais aussi le field src/Admin/Field/FlexibleContentField.php
+        Ce système sera supprimé dans la version 3.x du plugin.
 
 Todo :
 - Déporter la doc USAGE IN BLOCK-SPECIFIC SCRIPTS dans la doc de création d'un bloc

@@ -2,7 +2,7 @@
 
 ```yaml
 sylius_shop_homepage:
-  path: /{_locale}/
+  path: /{_locale}
   methods: [GET]
   controller: App\Controller\HomepageController::indexAction
 ```

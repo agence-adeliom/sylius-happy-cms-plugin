@@ -8,6 +8,13 @@
     {{ form_start(form) }}
         <div class="block-edit-container">
 
+            {# Footer with save button #}
+            <div class="page-builder__editor-header">
+                <button type="submit" class="btn btn-primary btn-sm">
+                    {% trans %}sylius_happy_cms.page_builder.save_block{% endtrans %}
+                </button>
+            </div>
+
             {# Form section with title #}
             <div class="page-builder__form-content">
                 <h5 class="mb-3">{% trans %}sylius_happy_cms.page_builder.edit_block_title{% endtrans %}</h5>
@@ -15,13 +22,6 @@
                 {% include '@SyliusAdmin/shared/crud/common/content/flashes.html.twig' %}
 
                 {{ form_widget(form) }}
-            </div>
-
-            {# Footer with save button #}
-            <div class="page-builder__editor-footer">
-                <button type="submit" class="btn btn-primary">
-                    {% trans %}sylius_happy_cms.page_builder.save_block{% endtrans %}
-                </button>
             </div>
 
         </div>
@@ -101,11 +101,17 @@
             padding: 1rem;
         }
 
-        .page-builder__editor-footer {
-            padding: 1rem;
+        .page-builder__editor-header {
+            padding: 0.6rem;
             border-top: 1px solid #dee2e6;
-            background-color: #fff;
             flex-shrink: 0;
+            text-align: right;
+            background: #6c757d;
+        }
+
+        .page-builder__editor-header button {
+            font-size: 14px;
+            padding: 6px 12px;
         }
     </style>
 {% endblock %}
@@ -132,4 +138,13 @@
             {% endif %}
         {% endfor %}
     {% endif %}
+
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            // Remove Symfony toolbar inside iframe
+            if (document.querySelector('.sf-toolbar')) {
+                document.querySelector('.sf-toolbar').remove();
+            }
+        });
+    </script>
 {% endblock %}
