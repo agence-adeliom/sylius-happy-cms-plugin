@@ -21,6 +21,9 @@ export default class extends Controller {
     // Listen for form:saved event from BlockEditorForm component
     this.element.addEventListener('form:saved', this.onFormSaved.bind(this));
 
+    // Listen for form:saved event from BlockEditorForm component
+    this.element.addEventListener('block-editor:reload-requested', this.onReloadRequested.bind(this));
+
     // Listen for custom editBlock event from the page builder script
     this.element.addEventListener('block-editor:edit', this.onEditBlock.bind(this));
     this.element.addEventListener('block-editor:close', this.onCloseBlock.bind(this));
@@ -91,5 +94,15 @@ export default class extends Controller {
 
     // Dispatch custom event for other parts of the page to listen
     this.dispatch('blockSaved', { detail: { blockId } });
+  }
+
+  /**
+   * Handle reload-requested event from BlockEditor component
+   */
+  onReloadRequested(event) {
+
+    console.log('Reloading iframe to show updated content');
+    window.location.reload();
+
   }
 }

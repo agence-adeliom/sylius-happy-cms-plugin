@@ -2,6 +2,7 @@
     <tinymce-editor
             id="{{ id }}"
             name="{{ full_name }}"
+            height="{{ attr.height|default(300) }}"
             {{ required ? "required" : "" }}
             {% with { attr: tinymce_attributes(attr) } %}
                 {{ block('attributes') }}

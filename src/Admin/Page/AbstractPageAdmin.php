@@ -57,15 +57,22 @@ abstract class AbstractPageAdmin extends AbstractAdmin implements PageAdminInter
             $contentAction = Action::new(
                 'content',
                 'sylius_happy_cms.page.admin.action.manage_content',
-                'bi:book',
+                'bi:card-heading',
             )->linkToRoute('sylius_happy_cms_admin_page_builder', [
                 'resource' => $this->getResourceAlias(),
                 'id' => $this->getResource()->getId(),
             ]);
-
-            $actions->addItemAction(Crud::PAGE_INDEX, $contentAction);
             $actions->addItemAction(Crud::PAGE_DETAIL, $contentAction);
             $actions->addItemAction(Crud::PAGE_EDIT, $contentAction);
+        } else {
+            $contentAction = Action::new(
+                'content',
+                'sylius_happy_cms.page.admin.action.manage_content',
+                'bi:card-heading',
+            )->linkToRoute('sylius_happy_cms_admin_page_builder', [
+                'resource' => $this->getResourceAlias(),
+            ]);
+            $actions->addItemAction(Crud::PAGE_INDEX, $contentAction);
         }
 
         $actions->addGlobalAction(Crud::PAGE_INDEX, $clearCacheAction);
@@ -82,14 +89,11 @@ abstract class AbstractPageAdmin extends AbstractAdmin implements PageAdminInter
             yield ResourceChoiceField::new('parent', 'sylius_happy_cms.page.admin.field.parent')
                 ->setMultiple(false)
                 ->setRequired(false)
+                ->onlyOnForms()
                 ->setResourceAlias('sylius_happy_cms.page');
 
             yield Field::new('name', 'sylius_happy_cms.page.admin.field.name')
                 ->setSortablePath('translations.name')
-                ->onlyOnIndex();
-
-            yield Field::new('slug', 'sylius_happy_cms.page.admin.field.slug')
-                ->setSortablePath('translations.slug')
                 ->onlyOnIndex();
 
             yield ColumnField::new('sylius_happy_cms.page.admin.panel.metadatas')
@@ -118,7 +122,6 @@ abstract class AbstractPageAdmin extends AbstractAdmin implements PageAdminInter
                 ->setEnum(ThreeStateStatusEnum::class)
                 ->setRequired(false)
                 ->setFormTypeOption('placeholder', false)
-                ->hideOnIndex()
                 ->renderExpanded(true);
 
             yield TabField::new('seo', 'sylius_happy_cms.page.admin.tab.seo');

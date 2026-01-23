@@ -411,70 +411,80 @@
             <div style="flex: 1; overflow-y: auto; padding: 2rem;">
                 <div style="max-width: 800px; margin: 0 auto;">
                     {% if this.isAIGenerationAvailable %}
-                        {# AI Generation Form #}
-                        <div class="alert alert-info mb-4">
-                            <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 8px; vertical-align: text-bottom;">
-                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                        <div data-loading="action(generateAIContent)|show">
+                            {% trans %}sylius_happy_cms.page_builder.ai_loading{% endtrans %}
+                            <br />
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"/>
+                                <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466"/>
                             </svg>
-                            {% trans %}sylius_happy_cms.page_builder.ai_generator_description{% endtrans %}
                         </div>
-
-                        <div class="mb-4">
-                            <label for="aiPrompt" class="form-label fw-bold">
-                                {% trans %}sylius_happy_cms.page_builder.ai_prompt_label{% endtrans %}
-                            </label>
-                            <textarea
-                                id="aiPrompt"
-                                class="form-control"
-                                rows="6"
-                                data-model="aiPrompt"
-                                placeholder="{% trans %}sylius_happy_cms.page_builder.ai_prompt_placeholder{% endtrans %}"
-                            ></textarea>
-                            <div class="form-text">
-                                {% trans %}sylius_happy_cms.page_builder.ai_prompt_help{% endtrans %}
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="aiBlockCount" class="form-label fw-bold">
-                                {% trans %}sylius_happy_cms.page_builder.ai_block_count_label{% endtrans %}
-                            </label>
-                            <input
-                                type="number"
-                                id="aiBlockCount"
-                                class="form-control"
-                                min="1"
-                                max="10"
-                                data-model="aiBlockCount"
-                                style="max-width: 150px;"
-                            >
-                            <div class="form-text">
-                                {% trans %}sylius_happy_cms.page_builder.ai_block_count_help{% endtrans %}
-                            </div>
-                        </div>
-
-                        <div class="d-flex gap-2">
-                            <button
-                                type="button"
-                                class="btn btn-success btn-lg"
-                                data-action="live#action"
-                                data-live-action-param="prevent|generateAIContent"
-                            >
+                        <div data-loading="action(generateAIContent)|hide">
+                            {# AI Generation Form #}
+                            <div class="alert alert-info mb-4">
                                 <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 8px; vertical-align: text-bottom;">
                                     <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                    <path d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445z"/>
+                                    <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
                                 </svg>
-                                {% trans %}sylius_happy_cms.page_builder.generate_button{% endtrans %}
-                            </button>
-                            <button
-                                type="button"
-                                class="btn btn-outline-secondary btn-lg"
-                                data-action="live#action"
-                                data-live-action-param="prevent|closeAIGenerator"
-                            >
-                                {% trans %}sylius_happy_cms.page_builder.cancel{% endtrans %}
-                            </button>
+                                {% trans %}sylius_happy_cms.page_builder.ai_generator_description{% endtrans %}
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="aiPrompt" class="form-label fw-bold">
+                                    {% trans %}sylius_happy_cms.page_builder.ai_prompt_label{% endtrans %}
+                                </label>
+                                <textarea
+                                    id="aiPrompt"
+                                    class="form-control"
+                                    rows="6"
+                                    data-model="aiPrompt"
+                                    placeholder="{% trans %}sylius_happy_cms.page_builder.ai_prompt_placeholder{% endtrans %}"
+                                ></textarea>
+                                <div class="form-text">
+                                    {% trans %}sylius_happy_cms.page_builder.ai_prompt_help{% endtrans %}
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="aiBlockCount" class="form-label fw-bold">
+                                    {% trans %}sylius_happy_cms.page_builder.ai_block_count_label{% endtrans %}
+                                </label>
+                                <input
+                                    type="number"
+                                    id="aiBlockCount"
+                                    class="form-control"
+                                    min="1"
+                                    max="10"
+                                    data-model="aiBlockCount"
+                                    style="max-width: 150px;"
+                                >
+                                <div class="form-text">
+                                    {% trans %}sylius_happy_cms.page_builder.ai_block_count_help{% endtrans %}
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button
+                                    type="button"
+                                    class="btn btn-primary"
+                                    data-action="live#action"
+                                    data-live-action-param="prevent|generateAIContent"
+                                >
+                                    <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 8px; vertical-align: text-bottom;">
+                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                        <path d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445z"/>
+                                    </svg>
+                                    {% trans %}sylius_happy_cms.page_builder.generate_button{% endtrans %}
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary"
+                                    data-action="live#action"
+                                    data-live-action-param="prevent|closeAIGenerator"
+                                >
+                                    {% trans %}sylius_happy_cms.page_builder.cancel{% endtrans %}
+                                </button>
+                            </div>
                         </div>
                     {% else %}
                         {# AI Bundle not installed message #}

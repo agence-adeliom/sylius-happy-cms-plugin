@@ -1,10 +1,14 @@
 services:
 
   # AI Services
-  Adeliom\SyliusHappyCMSPlugin\Service\AI\AIBundleDetector: ~
-
+  Adeliom\SyliusHappyCMSPlugin\Service\AI\AIBundleDetector:
+    public: true
+    arguments:
+      - '@kernel'
+      
   sylius.happy_cms.ai.bundle_detector:
-    alias: Adeliom\SyliusHappyCMSPlugin\Service\AI\AIBundleDetector
+      alias: Adeliom\SyliusHappyCMSPlugin\Service\AI\AIBundleDetector
+
 
   Adeliom\SyliusHappyCMSPlugin\Service\AI\BlockSchemaSerializer:
     public: true
@@ -15,6 +19,15 @@ services:
 
   sylius.happy_cms.ai.block_schema_serializer:
     alias: Adeliom\SyliusHappyCMSPlugin\Service\AI\BlockSchemaSerializer
+
+  Adeliom\SyliusHappyCMSPlugin\Service\AI\BlockContentGenerator:
+    public: true
+    arguments:
+      - '@sylius.happy_cms.ai.block_schema_serializer'
+      - '@?Symfony\AI\Agent\AgentInterface'  # Optional: will be null if AI bundle is not configured
+
+  sylius.happy_cms.ai.block_content_generator:
+    alias: Adeliom\SyliusHappyCMSPlugin\Service\AI\BlockContentGenerator
 
   sylius.happy_cms.ai.show_block_list:
       class: Adeliom\SyliusHappyCMSPlugin\Command\AI\ShowBlockSchemaCommand

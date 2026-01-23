@@ -10,6 +10,8 @@ use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableInterface;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockCollection;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Adeliom\SyliusHappyCMSPlugin\Service\AI\AIBundleDetector;
+use Adeliom\SyliusHappyCMSPlugin\Service\AI\BlockContentGenerator;
+use AllowDynamicProperties;
 use Doctrine\ORM\EntityManagerInterface;
 use Sylius\Resource\Model\ResourceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,6 +24,7 @@ use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\ComponentToolsTrait;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 
+#[AllowDynamicProperties]
 class BlockEditor extends AbstractController
 {
     use DefaultActionTrait;
@@ -67,6 +70,7 @@ class BlockEditor extends AbstractController
         private readonly EntityManagerInterface $entityManager,
         private readonly ParameterBagInterface $parameterBag,
         private readonly AIBundleDetector $aiBundleDetector,
+        private readonly BlockContentGenerator $blockContentGenerator,
     ) {
     }
 
@@ -258,6 +262,8 @@ class BlockEditor extends AbstractController
         $this->dispatchBrowserEvent('block:saved', [
             'blockId' => $this->blockId,
         ]);
+
+        $this->dispatchBrowserEvent('block-editor:close', []);
     }
 
     #[LiveAction]
@@ -738,14 +744,103 @@ class BlockEditor extends AbstractController
     #[LiveAction]
     public function generateAIContent(): void
     {
-        // TODO: This will be implemented in C.3
-        // For now, just close the AI generator
-        $this->showAIGenerator = false;
+        // Validate inputs
+        if (empty($this->aiPrompt)) {
+            $this->dispatchBrowserEvent('ai:generation-error', [
+                'message' => 'Please provide a description for the content you want to generate.',
+            ]);
 
-        // Dispatch event to notify that AI generation was requested
-        $this->dispatchBrowserEvent('ai:generation-requested', [
-            'prompt' => $this->aiPrompt,
-            'blockCount' => $this->aiBlockCount,
-        ]);
+            return;
+        }
+
+        if ($this->aiBlockCount < 1 || $this->aiBlockCount > 10) {
+            $this->dispatchBrowserEvent('ai:generation-error', [
+                'message' => 'Number of blocks must be between 1 and 10.',
+            ]);
+
+            return;
+        }
+
+        try {
+            // Resolve the entity class from the resource name
+            $entityClass = $this->resolveEntityClass($this->resourceName);
+
+            // Load the entity
+            $this->entity = $this->loadEntity($entityClass, $this->entityId);
+
+            // Generate blocks using AI
+            $generatedBlocks = $this->blockContentGenerator->generateBlocks(
+                $this->aiPrompt,
+                $this->aiBlockCount,
+            );
+
+            // Determine the ContentBlock class to use
+            $contentBlockClass = null;
+            $existingBlock = $this->entity->getContentBlocks()->first();
+            if ($existingBlock) {
+                $contentBlockClass = get_class($existingBlock);
+            } else {
+                $contentBlockClass = $this->entity->getContentBlockClass();
+
+                if (!class_exists($contentBlockClass)) {
+                    throw new \RuntimeException('Cannot determine ContentBlock class.');
+                }
+            }
+
+            // Get the current highest position for this locale
+            $existingBlocks = $this->entity->getContentBlocksForPreview($this->locale);
+            $nextPosition = $existingBlocks->count();
+
+            // Create and persist each generated block
+            $createdBlockIds = [];
+            foreach ($generatedBlocks->getBlocks() as $index => $blockData) {
+                $newBlock = new $contentBlockClass();
+
+                if (!$newBlock instanceof ContentBlockInterface) {
+                    throw new \RuntimeException(
+                        sprintf('Block class "%s" must implement ContentBlockInterface', $contentBlockClass),
+                    );
+                }
+
+                // Configure the new block
+                $position = $nextPosition + $index;
+                $newBlock->setLocale($this->locale);
+                $newBlock->setType($blockData['block_type']);
+                $newBlock->setPosition($position);
+                $newBlock->setPreviewPosition($position);
+                $newBlock->setDraftData($blockData['data']);
+                $newBlock->setPublishedData($blockData['data']);
+                $newBlock->setPreviewPublishState(
+                    $blockData['block_published'] ? ThreeStateStatusEnum::PUBLISHED : ThreeStateStatusEnum::UNPUBLISHED,
+                );
+
+                // Add to entity
+                $this->entity->addContentBlock($newBlock);
+                $this->entityManager->persist($newBlock);
+
+                $createdBlockIds[] = $newBlock->getId();
+            }
+
+            $this->entityManager->flush();
+
+            // Close the AI generator
+            $this->showAIGenerator = false;
+
+            // Dispatch success event
+            $this->dispatchBrowserEvent('ai:generation-success', [
+                'blockCount' => $generatedBlocks->getCount(),
+                'blockIds' => $createdBlockIds,
+                'reload' => true,
+            ]);
+
+            // Dispatch success event
+            $this->dispatchBrowserEvent('block-editor:reload-requested', []);
+            $this->dispatchBrowserEvent('block-editor:close', []);
+        } catch (\Exception $e) {
+            // Dispatch error event
+            $this->dispatchBrowserEvent('ai:generation-error', [
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 }

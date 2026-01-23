@@ -4,7 +4,7 @@ imports:
   - { resource: services/menu.yaml }
   - { resource: services/block.yaml }
   - { resource: services/maker.yaml }
-  - { resource: services/ia.yaml }
+  - { resource: services/ai.yaml }
 
 services:
   _defaults:
@@ -203,6 +203,7 @@ services:
           - "@sylius.happy_cms.block_collection"
           - "@doctrine.orm.entity_manager"
           - "@parameter_bag"
+          - "@sylius.happy_cms.ai.bundle_detector"
       tags:
           - { name: sylius.live_component.admin, key: happycms-builder-block-editor, template: '@SyliusHappyCMSPlugin/admin/page_builder/_block_editor.html.twig' }
       calls:

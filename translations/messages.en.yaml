@@ -328,7 +328,7 @@ sylius_happy_cms:
     view_published: View published page
     save_draft: Save draft
     publish: Publish
-    add_block: Add content
+    add_content: Add content
     preview: Preview
     toggle_panel: Toggle panel
     close_panel: Close
@@ -369,7 +369,7 @@ sylius_happy_cms:
     generate_ai_content: 'Generate content with AI'
     ai_generator_description: 'Describe the content you want to generate and the AI will create blocks for you.'
     ai_prompt_label: 'Content description'
-    ai_prompt_placeholder: 'Example: I want to generate content for a service page that explains our e-commerce development services.'
+    ai_prompt_placeholder: 'Create content for a landing page promoting our premium product line. Focus on benefits, features, testimonials, and pricing.'
     ai_prompt_help: 'Describe the content you want to generate. Be specific to get better results.'
     ai_block_count_label: 'Number of blocks'
     ai_block_count_help: 'How many blocks should the AI generate? (1-10)'
@@ -378,6 +378,10 @@ sylius_happy_cms:
     ai_not_configured: 'AI Bundle Not Configured'
     ai_not_configured_description: 'This feature requires the Symfony AI Bundle to be installed and configured.'
     ai_learn_more: 'Learn how to set it up'
+    ai_generating: 'Generating content with AI...'
+    ai_generation_success: 'Successfully generated %count% blocks!'
+    ai_generation_error: 'Error generating content: %message%'
+    ai_loading: 'Generating...'
     publish_title: 'Publish content'
     publish_description: 'Select the languages you want to publish the content for. Draft changes will be published.'
     select_all_locales: 'Select all languages'

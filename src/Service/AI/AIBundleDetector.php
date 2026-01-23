@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\Service\AI;
 
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Service to detect if Symfony AI Bundle is installed and configured
@@ -12,13 +13,18 @@ use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 #[Autoconfigure(public: true)]
 readonly class AIBundleDetector
 {
+    public function __construct(
+        private KernelInterface $kernel,
+    ) {
+    }
+
     /**
      * Check if Symfony AI Bundle is installed and enabled
      */
     public function isAvailable(): bool
     {
-        // Check if Symfony AI Bundle is installed by checking if a core class exists
-        return class_exists(\Symfony\Component\AiBundle\AiBundle::class);
+        // Check if Symfony AI Bundle is installed
+        return array_key_exists('AiBundle', $this->kernel->getBundles());
     }
 
     /**
