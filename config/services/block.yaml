@@ -237,3 +237,4 @@ services:
       - '@form.factory'
       - '@assets.packages'
     tags: [ 'sylius.happy_cms.block', 'form.type' ]
+

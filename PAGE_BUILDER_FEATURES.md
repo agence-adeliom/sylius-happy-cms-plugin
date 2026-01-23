@@ -125,7 +125,7 @@ Voici les étapes pour cette partie B :
 28. [x] Dans contentBlock, il faudrait ajouter un boolean pour une fonctionnalité de soft delete. Lorsqu'on supprime un bloc, cocher le boolean. Lors de la publication du contenu, supprimer le bloc à ce moment là. En mode preview, le bloc doit rester visible. Mais à la manière des blocs non publiés, il faudrait ajouter un layer au dessus du bloc pour indiquer qu'il est supprimé, en rouge. Un bloc supprimé peut être restauré dans le panneau d'édition. L'îcone de suppression sera remplacée par une icône de restauration.
 29. [x] Soucis pour lister blocs partagés
 30. [x] Dans easy crud, ajouter les contextes de la resource dans les actions. Afin de metDans PageAdmin, voir pour remplacer l'action "manage content" par le lien vers le nouveau page builder.
-31. [ ] Voir pour le bundle IA, pour l'intégrer et l'invoquer optionnement si le bundle est installé.
+31. [x] Voir pour le bundle IA, pour l'intégrer et l'invoquer optionnement si le bundle est installé.
 32. [x] Déplacer les styles et scripts dans des assets :
     - assets/admin/page-builder/page-builder.css (12KB - styles du page builder)
     - assets/admin/page-builder/page-builder.js (35KB - logique modulaire)
@@ -139,6 +139,57 @@ Voici les étapes pour cette partie B :
 39. [ ] Déplacer l'action de vidage de cache dans l'interface du page builder. Ajouter un bouton dans la toolbar pour vider le cache manuellement. Et l'enlever de l'interface des pages (grid)
 40. [ ] Ajouter des dépréciations pour les anciennes méthodes liées à l'ancien système de page builder (champ content JSON). Mais aussi le field src/Admin/Field/FlexibleContentField.php
         Ce système sera supprimé dans la version 3.x du plugin.
+41. [ ] Documentation
+
+C. Fonctionnalité de génération de contenu via IA
+
+Basé sur le bundle Symfony IA je souhaite :
+
+1. [x] Création d’un outil IA (ou service symfony) pour fournir la liste des blocs de contenus existants du CMS.
+- Les blocs héritent de l’interface Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockTypeInterface. Il est possible de récupérer la collection via le service Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockCollection
+- Chaque bloc est en réalité un form Symfony, on peut récupérer la liste des champs possibles via la méthod buildBlock. Qui aliment en un FormBuilderInterface passé en paramètre.
+- Cet outil IA, doit retourner la liste des blocs et leurs champs + type.
+- L’idée est de founir un json.
+- L’objectif est de serialiser les propriétés des blocs de contenu. Cela peut aussi se faire via un service. L’outil IA (Tool), pourrait être optionnel à ce stade.
+
+2. [ ] Ajout dans le page builder d’un bouton de génération de contenu via IA.
+- Le bundle IA n’est pas forcément intégré dans les dépendances du projet, il faudrait ajouter un test  qui va conditionner l’affichage du bouton. Si le bundle n'est pas installé on peut tout de même afficher la fonctionnalité mais avec un message indiquant qu'il est possible de profitier de cette fonctionnalité en installant le bundle Symfony IA et en branchant un agent IA (via ChatGPT, etc..)
+- Lorsqu’on ouvre le panneau d’édition. Ajouter dans l’interface un mini formulaire qui demande 2 informations :
+  a. Prompt du contenu de la page et du contenu qu’on souhaite générer. Par exemple : Je souhaite générer du contenu pour une page service, qui explique notre prestation de développement e-commerce.
+  b. Nombre de blocs à générer.
+- Utiliser le composant Live BlockEditor pour implémenter ça.
+- Lorsqu’on valide, poster ces éléments dans une action.
+- Créer un  service Symfony qui va récupérer ces données. Ce service va permettre ensuite d’appeler un agent IA via les fonctionnalités Symfony IA.
+
+3. [ ] Communication avec les agents IA.
+- Via les composants Symfony IA, créer un chat qui injecte la liste des blocs (A.) et fait une demande de création de contenu. Basé sur le prompt donné par l’utilisateur (B), et le nombre de bloc souhaités.
+- C’est l’agent IA qui doit à partir des blocs fourni prendre les plus pertinents selon le contexte et le contenu souhaité.
+- La réponse de l’agent doit être retournée via le systèmème de OutputProcessor et passer par un objet.
+- Cet objet renvoi la liste des blocs générés. A l’image de liste des blocs founis en entrés (meme propriétés, namespace, etc…)
+- Ce contenu doit ensuite être enregistré	 dans la page. Voici un exemple de contenu à enregistrer :
+```php
+[
+
+  'hp-flex-9' => [
+      'title' => 'Ready to Transform Your Content Management?',
+      'wysiwyg' => '<p>Join hundreds of Sylius stores already using Happy CMS to create exceptional content experiences. Get started today and see the difference a purpose-built CMS can make.</p>',
+      'cta_one' => [
+          'label' => 'Get Started Now',
+          'link' => 'https://github.com/agence-adeliom/sylius-happy-cms-plugin',
+      ],
+      'position' => '9',
+      'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\CtaBlockType',
+      'block_published' => '1',
+  ],
+
+    'hp-flex-10' => [
+        'wysiwyg' => '<p><strong>Happy CMS for Sylius</strong> is the complete content management solution designed specifically for Sylius e-commerce platforms. With its revolutionary visual page builder, advanced media management, multi-language support, and SEO optimization tools, Happy CMS empowers merchants to create stunning content experiences that drive conversions. Built by <strong>Agence Adeliom</strong>, Happy CMS seamlessly integrates with Sylius\'s architecture while providing an intuitive interface for content creators. Whether you\'re building product landing pages, managing blog content, or creating marketing campaigns, Happy CMS delivers the flexibility and power you need to succeed in e-commerce.</p>',
+        'position' => '10',
+        'block_type' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\SeoBlockType',
+        'block_published' => '1',
+    ],
+]
+```
 
 Todo :
 - Déporter la doc USAGE IN BLOCK-SPECIFIC SCRIPTS dans la doc de création d'un bloc

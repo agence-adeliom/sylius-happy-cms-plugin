@@ -4,6 +4,7 @@ imports:
   - { resource: services/menu.yaml }
   - { resource: services/block.yaml }
   - { resource: services/maker.yaml }
+  - { resource: services/ia.yaml }
 
 services:
   _defaults:

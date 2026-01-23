@@ -1,0 +1,19 @@
+services:
+    
+  # AI Services
+  Adeliom\SyliusHappyCMSPlugin\Service\AI\BlockSchemaSerializer:
+    public: true
+    arguments:
+      - '@sylius.happy_cms.block_collection'
+      - '@form.factory'
+      - '@translator'
+
+  sylius.happy_cms.ai.block_schema_serializer:
+    alias: Adeliom\SyliusHappyCMSPlugin\Service\AI\BlockSchemaSerializer
+
+  sylius.happy_cms.ai.show_block_list:
+      class: Adeliom\SyliusHappyCMSPlugin\Command\AI\ShowBlockSchemaCommand
+      arguments:
+          - '@sylius.happy_cms.ai.block_schema_serializer'
+      tags:
+          - { name: 'console.command' }

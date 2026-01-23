@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\Block;
 
 use Adeliom\SyliusHappyCMSPlugin\Asset\AssetHappyCMSPackage;
+use Adeliom\SyliusHappyCMSPlugin\Attribute\AIGeneratable;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\AbstractBlock;
 use Adeliom\SyliusHappyCMSPlugin\Form\MediaType;
 use Adeliom\SyliusHappyCMSPlugin\Form\TinymceBridgeType;
@@ -13,6 +14,11 @@ use Adeliom\SyliusHappyCMSPlugin\Form\Type\CheckboxJsonType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+#[AIGeneratable(
+    description: 'A combined text and image block with headline, title, rich content, image and call-to-action buttons',
+    useCases: ['about sections', 'service presentations', 'product highlights', 'team introductions', 'company values'],
+    priority: 135,
+)]
 class TextImageCtaBlockType extends AbstractBlock
 {
     public function buildBlock(FormBuilderInterface $builder, array $options): void
