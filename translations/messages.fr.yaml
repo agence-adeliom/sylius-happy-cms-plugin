@@ -333,7 +333,7 @@ sylius_happy_cms:
     view_published: Voir la page publiée
     save_draft: Enregistrer le brouillon
     publish: Publier
-    add_block: Ajouter un bloc
+    add_content: Ajouter du contenu
     preview: Aperçu
     toggle_panel: Afficher/masquer le panneau
     close_panel: Fermer
@@ -371,6 +371,18 @@ sylius_happy_cms:
     ai_translate_blocks: 'Traduire automatiquement les blocs avec l''IA'
     ai_translate_blocks_help: 'Cette fonctionnalité nécessite la configuration d''un agent IA.'
     ai_translate_learn_more: 'En savoir plus'
+    generate_ai_content: 'Générer du contenu avec l''IA'
+    ai_generator_description: 'Décrivez le contenu que vous souhaitez générer et l''IA créera des blocs pour vous.'
+    ai_prompt_label: 'Description du contenu'
+    ai_prompt_placeholder: 'Exemple : Je souhaite générer du contenu pour une page service, qui explique notre prestation de développement e-commerce.'
+    ai_prompt_help: 'Décrivez le contenu que vous souhaitez générer. Soyez précis pour obtenir de meilleurs résultats.'
+    ai_block_count_label: 'Nombre de blocs'
+    ai_block_count_help: 'Combien de blocs l''IA doit-elle générer ? (1-10)'
+    generate_button: 'Générer'
+    close: 'Fermer'
+    ai_not_configured: 'Bundle IA non configuré'
+    ai_not_configured_description: 'Cette fonctionnalité nécessite l''installation et la configuration du Bundle Symfony AI.'
+    ai_learn_more: 'Apprendre comment le configurer'
     publish_title: 'Publier le contenu'
     publish_description: 'Sélectionnez les langues pour lesquelles vous souhaitez publier le contenu. Les modifications en brouillon seront publiées.'
     select_all_locales: 'Sélectionner toutes les langues'

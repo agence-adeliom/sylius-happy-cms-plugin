@@ -1,6 +1,11 @@
 services:
-    
+
   # AI Services
+  Adeliom\SyliusHappyCMSPlugin\Service\AI\AIBundleDetector: ~
+
+  sylius.happy_cms.ai.bundle_detector:
+    alias: Adeliom\SyliusHappyCMSPlugin\Service\AI\AIBundleDetector
+
   Adeliom\SyliusHappyCMSPlugin\Service\AI\BlockSchemaSerializer:
     public: true
     arguments:

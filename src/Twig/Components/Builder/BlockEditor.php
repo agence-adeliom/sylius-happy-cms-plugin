@@ -9,6 +9,7 @@ use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentBlockInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableInterface;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockCollection;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
+use Adeliom\SyliusHappyCMSPlugin\Service\AI\AIBundleDetector;
 use Doctrine\ORM\EntityManagerInterface;
 use Sylius\Resource\Model\ResourceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -50,12 +51,22 @@ class BlockEditor extends AbstractController
     #[LiveProp(writable: true)]
     public string $blockFilterCategory = 'all_blocks';
 
+    #[LiveProp(writable: true)]
+    public bool $showAIGenerator = false;
+
+    #[LiveProp(writable: true)]
+    public string $aiPrompt = '';
+
+    #[LiveProp(writable: true)]
+    public int $aiBlockCount = 3;
+
     public ContentEditableInterface $entity;
 
     public function __construct(
         private readonly BlockCollection $blockCollection,
         private readonly EntityManagerInterface $entityManager,
         private readonly ParameterBagInterface $parameterBag,
+        private readonly AIBundleDetector $aiBundleDetector,
     ) {
     }
 
@@ -680,6 +691,61 @@ class BlockEditor extends AbstractController
         // Dispatch event to reload iframe
         $this->dispatchBrowserEvent('block:saved', [
             'blockId' => $this->blockId,
+        ]);
+    }
+
+    /**
+     * Check if AI content generation is available
+     */
+    public function isAIGenerationAvailable(): bool
+    {
+        return $this->aiBundleDetector->isAvailable();
+    }
+
+    /**
+     * Get AI installation instructions
+     */
+    public function getAIInstallationInstructions(): string
+    {
+        return $this->aiBundleDetector->getInstallationInstructions();
+    }
+
+    /**
+     * Open the AI content generator
+     */
+    #[LiveAction]
+    public function openAIGenerator(): void
+    {
+        $this->showAIGenerator = true;
+        $this->aiPrompt = '';
+        $this->aiBlockCount = 3;
+    }
+
+    /**
+     * Close the AI content generator
+     */
+    #[LiveAction]
+    public function closeAIGenerator(): void
+    {
+        $this->showAIGenerator = false;
+        $this->aiPrompt = '';
+        $this->aiBlockCount = 3;
+    }
+
+    /**
+     * Generate content blocks using AI
+     */
+    #[LiveAction]
+    public function generateAIContent(): void
+    {
+        // TODO: This will be implemented in C.3
+        // For now, just close the AI generator
+        $this->showAIGenerator = false;
+
+        // Dispatch event to notify that AI generation was requested
+        $this->dispatchBrowserEvent('ai:generation-requested', [
+            'prompt' => $this->aiPrompt,
+            'blockCount' => $this->aiBlockCount,
         ]);
     }
 }

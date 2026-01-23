@@ -42,7 +42,10 @@ readonly class BlockSchemaSerializer
      *
      * @param bool $onlyAIGeneratable If true, only include blocks with #[AIGeneratable] attribute
      *
-     * @return array<string, mixed>
+     * @return array{
+     *     blocks: array<int, array<string, mixed>>,
+     *     total_count: int
+     * }
      */
     public function serializeBlocks(bool $onlyAIGeneratable = true): array
     {

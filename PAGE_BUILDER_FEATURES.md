@@ -152,7 +152,7 @@ Basé sur le bundle Symfony IA je souhaite :
 - L’idée est de founir un json.
 - L’objectif est de serialiser les propriétés des blocs de contenu. Cela peut aussi se faire via un service. L’outil IA (Tool), pourrait être optionnel à ce stade.
 
-2. [ ] Ajout dans le page builder d’un bouton de génération de contenu via IA.
+2. [x] Ajout dans le page builder d’un bouton de génération de contenu via IA.
 - Le bundle IA n’est pas forcément intégré dans les dépendances du projet, il faudrait ajouter un test  qui va conditionner l’affichage du bouton. Si le bundle n'est pas installé on peut tout de même afficher la fonctionnalité mais avec un message indiquant qu'il est possible de profitier de cette fonctionnalité en installant le bundle Symfony IA et en branchant un agent IA (via ChatGPT, etc..)
 - Lorsqu’on ouvre le panneau d’édition. Ajouter dans l’interface un mini formulaire qui demande 2 informations :
   a. Prompt du contenu de la page et du contenu qu’on souhaite générer. Par exemple : Je souhaite générer du contenu pour une page service, qui explique notre prestation de développement e-commerce.
@@ -162,6 +162,7 @@ Basé sur le bundle Symfony IA je souhaite :
 - Créer un  service Symfony qui va récupérer ces données. Ce service va permettre ensuite d’appeler un agent IA via les fonctionnalités Symfony IA.
 
 3. [ ] Communication avec les agents IA.
+- Ajouter un paramètre au bundle Happy CMS pour définir l’agent IA à utiliser. Ou alors se baser sur l’agent par défaut configuré dans Symfony IA. Sans doute plus efficace.
 - Via les composants Symfony IA, créer un chat qui injecte la liste des blocs (A.) et fait une demande de création de contenu. Basé sur le prompt donné par l’utilisateur (B), et le nombre de bloc souhaités.
 - C’est l’agent IA qui doit à partir des blocs fourni prendre les plus pertinents selon le contexte et le contenu souhaité.
 - La réponse de l’agent doit être retournée via le systèmème de OutputProcessor et passer par un objet.
