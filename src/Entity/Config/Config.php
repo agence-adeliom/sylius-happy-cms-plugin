@@ -82,7 +82,7 @@ class Config implements ConfigInterface
         return $this->description;
     }
 
-    public function setDescription(string $description): void
+    public function setDescription(?string $description): void
     {
         $this->description = $description;
     }
@@ -92,7 +92,7 @@ class Config implements ConfigInterface
         return $this->type;
     }
 
-    public function setType(string $type): void
+    public function setType(?string $type): void
     {
         $this->type = $type;
     }
