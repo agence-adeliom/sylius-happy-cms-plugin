@@ -48,6 +48,10 @@ final readonly class BlockContentGenerator
 
         $result = $this->agent->call($messages);
 
+        if ($result->getContent() === null) {
+            throw new \RuntimeException('AI agent returned an empty response.');
+        }
+
         // Parse the response
         return $this->parseResponse($result->getContent());
     }

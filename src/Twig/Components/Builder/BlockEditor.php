@@ -824,13 +824,6 @@ class BlockEditor extends AbstractController
             $this->showAIGenerator = false;
 
             // Dispatch success event
-            $this->dispatchBrowserEvent('ai:generation-success', [
-                'blockCount' => $generatedBlocks->getCount(),
-                'blockIds' => $createdBlockIds,
-                'reload' => true,
-            ]);
-
-            // Dispatch success event
             $this->dispatchBrowserEvent('block-editor:reload-requested', []);
             $this->dispatchBrowserEvent('block-editor:close', []);
         } catch (\Exception $e) {
