@@ -63,6 +63,9 @@ class BlockEditor extends AbstractController
     #[LiveProp(writable: true)]
     public int $aiBlockCount = 3;
 
+    #[LiveProp(writable: true)]
+    public ?string $errorMessage = null;
+
     public ContentEditableInterface $entity;
 
     public function __construct(
@@ -746,18 +749,12 @@ class BlockEditor extends AbstractController
     {
         // Validate inputs
         if (empty($this->aiPrompt)) {
-            $this->dispatchBrowserEvent('ai:generation-error', [
-                'message' => 'Please provide a description for the content you want to generate.',
-            ]);
-
+            $this->errorMessage = 'Please provide a description for the content you want to generate.';
             return;
         }
 
         if ($this->aiBlockCount < 1 || $this->aiBlockCount > 10) {
-            $this->dispatchBrowserEvent('ai:generation-error', [
-                'message' => 'Number of blocks must be between 1 and 10.',
-            ]);
-
+            $this->errorMessage = 'Number of blocks must be between 1 and 10.';
             return;
         }
 
@@ -837,10 +834,7 @@ class BlockEditor extends AbstractController
             $this->dispatchBrowserEvent('block-editor:reload-requested', []);
             $this->dispatchBrowserEvent('block-editor:close', []);
         } catch (\Exception $e) {
-            // Dispatch error event
-            $this->dispatchBrowserEvent('ai:generation-error', [
-                'message' => $e->getMessage(),
-            ]);
+            $this->errorMessage = $e->getMessage();
         }
     }
 }

@@ -411,6 +411,14 @@
             <div style="flex: 1; overflow-y: auto; padding: 2rem;">
                 <div style="max-width: 800px; margin: 0 auto;">
                     {% if this.isAIGenerationAvailable %}
+                        {% if this.errorMessage %}
+                            <div class="alert alert-error mb-4">
+                                <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 8px; vertical-align: text-bottom;">
+                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
+                                    <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"></path>
+                                </svg>
+                                {{ this.errorMessage }}</div>
+                        {% endif %}
                         <div data-loading="action(generateAIContent)|show">
                             {% trans %}sylius_happy_cms.page_builder.ai_loading{% endtrans %}
                             <br />
