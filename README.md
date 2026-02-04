@@ -18,13 +18,42 @@
 
 ## Overview
 
-Happy CMS is a Content Management System (CMS) plugin for Sylius that enables you to create and manage dynamic, routable Sylius resources content with ease. It provides a flexible framework for building pages, managing blocks of content, and defining custom routable entities, all integrated seamlessly into your Sylius e-commerce platform.
+Happy CMS is a simple Content Management System (CMS) plugin for Sylius that enables you to create and manage dynamic pages based on Sylius custom and routable resources. 
 
-### A duo: Happy CMS + Easy CRUD
-
-This plugin is built to work hand in hand with [Sylius Easy CRUD Plugin]() to provide a seamless experience for managing CMS routable resources in front, and CRUD admin interfaces easily within Sylius.
-
+The plugin brings awesome CMS features to Sylius, including:
+- **Page Builder**: A back-office visual interface for preview and managing pages content with various content blocks.
+- **Media Management**: Organize and manage media files (images, videos, documents) used in your CMS pages. Compatible with CDN and cloud storage solutions.
+- **SEO**: Built-in SEO management for optimizing your pages for search engines.
+- **Multilingue**: Full support for multiple languages and locales.
+- **Custom Routable Resource**: Define your own entities that can be routed and displayed as CMS pages.
+- **Menu Management**: Create and manage menus for your site navigation.
+- **Flexible Blocks**: Use default (or create custom) various types of content blocks (text, images, videos, etc.) within your pages.
+- **Shared Blocks**: Reusable content blocks that can be used across multiple pages.
+- **Helpers**:
+    - Commands to generate entities, repositories and admin classes for your custom routable resources.
+    - Commands to generate blocks easily.
+- **AI**: Leverage AI to assist in generating content for your pages (requires API key).
+- **CRUD**: Integrated with [Sylius Easy CRUD Plugin](https://github.com/agence-adeliom/sylius-easy-crud-plugin) for simplified CRUD management.
 ---
+
+## Installation and documentation
+
+1.  [Install this plugin](./docs/INSTALLATION.md)
+2.  [Explore documentation](./README.md)
+
+## Versions
+
+| Plugin Version            | Sylius Version | New / Guide                 | Support |
+|---------------------------|----------------|-----------------------------|---------|
+| ^1.x                      | ^1.13          | Installation guide          | Beta    |
+| ^2.0.0                    | ^2.0.0         | Migration guide from ^1.x   | Beta    |
+| ^2.1.0 (new page builder) | \>= 2.0.0      | Migration guide from ^2.0.x | LTS     |
+
+## Feature preview
+
+![Page Builder preview](docs/screens/content-manager.png "Page Builder preview")
+
+![Page Builder preview](docs/screens/media-manager.png "Media manager preview")
 
 ## Installation
 
