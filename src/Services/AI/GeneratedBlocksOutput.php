@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Adeliom\SyliusHappyCMSPlugin\Service\AI;
+namespace Adeliom\SyliusHappyCMSPlugin\Services\AI;
 
 /**
  * Represents the output of AI-generated blocks

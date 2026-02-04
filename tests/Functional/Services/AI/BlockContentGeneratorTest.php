@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Tests\Functional\Services\AI;
 
-use Adeliom\SyliusHappyCMSPlugin\Service\AI\BlockContentGenerator;
-use Adeliom\SyliusHappyCMSPlugin\Service\AI\BlockSchemaSerializer;
-use Adeliom\SyliusHappyCMSPlugin\Service\AI\GeneratedBlocksOutput;
+use Adeliom\SyliusHappyCMSPlugin\Services\AI\BlockContentGenerator;
+use Adeliom\SyliusHappyCMSPlugin\Services\AI\BlockSchemaSerializer;
+use Adeliom\SyliusHappyCMSPlugin\Services\AI\GeneratedBlocksOutput;
 use PHPUnit\Framework\TestCase;
-use Symfony\AI\Agent\AgentInterface;
 use Symfony\AI\Agent\Result;
 
 final class BlockContentGeneratorTest extends TestCase

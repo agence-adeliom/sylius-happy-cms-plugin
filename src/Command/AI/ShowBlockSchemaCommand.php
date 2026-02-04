@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Command\AI;
 
-use Adeliom\SyliusHappyCMSPlugin\Service\AI\BlockSchemaSerializer;
+use Adeliom\SyliusHappyCMSPlugin\Services\AI\BlockSchemaSerializer;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

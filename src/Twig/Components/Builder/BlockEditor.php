@@ -9,8 +9,8 @@ use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentBlockInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableInterface;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockCollection;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
-use Adeliom\SyliusHappyCMSPlugin\Service\AI\AIBundleDetector;
-use Adeliom\SyliusHappyCMSPlugin\Service\AI\BlockContentGenerator;
+use Adeliom\SyliusHappyCMSPlugin\Services\AI\AIBundleDetector;
+use Adeliom\SyliusHappyCMSPlugin\Services\AI\BlockContentGenerator;
 use AllowDynamicProperties;
 use Doctrine\ORM\EntityManagerInterface;
 use Sylius\Resource\Model\ResourceInterface;
@@ -750,11 +750,13 @@ class BlockEditor extends AbstractController
         // Validate inputs
         if (empty($this->aiPrompt)) {
             $this->errorMessage = 'Please provide a description for the content you want to generate.';
+
             return;
         }
 
         if ($this->aiBlockCount < 1 || $this->aiBlockCount > 10) {
             $this->errorMessage = 'Number of blocks must be between 1 and 10.';
+
             return;
         }
 

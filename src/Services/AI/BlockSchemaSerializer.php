@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Adeliom\SyliusHappyCMSPlugin\Service\AI;
+namespace Adeliom\SyliusHappyCMSPlugin\Services\AI;
 
 use Adeliom\SyliusHappyCMSPlugin\Attribute\AIGeneratable;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockCollection;

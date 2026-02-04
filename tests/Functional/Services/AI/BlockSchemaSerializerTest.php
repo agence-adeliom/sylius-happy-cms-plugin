@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Adeliom\SyliusHappyCMSPlugin\Functional\Services\AI;
 
-use Adeliom\SyliusHappyCMSPlugin\Service\AI\BlockSchemaSerializer;
+use Adeliom\SyliusHappyCMSPlugin\Services\AI\BlockSchemaSerializer;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 final class BlockSchemaSerializerTest extends KernelTestCase

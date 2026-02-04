@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Tests\Functional\Services\AI;
 
-use Adeliom\SyliusHappyCMSPlugin\Service\AI\AIBundleDetector;
+use Adeliom\SyliusHappyCMSPlugin\Services\AI\AIBundleDetector;
 use PHPUnit\Framework\TestCase;
 
 final class AIBundleDetectorTest extends TestCase
