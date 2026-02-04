@@ -117,6 +117,10 @@ class Configuration implements ConfigurationInterface
             ->defaultValue(null)
             ->info('Custom template to use for page builder preview. If not set, the default page template will be used.')
             ->end()
+            ->scalarNode('ai_generate_content_prompt')
+            ->defaultValue(null)
+            ->info('Custom system prompt for AI content generation. If not set, a default prompt will be used.')
+            ->end()
             ->end()
             ->end()
 

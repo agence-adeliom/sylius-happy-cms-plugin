@@ -161,7 +161,7 @@ Basé sur le bundle Symfony IA je souhaite :
 - Lorsqu’on valide, poster ces éléments dans une action.
 - Créer un  service Symfony qui va récupérer ces données. Ce service va permettre ensuite d’appeler un agent IA via les fonctionnalités Symfony IA.
 
-3. [ ] Communication avec les agents IA.
+3. [x] Communication avec les agents IA.
 - Ajouter un paramètre au bundle Happy CMS pour définir l’agent IA à utiliser. Ou alors se baser sur l’agent par défaut configuré dans Symfony IA. Sans doute plus efficace.
 - Via les composants Symfony IA, créer un chat qui injecte la liste des blocs (A.) et fait une demande de création de contenu. Basé sur le prompt donné par l’utilisateur (B), et le nombre de bloc souhaités.
 - C’est l’agent IA qui doit à partir des blocs fourni prendre les plus pertinents selon le contexte et le contenu souhaité.
@@ -191,6 +191,9 @@ Basé sur le bundle Symfony IA je souhaite :
     ],
 ]
 ```
+
+4. [x] Améliorer la configuration du bundle pour gérer les options IA :
+    - Dans le fichier src/Services/AI/BlockContentGenerator.php (method buildSystemPrompt) on utilise un prompt système par défaut. Il faudrait permettre à l'utilisateur de le personnaliser via la configuration du bundle.
 
 Todo :
 - Déporter la doc USAGE IN BLOCK-SPECIFIC SCRIPTS dans la doc de création d'un bloc

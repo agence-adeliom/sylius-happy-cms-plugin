@@ -15,12 +15,80 @@ final class BlockContentGeneratorTest extends TestCase
     public function testGenerateBlocksThrowsExceptionWhenChatNotConfigured(): void
     {
         $blockSchemaSerializer = $this->createMock(BlockSchemaSerializer::class);
-        $generator = new BlockContentGenerator($blockSchemaSerializer, null);
+        $generator = new BlockContentGenerator($blockSchemaSerializer, null, null);
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('AI service is not configured');
 
         $generator->generateBlocks('Test prompt', 2);
+    }
+
+    public function testCustomSystemPromptIsUsed(): void
+    {
+        $blockSchemaSerializer = $this->createMock(BlockSchemaSerializer::class);
+        $blockSchemaSerializer->method('serializeBlocks')->willReturn([
+            'blocks' => [
+                [
+                    'namespace' => 'Adeliom\\SyliusHappyCMSPlugin\\Block\\TextCtaBlockType',
+                    'name' => 'Text CTA',
+                    'fields' => [
+                        ['name' => 'title', 'type' => 'text', 'required' => true],
+                    ],
+                ],
+            ],
+            'total_count' => 1,
+        ]);
+
+        // Define a custom system prompt with the placeholder
+        $customPrompt = 'Custom AI instructions. Available blocks: {blocks_schema}';
+
+        // Mock AI agent to verify the custom prompt is used
+        $agent = $this->createMock(\Symfony\AI\Agent\AgentInterface::class);
+        $agent->expects($this->once())
+            ->method('call')
+            ->with($this->callback(function ($messages) use ($customPrompt) {
+                // Verify that the system message contains our custom prompt structure
+                $systemMessage = $messages->getMessages()[0];
+                $content = $systemMessage->getContent();
+                // Check that custom prompt text is present
+                return str_contains($content, 'Custom AI instructions');
+            }))
+            ->willReturn($this->createMockResult('[{"block_type":"Test","position":0,"block_published":true,"data":{}}]'));
+
+        $generator = new BlockContentGenerator($blockSchemaSerializer, $agent, $customPrompt);
+        $generator->generateBlocks('Test', 1);
+    }
+
+    public function testDefaultSystemPromptIsUsedWhenNoCustomPrompt(): void
+    {
+        $blockSchemaSerializer = $this->createMock(BlockSchemaSerializer::class);
+        $blockSchemaSerializer->method('serializeBlocks')->willReturn([
+            'blocks' => [],
+            'total_count' => 0,
+        ]);
+
+        // Mock AI agent to verify the default prompt is used
+        $agent = $this->createMock(\Symfony\AI\Agent\AgentInterface::class);
+        $agent->expects($this->once())
+            ->method('call')
+            ->with($this->callback(function ($messages) {
+                // Verify that the system message contains default prompt text
+                $systemMessage = $messages->getMessages()[0];
+                $content = $systemMessage->getContent();
+                // Check for default prompt characteristics
+                return str_contains($content, 'You are a content generator for a Sylius CMS page builder');
+            }))
+            ->willReturn($this->createMockResult('[{"block_type":"Test","position":0,"block_published":true,"data":{}}]'));
+
+        $generator = new BlockContentGenerator($blockSchemaSerializer, $agent, null);
+        $generator->generateBlocks('Test', 1);
+    }
+
+    private function createMockResult(string $content): Result
+    {
+        $result = $this->createMock(Result::class);
+        $result->method('getContent')->willReturn($content);
+        return $result;
     }
 
     public function testGenerateBlocksReturnsGeneratedBlocksOutput(): void
@@ -71,7 +139,7 @@ final class BlockContentGeneratorTest extends TestCase
         $chat->method('generate')->willReturn($chatResponse);
 
         // Create generator
-        $generator = new BlockContentGenerator($blockSchemaSerializer, $chat);
+        $generator = new BlockContentGenerator($blockSchemaSerializer, $chat, null);
 
         // Test
         $result = $generator->generateBlocks('Generate content for e-commerce page', 2);
@@ -115,7 +183,7 @@ JSON;
         $chat = $this->createMock(ChatInterface::class);
         $chat->method('generate')->willReturn($chatResponse);
 
-        $generator = new BlockContentGenerator($blockSchemaSerializer, $chat);
+        $generator = new BlockContentGenerator($blockSchemaSerializer, $chat, null);
         $result = $generator->generateBlocks('Test prompt', 1);
 
         $this->assertSame(1, $result->getCount());

@@ -43,9 +43,9 @@ init:
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) up -d
 
 frontend-clear:
-	cp -R assets/controllers/* vendor/sylius/test-application/node_modules/@agence-adeliom/sylius-happy-cms-plugin/controllers
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm nodejs "cd vendor/sylius/test-application && yarn install" || true
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm nodejs "cd vendor/sylius/test-application && yarn run build" || true
+#	cp -R assets/controllers/* vendor/sylius/test-application/node_modules/@agence-adeliom/sylius-happy-cms-plugin/controllers
+#	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm nodejs "cd vendor/sylius/test-application && yarn install" || true
+#	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm nodejs "cd vendor/sylius/test-application && yarn run build" || true
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console assets:install
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php ln -sf /srv/sylius/public/bundles vendor/sylius/test-application/public
 

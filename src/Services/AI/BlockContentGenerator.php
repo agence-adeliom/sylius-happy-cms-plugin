@@ -16,6 +16,7 @@ final readonly class BlockContentGenerator
     public function __construct(
         private BlockSchemaSerializer $blockSchemaSerializer,
         private ?AgentInterface $agent = null,
+        private ?string $customSystemPrompt = null,
     ) {
     }
 
@@ -65,6 +66,20 @@ final readonly class BlockContentGenerator
     {
         $blocksJson = json_encode($blockSchema, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_UNICODE);
 
+        // Use custom prompt if provided, otherwise use default
+        if ($this->customSystemPrompt !== null && trim($this->customSystemPrompt) !== '') {
+            // Replace placeholders in custom prompt
+            return str_replace('{blocks_schema}', $blocksJson, $this->customSystemPrompt);
+        }
+
+        return $this->getDefaultSystemPrompt($blocksJson);
+    }
+
+    /**
+     * Get the default system prompt
+     */
+    private function getDefaultSystemPrompt(string $blocksJson): string
+    {
         return <<<PROMPT
 You are a content generator for a Sylius CMS page builder. Your task is to generate content blocks based on user requirements.
 

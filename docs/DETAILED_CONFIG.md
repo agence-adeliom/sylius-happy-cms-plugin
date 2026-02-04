@@ -7,6 +7,14 @@ sylius_happy_cms:
     page_repository: App\Repository\HappyCMS\Page\PageRepository
     page_admin: App\Admin\HappyCMS\Page\PageAdmin
 
+  page_builder:
+
+    # Optional: custom template for page builder preview (example a simple template without your theme's header/footer)
+    preview_template: null  
+    
+    # Optional: custom system prompt for AI content generation (learn more in docs/AI_CONTENT_GENERATION.md)
+    ai_generate_content_prompt: null  
+
   seo:
     title:
       suffix: ACME

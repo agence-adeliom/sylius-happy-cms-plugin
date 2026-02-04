@@ -12,7 +12,6 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\FieldInterface;
 use Adeliom\SyliusEasyCrudPlugin\Helper\Enum;
 use Adeliom\SyliusHappyCMSPlugin\Admin\Field\MediaField;
 use Adeliom\SyliusHappyCMSPlugin\Admin\Field\TinyMCEField;
-use Symfony\Component\DomCrawler\Field\FormField;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;

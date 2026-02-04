@@ -59,8 +59,10 @@ abstract class AbstractConfigAdmin extends AbstractAdmin implements ConfigAdminI
             ->setRequired(true)
             ->renderExpanded(false)
             ->setChoices(array_combine($transTypeKeys, $typeKeys))
-            ->setMap(array_combine($typeKeys, array_map(fn ($type) => [sprintf('config_admin_translations_%s', $type)],
-                $typeKeys)))
+            ->setMap(array_combine($typeKeys, array_map(
+                fn ($type) => [sprintf('config_admin_translations_%s', $type)],
+                $typeKeys,
+            )))
             ->isTranslation(true)
             ->hideOnIndex();
 
