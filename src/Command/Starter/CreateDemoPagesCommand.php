@@ -112,7 +112,7 @@ class CreateDemoPagesCommand extends AbstractContentCommand
         if (!$page instanceof PageInterface) {
             $page = new $pageClass();
         }
-        $page->setTemplate(PageInterface::HOMEPAGE);
+        $page->setHomepage(true);
         $page->setChannel($channel);
         $page->setPublishState(ThreeStateStatusEnum::PUBLISHED);
         $page->setFallbackLocale($localeCode);

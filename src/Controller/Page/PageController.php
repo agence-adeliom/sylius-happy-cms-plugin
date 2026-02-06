@@ -27,7 +27,7 @@ class PageController extends AbstractController
     ) {
     }
 
-    public function indexAction(Request $request): Response
+    public function homeAction(Request $request): Response
     {
         // Get locale from route parameter and set it in the request
         // This is necessary because the LocaleListener hasn't run yet

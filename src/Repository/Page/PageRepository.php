@@ -77,13 +77,23 @@ class PageRepository extends NestedTreeRepository implements PageRepositoryInter
         $qb->innerJoin('page.translations', 'translation', 'WITH', 'translation.locale = :locale');
         $qb->setParameter('locale', $locale);
 
-        $qb->andWhere('page.template = :template');
+        $qb->andWhere(
+            $qb->expr()->orX(
+                // New way to define homepage (plugin version >= 2.1):
+                $qb->expr()->eq('page.homepage', ':homepage'),
+                // Keep for backward compatibility (plugin version < 2.1):
+                $qb->expr()->eq('page.template', ':template'),
+            ),
+        );
+        $qb->setParameter('homepage', true);
         $qb->setParameter('template', PageInterface::HOMEPAGE);
 
         if (null !== $channel) {
             $qb->andWhere('page.channel = :channel');
             $qb->setParameter('channel', $channel);
         }
+
+        $qb->setMaxResults(1);
 
         $query = $qb->getQuery();
 

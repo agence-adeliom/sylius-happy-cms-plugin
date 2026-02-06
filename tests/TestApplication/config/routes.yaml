@@ -7,7 +7,7 @@ sylius_happy_cms:
 sylius_shop_homepage:
     path: /{_locale}
     methods: [GET]
-    controller: Adeliom\SyliusHappyCMSPlugin\Controller\Page\PageController::indexAction
+    controller: Adeliom\SyliusHappyCMSPlugin\Controller\Page\PageController::homeAction
 
 sylius_happy_cms_page_admin:
     resource: |

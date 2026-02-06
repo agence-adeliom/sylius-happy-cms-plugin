@@ -32,7 +32,7 @@ class Page implements PageInterface
     use EntityIdTrait;
     use TranslatableTrait {
         TranslatableTrait::__construct as private initializeTranslationsCollection;
-        getTranslation as private doGetTranslation;
+        TranslatableTrait::getTranslation as private doGetTranslation;
     }
     use EntityTimestampableTrait {
         EntityTimestampableTrait::__construct as private timestampableConstruct;
@@ -96,6 +96,10 @@ class Page implements PageInterface
     #[ORM\Column(name: 'template', type: Types::STRING, nullable: true)]
     #[Assert\Type('string')]
     protected ?string $template = null;
+
+    #[Groups('main')]
+    #[ORM\Column(name: 'homepage', type: Types::BOOLEAN, nullable: true)]
+    protected ?bool $homepage = null;
 
     #[ORM\Column(name: 'css', type: Types::TEXT, nullable: true)]
     #[Assert\Type('string')]
@@ -232,9 +236,28 @@ class Page implements PageInterface
         $this->children->removeElement($page);
     }
 
+    // Called in some places to check if the page is homepage,
+    // but getHomepage is the source of truth for the homepage field,
+    // so we keep both methods for backward compatibility
     public function isHomepage(): bool
     {
-        return PageInterface::HOMEPAGE == $this->template;
+        return $this->getHomepage();
+    }
+
+    public function getHomepage(): bool
+    {
+        if (null === $this->homepage) {
+            // Only for backward compatibility, if homepage is null, we consider it as homepage if template is homepage
+            // This is to avoid having to update all existing pages when adding the homepage field
+            return PageInterface::HOMEPAGE == $this->template;
+        }
+
+        return $this->homepage;
+    }
+
+    public function setHomepage(?bool $homepage): void
+    {
+        $this->homepage = $homepage;
     }
 
     public function getAction(): ?string

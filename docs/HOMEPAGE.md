@@ -1,33 +1,24 @@
-- Override sylius home page to get the root cms page
+To override sylius home page to get the happy cms root page
 
 ```yaml
 sylius_shop_homepage:
-  path: /{_locale}
-  methods: [GET]
-  controller: App\Controller\HomepageController::indexAction
+    path: /{_locale}
+    methods: [GET]
+    controller: Adeliom\SyliusHappyCMSPlugin\Controller\Page\PageController::homeAction
 ```
 
-- in App\Controller\HomepageController :
+Then create a page with the homepage boolean set to true and it will be used as the homepage of your shop based on the current channel.
 
 ```php
-public function indexAction(Request $request): Response
-    {
-        /** @var ?PageRepositoryInterface $pageRepository */
-        $pageRepository = $this->entityManager->getRepository(PageInterface::class);
-        if ($pageRepository instanceof PageRepositoryInterface) {
-            $page = $pageRepository
-                ->getHomePage($request->getLocale());
-            if (null !== $page) {
-                $onlineRoute = $page->getOnlineRoute();
-                if ($onlineRoute instanceof RouteInterface) {
-                    return $this->routeRenderService->renderAction(
-                        $page,
-                        $request,
-                        $onlineRoute,
-                    );
-                }
-            }
-        }
-        return new Response('', Response::HTTP_NOT_FOUND);
-    }
+$page = new Page();
+$page->setHomepage(true);
+...
 ```
+
+For older versions of this plugin (< v2.1) :
+
+```php
+$page = new Page();
+$page->setTemplate('homepage');
+...
+

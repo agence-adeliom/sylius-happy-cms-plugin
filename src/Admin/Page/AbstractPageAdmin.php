@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\Admin\Page;
 
 use Adeliom\SyliusEasyCrudPlugin\Admin\AbstractAdmin;
+use Adeliom\SyliusEasyCrudPlugin\Admin\Field\CheckboxField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\ColumnField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\EnumField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\ResourceChoiceField;
@@ -83,8 +84,7 @@ abstract class AbstractPageAdmin extends AbstractAdmin implements PageAdminInter
     public function configureFields(string $pageName, ?string $context = null): iterable
     {
         if (null === $context) {
-            yield TabField::new('Page', 'sylius_happy_cms.page.admin.tab.page')
-                ->renderHorizontal();
+            yield TabField::new('Page', 'sylius_happy_cms.page.admin.tab.page');
 
             yield ResourceChoiceField::new('parent', 'sylius_happy_cms.page.admin.field.parent')
                 ->setMultiple(false)
@@ -123,6 +123,9 @@ abstract class AbstractPageAdmin extends AbstractAdmin implements PageAdminInter
                 ->setRequired(false)
                 ->setFormTypeOption('placeholder', false)
                 ->renderExpanded(true);
+
+            yield CheckboxField::new('homepage', 'sylius_happy_cms.page.admin.field.homepage')
+                ->setRequired(false);
 
             yield TabField::new('seo', 'sylius_happy_cms.page.admin.tab.seo');
 

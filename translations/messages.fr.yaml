@@ -61,6 +61,7 @@ sylius_happy_cms:
         slug_edit: "Etes-vous sur de vouloir modifier le permalien ?"
         category: Catégorie
         seo: SEO
+        homepage: "Utiliser comme page d'accueil ?"
       tab:
         page: Page
         seo: SEO

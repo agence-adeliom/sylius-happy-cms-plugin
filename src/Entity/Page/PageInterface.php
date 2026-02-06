@@ -58,4 +58,10 @@ interface PageInterface extends ResourceInterface, TranslatableInterface, CmsRou
     public function setTemplate(?string $template): void;
 
     public function setPublishState(?string $state): void;
+
+    public function setHomepage(?bool $homepage): void;
+
+    public function isHomepage(): bool;
+
+    public function getHomepage(): bool;
 }

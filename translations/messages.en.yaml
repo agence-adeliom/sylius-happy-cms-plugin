@@ -59,6 +59,7 @@ sylius_happy_cms:
         slug_edit: "Are you sure you want to edit this permalink ?"
         category: Category
         seo: SEO
+        homepage: "Use as homepage ?"
       tab:
         page: Page
         seo: SEO
