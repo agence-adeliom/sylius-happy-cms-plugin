@@ -158,12 +158,19 @@ At this point, the plugin should be installed and ready to use!
 
 ## Documentation
 
-- **[Configure Homepage](./docs/HOMEPAGE.md)**
-- **[Create demo content](./docs/DEMO_CONTENT.md)**
+- **[Override default Sylius homepage](./docs/HOMEPAGE.md)**
+- **[Generate content with commands](./docs/DEMO_CONTENT.md)**
 - **[Create custom routable entities](./docs/CREATE_ROUTABLE_ENTITIES.md)**
 - **[Create custom CMS blocks](./docs/CREATE_BLOCK.md)**
-- **[Detailed default configuration](./docs/DETAILED_CONFIG.md)**
+- **[Override default blocks](./docs/OVERRIDE_BLOCK.md)**
+- **[Render page blocks in a template](./docs/RENDER_BLOCKS.md)**
+- **[Render a menu in a template](./docs/RENDER_MENU.md)**
 - **[How routing work](./docs/ROUTING.md)**
+- **[Generate sitemap](./docs/SITEMAP.md)**
+- **[Detailed media configuration](./docs/MEDIAS.md)**
+- **[Use AI feature](./docs/AI_FEATURES.md)**
+- **[See full plugin configuration](./docs/FULL_CONFIG.md)**
+- **[Contribution](./docs/CONTRIBUTION.md)**
 
 ---
 

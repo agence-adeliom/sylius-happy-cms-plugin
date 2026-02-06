@@ -117,8 +117,4 @@ Database credentials should be configured in:
 
 This project includes specialized AI guides to assist with common plugin development tasks:
 
-- **CLEANUP_GUIDE.md** - Guidelines for cleaning up and organizing plugin code
-- **RENAME_GUIDE.md** - Step-by-step instructions for renaming plugins and components
-- **COMPATIBILITY_GUIDE.md** - Best practices for maintaining compatibility across different Sylius versions
-
-These guides provide detailed instructions and automated workflows to help maintain code quality and ensure proper plugin structure.
+- **.docs** - All documentation related to plugin capabilities and development processes
