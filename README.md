@@ -38,16 +38,16 @@ The plugin brings awesome CMS features to Sylius, including:
 
 ## Installation and documentation
 
-1.  [Install this plugin](./docs/INSTALLATION.md)
-2.  [Explore documentation](./README.md)
+1.  [Install this plugin](#installation)
+2.  [Explore documentation](#documentation)
 
 ## Versions
 
-| Plugin Version            | Sylius Version | New / Guide                 | Support |
-|---------------------------|----------------|-----------------------------|---------|
-| ^1.x                      | ^1.13          | Installation guide          | Beta    |
-| ^2.0.0                    | ^2.0.0         | Migration guide from ^1.x   | Beta    |
-| ^2.1.0 (new page builder) | \>= 2.0.0      | Migration guide from ^2.0.x | LTS     |
+| Plugin Version | Sylius Version | New / Guide                                                                                                                       | Support |
+|----------------|----------------|-----------------------------------------------------------------------------------------------------------------------------------|---------|
+| ^1.x           | ^1.13          | [See installation guide](https://github.com/agence-adeliom/sylius-happy-cms-plugin/tree/v1.14.12?tab=readme-ov-file#installation) | No      |
+| ^2.0.0         | ^2.0.0         | [BC] Sylius 2.0 - [See migration guide](./docs/migration/SYLIUS_2.md)                                                             | No      |
+| ^2.1.0         | ^2.0.0         | [BC] New content model persistence, new page builder - [See migration guide](./docs/migration/CONTENT_BLOCK.md)                   | LTS     |
 
 ## Feature preview
 
