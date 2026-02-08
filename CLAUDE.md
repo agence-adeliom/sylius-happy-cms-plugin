@@ -115,6 +115,74 @@ Database credentials should be configured in:
 
 ## AI Development Guides
 
-This project includes specialized AI guides to assist with common plugin development tasks:
+This project includes specialized AI guides to assist with common plugin development tasks. These guides are optimized for AI agents to quickly understand and perform key operations.
 
-- **.docs** - All documentation related to plugin capabilities and development processes
+### 🚀 Start Here
+
+- **[Quick Start Guide](docs/agents/quickstart.md)** - Your first stop for common tasks
+  - Task-based quick reference (create entity/block/override)
+  - Standard workflow patterns
+  - Troubleshooting quick fixes
+  - Decision tree for choosing the right approach
+
+### Quick Reference Guides
+
+Located in `docs/agents/` directory:
+
+- **[Commands Reference](docs/agents/commands.md)** - Complete command reference
+  - All available CMS commands with detailed explanations
+  - Execution order and workflows
+  - Common patterns and troubleshooting
+
+- **[Routable Entities](docs/agents/routable-entities.md)** - Creating custom CMS resources
+  - Command: `php bin/console make:happy-cms:generate-cms-model`
+  - Use cases: Blog, FAQ, Brand pages, custom entity pages
+  - Includes automatic entity, repository, admin CRUD, routes generation
+
+- **[Content Blocks](docs/agents/blocks.md)** - Creating flex and shared content blocks
+  - Commands: `php bin/console make:happy-cms:block` (flex) or `make:happy-cms:block:shared` (shared)
+  - Manual creation using `AbstractBlock` or `AbstractSharedBlockType`
+  - Form building, template creation, block registration
+
+- **[Override Blocks](docs/agents/override-blocks.md)** - Customizing default blocks
+  - How to override: AccordionBlockType, CtaBlockType, GalleryBlockType, etc.
+  - Service configuration and template customization
+  - Step-by-step override process
+
+- **[Routing System](docs/agents/routing.md)** - Understanding dynamic routing
+  - How routes are automatically generated
+  - URL hierarchy and multi-language support
+  - Customizing routes, cache, and breadcrumbs
+  - Troubleshooting routing issues
+
+- **[Menu System](docs/agents/menu.md)** - Managing navigation menus
+  - Creating hierarchical menus programmatically
+  - Rendering menus in templates
+  - Multi-language menu support
+  - Performance optimization with ESI
+
+### AI Agent Workflow
+
+When working with this plugin, AI agents should:
+
+1. **For new routable entities**: Use `make:happy-cms:generate-cms-model` command and follow `docs/agents/routable-entities.md`
+2. **For new blocks**: Use `make:happy-cms:block` or `make:happy-cms:block:shared` and reference `docs/agents/blocks.md`
+3. **For block customization**: Follow the override process in `docs/agents/override-blocks.md`
+4. **After any generation**: Always run `php bin/console cache:clear` and database migrations if needed
+
+### Available Commands Summary
+
+```bash
+# Plugin initialization
+make:happy-cms:install              # Generate default files and configuration
+
+# Entity generation
+make:happy-cms:generate-cms-model   # Create routable entity with full CRUD
+
+# Block generation
+make:happy-cms:block                # Create flex block
+make:happy-cms:block:shared         # Create shared block
+
+# Demo content (optional)
+make:happy-cms:demo-content         # Generate sample content for testing
+```

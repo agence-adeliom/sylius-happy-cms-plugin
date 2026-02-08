@@ -43,11 +43,11 @@ The plugin brings awesome CMS features to Sylius, including:
 
 ## Versions
 
-| Plugin Version | Sylius Version | New / Guide                                                                                                                       | Support |
-|----------------|----------------|-----------------------------------------------------------------------------------------------------------------------------------|---------|
-| ^1.x           | ^1.13          | [See installation guide](https://github.com/agence-adeliom/sylius-happy-cms-plugin/tree/v1.14.12?tab=readme-ov-file#installation) | No      |
-| ^2.0.0         | ^2.0.0         | [BC] Sylius 2.0 - [See migration guide](./docs/migration/SYLIUS_2.md)                                                             | No      |
-| ^2.1.0         | ^2.0.0         | [BC] New content model persistence, new page builder - [See migration guide](./docs/migration/CONTENT_BLOCK.md)                   | LTS     |
+| Plugin Version | Sylius Version | New - Guide                                                                                                                       |       |
+|----------------|----------------|-----------------------------------------------------------------------------------------------------------------------------------|-------|
+| ^1.x           | ^1.13          | [See installation guide](https://github.com/agence-adeliom/sylius-happy-cms-plugin/tree/v1.14.12?tab=readme-ov-file#installation) |       |
+| ^2.0.0         | ^2.0.0         | [BC] Sylius 2.0 - [See migration guide](./docs/migration/SYLIUS_2.md)                                                             |       |
+| ^2.1.0         | ^2.0.0         | [BC] New content model persistence, new page builder - [See migration guide](./docs/migration/CONTENT_BLOCK.md)                   |       |
 
 ## Feature preview
 
@@ -152,25 +152,54 @@ php bin/console doc:mig:mig
 php bin/console cache:clear
 ```
 
-At this point, the plugin should be installed and ready to use!
+### 8. (Optional) Configure AI Development Guides
+
+If you're using AI assistants (like Claude Code, GitHub Copilot, or Cursor), configure them to use the plugin's specialized guides:
+
+#### For Claude Code users:
+
+Create or update `CLAUDE.md` in your project root:
+
+```markdown
+# Project Instructions
+
+[Your existing project instructions...]
+
+## Sylius Happy CMS Plugin
+
+This project uses [Sylius Happy CMS Plugin](https://github.com/agence-adeliom/sylius-happy-cms-plugin) for content management.
+
+### AI Development Guides
+
+Import the AI development guides for efficient development:
+
+- **Happy CMS development guides**: `vendor/agence-adeliom/sylius-happy-cms-plugin/docs/agents/CLAUDE.md`
+```
+
+#### For other AI assistants:
+
+Create or update `.cursorrules`, `AGENTS.md`, or your AI configuration file with similar content pointing to the guides in `vendor/agence-adeliom/sylius-happy-cms-plugin/docs/agents/`.
+
+Add "See @CLAUDE.md"
 
 ---
 
 ## Documentation
 
-- **[Override default Sylius homepage](./docs/HOMEPAGE.md)**
-- **[Generate content with commands](./docs/DEMO_CONTENT.md)**
-- **[Create custom routable entities](./docs/CREATE_ROUTABLE_ENTITIES.md)**
-- **[Create custom CMS blocks](./docs/CREATE_BLOCK.md)**
-- **[Override default blocks](./docs/OVERRIDE_BLOCK.md)**
-- **[Render page blocks in a template](./docs/RENDER_BLOCKS.md)**
-- **[Render a menu in a template](./docs/RENDER_MENU.md)**
-- **[How routing work](./docs/ROUTING.md)**
-- **[Generate sitemap](./docs/SITEMAP.md)**
-- **[Detailed media configuration](./docs/MEDIAS.md)**
-- **[Use AI feature](./docs/AI_FEATURES.md)**
-- **[See full plugin configuration](./docs/FULL_CONFIG.md)**
-- **[Contribution](./docs/CONTRIBUTION.md)**
+- **[Override default Sylius homepage](./docs/homepage.md)**
+- **[Routing](./docs/routing.md)**
+- **[Seo](./docs/seo.md)**
+- **[Medias](./docs/medias.md)**
+- **[Blocks](./docs/blocks.md)**
+- **[Menu](./docs/menu.md)**
+- **[AI](./docs/ai.md)**
+- **[Full plugin configuration](./docs/configuration.md)**
+- **[Contribution](./docs/contribution.md)**
+
+Start by read the documentation, then you can : 
+- Use bundles commands to create new routable resources (blog, faq, brand pages, etc.)
+- Use bundle commands to create new content blocks (flex or shared)
+- Or just simply ask your AI agent to create a blog.
 
 ---
 
