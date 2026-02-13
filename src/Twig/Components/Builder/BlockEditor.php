@@ -8,6 +8,7 @@ use Adeliom\SyliusEasyCrudPlugin\Enum\ThreeStateStatusEnum;
 use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentBlockInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableInterface;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockCollection;
+use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockTypeInterface;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Adeliom\SyliusHappyCMSPlugin\Services\AI\AIBundleDetector;
 use Adeliom\SyliusHappyCMSPlugin\Services\AI\BlockContentGenerator;
@@ -361,10 +362,10 @@ class BlockEditor extends AbstractController
         });
 
         // Get the entity class name for creating new blocks
-        $blockClass = get_class($sourceBlocks[0] ?? null);
-        if (!$blockClass) {
+        if (empty($sourceBlocks)) {
             return;
         }
+        $blockClass = get_class($sourceBlocks[0]);
 
         // Copy each block
         foreach ($sourceBlocks as $index => $sourceBlock) {
@@ -376,7 +377,10 @@ class BlockEditor extends AbstractController
 
             // Copy properties
             $newBlock->setLocale($this->locale);
-            $newBlock->setType($sourceBlock->getType());
+            $blockType = $sourceBlock->getType();
+            if (null !== $blockType) {
+                $newBlock->setType($blockType);
+            }
             $newBlock->setPosition($index);
             $newBlock->setPreviewPosition($index);
             $newBlock->setLayer($sourceBlock->getLayer());
@@ -510,7 +514,7 @@ class BlockEditor extends AbstractController
     /**
      * Get all available blocks organized by tabs.
      *
-     * @return array{blocks: array<string, array{block: BlockTypeInterface, type: string, tab: string, tabKey: string}>, tabs: array<string>}
+     * @return array{blocks: array<string, array{block: BlockTypeInterface, type: string, tab: string, tabKey: string}>, tabs: list<string>}
      */
     public function getAvailableBlocks(): array
     {

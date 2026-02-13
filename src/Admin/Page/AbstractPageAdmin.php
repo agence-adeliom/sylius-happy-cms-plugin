@@ -21,6 +21,7 @@ use Adeliom\SyliusEasyCrudPlugin\Enum\ThreeStateStatusEnum;
 use Adeliom\SyliusHappyCMSPlugin\Admin\Field\FlexibleContentField;
 use Adeliom\SyliusHappyCMSPlugin\Admin\Field\SEOField;
 use Sylius\Bundle\GridBundle\Builder\Filter\StringFilter;
+use Sylius\Resource\Model\ResourceInterface;
 
 abstract class AbstractPageAdmin extends AbstractAdmin implements PageAdminInterface
 {
@@ -54,14 +55,17 @@ abstract class AbstractPageAdmin extends AbstractAdmin implements PageAdminInter
         $clearCacheAction = Action::new('cache', 'sylius_happy_cms.page.admin.action.clear_cache', 'tabler:world-check')
             ->linkToRoute('sylius_happy_cms_admin_page_clear_cache');
 
-        if ($this->getResource()) {
+        /** @var ResourceInterface|null $resource */
+        $resource = $this->getResource();
+
+        if ($resource) {
             $contentAction = Action::new(
                 'content',
                 'sylius_happy_cms.page.admin.action.manage_content',
                 'bi:card-heading',
             )->linkToRoute('sylius_happy_cms_admin_page_builder', [
                 'resource' => $this->getResourceAlias(),
-                'id' => $this->getResource()->getId(),
+                'id' => $resource->getId(),
             ]);
             $actions->addItemAction(Crud::PAGE_DETAIL, $contentAction);
             $actions->addItemAction(Crud::PAGE_EDIT, $contentAction);
@@ -71,7 +75,7 @@ abstract class AbstractPageAdmin extends AbstractAdmin implements PageAdminInter
                 'sylius_happy_cms.page.admin.action.manage_content',
                 'bi:card-heading',
             )->linkToRoute('sylius_happy_cms_admin_page_builder', [
-                'resource' => $this->getResourceAlias(),
+                'resource' => $this->getResourceAlias() ?? 'sylius_happy_cms.page',
             ]);
             $actions->addItemAction(Crud::PAGE_INDEX, $contentAction);
         }

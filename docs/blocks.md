@@ -305,7 +305,7 @@ public function getPosition(): int
 Determines if block can be used with specific resource types.
 
 ```php
-public function supports(?ResourceInterface $resource = null): bool
+public function supports(?ContentEditableInterface $resource = null): bool
 {
     // Only allow this block on Blog entities
     return $resource instanceof BlogPost;
@@ -624,7 +624,7 @@ public static function researchableProperties(): array
 Control when blocks appear based on resource type:
 
 ```php
-public function supports(?ResourceInterface $resource = null): bool
+public function supports(?ContentEditableInterface $resource = null): bool
 {
     // Only show on Product pages
     return $resource instanceof ProductInterface;

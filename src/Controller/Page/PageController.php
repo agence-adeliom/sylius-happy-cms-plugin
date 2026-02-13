@@ -31,6 +31,7 @@ class PageController extends AbstractController
     {
         // Get locale from route parameter and set it in the request
         // This is necessary because the LocaleListener hasn't run yet
+        /** @var string $locale */
         $locale = $request->attributes->get('_locale', $request->getLocale());
         $request->setLocale($locale);
 
@@ -39,8 +40,8 @@ class PageController extends AbstractController
         if ($pageRepository instanceof PageRepositoryInterface) {
             $page = $pageRepository
                 ->getHomePage($locale);
-            $page->setCurrentLocale($locale);
             if (null !== $page) {
+                $page->setCurrentLocale($locale);
                 $onlineRoute = $page->getOnlineRoute($locale);
                 if ($onlineRoute instanceof RouteInterface) {
                     return $this->routeRenderService->renderAction(

@@ -57,7 +57,7 @@ class KeyFeaturesBlockType extends AbstractBlock
     }
 
     /**
-     * @return array<string, array<int,string|Asset>>
+     * @return string[]
      */
     public function configureAdminFormThemes(): array
     {

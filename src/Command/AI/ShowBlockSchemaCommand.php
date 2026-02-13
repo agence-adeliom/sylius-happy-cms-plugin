@@ -68,6 +68,7 @@ HELP
             $io->section('Blocks Summary');
             $tableRows = [];
             foreach ($serializedBlocks['blocks'] as $block) {
+                /** @var array{name: string, namespace: string, fields: array} $block */
                 $tableRows[] = [
                     $block['name'],
                     $block['namespace'],
@@ -80,7 +81,7 @@ HELP
             $json = $this->blockSchemaSerializer->toJson($onlyAIGeneratable);
 
             $outputFile = $input->getOption('output');
-            if ($outputFile) {
+            if (!empty($outputFile) && is_string($outputFile)) {
                 file_put_contents($outputFile, $json);
                 $io->success(sprintf('Schema written to: %s', $outputFile));
             } else {

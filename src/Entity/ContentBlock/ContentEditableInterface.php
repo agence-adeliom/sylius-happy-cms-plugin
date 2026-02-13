@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock;
 
 use Doctrine\Common\Collections\Collection;
+use Sylius\Resource\Model\ResourceInterface;
 
-interface ContentEditableInterface
+interface ContentEditableInterface extends ResourceInterface
 {
     /**
      * Get all content blocks for this entity.

@@ -49,12 +49,15 @@ final readonly class BlockContentGenerator
 
         $result = $this->agent->call($messages);
 
-        if ($result->getContent() === null) {
+        /** @var string $content */
+        $content = $result->getContent() ?? '';
+
+        if ($result->getContent() === '') {
             throw new \RuntimeException('AI agent returned an empty response.');
         }
 
         // Parse the response
-        return $this->parseResponse($result->getContent());
+        return $this->parseResponse($content);
     }
 
     /**
@@ -69,10 +72,10 @@ final readonly class BlockContentGenerator
         // Use custom prompt if provided, otherwise use default
         if ($this->customSystemPrompt !== null && trim($this->customSystemPrompt) !== '') {
             // Replace placeholders in custom prompt
-            return str_replace('{blocks_schema}', $blocksJson, $this->customSystemPrompt);
+            return str_replace('{blocks_schema}', $blocksJson ?: '', $this->customSystemPrompt);
         }
 
-        return $this->getDefaultSystemPrompt($blocksJson);
+        return $this->getDefaultSystemPrompt($blocksJson ?: '');
     }
 
     /**
@@ -139,8 +142,8 @@ PROMPT;
     {
         // Clean up potential markdown code fences
         $content = preg_replace('/^```json\s*/m', '', $content);
-        $content = preg_replace('/^```\s*/m', '', $content);
-        $content = trim($content);
+        $content = preg_replace('/^```\s*/m', '', $content ?? '');
+        $content = trim($content ?? '');
 
         // Parse JSON
         try {

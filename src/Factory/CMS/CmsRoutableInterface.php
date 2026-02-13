@@ -100,4 +100,6 @@ interface CmsRoutableInterface extends ChannelAwareInterface
      * Remove a route from the collection.
      */
     public function removeRoute(RouteInterface $route): void;
+
+    public function setCurrentLocale(string $currentLocale): void;
 }

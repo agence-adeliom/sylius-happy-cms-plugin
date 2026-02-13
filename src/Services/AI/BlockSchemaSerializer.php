@@ -52,6 +52,7 @@ class BlockSchemaSerializer
         $blocks = $this->blockCollection->getBlocks();
         $serializedBlocks = [];
 
+        /** @var class-string $blockClass */
         foreach ($blocks as $blockClass => $block) {
             // Filter by AIGeneratable attribute if requested
             if ($onlyAIGeneratable && !$this->isAIGeneratable($blockClass)) {
@@ -69,6 +70,7 @@ class BlockSchemaSerializer
 
     /**
      * Check if a block class has the AIGeneratable attribute
+     * @param class-string $blockClass
      */
     private function isAIGeneratable(string $blockClass): bool
     {
@@ -84,7 +86,7 @@ class BlockSchemaSerializer
 
     /**
      * Serialize a single block into a structured array
-     *
+     * @param class-string $blockClass
      * @return array<string, mixed>
      */
     private function serializeBlock(BlockTypeInterface $block, string $blockClass): array
@@ -108,7 +110,7 @@ class BlockSchemaSerializer
 
     /**
      * Extract metadata from AIGeneratable attribute
-     *
+     * @param class-string $blockClass
      * @return array<string, mixed>|null
      */
     private function getAIGeneratableMetadata(string $blockClass): ?array
@@ -169,14 +171,18 @@ class BlockSchemaSerializer
             }
 
             $fieldType = get_class($config->getType()->getInnerType());
+
             $label = $config->getOption('label', $fieldName);
-            $translatedLabel = $this->translateLabel($label);
+
+            if (is_string($label)) {
+                $translatedLabel = $this->translateLabel($label);
+            }
 
             $fieldData = [
                 'name' => $fieldName,
                 'type' => $this->simplifyFieldType($fieldType),
                 'required' => $config->getRequired(),
-                'label' => $translatedLabel,
+                'label' => $translatedLabel ?? 'No label',
             ];
 
             // Handle nested forms (like ButtonEmbeddableType)
@@ -187,7 +193,9 @@ class BlockSchemaSerializer
             // Extract additional useful options
             if ($config->hasOption('help')) {
                 $help = $config->getOption('help');
-                $fieldData['help'] = $this->translateLabel($help);
+                if (is_string($help)) {
+                    $fieldData['help'] = $this->translateLabel($help);
+                }
             }
 
             if ($config->hasOption('choices')) {
@@ -203,6 +211,7 @@ class BlockSchemaSerializer
     /**
      * Simplify field type class names to more readable types
      * Uses inheritance and interfaces to detect type instead of just class name
+     * @param class-string $fullClassName
      */
     private function simplifyFieldType(string $fullClassName): string
     {
@@ -272,7 +281,8 @@ class BlockSchemaSerializer
      */
     public function toJson(bool $onlyAIGeneratable = true): string
     {
-        return json_encode($this->serializeBlocks($onlyAIGeneratable), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_UNICODE);
+        return json_encode($this->serializeBlocks($onlyAIGeneratable), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_UNICODE)
+            ?: '';
     }
 
     /**

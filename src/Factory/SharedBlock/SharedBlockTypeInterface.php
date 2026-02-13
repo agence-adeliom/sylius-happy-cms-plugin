@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
+use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableInterface;
 use Sylius\Resource\Model\ResourceInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -57,5 +58,5 @@ interface SharedBlockTypeInterface
      */
     public function buildBlock(FormBuilderInterface $builder, array $options): void;
 
-    public function supports(?ResourceInterface $resource = null): bool;
+    public function supports(?ContentEditableInterface $resource = null): bool;
 }

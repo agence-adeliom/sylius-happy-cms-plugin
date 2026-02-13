@@ -43,7 +43,9 @@ class PageBuilderController extends AbstractController
 
         // Check if we need to publish content
         if ($request->query->has('publish') && '1' === $request->query->get('publish')) {
-            $localesToPublish = $request->query->all('locales') ?? [];
+
+            /** @var string[] $localesToPublish */
+            $localesToPublish = $request->query->all('locales');
 
             if (!empty($localesToPublish)) {
                 $this->publishContent($entity, $localesToPublish);
@@ -192,7 +194,7 @@ class PageBuilderController extends AbstractController
 
         // Get block name
         $className = (new \ReflectionClass($formClass))->getShortName();
-        $blockName = trim(preg_replace('/([A-Z])/', ' $1', str_replace('BlockType', '', $className)));
+        $blockName = trim(preg_replace('/([A-Z])/', ' $1', str_replace('BlockType', '', $className)) ?: '');
 
         // Use draft data for the form, fallback to published data if draft is empty
         $draftData = $block->getDraftData();
@@ -215,6 +217,12 @@ class PageBuilderController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             // Get form data
+            /**
+             * @var array{
+             *     block_type?: string,
+             *     block_published?: bool,
+             * } $formData
+             */
             $formData = $form->getData();
 
             // Remove metadata fields if they exist
@@ -313,7 +321,7 @@ class PageBuilderController extends AbstractController
                 $blockAssets = $blockConfig->configureAdminAssets();
 
                 // Merge CSS assets
-                if (isset($blockAssets['css']) && is_array($blockAssets['css'])) {
+                if (isset($blockAssets['css'])) {
                     foreach ($blockAssets['css'] as $asset) {
                         // Use asset value as key to avoid duplicates
                         $key = is_object($asset) && method_exists($asset, 'getValue') ? $asset->getValue() : (string) $asset;
@@ -322,7 +330,7 @@ class PageBuilderController extends AbstractController
                 }
 
                 // Merge JS assets
-                if (isset($blockAssets['js']) && is_array($blockAssets['js'])) {
+                if (isset($blockAssets['js'])) {
                     foreach ($blockAssets['js'] as $asset) {
                         $key = is_object($asset) && method_exists($asset, 'getValue') ? $asset->getValue() : (string) $asset;
                         $assets['js'][$key] = is_object($asset) && method_exists($asset, 'getAsDto') ? $asset->getAsDto() : (string) $asset;
@@ -330,7 +338,7 @@ class PageBuilderController extends AbstractController
                 }
 
                 // Merge Webpack assets
-                if (isset($blockAssets['webpack']) && is_array($blockAssets['webpack'])) {
+                if (isset($blockAssets['webpack'])) {
                     foreach ($blockAssets['webpack'] as $asset) {
                         $key = is_object($asset) && method_exists($asset, 'getValue') ? $asset->getValue() : (string) $asset;
                         $assets['webpack'][$key] = is_object($asset) && method_exists($asset, 'getAsDto') ? $asset->getAsDto() : (string) $asset;

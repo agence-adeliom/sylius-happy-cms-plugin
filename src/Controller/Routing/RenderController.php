@@ -23,6 +23,7 @@ class RenderController extends AbstractController
     ): Response {
         // Get locale from route parameter and set it in the request
         // This is necessary because the LocaleListener hasn't run yet
+        /** @var string $locale */
         $locale = $request->attributes->get('_locale', $request->getLocale());
         $request->setLocale($locale);
 
