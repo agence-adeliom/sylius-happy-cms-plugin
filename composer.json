@@ -33,9 +33,6 @@
         "stof/doctrine-extensions-bundle": "^1.6",
         "sylius/sylius": "^2.0.0 || ^2.1.0 || ^v2.2.0",
         "symfony-cmf/routing-bundle": "^3.0",
-        "symfony/ai-agent": "^0.3.0",
-        "symfony/ai-bundle": "^0.3.2",
-        "symfony/ai-open-ai-platform": "^0.3.0",
         "symfony/filesystem": "^7.4 || ^8.0",
         "symfony/options-resolver": "^7.4 || ^8.0",
         "symfony/property-access": "^7.4 || ^8.0"
