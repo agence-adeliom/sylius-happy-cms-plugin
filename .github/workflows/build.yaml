@@ -88,6 +88,7 @@ jobs:
 
             -   name: Diff and migrate database
                 run: |
+                    $CONSOLE doctrine:migrations:sync-metadata-storage -n -vvv
                     $CONSOLE doctrine:migrations:diff -n -vvv
                     $CONSOLE doctrine:migrations:migrate -n -vvv
                 shell: bash
