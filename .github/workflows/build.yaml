@@ -84,7 +84,20 @@ jobs:
                     php_version: "${{ matrix.php }}"
                     sylius_version: "${{ matrix.sylius }}"
                     symfony_version: "${{ matrix.symfony }}"
+                    load_fixtures: "no"
 
+            -   name: Diff and migrate database
+                run: |
+                    $CONSOLE doctrine:migrations:diff -n -vvv
+                    $CONSOLE doctrine:migrations:migrate -n -vvv
+                shell: bash
+                working-directory: "${{ env.test_dir }}"
+
+            -   name: Fixtures
+                run: $CONSOLE sylius:fixtures:load -n
+                shell: bash
+                working-directory: "${{ env.test_dir }}"
+        
             -   name: Run unit tests
                 run: vendor/bin/phpunit --colors=always --testsuite=unit
 
