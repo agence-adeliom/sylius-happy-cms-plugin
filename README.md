@@ -200,7 +200,7 @@ Start by read the documentation, then you can :
 - Use bundles commands to create new routable resources (blog, faq, brand pages, etc.)
 - Use bundle commands to create new content blocks (flex or shared)
 - Or just simply ask your AI agent to create a blog :
-```bash
+```txt
 With Happy CMS, please create a new routable entity named BlogPost with categories, translations, title, publishedAt fields and his CRUD. Then create a command to generate some demo blog posts with fake data, use the default blocks to mount a simple article.
 ```
 

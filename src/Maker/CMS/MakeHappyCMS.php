@@ -67,6 +67,24 @@ final class MakeHappyCMS extends AbstractMaker
                 'Taxonomy entity filename name for %s scope',
                 'Taxonomy',
             )
+            ->addArgument(
+                'hasFlexibleContent',
+                InputArgument::OPTIONAL,
+                'Use blocks for %s scope',
+                true,
+            )
+            ->addArgument(
+                'hasRouting',
+                InputArgument::OPTIONAL,
+                'Use routing for %s scope',
+                true,
+            )
+            ->addArgument(
+                'hasTaxonomy',
+                InputArgument::OPTIONAL,
+                'Generate a taxonomy associated resources for %s scope',
+                true,
+            )
         ;
         $inputConfig->setArgumentAsNonInteractive('scope');
     }
