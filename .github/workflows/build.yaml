@@ -86,11 +86,12 @@ jobs:
                     symfony_version: "${{ matrix.symfony }}"
                     load_fixtures: "no"
 
-            -   name: Diff and migrate database
+            -   name: Reset database and generate migration
                 run: |
-                    $CONSOLE doctrine:migrations:sync-metadata-storage -n -vvv
-                    $CONSOLE doctrine:migrations:diff -n -vvv
-                    $CONSOLE doctrine:migrations:migrate -n -vvv
+                    run: |
+                    $CONSOLE doctrine:database:drop -n -vvv
+                    $CONSOLE doctrine:database:create -n -vvv
+                    $CONSOLE doctrine:schema:create -n -vvv
                 shell: bash
                 working-directory: "${{ env.test_dir }}"
 
@@ -107,9 +108,6 @@ jobs:
 
             -   name: Validate container
                 run: vendor/bin/console lint:container
-                
-            -   name: Run phpstan tests
-                run: vendor/bin/phpstan analyse -c phpstan.neon
 
             -   name: Run Non-unit PHPUnit tests
                 run: vendor/bin/phpunit --colors=always --testsuite=non-unit
@@ -127,6 +125,9 @@ jobs:
                     compression-level: 6
                     overwrite: true
 
+            -   name: Run phpstan tests
+                run: vendor/bin/phpstan analyse -c phpstan.neon
+                
             -   
                 name: Load demo pages in test application
                 run: vendor/bin/console happycms:starter:create-demo-pages -n
