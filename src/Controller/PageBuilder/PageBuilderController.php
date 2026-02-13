@@ -43,7 +43,6 @@ class PageBuilderController extends AbstractController
 
         // Check if we need to publish content
         if ($request->query->has('publish') && '1' === $request->query->get('publish')) {
-
             /** @var string[] $localesToPublish */
             $localesToPublish = $request->query->all('locales');
 

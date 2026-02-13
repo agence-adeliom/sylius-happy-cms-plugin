@@ -6,7 +6,6 @@ namespace Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
 use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableInterface;
-use Sylius\Resource\Model\ResourceInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 
 interface SharedBlockTypeInterface

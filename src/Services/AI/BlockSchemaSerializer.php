@@ -70,6 +70,7 @@ class BlockSchemaSerializer
 
     /**
      * Check if a block class has the AIGeneratable attribute
+     *
      * @param class-string $blockClass
      */
     private function isAIGeneratable(string $blockClass): bool
@@ -86,7 +87,9 @@ class BlockSchemaSerializer
 
     /**
      * Serialize a single block into a structured array
+     *
      * @param class-string $blockClass
+     *
      * @return array<string, mixed>
      */
     private function serializeBlock(BlockTypeInterface $block, string $blockClass): array
@@ -110,7 +113,9 @@ class BlockSchemaSerializer
 
     /**
      * Extract metadata from AIGeneratable attribute
+     *
      * @param class-string $blockClass
+     *
      * @return array<string, mixed>|null
      */
     private function getAIGeneratableMetadata(string $blockClass): ?array
@@ -211,6 +216,7 @@ class BlockSchemaSerializer
     /**
      * Simplify field type class names to more readable types
      * Uses inheritance and interfaces to detect type instead of just class name
+     *
      * @param class-string $fullClassName
      */
     private function simplifyFieldType(string $fullClassName): string

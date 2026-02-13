@@ -7,7 +7,6 @@ namespace Adeliom\SyliusHappyCMSPlugin\Factory\Block;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
 use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Sylius\Resource\Model\ResourceInterface;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;

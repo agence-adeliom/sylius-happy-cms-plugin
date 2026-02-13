@@ -6,7 +6,6 @@ namespace Adeliom\SyliusHappyCMSPlugin\Factory\Block;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
 use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableInterface;
-use Sylius\Resource\Model\ResourceInterface;
 
 interface BlockTypeInterface
 {
