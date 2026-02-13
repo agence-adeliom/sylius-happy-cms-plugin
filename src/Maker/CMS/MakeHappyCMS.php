@@ -91,14 +91,27 @@ final class MakeHappyCMS extends AbstractMaker
 
     public function interact(InputInterface $input, ConsoleStyle $io, Command $command): void
     {
-        $argument = $command->getDefinition()->getArgument('scope');
+        // Only ask for scope if not provided
+        if (!$input->getArgument('scope')) {
+            $argument = $command->getDefinition()->getArgument('scope');
+            /** @var string $scope */
+            $scope = $io->ask($argument->getDescription(), 'Faq');
+            $input->setArgument('scope', $scope);
+        }
+
         /** @var string $scope */
-        $scope = $io->ask($argument->getDescription(), 'Faq');
+        $scope = $input->getArgument('scope');
 
-        $input->setArgument('scope', $scope);
-
+        // Only ask for string arguments that haven't been provided
         foreach (['entryNamespace', 'entryClassName', 'taxonomyClassName'] as $argName) {
             $arg = $command->getDefinition()->getArgument($argName);
+            $currentValue = $input->getArgument($argName);
+
+            // Skip if argument already has a non-default value
+            if ($currentValue !== null && $currentValue !== $arg->getDefault()) {
+                continue;
+            }
+
             $question = sprintf($arg->getDescription(), $scope);
             if (is_string($arg->getDefault())) {
                 $default = sprintf($arg->getDefault(), $scope);
@@ -107,6 +120,23 @@ final class MakeHappyCMS extends AbstractMaker
                     $io->ask($question, $default),
                 );
             }
+        }
+
+        // Only ask for boolean arguments if they haven't been explicitly set
+        foreach (['hasFlexibleContent', 'hasRouting', 'hasTaxonomy'] as $argName) {
+            $arg = $command->getDefinition()->getArgument($argName);
+            $currentValue = $input->getArgument($argName);
+
+            // Skip if argument was explicitly provided (not the default value placeholder)
+            if ($currentValue !== $arg->getDefault()) {
+                continue;
+            }
+
+            $question = sprintf($arg->getDescription(), $scope);
+            $input->setArgument(
+                $arg->getName(),
+                $io->confirm($question, true),
+            );
         }
     }
 
