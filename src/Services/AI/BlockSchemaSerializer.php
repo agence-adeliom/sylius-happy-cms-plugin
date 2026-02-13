@@ -28,7 +28,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Service to serialize CMS blocks into a structured JSON format for AI consumption
  */
-readonly class BlockSchemaSerializer
+class BlockSchemaSerializer
 {
     public function __construct(
         private BlockCollection $blockCollection,

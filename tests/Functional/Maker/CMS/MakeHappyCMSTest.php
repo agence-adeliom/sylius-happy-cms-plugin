@@ -13,6 +13,7 @@ final class MakeHappyCMSTest extends KernelTestCase
 {
     private Application $application;
     private CommandTester $commandTester;
+    private string $projectDir;
 
     protected function setUp(): void
     {
@@ -21,6 +22,9 @@ final class MakeHappyCMSTest extends KernelTestCase
         $this->application = new Application(self::$kernel);
         $command = $this->application->find('make:happy-cms:generate-cms-model');
         $this->commandTester = new CommandTester($command);
+
+        // Save project directory before kernel is shut down
+        $this->projectDir = self::$kernel->getProjectDir();
     }
 
     public function testCommandWithAllArgumentsNonInteractive(): void
@@ -185,7 +189,7 @@ final class MakeHappyCMSTest extends KernelTestCase
     private function cleanupGeneratedFiles(): void
     {
         // Define paths to clean up generated test files
-        $testEntityPath = self::$kernel->getProjectDir() . '/tests/TestApplication/src/Entity/HappyCMS';
+        $testEntityPath = $this->projectDir . '/tests/TestApplication/src/Entity/HappyCMS';
 
         // Only clean up if the test entity path exists
         if (is_dir($testEntityPath)) {

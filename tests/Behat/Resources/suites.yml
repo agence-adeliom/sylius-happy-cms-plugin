@@ -15,7 +15,7 @@ default:
                 - sylius.behat.context.ui.admin.login
 
             filters:
-                tags: "@admin_dashboard&&@ui"
+                tags: "@admin_dashboard&&@ui~@mink:chromedriver"
 
         ui_admin_page_builder:
             contexts:
@@ -36,4 +36,4 @@ default:
                 - tests.adeliom_sylius_happy_cms_plugin.behat.context.page_builder
 
             filters:
-                tags: "@admin_page_builder&&@ui"
+                tags: "@admin_page_builder&&@ui~@mink:chromedriver"
