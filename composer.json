@@ -35,7 +35,6 @@
         "symfony-cmf/routing-bundle": "^3.0",
         "symfony/ai-bundle": "^0.3.2",
         "symfony/ai-chat": "^0.3.0",
-        "symfony/ai-open-ai-platform": "^0.3.0",
         "symfony/filesystem": "^7.4 || ^8.0",
         "symfony/options-resolver": "^7.4 || ^8.0",
         "symfony/property-access": "^7.4 || ^8.0"
