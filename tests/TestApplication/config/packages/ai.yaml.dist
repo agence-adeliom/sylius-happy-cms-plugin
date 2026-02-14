@@ -1,3 +1,4 @@
+# Copy this file to config/packages/ai.yaml and fill in the OPENAI_API_KEY environment variable with your OpenAI API key.
 parameters:
     env(OPENAI_API_KEY): 'some_secret'
 
