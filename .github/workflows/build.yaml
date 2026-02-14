@@ -86,12 +86,8 @@ jobs:
                     symfony_version: "${{ matrix.symfony }}"
                     load_fixtures: "no"
 
-            -   name: Reset database and generate migration
-                run: |
-                    run: |
-                    $CONSOLE doctrine:database:drop --force -n -vvv
-                    $CONSOLE doctrine:database:create -n -vvv
-                    $CONSOLE doctrine:schema:create -n -vvv
+            -   name: Update database schema
+                run: $CONSOLE doctrine:schema:update --force -n -vvv
                 shell: bash
                 working-directory: "${{ env.test_dir }}"
 
