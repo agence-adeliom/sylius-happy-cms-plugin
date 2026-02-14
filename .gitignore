@@ -28,5 +28,3 @@ composer.lock
 php.ini
 .php-version
 public/*
-
-tests/TestApplication/config/packages/ai.yaml
