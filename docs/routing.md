@@ -13,6 +13,7 @@
 - [HTTP Caching](#http-caching)
 - [Interfaces and Traits](#interfaces-and-traits)
 - [Events](#events)
+- [Commands](#commands)
 - [Breadcrumb Navigation](#breadcrumb-navigation)
 - [Cache Invalidation](#cache-invalidation)
 - [Troubleshooting](#troubleshooting)
@@ -202,6 +203,13 @@ class BlogPostPrefixListener
     }
 }
 ```
+
+## Commands
+
+```bash
+php bin/console make:happy-cms:generate-cms-model
+```
+[Learn mode about this command usage here](./docs/commands/generate-cms-model.md)
 
 ## Breadcrumb Navigation
 

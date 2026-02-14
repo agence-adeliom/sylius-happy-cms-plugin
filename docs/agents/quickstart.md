@@ -9,6 +9,7 @@ This is a quick reference guide for AI agents working with the Sylius Happy CMS 
 ```bash
 php bin/console make:happy-cms:generate-cms-model Cms Faq Entry Category --no-interaction
 ```
+Read more about the command `make:happy-cms:generate-cms-model` and options in [this documentation](../commands/generate-cms-model.md)
 
 ### I need to create a custom content block
 → **Use**: [Content Blocks Guide](./blocks.md)
