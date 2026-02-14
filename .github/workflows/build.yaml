@@ -103,6 +103,7 @@ jobs:
                     cp ../../../tests/TestApplication/config/packages/ai.yaml.dist ../../../tests/TestApplication/config/packages/ai.yaml
                     composer require symfony/ai-chat --no-interaction
                     composer require symfony/ai-open-ai-platform --no-interaction
+                    cat src/Kernel.php
                     $CONSOLE cache:clear -vvv
                     $CONSOLE cache:warmup -vvv
                 shell: bash
