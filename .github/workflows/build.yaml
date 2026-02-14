@@ -95,6 +95,18 @@ jobs:
                 run: $CONSOLE sylius:fixtures:load -n
                 shell: bash
                 working-directory: "${{ env.test_dir }}"
+                
+            -   name: Install ai dependencies
+                run: |
+                    composer require symfony/ai-bundle --no-interaction
+                    rm ../../../tests/TestApplication/config/packages/ai.yaml
+                    cp ../../../tests/TestApplication/config/packages/ai.yaml.dist ../../../tests/TestApplication/config/packages/ai.yaml
+                    composer require symfony/ai-chat --no-interaction
+                    composer require symfony/ai-open-ai-platform --no-interaction
+                    $CONSOLE cache:clear -vvv
+                    $CONSOLE cache:warmup -vvv
+                shell: bash
+                working-directory: "${{ env.test_dir }}"
         
             -   name: Run unit tests
                 run: vendor/bin/phpunit --colors=always --testsuite=unit
