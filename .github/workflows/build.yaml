@@ -89,7 +89,7 @@ jobs:
             -   name: Reset database and generate migration
                 run: |
                     run: |
-                    $CONSOLE doctrine:database:drop -n -vvv
+                    $CONSOLE doctrine:database:drop --force -n -vvv
                     $CONSOLE doctrine:database:create -n -vvv
                     $CONSOLE doctrine:schema:create -n -vvv
                 shell: bash
