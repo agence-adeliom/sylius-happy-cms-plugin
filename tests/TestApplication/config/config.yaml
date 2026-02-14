@@ -5,6 +5,7 @@ imports:
     - { resource: "packages/sylius_resource.yaml" }
     - { resource: "packages/cmf_routing.yaml" }
     - { resource: "packages/ai.yaml" }
+    - { resource: "packages/maker.yaml" }
     - { resource: "services.yaml" }
     - { resource: "services_test.php" }
 

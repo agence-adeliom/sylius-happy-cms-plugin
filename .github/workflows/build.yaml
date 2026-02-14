@@ -124,10 +124,11 @@ jobs:
             -   name: Run phpstan tests
                 run: vendor/bin/phpstan analyse -c phpstan.neon
                 
-            -   
-                name: Load demo pages in test application
+            -   name: Load demo pages in test application
                 run: vendor/bin/console happycms:starter:create-demo-pages -n
 
-            -
-                name: Load demo menus in test application
+            -   name: Load demo menus in test application
                 run: vendor/bin/console happycms:starter:create-demo-menu -n
+            
+            -   name: Run HappyCMS model generator
+                run: vendor/bin/console make:happy-cms:generate-cms-model Cms Faq Entry Category --no-interaction

@@ -15,6 +15,7 @@ use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 final class MakeHappyCMS extends AbstractMaker
@@ -53,7 +54,7 @@ final class MakeHappyCMS extends AbstractMaker
                 'entryNamespace',
                 InputArgument::OPTIONAL,
                 'Namespace for %s scope',
-                '%s',
+                'Faq',
             )
             ->addArgument(
                 'entryClassName',
@@ -67,23 +68,17 @@ final class MakeHappyCMS extends AbstractMaker
                 'Taxonomy entity filename name for %s scope',
                 'Taxonomy',
             )
-            ->addArgument(
-                'hasFlexibleContent',
-                InputArgument::OPTIONAL,
-                'Use blocks for %s scope',
-                true,
+            ->addOption(
+                'no-flexible-content',
+                null,
+                InputOption::VALUE_NONE,
+                'Disable flexible content blocks for this model',
             )
-            ->addArgument(
-                'hasRouting',
-                InputArgument::OPTIONAL,
-                'Use routing for %s scope',
-                true,
-            )
-            ->addArgument(
-                'hasTaxonomy',
-                InputArgument::OPTIONAL,
-                'Generate a taxonomy associated resources for %s scope',
-                true,
+            ->addOption(
+                'no-taxonomy',
+                null,
+                InputOption::VALUE_NONE,
+                'Do not generate taxonomy associated resources',
             )
         ;
         $inputConfig->setArgumentAsNonInteractive('scope');
@@ -102,8 +97,45 @@ final class MakeHappyCMS extends AbstractMaker
         /** @var string $scope */
         $scope = $input->getArgument('scope');
 
+        $arguments = ['entryNamespace', 'entryClassName'];
+
+        // Ask for boolean options if in interactive mode
+        // Options are already set to false by default if not provided via CLI
+        if (!$input->getOption('no-flexible-content')) {
+            if ($input->getOption('no-interaction')) {
+                $input->setOption('no-flexible-content', true);
+
+                return;
+            }
+            $hasFlexibleContent = $io->confirm(
+                sprintf('Use blocks for %s scope', $scope),
+                true,
+            );
+            if (!$hasFlexibleContent) {
+                $input->setOption('no-flexible-content', true);
+            }
+        }
+
+        if (!$input->getOption('no-taxonomy')) {
+            if ($input->getOption('no-interaction')) {
+                $input->setOption('no-taxonomy', true);
+
+                return;
+            }
+            $hasTaxonomy = $io->confirm(
+                sprintf('Generate a taxonomy associated resources for %s scope', $scope),
+                true,
+            );
+            if (!$hasTaxonomy) {
+                $input->setOption('no-taxonomy', true);
+            }
+        }
+        if (!$input->getOption('no-taxonomy')) {
+            $arguments[] = 'taxonomyClassName';
+        }
+
         // Only ask for string arguments that haven't been provided
-        foreach (['entryNamespace', 'entryClassName', 'taxonomyClassName'] as $argName) {
+        foreach ($arguments as $argName) {
             $arg = $command->getDefinition()->getArgument($argName);
             $currentValue = $input->getArgument($argName);
 
@@ -121,23 +153,6 @@ final class MakeHappyCMS extends AbstractMaker
                 );
             }
         }
-
-        // Only ask for boolean arguments if they haven't been explicitly set
-        foreach (['hasFlexibleContent', 'hasRouting', 'hasTaxonomy'] as $argName) {
-            $arg = $command->getDefinition()->getArgument($argName);
-            $currentValue = $input->getArgument($argName);
-
-            // Skip if argument was explicitly provided (not the default value placeholder)
-            if ($currentValue !== $arg->getDefault()) {
-                continue;
-            }
-
-            $question = sprintf($arg->getDescription(), $scope);
-            $input->setArgument(
-                $arg->getName(),
-                $io->confirm($question, true),
-            );
-        }
     }
 
     /**
@@ -150,11 +165,11 @@ final class MakeHappyCMS extends AbstractMaker
         /** @var string $scope */
         $scope = $input->getArgument('scope');
         /** @var bool $hasFlexibleContent */
-        $hasFlexibleContent = $input->getArgument('hasFlexibleContent') ?? true;
-        /** @var bool $hasRouting */
-        $hasRouting = $input->getArgument('hasRouting') ?? true;
+        $hasFlexibleContent = !($input->getOption('no-flexible-content') === true);
+        // Generating cms model always requires routing
+        $hasRouting = true;
         /** @var bool $hasTaxonomy */
-        $hasTaxonomy = $input->getArgument('hasTaxonomy') ?? true;
+        $hasTaxonomy = !($input->getOption('no-taxonomy') === true);
         /** @var string|class-string $entryClassName */
         $entryClassName = $input->getArgument('entryClassName');
         /** @var string|class-string $taxonomyClassName */

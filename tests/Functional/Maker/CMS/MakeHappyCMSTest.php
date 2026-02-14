@@ -35,9 +35,6 @@ final class MakeHappyCMSTest extends KernelTestCase
             'entryNamespace' => 'Blog',
             'entryClassName' => 'Article',
             'taxonomyClassName' => 'Category',
-            'hasFlexibleContent' => true,
-            'hasRouting' => true,
-            'hasTaxonomy' => true,
             '--no-interaction' => true,
         ]);
 
@@ -88,7 +85,7 @@ final class MakeHappyCMSTest extends KernelTestCase
             'scope' => 'Gallery',
             'entryNamespace' => 'Gallery',
             'entryClassName' => 'Image',
-            'hasTaxonomy' => false,
+            '--no-taxonomy' => true,
             '--no-interaction' => true,
         ]);
 
@@ -107,23 +104,7 @@ final class MakeHappyCMSTest extends KernelTestCase
         // Execute command without flexible content
         $this->commandTester->execute([
             'scope' => 'SimpleContent',
-            'hasFlexibleContent' => false,
-            '--no-interaction' => true,
-        ]);
-
-        // Command should complete successfully
-        $this->assertSame(0, $this->commandTester->getStatusCode());
-
-        $output = $this->commandTester->getDisplay();
-        $this->assertStringContainsString('Thank you for using HappyCMS Plugin', $output);
-    }
-
-    public function testCommandWithoutRouting(): void
-    {
-        // Execute command without routing
-        $this->commandTester->execute([
-            'scope' => 'NonRoutable',
-            'hasRouting' => false,
+            '--no-flexible-content' => true,
             '--no-interaction' => true,
         ]);
 
@@ -178,6 +159,46 @@ final class MakeHappyCMSTest extends KernelTestCase
         // but we can verify the command completed successfully
     }
 
+    public function testCommandWithMultipleDisabledFeatures(): void
+    {
+        // Execute command with multiple features disabled
+        $this->commandTester->execute([
+            'scope' => 'Minimal',
+            'entryNamespace' => 'Minimal',
+            'entryClassName' => 'MinimalEntry',
+            '--no-flexible-content' => true,
+            '--no-taxonomy' => true,
+            '--no-interaction' => true,
+        ]);
+
+        // Command should complete successfully
+        $this->assertSame(0, $this->commandTester->getStatusCode());
+
+        $output = $this->commandTester->getDisplay();
+        $this->assertStringContainsString('Thank you for using HappyCMS Plugin', $output);
+
+        // Should not contain taxonomy configuration
+        $this->assertStringNotContainsString('Taxonomy', $output);
+    }
+
+    public function testCommandWithOriginalSyntax(): void
+    {
+        // Test the original command syntax from the issue
+        $this->commandTester->execute([
+            'scope' => 'Demo',
+            'entryNamespace' => 'Demo',
+            'entryClassName' => 'Demo',
+            'taxonomyClassName' => 'DemoCategory',
+            '--no-interaction' => true,
+        ]);
+
+        // Command should complete successfully
+        $this->assertSame(0, $this->commandTester->getStatusCode());
+
+        $output = $this->commandTester->getDisplay();
+        $this->assertStringContainsString('Thank you for using HappyCMS Plugin', $output);
+    }
+
     protected function tearDown(): void
     {
         parent::tearDown();
@@ -203,6 +224,9 @@ final class MakeHappyCMSTest extends KernelTestCase
                 'NonRoutable',
                 'Custom',
                 'TestScope',
+                'Minimal',
+                'Demo',
+                'TestNamespace',
             ];
 
             foreach ($testDirectories as $dir) {

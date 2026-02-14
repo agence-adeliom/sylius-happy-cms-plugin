@@ -7,7 +7,7 @@ This is a quick reference guide for AI agents working with the Sylius Happy CMS 
 ### I need to create a new type of CMS page (Blog, FAQ, Brand, etc.)
 → **Use**: [Routable Entities Guide](./routable-entities.md)
 ```bash
-php bin/console make:happy-cms:generate-cms-model
+php bin/console make:happy-cms:generate-cms-model Cms Faq Entry Category --no-interaction
 ```
 
 ### I need to create a custom content block
@@ -40,7 +40,7 @@ Learn about creating hierarchical menus, templates, and rendering
 ### Creating New Routable Entity
 ```bash
 # 1. Generate entity
-php bin/console make:happy-cms:generate-cms-model
+php bin/console make:happy-cms:generate-cms-model Cms Faq Entry Category --no-interaction
 
 # 2. Update database
 php bin/console doctrine:migrations:diff
@@ -51,6 +51,9 @@ php bin/console cache:clear
 
 # 4. Test in admin at /admin/{resource-name}
 ```
+
+Read more about the command `make:happy-cms:generate-cms-model` and options in [this documentation](./commands/generate-cms-model.md)
+
 
 ### Creating New Block
 ```bash
