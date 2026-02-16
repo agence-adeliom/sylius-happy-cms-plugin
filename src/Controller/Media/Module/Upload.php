@@ -26,6 +26,18 @@ trait Upload
      */
     public function upload(Request $request): JsonResponse
     {
+        // CSRF Protection
+        try {
+            $this->validateCsrfToken($request);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                [
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                ],
+            ]);
+        }
+
         $upload_folder_id = (int) $request->request->get('upload_folder');
         $folder = null;
         $custom_attr = [];
@@ -117,6 +129,16 @@ trait Upload
      */
     public function uploadEditedImage(Request $request): JsonResponse
     {
+        // CSRF Protection
+        try {
+            $this->validateCsrfToken($request);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
+
         if ($this->allowUpload()) {
             /** @var array{
              *     folder: int|null,
@@ -169,6 +191,16 @@ trait Upload
      */
     public function uploadLink(Request $request): JsonResponse
     {
+        // CSRF Protection
+        try {
+            $this->validateCsrfToken($request);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
+
         if ($this->allowUpload()) {
             /** @var array{
              *     url: string,

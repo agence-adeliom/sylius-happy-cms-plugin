@@ -15,6 +15,16 @@ trait Rename
      */
     public function renameItem(Request $request): JsonResponse
     {
+        // CSRF Protection
+        try {
+            $this->validateCsrfToken($request);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'message' => $e->getMessage(),
+                'new_filename' => '',
+            ]);
+        }
+
         $message = '';
         $new_filename = '';
         $content = $request->getContent();

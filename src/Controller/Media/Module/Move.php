@@ -17,6 +17,18 @@ trait Move
      */
     public function moveItem(Request $request): JsonResponse
     {
+        // CSRF Protection
+        try {
+            $this->validateCsrfToken($request);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                [
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                ],
+            ]);
+        }
+
         /**
          * @var array{
          *     destination: int,

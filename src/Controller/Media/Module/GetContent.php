@@ -20,6 +20,19 @@ trait GetContent
      */
     public function getFiles(Request $request): JsonResponse
     {
+        // OPTIONAL: CSRF Protection for read operations
+        // Note: This is NOT recommended as it can cause UX issues
+        // Uncomment only if you want very strict CSRF protection
+        /*
+        try {
+            $this->validateCsrfToken($request);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'error' => $e->getMessage(),
+            ]);
+        }
+        */
+
         /**
          * @var array{
          *     folder: int|null,

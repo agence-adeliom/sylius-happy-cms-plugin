@@ -16,6 +16,16 @@ trait NewFolder
      */
     public function createNewFolder(Request $request): JsonResponse
     {
+        // CSRF Protection
+        try {
+            $this->validateCsrfToken($request);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'message' => $e->getMessage(),
+                'new_folder_name' => '',
+            ]);
+        }
+
         /** @var array{
          *    folder: int|null,
          *    new_folder_name: string

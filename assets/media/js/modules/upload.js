@@ -79,6 +79,20 @@ export default {
                     done()
                 },
                 sending(file, xhr, formData) {
+                    // Get CSRF token
+                    let csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                    if (!csrfToken) {
+                        csrfToken = document.querySelector('[data-csrf-token]')?.getAttribute('data-csrf-token')
+                    }
+                    if (!csrfToken) {
+                        csrfToken = document.getElementById('media-manager')?.getAttribute('data-csrf-token')
+                    }
+
+                    // Add CSRF token to FormData
+                    if (csrfToken) {
+                        formData.append('_csrf_token', csrfToken)
+                    }
+
                     formData.append('upload_folder', manager.files.folder)
                     formData.append('random_names', manager.useRandomNamesForUpload)
                     formData.append('custom_attrs', JSON.stringify(manager.uploadPreviewOptionsList))

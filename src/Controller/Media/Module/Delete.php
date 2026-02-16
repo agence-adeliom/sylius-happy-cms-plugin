@@ -17,6 +17,18 @@ trait Delete
      */
     public function deleteItem(Request $request): JsonResponse
     {
+        // CSRF Protection
+        try {
+            $this->validateCsrfToken($request);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                [
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                ],
+            ]);
+        }
+
         /** @var array{
          *     deleted_files: array<int, array{
          *          id: int,

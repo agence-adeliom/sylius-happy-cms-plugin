@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Controller\Media;
 
+use Adeliom\SyliusHappyCMSPlugin\Controller\Media\Module\CsrfProtection;
 use Adeliom\SyliusHappyCMSPlugin\Controller\Media\Module\Delete;
 use Adeliom\SyliusHappyCMSPlugin\Controller\Media\Module\Download;
 use Adeliom\SyliusHappyCMSPlugin\Controller\Media\Module\GetContent;
@@ -28,6 +29,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MediaController extends AbstractController
 {
+    use CsrfProtection;
     use Utils;
     use GetContent;
     use Delete;
@@ -80,9 +82,11 @@ class MediaController extends AbstractController
         $this->translator = $translator;
     }
 
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        return $this->render('@SyliusHappyCMSPlugin/media/manager_view.html.twig');
+        return $this->render('@SyliusHappyCMSPlugin/media/manager_view.html.twig', [
+            'csrf_token' => $this->getCsrfToken($request),
+        ]);
     }
 
     public function browse(Request $request): Response
@@ -93,6 +97,7 @@ class MediaController extends AbstractController
             'CKEditor' => $request->query->get('CKEditor'),
             'CKEditorFuncNum' => $request->query->get('CKEditorFuncNum'),
             'langCode' => $request->query->get('langCode', 'en'),
+            'csrf_token' => $this->getCsrfToken($request),
         ];
 
         return $this->render('@SyliusHappyCMSPlugin/media/browser.html.twig', $data);
