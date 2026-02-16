@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\Doctrine\Query\Menu;
 
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
@@ -63,9 +64,9 @@ final class AllMenuItems implements AllMenuItemsInterface
                 ),
             )
             ->andWhere('menu_item.menu_id = :menuId')
-            ->orderBy('menu_item.lvl', Criteria::DESC)
-            ->addOrderBy('menu_item.root', Criteria::ASC)
-            ->addOrderBy('menu_item.lft', Criteria::ASC)
+            ->orderBy('menu_item.lvl', Order::Descending)
+            ->addOrderBy('menu_item.root', Order::Ascending)
+            ->addOrderBy('menu_item.lft', Order::Ascending)
             ->setParameter('currentLocale', $currentLocale, Types::STRING)
             ->setParameter('fallbackLocale', $fallbackLocale, Types::STRING)
             ->setParameter('menuId', $menuId, Types::INTEGER)

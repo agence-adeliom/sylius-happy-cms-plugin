@@ -25,7 +25,8 @@ class Menu implements MenuInterface
     use EntityStatusTrait;
 
     /** @var Collection<int, MenuItemInterface> */
-    #[ORM\OneToMany(mappedBy: 'menu', targetEntity: MenuItemInterface::class, cascade: ['all'])]
+    #[ORM\OneToMany(targetEntity: MenuItemInterface::class, mappedBy: 'menu', cascade: ['all'])]
+    #[ORM\OrderBy(['lvl' => 'DESC', 'root' => 'ASC', 'lft' => 'ASC'])]
     protected Collection $items;
 
     #[ORM\Column(name: 'code', type: Types::STRING, length: 30)]
