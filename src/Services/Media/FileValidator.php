@@ -138,14 +138,14 @@ class FileValidator
         // 3. Check for dangerous extensions (double check)
         if (in_array($extension, self::DANGEROUS_EXTENSIONS, true)) {
             throw new \InvalidArgumentException(
-                sprintf('Dangerous file extension detected: %s', $extension)
+                sprintf('Dangerous file extension detected: %s', $extension),
             );
         }
 
         // 4. Check extension whitelist
         if (!in_array($extension, self::ALLOWED_EXTENSIONS, true)) {
             throw new \InvalidArgumentException(
-                sprintf('File extension not allowed: %s', $extension)
+                sprintf('File extension not allowed: %s', $extension),
             );
         }
 
@@ -155,7 +155,7 @@ class FileValidator
         // 6. Check MIME type whitelist
         if (!in_array($realMimeType, self::ALLOWED_MIME_TYPES, true)) {
             throw new \InvalidArgumentException(
-                sprintf('MIME type not allowed: %s', $realMimeType)
+                sprintf('MIME type not allowed: %s', $realMimeType),
             );
         }
 
@@ -218,6 +218,7 @@ class FileValidator
 
                 if ($fileSignature === $signature) {
                     $signatureMatched = true;
+
                     break;
                 }
             }
@@ -226,8 +227,8 @@ class FileValidator
                 throw new \InvalidArgumentException(
                     sprintf(
                         'File content does not match expected type %s (magic bytes verification failed)',
-                        $expectedMimeType
-                    )
+                        $expectedMimeType,
+                    ),
                 );
             }
         } finally {
@@ -253,7 +254,7 @@ class FileValidator
                 $ext = strtolower($part);
                 if (in_array($ext, self::DANGEROUS_EXTENSIONS, true)) {
                     throw new \InvalidArgumentException(
-                        sprintf('Dangerous double extension detected: %s', $filename)
+                        sprintf('Dangerous double extension detected: %s', $filename),
                     );
                 }
             }

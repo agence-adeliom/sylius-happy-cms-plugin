@@ -38,6 +38,7 @@ class MediaManager
         protected TranslatorInterface $translator,
         protected EventDispatcherInterface $eventDispatcher,
         protected FileValidator $fileValidator,
+        protected UrlValidator $urlValidator,
     ) {
     }
 
@@ -285,6 +286,18 @@ class MediaManager
 
     private function createFromOembed(MediaInterface $entity, string $source): MediaInterface
     {
+        // SECURITY: Validate URL to prevent SSRF attacks
+        try {
+            $this->urlValidator->validate($source);
+        } catch (\InvalidArgumentException $e) {
+            throw new ProviderNotFound(
+                sprintf(
+                    'URL validation failed for security reasons: %s',
+                    $e->getMessage(),
+                ),
+            );
+        }
+
         $embed = new Embed();
         $infos = $embed->get($source);
 
@@ -398,6 +411,18 @@ class MediaManager
      */
     private function createFromImageURL(MediaInterface $entity, string $source, int $type): MediaInterface
     {
+        // SECURITY: Validate URL to prevent SSRF attacks
+        try {
+            $this->urlValidator->validate($source);
+        } catch (\InvalidArgumentException $e) {
+            throw new NoFile(
+                sprintf(
+                    'URL validation failed for security reasons: %s',
+                    $e->getMessage(),
+                ),
+            );
+        }
+
         $urlPath = parse_url($source, \PHP_URL_PATH);
         $original = substr((string) $urlPath, strrpos((string) $urlPath, '/') + 1);
         $name = $entity->getName() ?: pathinfo($original, \PATHINFO_FILENAME);
@@ -434,6 +459,9 @@ class MediaManager
         try {
             $filepath = $entity->getPath();
             if (!$this->filesystem->fileExists($filepath)) {
+                // SECURITY: Double-check URL before fetching
+                // This prevents race conditions where URL could be modified between validation and fetch
+                $this->urlValidator->validate($source);
                 $stream = file_get_contents($source);
                 if ($stream) {
                     $this->filesystem->write($filepath, $stream);
