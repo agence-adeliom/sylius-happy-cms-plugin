@@ -53,7 +53,7 @@ trait CsrfProtection
      *
      * @return string The current token
      */
-    protected function getCsrfToken(Request $request): string
+    public function getCsrfToken(Request $request): string
     {
         $session = $this->getSession($request);
         $tokenData = $session->get(self::CSRF_TOKEN_SESSION_KEY);
@@ -78,6 +78,7 @@ trait CsrfProtection
      * @param string|null $tokenKey The key to look for the token (default: '_csrf_token')
      *
      * @throws BadRequestException If token is invalid or missing
+     *
      * @return bool True if valid
      */
     protected function validateCsrfToken(Request $request, ?string $tokenKey = '_csrf_token'): bool
@@ -91,7 +92,7 @@ trait CsrfProtection
         $content = $request->getContent();
         if (!empty($content)) {
             try {
-                $data = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+                $data = json_decode($content, true, 512, \JSON_THROW_ON_ERROR);
                 if (is_array($data) && isset($data[$tokenKey])) {
                     $submittedToken = $data[$tokenKey];
                 }
@@ -101,7 +102,7 @@ trait CsrfProtection
         }
 
         // Fallback to POST parameters
-        if (!$submittedToken) {
+        if (!$submittedToken && is_string($tokenKey)) {
             $submittedToken = $request->request->get($tokenKey);
         }
 
@@ -113,7 +114,7 @@ trait CsrfProtection
         // Check if token was submitted
         if (!$submittedToken || !is_string($submittedToken)) {
             throw new BadRequestException(
-                $this->translator->trans('error.csrf_token_missing', [], 'SyliusHappyCMSPlugin')
+                $this->translator->trans('error.csrf_token_missing', [], 'SyliusHappyCMSPlugin'),
             );
         }
 
@@ -123,7 +124,7 @@ trait CsrfProtection
         // Validate token exists
         if (!is_array($tokenData) || !isset($tokenData['token'], $tokenData['timestamp'])) {
             throw new BadRequestException(
-                $this->translator->trans('error.csrf_token_invalid', [], 'SyliusHappyCMSPlugin')
+                $this->translator->trans('error.csrf_token_invalid', [], 'SyliusHappyCMSPlugin'),
             );
         }
 
@@ -133,14 +134,14 @@ trait CsrfProtection
             $session->remove(self::CSRF_TOKEN_SESSION_KEY);
 
             throw new BadRequestException(
-                $this->translator->trans('error.csrf_token_expired', [], 'SyliusHappyCMSPlugin')
+                $this->translator->trans('error.csrf_token_expired', [], 'SyliusHappyCMSPlugin'),
             );
         }
 
         // Use timing-safe comparison to prevent timing attacks
         if (!hash_equals($tokenData['token'], $submittedToken)) {
             throw new BadRequestException(
-                $this->translator->trans('error.csrf_token_invalid', [], 'SyliusHappyCMSPlugin')
+                $this->translator->trans('error.csrf_token_invalid', [], 'SyliusHappyCMSPlugin'),
             );
         }
 
@@ -150,27 +151,18 @@ trait CsrfProtection
     /**
      * Get session from request
      *
-     * @param Request $request
-     * @return SessionInterface
-     * @throws \RuntimeException If session is not available
+     * @throws \Symfony\Component\HttpFoundation\Exception\SessionNotFoundException If session is not available
      */
     private function getSession(Request $request): SessionInterface
     {
-        $session = $request->getSession();
-
-        if (!$session instanceof SessionInterface) {
-            throw new \RuntimeException('Session is not available');
-        }
-
-        return $session;
+        // In Symfony 6+, getSession() throws SessionNotFoundException if no session is set
+        // We let this exception propagate naturally
+        return $request->getSession();
     }
 
     /**
      * Helper method to refresh the CSRF token
      * Useful after successful operations to prevent token reuse
-     *
-     * @param Request $request
-     * @return void
      */
     protected function refreshCsrfToken(Request $request): void
     {

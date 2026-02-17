@@ -12,5 +12,11 @@
             <argument type="service" id="sylius.happy_cms.command.create_demo_pages" />
             <argument type="service" id="router" />
         </service>
+
+        <service id="tests.adeliom_sylius_happy_cms_plugin.behat.context.ui.admin.media_csrf"
+                 class="Tests\Adeliom\SyliusHappyCMSPlugin\Behat\Context\Ui\Admin\MediaCsrfContext">
+            <argument type="service" id="behat.mink.default_session" />
+            <argument type="service" id="sylius.behat.shared_storage" />
+        </service>
     </services>
 </container>

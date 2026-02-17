@@ -8,6 +8,8 @@ use Adeliom\SyliusHappyCMSPlugin\Controller\Media\MediaController;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 final class NewFolderTest extends KernelTestCase
 {
@@ -21,17 +23,28 @@ final class NewFolderTest extends KernelTestCase
         $this->mediaController = $container->get(MediaController::class);
     }
 
-    public function testCreateNewFolderWithValidJsonData(): void
+    /**
+     * Helper method to create a request with CSRF token
+     */
+    private function createRequestWithCsrfToken(array $requestData): Request
     {
-        // Arrange: Préparer les données JSON
-        $requestData = [
-            'folder' => null,
-            'new_folder_name' => 'test-folder',
-        ];
+        // Create a session
+        $session = new Session(new MockArraySessionStorage());
+        $session->start();
+
+        // Create a temporary request to generate CSRF token
+        $tempRequest = new Request();
+        $tempRequest->setSession($session);
+
+        // Generate CSRF token
+        $csrfToken = $this->mediaController->getCsrfToken($tempRequest);
+
+        // Add CSRF token to request data
+        $requestData['_csrf_token'] = $csrfToken;
 
         $jsonContent = json_encode($requestData, JSON_THROW_ON_ERROR);
 
-        // Créer une requête avec du contenu JSON
+        // Create the actual request with session and JSON content
         $request = new Request(
             [], // GET parameters
             [], // POST parameters
@@ -41,6 +54,21 @@ final class NewFolderTest extends KernelTestCase
             ['CONTENT_TYPE' => 'application/json'], // server
             $jsonContent // content
         );
+        $request->setSession($session);
+
+        return $request;
+    }
+
+    public function testCreateNewFolderWithValidJsonData(): void
+    {
+        // Arrange: Préparer les données JSON
+        $requestData = [
+            'folder' => null,
+            'new_folder_name' => 'test-folder',
+        ];
+
+        // Créer une requête avec du contenu JSON et un CSRF token valide
+        $request = $this->createRequestWithCsrfToken($requestData);
 
         // Act: Appeler la méthode
         $response = $this->mediaController->createNewFolder($request);
@@ -65,17 +93,8 @@ final class NewFolderTest extends KernelTestCase
             'new_folder_name' => 'subfolder-test',
         ];
 
-        $jsonContent = json_encode($requestData, JSON_THROW_ON_ERROR);
-
-        $request = new Request(
-            [],
-            [],
-            [],
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            $jsonContent
-        );
+        // Créer une requête avec un CSRF token valide
+        $request = $this->createRequestWithCsrfToken($requestData);
 
         // Act
         $response = $this->mediaController->createNewFolder($request);
@@ -98,17 +117,8 @@ final class NewFolderTest extends KernelTestCase
             'new_folder_name' => 'test&/ `*folder',
         ];
 
-        $jsonContent = json_encode($requestData, JSON_THROW_ON_ERROR);
-
-        $request = new Request(
-            [],
-            [],
-            [],
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            $jsonContent
-        );
+        // Créer une requête avec un CSRF token valide
+        $request = $this->createRequestWithCsrfToken($requestData);
 
         // Act
         $response = $this->mediaController->createNewFolder($request);
