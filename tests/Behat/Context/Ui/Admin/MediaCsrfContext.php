@@ -208,7 +208,7 @@ final class MediaCsrfContext implements Context
      * @Then the file should not be uploaded
      * @Then the file :filename should not be uploaded
      */
-    public function theFileShouldNotBeUploaded(string $filename = null): void
+    public function theFileShouldNotBeUploaded(?string $filename = null): void
     {
         // This would require checking the actual media library
         // For now, we rely on the error response

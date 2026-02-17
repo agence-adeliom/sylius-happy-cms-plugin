@@ -247,10 +247,34 @@ trait Upload
     }
 
     /**
-     * allow/disallow user upload.
+     * Hook to allow/disallow user upload based on custom business logic
+     *
+     * SECURITY NOTE:
+     * - File type validation is handled in MediaManager using FileValidator
+     * - This method is for additional checks like:
+     *   - User permissions
+     *   - Storage quotas
+     *   - Rate limiting
+     *   - Custom business rules
+     *
+     * Override this method to implement custom upload restrictions.
+     * DO NOT use this as the only security measure.
+     *
+     * @param UploadedFile|null $file The file being uploaded (null for clipboard/URL uploads)
+     *
+     * @return bool True to allow upload, false to deny
      */
     protected function allowUpload(?UploadedFile $file = null): bool
     {
+        // Default: allow uploads (file validation is done in MediaManager)
+        // Override this method to add custom restrictions
+
+        // Example of custom checks you could add:
+        // - Check user storage quota
+        // - Verify user permissions
+        // - Implement rate limiting
+        // - Check file size limits
+
         return true;
     }
 

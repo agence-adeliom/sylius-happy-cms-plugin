@@ -37,6 +37,7 @@ class MediaManager
         protected ContainerBagInterface $parameters,
         protected TranslatorInterface $translator,
         protected EventDispatcherInterface $eventDispatcher,
+        protected FileValidator $fileValidator,
     ) {
     }
 
@@ -482,14 +483,23 @@ class MediaManager
         }
 
         if ($source instanceof UploadedFile) {
+            // SECURITY: Validate uploaded file BEFORE processing
+            try {
+                $this->fileValidator->validate($source);
+            } catch (\InvalidArgumentException $e) {
+                throw new ExtNotAllowed($e->getMessage());
+            }
+
             $orig_name = $source->getClientOriginalName();
             $name = $entity->getName() ?: pathinfo($orig_name, \PATHINFO_FILENAME);
             $ext_only = pathinfo($orig_name, \PATHINFO_EXTENSION);
-            if (($type = $source->getClientMimeType()) !== '' && ($type = $source->getClientMimeType()) !== '0') {
-                $entity->setMime($type);
-                if ($ext = MediaHelper::mime2ext($type)) {
-                    $ext_only = $ext;
-                }
+
+            // SECURITY: Use real MIME type from file content, NOT client-provided header
+            $realMimeType = $this->fileValidator->getRealMimeType($source);
+            $entity->setMime($realMimeType);
+
+            if ($ext = MediaHelper::mime2ext($realMimeType)) {
+                $ext_only = $ext;
             }
 
             if (empty($entity->getName())) {
@@ -499,6 +509,8 @@ class MediaManager
             $orig_name = $source->getFilename();
             $name = $entity->getName() ?: $source->getBasename('.' . $source->getExtension());
             $ext_only = pathinfo($orig_name, \PATHINFO_EXTENSION);
+
+            // For non-uploaded files (internal operations), use getMimeType()
             if ($type = $source->getMimeType()) {
                 $entity->setMime($type);
                 if ($ext = MediaHelper::mime2ext($type)) {
