@@ -122,16 +122,29 @@ trait Download
      */
     public function downloadFile(string $path): StreamedResponse
     {
-        try {
-            $mimeType = $this->filesystem->mimeType($path);
+        // SECURITY: Sanitize and validate the path against database
+        $sanitizedPath = $this->helper->sanitizePath($path);
 
-            $stream = $this->filesystem->readStream($path);
+        // Verify that this path corresponds to a real media in the database
+        $media = $this->helper->getMediaByPath($sanitizedPath);
+
+        if (!$media) {
+            throw new NotLoadableException(sprintf('Media not found.'));
+        }
+
+        // Use the validated path from the media entity
+        $validatedPath = $media->getPath();
+
+        try {
+            $mimeType = $this->filesystem->mimeType($validatedPath);
+
+            $stream = $this->filesystem->readStream($validatedPath);
             $response = new StreamedResponse(static function () use ($stream) {
                 fpassthru($stream);
                 exit;
             });
 
-            $response->setLastModified((new \DateTime())->setTimestamp($this->filesystem->lastModified($path)));
+            $response->setLastModified((new \DateTime())->setTimestamp($this->filesystem->lastModified($validatedPath)));
             $response->headers->set('Content-Type', $mimeType);
             $response->setPublic();
             $response->setMaxAge(60 * 12);
@@ -139,7 +152,7 @@ trait Download
 
             return $response;
         } catch (FilesystemException $filesystemException) {
-            throw new NotLoadableException(sprintf('Source image "%s" not found.', $path), 0, $filesystemException);
+            throw new NotLoadableException('File cannot be loaded.', 0, $filesystemException);
         }
     }
 }

@@ -418,4 +418,67 @@ class MediaHelper
     {
         return sprintf('/(script.*?\/script)|[^(%s)a-zA-Z0-9]+/ius', $item);
     }
+
+    /**
+     * Sanitize a file path to prevent path traversal attacks.
+     * Removes dangerous characters like ../, \, and ensures the path is clean.
+     */
+    public function sanitizePath(string $path): string
+    {
+        // Remove null bytes
+        $path = str_replace("\0", '', $path);
+
+        // Remove path traversal sequences
+        $path = str_replace(['../', '..\\', '.../', '...\\'], '', $path);
+
+        // Normalize slashes
+        $path = str_replace('\\', '/', $path);
+
+        // Remove multiple slashes
+        $path = $this->clearDblSlash($path);
+
+        // Remove leading slash
+        $path = ltrim($path, '/');
+
+        return $path;
+    }
+
+    /**
+     * Get a media entity by its storage path.
+     * This method validates that the path corresponds to a real media in the database,
+     * preventing path traversal attacks.
+     *
+     * @return MediaInterface|null Returns the media if found, null otherwise
+     */
+    public function getMediaByPath(string $path): ?MediaInterface
+    {
+        // First, sanitize the input path
+        $path = $this->sanitizePath($path);
+
+        if (empty($path)) {
+            return null;
+        }
+
+        $mediaRepository = $this->getMediaRepository();
+        if (!$mediaRepository) {
+            return null;
+        }
+
+        // Get all media and check their computed paths
+        // We need to iterate because the path is computed, not stored directly
+        try {
+            $allMedia = $mediaRepository->findAll();
+
+            foreach ($allMedia as $media) {
+                if ($media instanceof MediaInterface && $media->getPath() === $path) {
+                    return $media;
+                }
+            }
+        } catch (\Exception $e) {
+            // Log error but don't expose it
+            return null;
+        }
+
+        return null;
+    }
 }
