@@ -61,7 +61,7 @@ The plugin brings awesome CMS features to Sylius, including:
 
 ```bash
 composer require agence-adeliom/sylius-happy-cms-plugin --no-scripts
-composer require --dev symfony/maker-bundle
+composer require --dev symfony/maker-bundle --no-scripts
 ```
 
 ### 2. Enable the Bundle
