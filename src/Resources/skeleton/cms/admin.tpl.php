@@ -71,21 +71,10 @@ final class <?= $classNameDetail->getShortName() ?>Admin extends AbstractAdmin i
     public function configureActions(string $pageName): Actions
     {
         $actions = parent::configureActions($pageName);
-        $contentAction = Action::new('content', 'happy_cms.page.admin.action.manage_content', 'bxs:book-content')
-            ->addSubAction(
-                Action::new('en_US', 'en_US', 'bxs:book-content')
-                    ->linkToRoute('happy_cms_admin_page_update', [
-                        'context' => 'flexible_content:en_US',
-                    ])
-            )
-            //->addSubAction(
-            //    Action::new('fr_FR', 'fr_FR', 'bxs:book-content')
-            //        ->linkToRoute('happy_cms_admin_page_update', [
-            //            'context' => 'flexible_content:fr_FR',
-            //        ])
-            //)
-        ;
-
+        $contentAction = Action::new('content', 'happy_cms.page.admin.action.manage_content', 'bi:book')
+            ->linkToRoute('happy_cms_admin_page_content_builder', [
+                'id' => '$resource.getId()',
+            ]);
         //$actions->addItemAction(Crud::PAGE_INDEX, $contentAction);
         $actions->addItemAction(Crud::PAGE_DETAIL, $contentAction);
         $actions->addItemAction(Crud::PAGE_EDIT, $contentAction);
@@ -99,7 +88,8 @@ final class <?= $classNameDetail->getShortName() ?>Admin extends AbstractAdmin i
         if (is_null($context)) {
 
             yield TabField::new('<?= $classNameDetail->getShortName() ?>', 'happy_cms.<?= $scope ?>.admin.tab.<?=
-        mb_strtolower($classNameDetail->getShortName()) ?>');
+        mb_strtolower($classNameDetail->getShortName()) ?>')
+                ->renderHorizontal();
 
             yield ColumnField::new('happy_cms.<?= $scope ?>.admin.panel.metadata')
                 ->setSize(ColumnSizeEnum::WIDE_6_OF_12);
@@ -189,20 +179,6 @@ final class <?= $classNameDetail->getShortName() ?>Admin extends AbstractAdmin i
                 )
                 ->hideOnIndex();
         }
-<?php if ($hasFlexibleContent) { ?>
-        elseif (str_starts_with($context, 'flexible_content:')) {
-            $locale = str_replace( 'flexible_content:', '', $context);
-            yield TranslationField::new('translations')
-                ->restrictToLocales([
-                    $locale
-                ])
-                ->addField(
-                    FlexibleContentField::new('content')
-                    ->hideOnIndex()
-                )
-                ->hideOnIndex();
-        }
-<?php } ?>
     }
 }
 

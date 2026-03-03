@@ -1,0 +1,114 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock;
+
+use Sylius\Resource\Model\ResourceInterface;
+
+interface ContentBlockInterface
+{
+    public function getId(): ?int;
+
+    public function setContentOwner(?ResourceInterface $contentOwner): void;
+
+    public function getContentOwner(): ?ResourceInterface;
+
+    public function getType(): ?string;
+
+    public function setType(string $type): void;
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function getPublishedData(): ?array;
+
+    /**
+     * @param array<string, mixed>|null $data
+     */
+    public function setPublishedData(?array $data): void;
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function getDraftData(): ?array;
+
+    /**
+     * @param array<string, mixed>|null $data
+     */
+    public function setDraftData(?array $data): void;
+
+    public function getLocale(): ?string;
+
+    public function setLocale(string $locale): void;
+
+    public function getPosition(): ?int;
+
+    public function setPosition(int $position): void;
+
+    public function getPreviewPosition(): int;
+
+    public function setPreviewPosition(int $previewPosition): void;
+
+    public function isPublished(): bool;
+
+    public function getPublishState(): ?string;
+
+    public function setPublishState(?string $state): void;
+
+    public function getPublishDate(): ?\DateTimeInterface;
+
+    public function setPublishDate(?\DateTimeInterface $publishDate): self;
+
+    public function getUnpublishDate(): ?\DateTimeInterface;
+
+    public function setUnpublishDate(?\DateTimeInterface $unpublishDate): self;
+
+    public function setPreviewPublishState(?string $state): void;
+
+    public function getPreviewPublishState(): ?string;
+
+    public function getPreviewPublishDate(): ?\DateTimeInterface;
+
+    public function setPreviewPublishDate(?\DateTimeInterface $publishDate): self;
+
+    public function getPreviewUnpublishDate(): ?\DateTimeInterface;
+
+    public function setPreviewUnpublishDate(?\DateTimeInterface $unpublishDate): self;
+
+    public function isPreviewPublished(): bool;
+
+    public function getLayer(): ?string;
+
+    public function setLayer(?string $layer): void;
+
+    /**
+     * Publish the draft data by copying it to published data.
+     */
+    public function publish(): void;
+
+    /**
+     * Check if there are unpublished changes.
+     */
+    public function hasUnpublishedChanges(): bool;
+
+    /**
+     * Check if the block is marked as deleted.
+     */
+    public function isDeleted(): bool;
+
+    /**
+     * Set the deleted state of the block.
+     */
+    public function setDeleted(bool $deleted): void;
+
+    /**
+     * Mark the block as deleted (soft delete).
+     */
+    public function delete(): void;
+
+    /**
+     * Restore a deleted block.
+     */
+    public function restore(): void;
+}

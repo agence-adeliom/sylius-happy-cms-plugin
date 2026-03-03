@@ -34,8 +34,7 @@ class RouteRenderServiceEvent extends Event
      *     metadata?: Metadata,
      *     configuration?: RequestConfiguration,
      *     resource?: CmsRoutableInterface,
-     *     route?: RouteInterface,
-     *     preview?: bool
+     *     route?: RouteInterface
      * } $parameters
      */
     public function setParameters(array $parameters): void

@@ -61,6 +61,7 @@ sylius_happy_cms:
         slug_edit: "Etes-vous sur de vouloir modifier le permalien ?"
         category: Catégorie
         seo: SEO
+        homepage: "Utiliser comme page d'accueil ?"
       tab:
         page: Page
         seo: SEO
@@ -327,3 +328,70 @@ sylius_happy_cms:
   cache:
     successfully_cleared: Le cache a été vidé avec succès
     something_went_wrong: Une erreur est survenue lors du vidage du cache
+  page_builder:
+    title: Éditeur de page
+    back: Retour
+    view_published: Voir la page publiée
+    save_draft: Enregistrer le brouillon
+    publish: Publier
+    add_content: Ajouter du contenu
+    preview: Aperçu
+    toggle_panel: Afficher/masquer le panneau
+    close_panel: Fermer
+    menu: Menu
+    select_block: Select a block
+    select_block_help: Please choose a block among the following collection
+    cancel: Annuler
+    save_block: Enregistrer le bloc
+    browse_blocks: Parcourir la liste des blocs
+    published: Publié
+    unpublished: Non publié
+    publish_block: Publier le bloc
+    unpublish_block: Dépublier le bloc
+    position: "Position %position%/%total%"
+    move_first: Déplacer en premier
+    move_last: Déplacer en dernier
+    move_to_position: "Déplacer en position %position%"
+    delete: Supprimer
+    restore: Restaurer
+    confirm_delete: Êtes-vous sûr de vouloir supprimer ce bloc ?
+    confirm_delete_action: Confirmer la suppression
+    edit_block_title: Remplissez le formulaire pour éditer le bloc
+    no_blocks_for_locale: Aucun bloc n'existe encore pour cette langue
+    copy_from_locale_title: Copier les blocs depuis une autre langue
+    copy_from_locale: "Copier depuis %locale%"
+    or_add_new_block: Ou ajouter un nouveau bloc à partir de zéro
+    edit_block: 'Éditer le bloc'
+    block_saved: 'Bloc enregistré'
+    block_saved_successfully: 'Bloc enregistré avec succès'
+    form_contain_errors: 'Le formulaire contient des erreurs'
+    reloading_preview: 'Actualisation de l''aperçu...'
+    visibility_managed_in_parent: 'La visibilité est gérée dans la page parente'
+    position_managed_in_parent: 'La position est gérée dans la page parente'
+    delete_managed_in_parent: 'La suppression est gérée dans la page parente'
+    ai_translate_blocks: 'Traduire automatiquement les blocs avec l''IA'
+    ai_translate_blocks_help: 'Cette fonctionnalité nécessite la configuration d''un agent IA.'
+    ai_translate_learn_more: 'En savoir plus'
+    generate_ai_content: 'Générer du contenu avec l''IA'
+    ai_generator_description: 'Décrivez le contenu que vous souhaitez générer et l''IA créera des blocs pour vous.'
+    ai_prompt_label: 'Description du contenu'
+    ai_prompt_placeholder: "Exemple : Créez du contenu pour une page de destination promouvant notre gamme de produits premium. Concentrez-vous sur les bénéfices, les fonctionnalités, les témoignages et les tarifs."
+    ai_prompt_help: 'Décrivez le contenu que vous souhaitez générer. Soyez précis pour obtenir de meilleurs résultats.'
+    ai_block_count_label: 'Nombre de blocs'
+    ai_block_count_help: 'Combien de blocs l''IA doit-elle générer ? (1-10)'
+    generate_button: 'Générer'
+    close: 'Fermer'
+    ai_not_configured: 'Bundle IA non configuré'
+    ai_not_configured_description: 'Cette fonctionnalité nécessite l''installation et la configuration du Bundle Symfony AI.'
+    ai_learn_more: 'Apprendre comment le configurer'
+    ai_generating: 'Génération du contenu avec l''IA...'
+    ai_generation_success: '%count% blocs générés avec succès !'
+    ai_generation_error: 'Erreur lors de la génération : %message%'
+    ai_loading: 'Génération en cours ...'
+    publish_title: 'Publier le contenu'
+    publish_description: 'Sélectionnez les langues pour lesquelles vous souhaitez publier le contenu. Les modifications en brouillon seront publiées.'
+    select_all_locales: 'Sélectionner toutes les langues'
+    confirm_publish: 'Publier'
+    select_at_least_one_locale: 'Veuillez sélectionner au moins une langue'
+    content_published_successfully: 'Le contenu a été publié avec succès pour les langues sélectionnées'
+    toggle_alignment: 'Aligner la zone de prévisualisation à gauche ou droite'

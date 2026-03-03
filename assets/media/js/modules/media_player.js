@@ -1,5 +1,5 @@
 import omit from 'lodash/omit'
-import Plyr from 'plyr'
+const Plyr = require('plyr')
 
 const AudioWorker = new Worker(
     new URL('../workers/audio.js', import.meta.url),

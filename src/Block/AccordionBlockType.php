@@ -7,6 +7,7 @@ namespace Adeliom\SyliusHappyCMSPlugin\Block;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
 use Adeliom\SyliusEasyCrudPlugin\Form\SortableCollectionType;
 use Adeliom\SyliusHappyCMSPlugin\Asset\AssetHappyCMSPackage;
+use Adeliom\SyliusHappyCMSPlugin\Attribute\AIGeneratable;
 use Adeliom\SyliusHappyCMSPlugin\Block\SubType\AccordionItemEmbeddableType;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\AbstractBlock;
 use Adeliom\SyliusHappyCMSPlugin\Form\TinymceBridgeType;
@@ -14,6 +15,11 @@ use Adeliom\SyliusHappyCMSPlugin\Form\Type\ButtonEmbeddableType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+#[AIGeneratable(
+    description: 'An accordion block with expandable/collapsible items for FAQs and structured content',
+    useCases: ['FAQ sections', 'Q&A pages', 'help documentation', 'feature lists', 'product specifications'],
+    priority: 120,
+)]
 class AccordionBlockType extends AbstractBlock
 {
     public function buildBlock(FormBuilderInterface $builder, array $options): void

@@ -1,0 +1,6 @@
+cmf_routing:
+    dynamic:
+        locales:
+            - "en_GB"
+            - "fr_FR"
+            - "de_DE"

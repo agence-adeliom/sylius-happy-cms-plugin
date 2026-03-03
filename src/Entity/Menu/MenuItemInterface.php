@@ -45,6 +45,8 @@ interface MenuItemInterface extends ResourceInterface, TranslatableInterface, \S
 
     public function getParent(): ?self;
 
+    public function setParent(?self $parent): void;
+
     public function getMenu(): ?MenuInterface;
 
     /**

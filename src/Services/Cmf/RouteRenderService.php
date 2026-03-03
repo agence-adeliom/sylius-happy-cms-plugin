@@ -7,7 +7,6 @@ namespace Adeliom\SyliusHappyCMSPlugin\Services\Cmf;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\Route as OrmRoute;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
 use Adeliom\SyliusHappyCMSPlugin\Event\Route\RouteRenderServiceEvent;
-use Adeliom\SyliusHappyCMSPlugin\EventListener\EntityRouteIndexer;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Adeliom\SyliusHappyCMSPlugin\Security\ContentDocumentVoter;
 use Adeliom\SyliusHappyCMSPlugin\Services\Seo\BreadcrumbCollection;
@@ -23,6 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Twig\Environment;
 
 class RouteRenderService extends AbstractController
@@ -68,7 +68,7 @@ class RouteRenderService extends AbstractController
     public function renderAction(
         CmsRoutableInterface $contentDocument,
         Request $request,
-        ?OrmRoute $route = null,
+        ?RouteInterface $route = null,
     ): Response {
         if (null === $route) {
             /**
@@ -77,15 +77,35 @@ class RouteRenderService extends AbstractController
             $route = $request->attributes->get('routeDocument');
         }
 
+        /** @var bool $preview */
+        $preview = $request->get('happy_cms_preview') && $request->get('happy_cms_preview') === '1';
+
+        if ($preview) {
+            try {
+                $this->denyAccessUnlessGranted(ContentDocumentVoter::PAGE_BUILDER, $contentDocument);
+            } catch (AccessDeniedException $e) {
+                throw new \Exception('Access Denied to preview content document');
+            }
+        }
+
+        if (!$contentDocument->isOnline() && !$preview) {
+            throw $this->createNotFoundException('Document is not published');
+        }
+
         if (null === $route) {
             throw new \Exception('missing route with entity');
         }
 
         $cacheEnabled = $contentDocument->isHttpCacheEnabled($this->kernel->getEnvironment(), $route);
 
+        // In preview mode we don't want http cache
+        if ($preview) {
+            $cacheEnabled = false;
+        }
+
         $response = $contentDocument->renderResponse($request, new Response(null), $route, $cacheEnabled);
 
-        if ($response->isNotModified($request)) {
+        if (!$preview && $response->isNotModified($request)) {
             // return the 304 Response
             return $response;
         }
@@ -100,6 +120,19 @@ class RouteRenderService extends AbstractController
         }
 
         $template = $contentDocument->getRouteTemplate();
+
+        // In preview mode, use custom template if configured
+        if ($preview) {
+            try {
+                $previewTemplate = $this->parameterBag->get('sylius_happy_cms.page_builder.preview_template');
+                if (is_string($previewTemplate) && !empty($previewTemplate)) {
+                    $template = $previewTemplate;
+                }
+            } catch (\Exception $e) {
+                // If parameter is not set or invalid, continue with default template
+            }
+        }
+
         if (null === $template) {
             $template = '@SyliusHappyCMSPlugin/front/document/default.html.twig';
         }
@@ -116,14 +149,6 @@ class RouteRenderService extends AbstractController
             }
         }
 
-        if (true === $route->getOption(EntityRouteIndexer::OPTION_PREVIEW)) {
-            $this->denyAccessUnlessGranted(ContentDocumentVoter::PREVIEW, $contentDocument);
-        }
-
-        if (!$contentDocument->isOnline()) {
-            throw $this->createNotFoundException('Document is not published');
-        }
-
         $breadcrumbItems = $contentDocument->getBreadcrumbItems();
         foreach ($breadcrumbItems as $breadcrumbItem) {
             $this->breadcrumb->addSimpleItem(
@@ -133,9 +158,6 @@ class RouteRenderService extends AbstractController
         }
 
         $this->twig->addGlobal('resource', $contentDocument);
-
-        /** @var bool $preview */
-        $preview = $route->getOption(EntityRouteIndexer::OPTION_PREVIEW) ?? false;
 
         $renderEvent = new RouteRenderServiceEvent([
              'metadata' => $metadata,
@@ -161,8 +183,6 @@ class RouteRenderService extends AbstractController
         Request $request,
     ): array {
         try {
-            /** @var ParameterBag $parameterBag */
-            $parameterBag = $request->attributes->get('parameterBag');
             /** @var array<string, array{
              *  classes: array{
              *     model: class-string,
@@ -172,7 +192,7 @@ class RouteRenderService extends AbstractController
              *     factory: class-string,
              *  }
              * }|null> $resources */
-            $resources = $parameterBag->get('sylius.resources');
+            $resources = $this->parameterBag->get('sylius.resources');
         } catch (InvalidArgumentException $exception) {
             return [null, null];
         }

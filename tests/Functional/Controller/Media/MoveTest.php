@@ -8,6 +8,8 @@ use Adeliom\SyliusHappyCMSPlugin\Controller\Media\MediaController;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 final class MoveTest extends KernelTestCase
 {
@@ -19,6 +21,42 @@ final class MoveTest extends KernelTestCase
 
         $container = static::getContainer();
         $this->mediaController = $container->get(MediaController::class);
+    }
+
+    /**
+     * Helper method to create a request with CSRF token
+     */
+    private function createRequestWithCsrfToken(array $requestData): Request
+    {
+        // Create a session
+        $session = new Session(new MockArraySessionStorage());
+        $session->start();
+
+        // Create a temporary request to generate CSRF token
+        $tempRequest = new Request();
+        $tempRequest->setSession($session);
+
+        // Generate CSRF token
+        $csrfToken = $this->mediaController->getCsrfToken($tempRequest);
+
+        // Add CSRF token to request data
+        $requestData['_csrf_token'] = $csrfToken;
+
+        $jsonContent = json_encode($requestData, JSON_THROW_ON_ERROR);
+
+        // Create the actual request with session and JSON content
+        $request = new Request(
+            [], // GET parameters
+            [], // POST parameters
+            [], // attributes
+            [], // cookies
+            [], // files
+            ['CONTENT_TYPE' => 'application/json'], // server
+            $jsonContent // content
+        );
+        $request->setSession($session);
+
+        return $request;
     }
 
     /**
@@ -46,18 +84,8 @@ final class MoveTest extends KernelTestCase
             ],
         ];
 
-        $jsonContent = json_encode($requestData, JSON_THROW_ON_ERROR);
-
-        // Créer une requête avec du contenu JSON valide
-        $request = new Request(
-            [],
-            [],
-            [],
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            $jsonContent
-        );
+        // Créer une requête avec un CSRF token valide
+        $request = $this->createRequestWithCsrfToken($requestData);
 
         // Act: Appeler la méthode moveItem
         $response = $this->mediaController->moveItem($request);
@@ -93,17 +121,8 @@ final class MoveTest extends KernelTestCase
             ],
         ];
 
-        $jsonContent = json_encode($requestData, JSON_THROW_ON_ERROR);
-
-        $request = new Request(
-            [],
-            [],
-            [],
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            $jsonContent
-        );
+        // Créer une requête avec un CSRF token valide
+        $request = $this->createRequestWithCsrfToken($requestData);
 
         // Act: Appeler la méthode moveItem
         $response = $this->mediaController->moveItem($request);
@@ -128,17 +147,8 @@ final class MoveTest extends KernelTestCase
             'moved_files' => [],
         ];
 
-        $jsonContent = json_encode($requestData, JSON_THROW_ON_ERROR);
-
-        $request = new Request(
-            [],
-            [],
-            [],
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            $jsonContent
-        );
+        // Créer une requête avec un CSRF token valide
+        $request = $this->createRequestWithCsrfToken($requestData);
 
         // Act: Appeler la méthode moveItem
         $response = $this->mediaController->moveItem($request);
@@ -202,17 +212,8 @@ final class MoveTest extends KernelTestCase
             ],
         ];
 
-        $jsonContent = json_encode($requestData, JSON_THROW_ON_ERROR);
-
-        $request = new Request(
-            [],
-            [],
-            [],
-            [],
-            [],
-            ['CONTENT_TYPE' => 'application/json'],
-            $jsonContent
-        );
+        // Créer une requête avec un CSRF token valide
+        $request = $this->createRequestWithCsrfToken($requestData);
 
         // Act: Appeler la méthode moveItem avec des données complètes
         $response = $this->mediaController->moveItem($request);

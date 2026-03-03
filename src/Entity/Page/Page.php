@@ -9,6 +9,8 @@ use Adeliom\SyliusEasyCrudPlugin\Traits\EntityIdTrait;
 use Adeliom\SyliusEasyCrudPlugin\Traits\EntityPublishableTrait;
 use Adeliom\SyliusEasyCrudPlugin\Traits\EntityTimestampableTrait;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
+use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentBlockInterface;
+use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableTrait;
 use Adeliom\SyliusHappyCMSPlugin\Repository\Page\PageRepository;
 use Adeliom\SyliusHappyCMSPlugin\Traits\EntityRouteTrait;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -21,6 +23,7 @@ use Sylius\Resource\Model\TranslatableTrait;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
+use Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Page\PageContentBlock;
 
 #[Gedmo\Tree(type: 'nested')]
 #[ORM\MappedSuperclass(repositoryClass: PageRepository::class)]
@@ -29,7 +32,7 @@ class Page implements PageInterface
     use EntityIdTrait;
     use TranslatableTrait {
         TranslatableTrait::__construct as private initializeTranslationsCollection;
-        getTranslation as private doGetTranslation;
+        TranslatableTrait::getTranslation as private doGetTranslation;
     }
     use EntityTimestampableTrait {
         EntityTimestampableTrait::__construct as private timestampableConstruct;
@@ -40,11 +43,20 @@ class Page implements PageInterface
     use EntityRouteTrait {
         EntityRouteTrait::__construct as private entityRouteConstruct;
     }
+    use ContentEditableTrait;
 
     /** @var Collection<int, RouteInterface> */
     #[ORM\ManyToMany(targetEntity: RouteInterface::class, cascade: ['persist', 'remove'])]
     #[ORM\JoinTable('sylius_happy_cms__page_route')]
     protected Collection $routes;
+
+    /**
+     * @return class-string<ContentBlockInterface>
+     */
+    public static function getContentBlockClass(): string
+    {
+        return PageContentBlock::class;
+    }
 
     #[ORM\Column(name: 'lft', type: Types::INTEGER)]
     #[Gedmo\TreeLeft]
@@ -85,6 +97,10 @@ class Page implements PageInterface
     #[Assert\Type('string')]
     protected ?string $template = null;
 
+    #[Groups('main')]
+    #[ORM\Column(name: 'homepage', type: Types::BOOLEAN, nullable: true)]
+    protected ?bool $homepage = null;
+
     #[ORM\Column(name: 'css', type: Types::TEXT, nullable: true)]
     #[Assert\Type('string')]
     protected ?string $css = null;
@@ -97,6 +113,7 @@ class Page implements PageInterface
     {
         $this->children = new ArrayCollection();
         $this->initializeTranslationsCollection();
+        $this->initializeContentBlocksCollection();
         $this->timestampableConstruct();
         $this->publishableConstruct();
         $this->entityRouteConstruct();
@@ -219,9 +236,28 @@ class Page implements PageInterface
         $this->children->removeElement($page);
     }
 
+    // Called in some places to check if the page is homepage,
+    // but getHomepage is the source of truth for the homepage field,
+    // so we keep both methods for backward compatibility
     public function isHomepage(): bool
     {
-        return PageInterface::HOMEPAGE == $this->template;
+        return $this->getHomepage();
+    }
+
+    public function getHomepage(): bool
+    {
+        if (null === $this->homepage) {
+            // Only for backward compatibility, if homepage is null, we consider it as homepage if template is homepage
+            // This is to avoid having to update all existing pages when adding the homepage field
+            return PageInterface::HOMEPAGE == $this->template;
+        }
+
+        return $this->homepage;
+    }
+
+    public function setHomepage(?bool $homepage): void
+    {
+        $this->homepage = $homepage;
     }
 
     public function getAction(): ?string

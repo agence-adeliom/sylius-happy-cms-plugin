@@ -6,9 +6,11 @@ namespace Adeliom\SyliusHappyCMSPlugin\Admin\Config;
 
 use Adeliom\SyliusEasyCrudPlugin\Admin\AbstractAdmin;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\ChoiceMaskField;
+use Adeliom\SyliusEasyCrudPlugin\Admin\Field\ColumnField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TabField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TranslationField;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\Field;
+use Adeliom\SyliusEasyCrudPlugin\Enum\ColumnSizeEnum;
 use Adeliom\SyliusHappyCMSPlugin\DataMapperInterface\ConfigTranslatableDataMapper;
 use Adeliom\SyliusHappyCMSPlugin\Enum\Config\ConfigTypeEnum;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -36,6 +38,9 @@ abstract class AbstractConfigAdmin extends AbstractAdmin implements ConfigAdminI
         yield TabField::new('sylius_happy_cms.config.admin.tab.configuration')
             ->renderHorizontal();
 
+        yield ColumnField::new('sylius_happy_cms.config.admin.tab.configuration')
+            ->setSize(ColumnSizeEnum::WIDE_4_OF_12);
+
         yield Field::new('key', 'sylius_happy_cms.config.admin.field.key')
             ->setRequired(true);
 
@@ -44,6 +49,9 @@ abstract class AbstractConfigAdmin extends AbstractAdmin implements ConfigAdminI
 
         yield Field::new('description', 'sylius_happy_cms.config.admin.field.description');
 
+        yield ColumnField::new('sylius_happy_cms.config.admin.tab.value')
+            ->setSize(ColumnSizeEnum::WIDE_6_OF_12);
+
         $typeKeys = array_values(ConfigTypeEnum::toArray());
         $transTypeKeys = preg_filter('/^/', 'sylius_happy_cms.config.admin.type.', $typeKeys);
 
@@ -51,7 +59,10 @@ abstract class AbstractConfigAdmin extends AbstractAdmin implements ConfigAdminI
             ->setRequired(true)
             ->renderExpanded(false)
             ->setChoices(array_combine($transTypeKeys, $typeKeys))
-            ->setMap(array_combine($typeKeys, array_map(fn ($type) => [sprintf('translations_%s', $type)], $typeKeys)))
+            ->setMap(array_combine($typeKeys, array_map(
+                fn ($type) => [sprintf('config_admin_translations_%s', $type)],
+                $typeKeys,
+            )))
             ->isTranslation(true)
             ->hideOnIndex();
 
@@ -60,7 +71,7 @@ abstract class AbstractConfigAdmin extends AbstractAdmin implements ConfigAdminI
                 ->addField(
                     ConfigTypeEnum::getAdminField($typeKey),
                 )
-                ->hideOnIndex();
+                ->onlyOnForms();
         }
     }
 }

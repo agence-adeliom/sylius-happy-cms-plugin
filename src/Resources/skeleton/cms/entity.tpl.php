@@ -5,7 +5,7 @@ use Symfony\Bundle\MakerBundle\Util\ClassNameDetails;
 
 if (
     isset($classNameDetail) && $classNameDetail instanceof ClassNameDetails &&
-    isset($relationClassNameDetail, $scope,$addRepo,$addTrans,$isOwningSide,$hasRouting)
+    isset($relationClassNameDetail, $scope,$addRepo,$addTrans,$isOwningSide,$hasRouting, $hasFlexibleContent)
 ) {
     $mainClassData = [
         'singular' => mb_strtolower(Str::asSnakeCase($classNameDetail->getShortName())),
@@ -26,7 +26,6 @@ namespace <?= Str::getNamespace($classNameDetail->getFullName()) ?>;
 
 use Adeliom\SyliusEasyCrudPlugin\Traits\EntityIdTrait;
 use Adeliom\SyliusEasyCrudPlugin\Traits\EntityPublishableTrait;
-#use Adeliom\SyliusEasyCrudPlugin\Traits\EntityStatusTrait;
 use Adeliom\SyliusEasyCrudPlugin\Traits\EntityTimestampableTrait;
 <?php if ($addRepo === true) { ?>
 
@@ -48,6 +47,11 @@ use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Adeliom\SyliusHappyCMSPlugin\Traits\EntityRouteTrait;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
 <?php } ?>
+<?php if (true === $hasFlexibleContent) { ?>
+use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableInterface;
+use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableTrait;
+use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentBlockInterface;
+<?php } ?>
 
 #[ORM\HasLifecycleCallbacks]
 <?php if ($addRepo === true) { ?>
@@ -57,7 +61,7 @@ use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
 <?php } ?>
 #[ORM\Table(name: 'sylius_happy_cms__<?= Str::asSnakeCase($classNameDetail->getShortName()) ?>')]
 #[ORM\Index(columns: ['publishState'], name: '<?= mb_strtolower($scope) ?>__<?= $mainClassData['singular'] ?>_indexes')]
-class <?= $classNameDetail->getShortName() ?> implements ResourceInterface, TranslatableInterface<?= $hasRouting ? ', CmsRoutableInterface ' : ' ' ?>
+class <?= $classNameDetail->getShortName() ?> implements ResourceInterface, TranslatableInterface<?= $hasRouting ? ', CmsRoutableInterface' : ' ' ?><?= $hasFlexibleContent ? ', ContentEditableInterface' : ' ' ?>
 {
     use TranslatableTrait {
         TranslatableTrait::__construct as private _initializeTranslationsCollection;
@@ -73,6 +77,9 @@ class <?= $classNameDetail->getShortName() ?> implements ResourceInterface, Tran
     use EntityRouteTrait {
         EntityRouteTrait::__construct as private _entityRouteConstruct;
     }
+<?php } ?>
+<?php if (true === $hasFlexibleContent) { ?>
+    use ContentEditableTrait;
 <?php } ?>
 
     use EntityIdTrait;
@@ -94,6 +101,22 @@ class <?= $classNameDetail->getShortName() ?> implements ResourceInterface, Tran
     protected Collection $routes;
 <?php } ?>
 
+<?php if (true === $hasFlexibleContent) { ?>
+    /** @var Collection<int, <?= $classNameDetail->getShortName() ?>ContentBlock> */
+    #[ORM\OneToMany(targetEntity: <?= $classNameDetail->getShortName() ?>ContentBlock::class, mappedBy: 'contentOwner', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OrderBy(['position' => 'ASC'])]
+    protected Collection $contentBlocks;
+
+    /**
+     * @return class-string<ContentBlockInterface>
+     */
+    public static function getContentBlockClass(): string
+    {
+        return <?= $classNameDetail->getShortName() ?>ContentBlock::class;
+    }
+
+<?php } ?>
+
     #[ORM\Column(name: 'css', type: Types::TEXT, nullable: true)]
     #[Assert\Type('string')]
     protected ?string $css = null;
@@ -109,6 +132,9 @@ class <?= $classNameDetail->getShortName() ?> implements ResourceInterface, Tran
         $this->_timestampableConstruct();
     <?php if (true === $hasRouting) { ?>
         $this->_entityRouteConstruct();
+    <?php } ?>
+    <?php if (true === $hasFlexibleContent) { ?>
+        $this->initializeContentBlocksCollection();
     <?php } ?>
     <?php if ($relationClassNameDetail instanceof ClassNameDetails) { ?>
         $this-><?= $relationClassData['plural'] ?> = new ArrayCollection();
@@ -208,11 +234,11 @@ class <?= $classNameDetail->getShortName() ?> implements ResourceInterface, Tran
         return 'happy_cms_<?= mb_strtolower($scope) ?>_' . $this->getId();
     }
 
-    public function getRouteStaticPrefix(TranslationInterface $translation, bool $isPreview): string
+    public function getRouteStaticPrefix(TranslationInterface $translation): string
     {
         $slug = (method_exists($translation, 'getSlug') ? $translation->getSlug() : '');
         $locale = $translation->getLocale();
-        return sprintf('/%s/<?= mb_strtolower($scope) ?>/%s%s', $locale, $slug, ($isPreview ? '-preview': ''));
+        return sprintf('/%s/<?= mb_strtolower($scope) ?>/%s%s', $locale, $slug, '');
     }
 <?php } ?>
 

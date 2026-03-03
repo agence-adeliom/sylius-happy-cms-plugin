@@ -10,19 +10,10 @@ use Adeliom\SyliusHappyCMSPlugin\Asset\AssetHappyCMSPackage;
 use Adeliom\SyliusHappyCMSPlugin\Entity\SharedBlock\SharedBlock;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\AbstractBlock;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockTypeInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-class SharedBlockType extends AbstractBlock implements ServiceSubscriberInterface, BlockTypeInterface
+class SharedBlockType extends AbstractBlock implements BlockTypeInterface
 {
-    public static function getSubscribedServices(): array
-    {
-        return [
-            ParameterBagInterface::class,
-        ];
-    }
-
     public function buildBlock(FormBuilderInterface $builder, array $options): void
     {
         global $allowedSharedBlockTypesForResource;
@@ -32,7 +23,7 @@ class SharedBlockType extends AbstractBlock implements ServiceSubscriberInterfac
                 'resource' => 'sylius_happy_cms.shared_block',
                 'persist_into_an_array' => true,
                 'repositoryMethod' => 'findByTypes',
-                'repositoryArguments' => ['types' => $allowedSharedBlockTypesForResource],
+                'repositoryArguments' => ['types' => $allowedSharedBlockTypesForResource ?? []],
             ]);
     }
 

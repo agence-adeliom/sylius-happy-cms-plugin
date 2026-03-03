@@ -12,5 +12,9 @@ interface PageTranslationInterface extends TranslationInterface, ResourceInterfa
 {
     public function getSlug(): ?string;
 
+    public function setSlug(?string $slug): void;
+
     public function getName(): ?string;
+
+    public function setName(?string $name): void;
 }

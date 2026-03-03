@@ -6,7 +6,6 @@ namespace Adeliom\SyliusHappyCMSPlugin\Traits;
 
 use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Page\PageInterface;
-use Adeliom\SyliusHappyCMSPlugin\EventListener\EntityRouteIndexer;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -40,20 +39,22 @@ trait EntityRouteTrait
         return $this->routes;
     }
 
-    public function getOnlineRoute(): ?RouteInterface
+    public function getOnlineRoute(?string $locale = null): ?RouteInterface
     {
-        return $this->getRoute(false);
+        return $this->getRoute($locale);
     }
 
-    public function getPreviewRoute(): ?RouteInterface
+    public function getPreviewRoute(?string $locale = null): ?RouteInterface
     {
-        return $this->getRoute(true);
+        return $this->getRoute($locale);
     }
 
-    private function getRoute(bool $preview = false): ?RouteInterface
+    private function getRoute(?string $locale = null): ?RouteInterface
     {
         foreach ($this->routes as $route) {
-            if ($preview === $route->getOption(EntityRouteIndexer::OPTION_PREVIEW)) {
+            if (
+                null === $locale || (is_string($locale) && $locale == $route->getDefault('_locale'))
+            ) {
                 $route->setContent($this);
 
                 return $route;
@@ -171,11 +172,6 @@ trait EntityRouteTrait
             return $response;
         }
 
-        // No cache in preview mode
-        if ($route->getOption('preview_behavior') === true) {
-            return $response;
-        }
-
         // This timestamp is update on every persist of the entity
         // It's store into the route option 'last_modification_timestamp'
         // This allow to simply check the last modification date of the entity and before rendering all page
@@ -201,7 +197,7 @@ trait EntityRouteTrait
         return $response;
     }
 
-    public function getRouteStaticPrefix(TranslationInterface $translation, bool $isPreview): string
+    public function getRouteStaticPrefix(TranslationInterface $translation): string
     {
         /** @var PageInterface $translatable */
         $translatable = $translation->getTranslatable();
@@ -214,7 +210,7 @@ trait EntityRouteTrait
         }
 
         // Calcul de l'url de l'entité en cours
-        $urlPattern = '{{parents}}{{current}}{{preview}}';
+        $urlPattern = '{{parents}}{{current}}';
 
         // 1. Le slug de la page en cours
         $current = '';
@@ -222,13 +218,7 @@ trait EntityRouteTrait
             $current = '/' . $translation->getSlug();
         }
 
-        // 2. Si c'est une preview, on ajoute -preview à la fin de l'url
-        $preview = '';
-        if ($isPreview) {
-            $preview .= '-preview';
-        }
-
-        // 3. Le slug des parents
+        // 2. Le slug des parents
         $parents = [];
         while (null !== $translatable) {
             assert($translatable instanceof CmsRoutableInterface);
@@ -263,18 +253,16 @@ trait EntityRouteTrait
             [
                                '{{parents}}',
                                '{{current}}',
-                               '{{preview}}',
                            ],
             [
                                (count($parents) > 0) ? '/' . implode('/', array_reverse($parents)) : '',
                                $current,
-                               $preview,
                            ],
             $urlPattern,
         );
     }
 
-    public function getVariablePattern(TranslationInterface $translation, bool $isPreview): string
+    public function getVariablePattern(TranslationInterface $translation): string
     {
         return '';
     }

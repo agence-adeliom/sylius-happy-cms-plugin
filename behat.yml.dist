@@ -11,7 +11,6 @@ default:
 
     extensions:
         DMore\ChromeExtension\Behat\ServiceContainer\ChromeExtension: ~
-        Robertfausk\Behat\PantherExtension: ~
 
         FriendsOfBehat\MinkDebugExtension:
             directory: etc/build
@@ -20,9 +19,9 @@ default:
 
         Behat\MinkExtension:
             files_path: "%paths.base%/vendor/sylius/sylius/src/Sylius/Behat/Resources/fixtures/"
-            base_url: "https://127.0.0.1:8080/"
+            base_url: "%env(BEHAT_BASE_URL)%"
             default_session: symfony
-            javascript_session: panther
+            javascript_session: chrome
             sessions:
                 symfony:
                     symfony: ~
@@ -30,46 +29,15 @@ default:
                     chrome:
                         api_url: http://127.0.0.1:9222
                         validate_certificate: false
-                panther:
-                    panther:
-                        manager_options:
-                            connection_timeout_in_ms: 5000
-                            request_timeout_in_ms: 120000
-                            chromedriver_arguments:
-                                - --log-path=etc/build/chromedriver.log
-                                - --verbose
-                            capabilities:
-                                acceptSslCerts: true
-                                acceptInsecureCerts: true
-                                unexpectedAlertBehaviour: accept
-                        options:
-                            webServerDir: '%paths.base%/vendor/sylius/test-application/public'
-                            browser_arguments:
-                                - --window-size=1200,1000
-                                - --headless
-                                - --no-sandbox
-                                - --disable-dev-shm-usage
-                                - --disable-gpu
-                                - --disable-infobars
-                                - --disable-features=TranslateUI
-                                - --disable-translate
-                                - --disable-popup-blocking
-                                - --disable-blink-features=AutomationControlled
-                                - --disable-component-extensions-with-background-pages
-                                - --disable-background-networking
-                                - --disable-dev-tools
-                                - --disable-extensions
-                                - --disable-password-manager-leak-detection
             show_auto: false
 
         FriendsOfBehat\SymfonyExtension:
             bootstrap: vendor/sylius/test-application/config/bootstrap.php
             kernel:
                 class: Sylius\TestApplication\Kernel
+                environment: test
 
         FriendsOfBehat\VariadicExtension: ~
-
-        SyliusLabs\SuiteTagsExtension: ~
 
         FriendsOfBehat\SuiteSettingsExtension:
             paths:

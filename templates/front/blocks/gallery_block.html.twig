@@ -3,23 +3,33 @@
 {% set images = settings.images|default([]) %}
 
 {% if title or wysiwyg or images is not empty %}
-<section class="container">
-    <div class="my-10 lg:my-20 wrapper-12">
-        <div class="col-span-full md:col-span-8 md:col-start-3 text-center">
-            {% if title %}<h2 class="heading-5">{{ title }}</h2>{% endif %}
-            {% if wysiwyg %}
-                <div class="wysiwyg">
-                    {{ wysiwyg|raw }}
-                </div>
-            {% endif %}
+<section class="py-6">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-lg-8 offset-lg-2 text-center mb-4">
+                {% if title %}
+                    <h2 class="h3 mb-3">{{ title }}</h2>
+                {% endif %}
+                {% if wysiwyg %}
+                    <div class="mb-4">
+                        {{ wysiwyg|raw }}
+                    </div>
+                {% endif %}
+            </div>
         </div>
         {% if images is not empty %}
-            <div class="col-span-full grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="row g-3 g-lg-4">
                 {% for img in images %}
-                    {{ happy_cms_media(img, 'reference', {
-                        'class': 'aspect-[4/3] col-span-1 object-cover w-full h-full',
-                        'alt': 'sylius.homepage.banner_content'|trans
-                    }) }}
+                    {% if img %}
+                        <div class="col-12 col-sm-6 col-md-4">
+                            <div class="ratio ratio-4x3 rounded overflow-hidden shadow-sm">
+                                {{ happy_cms_media(img, 'reference', {
+                                    'class': 'object-fit-cover w-100 h-100',
+                                    'alt': title|default('sylius.homepage.banner_content'|trans)
+                                }) }}
+                            </div>
+                        </div>
+                    {% endif %}
                 {% endfor %}
             </div>
         {% endif %}

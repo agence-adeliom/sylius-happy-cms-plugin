@@ -10,6 +10,7 @@ use Adeliom\SyliusHappyCMSPlugin\Entity\Embeddable\ButtonEmbeddableInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormTypeInterface;
@@ -68,6 +69,8 @@ class ButtonEmbeddableType extends AbstractType implements FormTypeInterface
             }
 
             $builder->add('label', TextType::class, $attrs);
+        } else {
+            $builder->add('label', HiddenType::class, ['required' => false]);
         }
     }
 
@@ -88,6 +91,8 @@ class ButtonEmbeddableType extends AbstractType implements FormTypeInterface
             }
 
             $builder->add('link', TextType::class, $attrs);
+        } else {
+            $builder->add('link', HiddenType::class, ['required' => false]);
         }
     }
 
@@ -113,6 +118,8 @@ class ButtonEmbeddableType extends AbstractType implements FormTypeInterface
             }
 
             $builder->add('action', ChoiceType::class, $attrs);
+        } else {
+            $builder->add('action', HiddenType::class, ['required' => false]);
         }
     }
 
@@ -135,6 +142,8 @@ class ButtonEmbeddableType extends AbstractType implements FormTypeInterface
             }
 
             $builder->add('icon', IconType::class, $attrs);
+        } else {
+            $builder->add('icon', HiddenType::class, ['required' => false]);
         }
     }
 }

@@ -3,6 +3,8 @@
     <head>
         <meta charset="utf-8">
         <title>{{ 'sylius_happy_cms.media.title'|trans({}, 'SyliusHappyCMSPlugin')|striptags|raw }}</title>
+        {# CSRF Token for media manager #}
+        <meta name="csrf-token" content="{{ csrf_token }}">
 {# <script src="//cdnjs.cloudflare.com/ajax/libs/camanjs/4.1.2/caman.full.min.js"></script> #}
         {{ encore_entry_link_tags('media-form') }}
     </head>

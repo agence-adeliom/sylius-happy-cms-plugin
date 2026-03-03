@@ -40,6 +40,57 @@ if(!window.axios){
     axios.defaults.headers.common = {
         'X-Requested-With' : 'XMLHttpRequest'
     }
+
+    // Add CSRF token interceptor for POST requests
+    axios.interceptors.request.use((config) => {
+        // Only add CSRF token for POST requests
+        if (config.method === 'post') {
+            // Get CSRF token from meta tag or data attribute
+            let csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+            if (!csrfToken) {
+                csrfToken = document.querySelector('[data-csrf-token]')?.getAttribute('data-csrf-token')
+            }
+            if (!csrfToken) {
+                csrfToken = document.getElementById('media-manager')?.getAttribute('data-csrf-token')
+            }
+
+            if (csrfToken) {
+                // Initialize data if not set
+                if (!config.data) {
+                    config.data = {}
+                }
+
+                // Add token to request body based on type
+                if (config.data instanceof FormData) {
+                    config.data.append('_csrf_token', csrfToken)
+                } else if (typeof config.data === 'string') {
+                    // If data is JSON string, parse, add token, re-stringify
+                    try {
+                        let dataObj = JSON.parse(config.data)
+                        dataObj._csrf_token = csrfToken
+                        config.data = JSON.stringify(dataObj)
+                    } catch (e) {
+                        // Not JSON, add as query param or header only
+                    }
+                } else if (typeof config.data === 'object') {
+                    // For plain objects
+                    config.data._csrf_token = csrfToken
+                }
+
+                // Always add as header as fallback
+                if (!config.headers) {
+                    config.headers = {}
+                }
+                config.headers['X-CSRF-Token'] = csrfToken
+            } else {
+                console.warn('CSRF token not found in page metadata')
+            }
+        }
+        return config
+    }, (error) => {
+        return Promise.reject(error)
+    })
+
     axios.interceptors.response.use(
         (response) => response,
         (error) => Promise.reject(error.response)

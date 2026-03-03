@@ -26,6 +26,18 @@ trait Upload
      */
     public function upload(Request $request): JsonResponse
     {
+        // CSRF Protection
+        try {
+            $this->validateCsrfToken($request);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                [
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                ],
+            ]);
+        }
+
         $upload_folder_id = (int) $request->request->get('upload_folder');
         $folder = null;
         $custom_attr = [];
@@ -117,6 +129,16 @@ trait Upload
      */
     public function uploadEditedImage(Request $request): JsonResponse
     {
+        // CSRF Protection
+        try {
+            $this->validateCsrfToken($request);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
+
         if ($this->allowUpload()) {
             /** @var array{
              *     folder: int|null,
@@ -169,6 +191,16 @@ trait Upload
      */
     public function uploadLink(Request $request): JsonResponse
     {
+        // CSRF Protection
+        try {
+            $this->validateCsrfToken($request);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
+
         if ($this->allowUpload()) {
             /** @var array{
              *     url: string,
@@ -215,10 +247,34 @@ trait Upload
     }
 
     /**
-     * allow/disallow user upload.
+     * Hook to allow/disallow user upload based on custom business logic
+     *
+     * SECURITY NOTE:
+     * - File type validation is handled in MediaManager using FileValidator
+     * - This method is for additional checks like:
+     *   - User permissions
+     *   - Storage quotas
+     *   - Rate limiting
+     *   - Custom business rules
+     *
+     * Override this method to implement custom upload restrictions.
+     * DO NOT use this as the only security measure.
+     *
+     * @param UploadedFile|null $file The file being uploaded (null for clipboard/URL uploads)
+     *
+     * @return bool True to allow upload, false to deny
      */
     protected function allowUpload(?UploadedFile $file = null): bool
     {
+        // Default: allow uploads (file validation is done in MediaManager)
+        // Override this method to add custom restrictions
+
+        // Example of custom checks you could add:
+        // - Check user storage quota
+        // - Verify user permissions
+        // - Implement rate limiting
+        // - Check file size limits
+
         return true;
     }
 

@@ -2,42 +2,56 @@
 {% set wysiwyg = settings.wysiwyg|default(false) %}
 {% set cta = settings.cta|default(false) %}
 {% set items = settings.items|default([]) %}
+{% set accordion_id = 'accordion-' ~ random() %}
 
 {% if title or wysiwyg or cta or items is not empty %}
-<section class="container">
-    <div class="wrapper-12 my-10 lg:my-20">
-        <div class="col-span-full md:col-span-5 lg:mr-10">
-            {% if title %}<h2 class="heading-3">{{ title }}</h2>{% endif %}
-            {% if wysiwyg %}
-                <div class="wysiwyg mt-4 mb-6">
-                    {{ wysiwyg|raw }}
+<section class="py-6">
+    <div class="container">
+        <div class="row g-4 g-lg-5">
+            <div class="col-12 col-md-5">
+                {% if title %}
+                    <h2 class="h3 mb-3">{{ title }}</h2>
+                {% endif %}
+                {% if wysiwyg %}
+                    <div class="mb-4">
+                        {{ wysiwyg|raw }}
+                    </div>
+                {% endif %}
+                {% if cta is iterable and cta.link and cta.label %}
+                    <a href="{{ cta.link }}" class="btn btn-primary">{{ cta.label }}</a>
+                {% endif %}
+            </div>
+            {% if items is not empty %}
+                <div class="col-12 col-md-7">
+                    <div class="accordion" id="{{ accordion_id }}">
+                        {% for index, item in items %}
+                            {% set item_title = item.title|default(false) %}
+                            {% set item_content = item.content|default(false) %}
+                            {% set item_id = accordion_id ~ '-item-' ~ index %}
+                            <div class="accordion-item">
+                                <h3 class="accordion-header">
+                                    <button class="accordion-button{% if index != 0 %} collapsed{% endif %}"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#{{ item_id }}"
+                                            aria-expanded="{% if index == 0 %}true{% else %}false{% endif %}"
+                                            aria-controls="{{ item_id }}">
+                                        {{ item_title }}
+                                    </button>
+                                </h3>
+                                <div id="{{ item_id }}"
+                                     class="accordion-collapse collapse{% if index == 0 %} show{% endif %}"
+                                     data-bs-parent="#{{ accordion_id }}">
+                                    <div class="accordion-body">
+                                        {{ item_content|raw }}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
             {% endif %}
-            {% if cta is iterable and cta.link and cta.label %}
-                <a href="{{ cta.link }}" class="btn btn-primary">{{ cta.label }}</a>
-            {% endif %}
         </div>
-        {% if items is not empty %}
-            <div class="col-span-full md:col-span-7 flex flex-col gap-4">
-                {% set card_class = "flex justify-between items-center" %}
-                {% set border_class = "border rounded border-gray-200" %}
-                {% for item in items %}
-                    {% set item_title = item.title|default(false) %}
-                    {% set item_content = item.content|default(false) %}
-                    <div js-accordion-block-type class="{{ border_class }}">
-                        <div class="{{ card_class }} cursor-pointer p-4 is-active:text-primary " js-accordion-block-type-title>
-                            <p class="select-none font-semibold">{{ item_title }}</p>
-                            <i class="fa-regular fa-chevron-down is-active:rotate-180 text-sm trans-default fa-sharp"></i>
-                        </div>
-                        <div class="max-h-0 overflow-hidden trans-default" js-accordion-block-type-content>
-                            <div js-accordion-block-type-transition class="p-4 pb-8 wysiwyg">
-                                {{ item_content|raw }}
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
     </div>
 </section>
 {% endif %}

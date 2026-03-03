@@ -112,26 +112,37 @@
         </happy-cms-media-modal>
 
         {% if ea.field.help ?? false %}
-            <small class="form-help">{{ ea.field.help|raw }}</small>
+            <small>{{ ea.field.help|raw }}</small>
         {% elseif form.vars.help ?? false %}
-            <small class="form-help">{{ form.vars.help|trans(form.vars.help_translation_parameters, form.vars.translation_domain)|raw }}</small>
+            <small>{{ form.vars.help|trans(form.vars.help_translation_parameters, form.vars.translation_domain)|raw }}</small>
         {% endif %}
 
         {{- form_errors(form) -}}
     </div>
 
     <script type="text/javascript">
+        // Helper function to initialize Vue with watcher for Live Components compatibility
+        function initVueMediaWidget(element) {
+            if (!element || element.__vue__ || !window.Vue) return;
+
+            new window.Vue({
+                el: element,
+            });
+        }
+
         Array.from(document.querySelectorAll(".happy-cms-media-widget[data-widget]")).forEach(w => {
-            if(w && !w.__vue__ && window.Vue){
-                new window.Vue({ el: w });
-            }
+            initVueMediaWidget(w);
         });
 
         window.addEventListener("DOMContentLoaded", function() {
             var vueElement = document.querySelector(".happy-cms-media-widget[data-widget='{{ form.vars.id }}']");
-            if(vueElement && !vueElement.__vue__ && window.Vue){
-                new window.Vue({ el: vueElement });
-            }
+            initVueMediaWidget(vueElement);
+        });
+
+        // When render in the page builder
+        window.addEventListener('sylius-crud:dynamic:reload', (event) => {
+            var vueElement = document.querySelector(".happy-cms-media-widget[data-widget='{{ form.vars.id }}']");
+            initVueMediaWidget(vueElement);
         });
     </script>
 {% endblock %}

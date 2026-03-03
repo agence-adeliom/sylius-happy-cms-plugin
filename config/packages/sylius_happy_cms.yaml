@@ -1,4 +1,8 @@
 sylius_happy_cms:
+  # Use a specific template for page builder preview (example without header/footer)
+  page_builder:
+    preview_template: '@SyliusHappyCMSPlugin/front/document/preview.html.twig'
+
   page:
     page_model: Adeliom\SyliusHappyCMSPlugin\Entity\Page\Page
     page_repository: Adeliom\SyliusHappyCMSPlugin\Repository\Page\PageRepository
@@ -27,6 +31,17 @@ sylius_happy_cms:
     base_url: '/media/download'
     media_entity: Adeliom\SyliusHappyCMSPlugin\Entity\Media\Media
     folder_entity: Adeliom\SyliusHappyCMSPlugin\Entity\Media\Folder
+      # File size limits (in MB, 0 = no limit)
+    max_file_size: 10                  # Maximum 10 MB per file
+    max_total_upload_size: 50          # Maximum 50 MB total per request
+    max_files_per_upload: 20           # Maximum 20 files per upload
+      # Rate limiting for upload requests
+    rate_limiting:
+        enabled: true                  # Enable rate limiting
+        max_requests: 60               # 60 uploads per period
+        period: 60                     # Period in seconds (60 = 1 minute)
+        ban_duration: 300              # Ban for 5 minutes after exceeding limit
+        cache_pool: 'cache.app'        # Cache pool for rate limit storage
   shared_block:
     shared_block_model: Adeliom\SyliusHappyCMSPlugin\Entity\SharedBlock\SharedBlock
     shared_block_repository: Adeliom\SyliusHappyCMSPlugin\Repository\SharedBlock\SharedBlockRepository

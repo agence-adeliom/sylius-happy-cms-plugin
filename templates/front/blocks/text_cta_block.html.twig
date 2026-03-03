@@ -5,21 +5,33 @@
 {% set cta_two = settings.cta_two|default(false) %}
 
 {% if title or wysiwyg or cta_one or cta_two %}
-<section class="container">
-    <div class="my-10 lg:my-20">
-        {% if headline %}<p class="headline">{{ headline }}</p>{% endif %}
-        {% if title %}<h2 class="heading-5">{{ title|raw }}</h2>{% endif %}
-        {% if wysiwyg %}
-            <div class="wysiwyg mt-4 mb-6">
-                {{ wysiwyg|raw }}
+<section class="py-6">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">
+                {% if headline %}
+                    <p class="text-primary text-uppercase fw-semibold mb-2 small">{{ headline }}</p>
+                {% endif %}
+                {% if title %}
+                    <h2 class="h3 mb-3">{{ title|raw }}</h2>
+                {% endif %}
+                {% if wysiwyg %}
+                    <div class="mb-4">
+                        {{ wysiwyg|raw }}
+                    </div>
+                {% endif %}
+                {% if (cta_one is iterable and cta_one.link and cta_one.label) or (cta_two is iterable and cta_two.link and cta_two.label) %}
+                    <div class="d-flex flex-wrap gap-2">
+                        {% if cta_one is iterable and cta_one.link and cta_one.label %}
+                            <a href="{{ cta_one.link }}" class="btn btn-primary">{{ cta_one.label }}</a>
+                        {% endif %}
+                        {% if cta_two is iterable and cta_two.link and cta_two.label %}
+                            <a href="{{ cta_two.link }}" class="btn btn-outline-secondary">{{ cta_two.label }}</a>
+                        {% endif %}
+                    </div>
+                {% endif %}
             </div>
-        {% endif %}
-        {% if cta_one is iterable and cta_one.link and cta_one.label %}
-            <a href="{{ cta_one.link }}" class="btn btn-primary">{{ cta_one.label }}</a>
-        {% endif %}
-        {% if cta_two is iterable and cta_two.link and cta_two.label %}
-            <a href="{{ cta_two.link }}" class="btn btn-secondary">{{ cta_two.label }}</a>
-        {% endif %}
+        </div>
     </div>
 </section>
 {% endif %}

@@ -11,7 +11,6 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action\Action;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Actions;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\Field;
-use Sylius\Bundle\GridBundle\Builder\Filter\BooleanFilter;
 use Sylius\Bundle\GridBundle\Builder\Filter\DateFilter;
 use Sylius\Bundle\GridBundle\Builder\Filter\StringFilter;
 
@@ -38,10 +37,6 @@ abstract class AbstractRouteAdmin extends AbstractAdmin implements RouteAdminInt
 
         yield StringFilter::create('staticPrefix', ['staticPrefix'])
             ->setLabel('sylius_happy_cms.route.admin.static_prefix');
-
-        yield BooleanFilter::create('preview')
-            ->setLabel('sylius_happy_cms.route.admin.preview')
-            ->setDefaultValue('false');
 
         yield DateFilter::create('lastModification')
             ->setLabel('sylius_happy_cms.route.admin.lastModification');

@@ -19,6 +19,16 @@ trait Metas
      */
     public function editMetasItem(Request $request): JsonResponse
     {
+        // CSRF Protection
+        try {
+            $this->validateCsrfToken($request);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'message' => $e->getMessage(),
+                'metas' => [],
+            ]);
+        }
+
         /** @var array{
          *    file: array{
          *      id: int
@@ -50,6 +60,16 @@ trait Metas
      */
     public function generateAltItem(Request $request): JsonResponse
     {
+        // CSRF Protection
+        try {
+            $this->validateCsrfToken($request);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'error' => $e->getMessage(),
+                'alt' => '',
+            ]);
+        }
+
         /** @var array{
          *    file: array{
          *      id: int
@@ -97,6 +117,16 @@ trait Metas
      */
     public function generateAltGroup(Request $request): JsonResponse
     {
+        // CSRF Protection
+        try {
+            $this->validateCsrfToken($request);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'error' => $e->getMessage(),
+                'data' => '',
+            ]);
+        }
+
         try {
             /**
              * @var array{
@@ -125,6 +155,16 @@ trait Metas
      */
     public function generateAllAlt(Request $request): JsonResponse
     {
+        // CSRF Protection
+        try {
+            $this->validateCsrfToken($request);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'error' => $e->getMessage(),
+                'data' => '',
+            ]);
+        }
+
         try {
             $this->eventDispatcher->dispatch(new MediaGenerateAllAlt($request), MediaGenerateAllAlt::NAME);
 

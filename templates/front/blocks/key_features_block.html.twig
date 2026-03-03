@@ -4,27 +4,43 @@
 {% set features = settings.features|default([]) %}
 
 {% if headline or title or wysiwyg or features is not empty %}
-<section class="container">
-    <div class="my-10 lg:my-20 wrapper-12">
-        <div class="col-span-full md:col-span-8 md:col-start-3 text-center">
-            {% if headline %}<p class="headline">{{ headline }}</p>{% endif %}
-            {% if title %}<h2 class="heading-5">{{ title }}</h2>{% endif %}
-            {% if wysiwyg %}
-                <div class="wysiwyg">
-                    {{ wysiwyg|raw }}
-                </div>
-            {% endif %}
+<section class="py-6">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-lg-8 offset-lg-2 text-center mb-5">
+                {% if headline %}
+                    <p class="text-primary text-uppercase fw-semibold mb-2 small">{{ headline }}</p>
+                {% endif %}
+                {% if title %}
+                    <h2 class="h3 mb-3">{{ title }}</h2>
+                {% endif %}
+                {% if wysiwyg %}
+                    <div class="mb-3">
+                        {{ wysiwyg|raw }}
+                    </div>
+                {% endif %}
+            </div>
         </div>
         {% if features is not empty %}
-            <div class="col-span-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            <div class="row g-4">
                 {% for feature in features %}
                     {% set icon = feature.icon|default('fa-box') %}
                     {% set key = feature.key|default(false) %}
                     {% set text = feature.text|default(false) %}
-                    <div class="col-span-1 p-4 md:p-6 bg-neutral-100 text-center">
-                        <i class="fa-regular fa-sharp {{ icon }} text-4xl text-primary"></i>
-                        <p class="heading-3 mt-4 mb-2">{{ key }}</p>
-                        <p>{{ text }}</p>
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="card h-100 border-0 bg-light text-center p-4">
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <i class="{{ icon }} text-primary"></i>
+                                </div>
+                                {% if key %}
+                                    <h3 class="h5 card-title mb-2">{{ key }}</h3>
+                                {% endif %}
+                                {% if text %}
+                                    <p class="card-text text-muted small">{{ text }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
                 {% endfor %}
             </div>

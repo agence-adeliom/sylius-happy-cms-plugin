@@ -19,7 +19,7 @@ interface RouteInterface extends ResourceInterface, RouteObjectInterface
 
     public function getRouteKey(): string;
 
-    public function isPreview(): bool;
+    public function getDefault(string $name): mixed;
 
     public function getOption(string $name): mixed;
 
@@ -52,8 +52,6 @@ interface RouteInterface extends ResourceInterface, RouteObjectInterface
     public function setMethods(string|array $methods): static;
 
     public function setVariablePattern(string $variablePattern): static;
-
-    public function setPreview(bool $preview): void;
 
     public function setOption(string $name, mixed $value): static;
 }

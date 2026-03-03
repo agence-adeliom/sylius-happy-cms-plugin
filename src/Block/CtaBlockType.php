@@ -5,12 +5,18 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\Block;
 
 use Adeliom\SyliusHappyCMSPlugin\Asset\AssetHappyCMSPackage;
+use Adeliom\SyliusHappyCMSPlugin\Attribute\AIGeneratable;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\AbstractBlock;
 use Adeliom\SyliusHappyCMSPlugin\Form\TinymceBridgeType;
 use Adeliom\SyliusHappyCMSPlugin\Form\Type\ButtonEmbeddableType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+#[AIGeneratable(
+    description: 'A call-to-action block with title, rich text content and a primary action button',
+    useCases: ['conversions', 'sign-up forms', 'download sections', 'contact prompts'],
+    priority: 140,
+)]
 class CtaBlockType extends AbstractBlock
 {
     public function buildBlock(FormBuilderInterface $builder, array $options): void

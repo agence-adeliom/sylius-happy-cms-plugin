@@ -39,12 +39,12 @@ class RouteExtension extends AbstractExtension
         ];
     }
 
-    public function getPath(CmsRoutableInterface $object): ?string
+    public function getPath(CmsRoutableInterface $object, ?bool $preview = false, ?string $locale = null): ?string
     {
         try {
             return $this->router->generate(RouteObjectInterface::OBJECT_BASED_ROUTE_NAME, [
-                RouteObjectInterface::ROUTE_OBJECT => $object->getOnlineRoute(),
-            ]);
+                RouteObjectInterface::ROUTE_OBJECT => $object->getOnlineRoute($locale),
+            ]) . ($preview ? '?happy_cms_preview=1' : '');
         } catch (NoResultException | NonUniqueResultException $e) {
             return '';
         }
@@ -83,7 +83,7 @@ class RouteExtension extends AbstractExtension
             $object = $repository->getBySeoKey($key, $locale);
             if (null !== $object) {
                 return $this->router->generate(RouteObjectInterface::OBJECT_BASED_ROUTE_NAME, [
-                    RouteObjectInterface::ROUTE_OBJECT => $object->getOnlineRoute(),
+                    RouteObjectInterface::ROUTE_OBJECT => $object->getOnlineRoute($locale),
                 ]);
             }
 
@@ -93,8 +93,12 @@ class RouteExtension extends AbstractExtension
         }
     }
 
-    public function getPathByKey(string $key, string $resourceName = 'sylius_happy_cms.page'): ?string
-    {
+    public function getPathByKey(
+        string $key,
+        string $resourceName = 'sylius_happy_cms.page',
+        ?bool $preview = false,
+        ?string $locale = null,
+    ): ?string {
         try {
             /** @var array<string, array{
              *  classes: array{
@@ -122,8 +126,8 @@ class RouteExtension extends AbstractExtension
             $object = $repository->getByKey($key);
             if (null !== $object) {
                 return $this->router->generate(RouteObjectInterface::OBJECT_BASED_ROUTE_NAME, [
-                    RouteObjectInterface::ROUTE_OBJECT => $object->getOnlineRoute(),
-                ]);
+                    RouteObjectInterface::ROUTE_OBJECT => $object->getOnlineRoute($locale),
+                ]) . ($preview ? '?happy_cms_preview=1' : '');
             }
 
             return '';
@@ -137,6 +141,7 @@ class RouteExtension extends AbstractExtension
         string $resourceName = 'sylius_happy_cms.page',
         ?string $locale = null,
         ?ChannelInterface $channel = null,
+        ?bool $preview = false,
     ): ?string {
         try {
             /** @var array<string, array{
@@ -173,8 +178,8 @@ class RouteExtension extends AbstractExtension
             $object = $repository->getByTemplate($key, $locale, $channel);
             if (null !== $object) {
                 return $this->router->generate(RouteObjectInterface::OBJECT_BASED_ROUTE_NAME, [
-                    RouteObjectInterface::ROUTE_OBJECT => $object->getOnlineRoute(),
-                ]);
+                    RouteObjectInterface::ROUTE_OBJECT => $object->getOnlineRoute($locale),
+                ]) . ($preview ? '?happy_cms_preview=1' : '');
             }
 
             return '';
@@ -183,8 +188,13 @@ class RouteExtension extends AbstractExtension
         }
     }
 
-    public function getPathById(int $id, string $resourceName = 'sylius_happy_cms.page'): ?string
-    {
+    public function getPathById(
+        int $id,
+        string $resourceName = 'sylius_happy_cms.page',
+        ?string $locale = null,
+        ?ChannelInterface $channel = null,
+        ?bool $preview = false,
+    ): ?string {
         try {
             /** @var array<string, array{
              *  classes: array{
@@ -202,14 +212,27 @@ class RouteExtension extends AbstractExtension
                 throw new \InvalidArgumentException(sprintf('The resource "%s" must implement "%s".', $resourceName, CmsRoutableInterface::class));
             }
 
+            if (null === $locale) {
+                $locale = $this->requestStack->getCurrentRequest()?->getLocale() ?? 'en_US';
+            }
+
+            if (null === $channel) {
+                $channel = $this->channelContext->getChannel();
+            }
+
             $repository = $this->manager->getRepository($modelClass);
 
+            if (!method_exists($repository, 'getById')) {
+                throw new \InvalidArgumentException(sprintf('The resource "%s" repository must have a method "%s".', $resourceName, 'getById'));
+            }
+
             /** @var CmsRoutableInterface|null $object */
-            $object = $repository->find($id);
+            $object = $repository->getById($id, $locale, $channel);
+
             if (null !== $object) {
                 return $this->router->generate(RouteObjectInterface::OBJECT_BASED_ROUTE_NAME, [
-                    RouteObjectInterface::ROUTE_OBJECT => $object->getOnlineRoute(),
-                ]);
+                    RouteObjectInterface::ROUTE_OBJECT => $object->getOnlineRoute($locale),
+                ]) . ($preview ? '?happy_cms_preview=1' : '');
             }
 
             return '';

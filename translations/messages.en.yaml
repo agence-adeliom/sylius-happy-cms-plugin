@@ -59,6 +59,7 @@ sylius_happy_cms:
         slug_edit: "Are you sure you want to edit this permalink ?"
         category: Category
         seo: SEO
+        homepage: "Use as homepage ?"
       tab:
         page: Page
         seo: SEO
@@ -322,3 +323,70 @@ sylius_happy_cms:
   cache:
     successfully_cleared: Cache successfully cleared
     something_went_wrong: Something went wrong while clearing the cache
+  page_builder:
+    title: Page Builder
+    back: Back
+    view_published: View published page
+    save_draft: Save draft
+    publish: Publish
+    add_content: Add content
+    preview: Preview
+    toggle_panel: Toggle panel
+    close_panel: Close
+    menu: Menu
+    select_block: Select a block
+    select_block_help: Please choose a block among the following collection
+    cancel: Cancel
+    save_block: Save block
+    browse_blocks: Browse block list
+    published: Published
+    unpublished: Unpublished
+    publish_block: Publish block
+    unpublish_block: Unpublish block
+    position: "Position %position%/%total%"
+    move_first: Move to first
+    move_last: Move to last
+    move_to_position: "Move to position %position%"
+    delete: Delete
+    restore: Restore
+    confirm_delete: Are you sure you want to delete this block?
+    confirm_delete_action: Confirm deletion
+    edit_block_title: Fill out the form to edit the block
+    no_blocks_for_locale: No blocks exist for this language yet
+    copy_from_locale_title: Copy blocks from another language
+    copy_from_locale: "Copy from %locale%"
+    or_add_new_block: Or add a new block from scratch
+    edit_block: 'Edit Block'
+    block_saved: 'Block Saved'
+    block_saved_successfully: 'Block saved successfully'
+    form_contain_errors: 'The form contain some errors'
+    reloading_preview: 'Reloading preview...'
+    visibility_managed_in_parent: 'Visibility is managed in the parent page'
+    position_managed_in_parent: 'Position is managed in the parent page'
+    delete_managed_in_parent: 'Delete is managed in the parent page'
+    ai_translate_blocks: 'Automatically translate blocks with AI'
+    ai_translate_blocks_help: 'This feature requires AI agent configuration.'
+    ai_translate_learn_more: 'Learn more'
+    generate_ai_content: 'Generate content with AI'
+    ai_generator_description: 'Describe the content you want to generate and the AI will create blocks for you.'
+    ai_prompt_label: 'Content description'
+    ai_prompt_placeholder: 'Create content for a landing page promoting our premium product line. Focus on benefits, features, testimonials, and pricing.'
+    ai_prompt_help: 'Describe the content you want to generate. Be specific to get better results.'
+    ai_block_count_label: 'Number of blocks'
+    ai_block_count_help: 'How many blocks should the AI generate? (1-10)'
+    generate_button: 'Generate'
+    close: 'Close'
+    ai_not_configured: 'AI Bundle Not Configured'
+    ai_not_configured_description: 'This feature requires the Symfony AI Bundle to be installed and configured.'
+    ai_learn_more: 'Learn how to set it up'
+    ai_generating: 'Generating content with AI...'
+    ai_generation_success: 'Successfully generated %count% blocks!'
+    ai_generation_error: 'Error generating content: %message%'
+    ai_loading: 'Generating...'
+    publish_title: 'Publish content'
+    publish_description: 'Select the languages you want to publish the content for. Draft changes will be published.'
+    select_all_locales: 'Select all languages'
+    confirm_publish: 'Publish'
+    select_at_least_one_locale: 'Please select at least one language'
+    content_published_successfully: 'Content has been successfully published for the selected languages'
+    toggle_alignment: 'Align preview to left or center'

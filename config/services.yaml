@@ -4,6 +4,7 @@ imports:
   - { resource: services/menu.yaml }
   - { resource: services/block.yaml }
   - { resource: services/maker.yaml }
+  - { resource: services/ai.yaml }
 
 services:
   _defaults:
@@ -73,8 +74,15 @@ services:
       -   assets.package: { package: 'sylius.happy.cms.assets.package' }
 
   Adeliom\SyliusHappyCMSPlugin\Security\ContentDocumentVoter:
+    arguments:
+      - '@security.authorization_checker'
     tags:
       - "security.voter"
+  
+  
+  sylius.happy_cms.plugin.security.preview_request_matcher:
+    class: Adeliom\SyliusHappyCMSPlugin\Security\PreviewRequestMatcher
+    public: true
 
   Adeliom\SyliusHappyCMSPlugin\Routing\MediaLoader:
     tags: [ routing.loader ]
@@ -158,3 +166,46 @@ services:
       - '@sylius.happy_cms.plugin.services.render'
     tags:
       - { name: 'console.command' }
+
+  sylius.happy_cms.command.migrate_content_to_new_block_builder:
+    class: Adeliom\SyliusHappyCMSPlugin\Command\MigrateContentToBlocksCommand
+    arguments:
+      - '@doctrine.orm.entity_manager'
+      - '@parameter_bag'
+    tags:
+      - { name: 'console.command' }
+
+  sylius.happy_cms.command.create_demo_pages:
+    class: Adeliom\SyliusHappyCMSPlugin\Command\Starter\CreateDemoPagesCommand
+    arguments:
+      - '@happy.cms.media.manager'
+      - '@kernel'
+      - "@parameter_bag"
+      - '@doctrine.orm.entity_manager'
+      - '@logger'
+    tags:
+      - { name: 'console.command' }
+
+  sylius.happy_cms.command.create_demo_menu:
+    class: Adeliom\SyliusHappyCMSPlugin\Command\Starter\CreateDemoMenuCommand
+    arguments:
+      - '@happy.cms.media.manager'
+      - '@kernel'
+      - "@parameter_bag"
+      - '@doctrine.orm.entity_manager'
+      - '@logger'
+    tags:
+      - { name: 'console.command' }
+
+  sylius.happy_cms.admin.builder.block_editor:
+      class: Adeliom\SyliusHappyCMSPlugin\Twig\Components\Builder\BlockEditor
+      arguments:
+          - "@sylius.happy_cms.block_collection"
+          - "@doctrine.orm.entity_manager"
+          - "@parameter_bag"
+          - "@sylius.happy_cms.ai.bundle_detector"
+      tags:
+          - { name: sylius.live_component.admin, key: happycms-builder-block-editor, template: '@SyliusHappyCMSPlugin/admin/page_builder/_block_editor.html.twig' }
+      calls:
+          - setLiveResponder: ['@ux.live_component.live_responder']
+

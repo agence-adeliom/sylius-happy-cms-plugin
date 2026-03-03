@@ -245,9 +245,13 @@ class MediaRuntime implements RuntimeExtensionInterface
         ];
 
         /**
-         * @var array{width: int|null, height: int|null, ratio: float|null} $box
+         * @var array{width: int|null, height: int|null, ratio: float|null}|null $box
          */
         $box = $media->getMeta('dimensions');
+
+        if (!$box) {
+            $box = ['width' => false, 'height' => false, 'ratio' => false];
+        }
 
         $params += [
             'ratio' => $box['ratio'] ?: null,
@@ -413,7 +417,7 @@ class MediaRuntime implements RuntimeExtensionInterface
         }
 
         if (isset($params['ratio'])) {
-            $params['orientation'] = ($params['ratio'] && $params['ratio'] <= 100) ? 'landscape' : 'portrait';
+            $params['orientation'] = $params['ratio'] <= 100 ? 'landscape' : 'portrait';
         }
 
         return array_merge($params, $options);

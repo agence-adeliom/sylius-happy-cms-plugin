@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "license": "MIT",
   "engines": {
-    "node": ">=20"
+    "node": ">=18"
   },
   "requires": true,
   "engineStrict": true,
@@ -29,6 +29,12 @@
       },
       "menu-item-tree-delete": {
         "main": "controllers/DeleteMenuItemController.js",
+        "webpackMode": "lazy",
+        "fetch": "lazy",
+        "enabled": true
+      },
+      "builder-block-editor": {
+        "main": "controllers/BlockEditor.js",
         "webpackMode": "lazy",
         "fetch": "lazy",
         "enabled": true

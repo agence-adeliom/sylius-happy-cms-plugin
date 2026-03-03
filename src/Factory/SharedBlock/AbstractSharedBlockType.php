@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock;
 
+use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Sylius\Resource\Model\ResourceInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -115,7 +115,7 @@ abstract class AbstractSharedBlockType extends AbstractType implements SharedBlo
         return 100;
     }
 
-    public function supports(?ResourceInterface $resource = null): bool
+    public function supports(?ContentEditableInterface $resource = null): bool
     {
         return true;
     }

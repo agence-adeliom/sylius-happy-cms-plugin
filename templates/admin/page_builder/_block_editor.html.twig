@@ -1,0 +1,534 @@
+<div {{ attributes.defaults(stimulus_controller('@agence-adeliom/sylius-happy-cms-plugin/builder-block-editor', {
+    blockId: this.blockId
+})) }}
+     style="display: flex; flex-direction: column; height: 100%;">
+    {% if this.hasBlock %}
+        {# Edit mode: Show form for existing block #}
+        <div class="page-builder__editor-content" data-loading="hide" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; max-height: calc(100% - 61px)">
+            {# Block toolbar #}
+            <div class="page-builder__block-toolbar">
+                {# Left: Block name #}
+                <div class="page-builder__block-toolbar-left">
+                    <strong>{{ this.blockName }}</strong>
+                </div>
+
+                {# Middle: Visibility and position dropdowns #}
+                <div class="page-builder__block-toolbar-middle">
+                    {# Visibility dropdown #}
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                type="button"
+                                id="visibilityDropdown"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                            {% if this.block.isPreviewPublished %}
+                                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 4px;">
+                                    <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                                    <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                                </svg>
+                                {% trans %}sylius_happy_cms.page_builder.published{% endtrans %}
+                            {% else %}
+                                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 4px;">
+                                    <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"/>
+                                    <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829z"/>
+                                    <path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12-.708.708z"/>
+                                </svg>
+                                {% trans %}sylius_happy_cms.page_builder.unpublished{% endtrans %}
+                            {% endif %}
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="visibilityDropdown">
+                            <li>
+                                <a class="dropdown-item{% if this.block.isPreviewPublished %} active{% endif %}"
+                                   href="#"
+                                   data-action="live#action"
+                                   data-live-action-param="prevent|togglePublished">
+                                    {% trans %}sylius_happy_cms.page_builder.publish_block{% endtrans %}
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item{% if not this.block.published %} active{% endif %}"
+                                   href="#"
+                                   data-action="live#action"
+                                   data-live-action-param="prevent|togglePublished">
+                                    {% trans %}sylius_happy_cms.page_builder.unpublish_block{% endtrans %}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    {# Position dropdown #}
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                type="button"
+                                id="positionDropdown"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                            {% trans with {'%position%': this.blockPosition + 1, '%total%': this.totalBlocks} %}sylius_happy_cms.page_builder.position{% endtrans %}
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="positionDropdown">
+                            <li>
+                                <a class="dropdown-item"
+                                   href="#"
+                                   data-action="live#action"
+                                   data-live-action-param="prevent|moveBlock"
+                                   data-live-position-param="0">
+                                    {% trans %}sylius_happy_cms.page_builder.move_first{% endtrans %}
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item"
+                                   href="#"
+                                   data-action="live#action"
+                                   data-live-action-param="prevent|moveBlock"
+                                   data-live-position-param="{{ this.totalBlocks - 1 }}">
+                                    {% trans %}sylius_happy_cms.page_builder.move_last{% endtrans %}
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            {% for i in 0..this.totalBlocks - 1 %}
+                                <li>
+                                    <a class="dropdown-item{% if i == this.blockPosition %} active{% endif %}"
+                                       href="#"
+                                       data-action="live#action"
+                                       data-live-action-param="prevent|moveBlock"
+                                       data-live-position-param="{{ i }}">
+                                        {% trans with {'%position%': i + 1} %}sylius_happy_cms.page_builder.move_to_position{% endtrans %}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                {# Right: Delete/Restore button #}
+                <div class="page-builder__block-toolbar-right">
+                    {% if this.block.isDeleted %}
+                        {# Restore button for deleted blocks #}
+                        <button type="button"
+                                class="btn btn-sm btn-success"
+                                data-action="live#action"
+                                data-live-action-param="prevent|restoreBlock">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 4px;">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                <path d="M12.354 5.854a.5.5 0 0 0-.708-.708L8 8.793 5.354 6.146a.5.5 0 1 0-.708.708L7.293 9.5l-2.647 2.646a.5.5 0 0 0 .708.708L8 10.207l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 9.5l2.647-2.646z"/>
+                            </svg>
+                            {% trans %}sylius_happy_cms.page_builder.restore{% endtrans %}
+                        </button>
+                    {% else %}
+                        {# Delete button with confirmation dropdown #}
+                        <div class="dropdown">
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-danger dropdown-toggle"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                    <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                </svg>
+                                {% trans %}sylius_happy_cms.page_builder.delete{% endtrans %}
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end p-3" style="min-width: 280px;">
+                                <p class="mb-3 text-muted" style="font-size: 0.875rem;">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" class="text-warning" style="margin-right: 4px; vertical-align: text-bottom;">
+                                        <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                                    </svg>
+                                    {% trans %}sylius_happy_cms.page_builder.confirm_delete{% endtrans %}
+                                </p>
+                                <button type="button"
+                                        class="btn btn-danger btn-sm w-100"
+                                        data-action="live#action"
+                                        data-live-action-param="prevent|deleteBlock">
+                                    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 4px;">
+                                        <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/>
+                                    </svg>
+                                    {% trans %}sylius_happy_cms.page_builder.confirm_delete_action{% endtrans %}
+                                </button>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# Block Form Editor Iframe #}
+            <iframe
+                class="block-editor-form-iframe"
+                data-page-builder-target="blockFormIframe"
+                sandbox="allow-same-origin allow-scripts allow-forms allow-modals allow-popups"
+                src="{{ path('sylius_happy_cms_admin_page_builder_block_edit', {
+                    resource: this.resourceName,
+                    id: this.entityId,
+                    blockId: this.blockId,
+                    locale: this.locale
+                }) }}"
+                style="width: 100%; height: 100%; border: none; flex: 1; max-height: calc(100% - 46px)"
+                title="{% trans %}sylius_happy_cms.page_builder.edit_block{% endtrans %}">
+            </iframe>
+        </div>
+
+        {# Footer with save button is now handled by BlockEditorForm #}
+    {% else %}
+        {# Create mode: Show block selector or copy from locale option #}
+        <div class="page-builder__editor-content" style="flex: 1; display: flex;">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100%; width: 100%; padding: 2rem;">
+
+                {% set hasBlocksForCurrentLocale = this.hasBlocksForCurrentLocale %}
+                {% set availableLocalesWithBlocks = this.availableLocalesWithBlocks %}
+
+                {% if not hasBlocksForCurrentLocale and availableLocalesWithBlocks|length > 0 %}
+                    {# No blocks in current locale but other locales have blocks - show copy option #}
+                    <div class="alert alert-info mb-4" style="max-width: 600px;">
+                        <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 8px; vertical-align: text-bottom;">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                            <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                        </svg>
+                        {% trans %}sylius_happy_cms.page_builder.no_blocks_for_locale{% endtrans %}
+                    </div>
+
+                    <p class="h4 mb-4">{% trans %}sylius_happy_cms.page_builder.copy_from_locale_title{% endtrans %}</p>
+
+                    <div class="list-group mb-4" style="max-width: 400px; width: 100%;">
+                        {% for localeCode, localeLabel in availableLocalesWithBlocks %}
+                            <button
+                                type="button"
+                                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                                data-action="live#action"
+                                data-live-action-param="prevent|copyBlocksFromLocale"
+                                data-live-source-locale-param="{{ localeCode }}"
+                            >
+                                <span>
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 8px;">
+                                        <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+                                        <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+                                    </svg>
+                                    {% trans with {'%locale%': localeLabel} %}sylius_happy_cms.page_builder.copy_from_locale{% endtrans %}
+                                </span>
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+                                </svg>
+                            </button>
+                        {% endfor %}
+                    </div>
+
+                    {# AI Translation option #}
+                    <div class="form-check mb-3" style="max-width: 400px; width: 100%;">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            id="aiTranslateBlocks"
+                            data-model="aiTranslateEnabled"
+                        >
+                        <label class="form-check-label" for="aiTranslateBlocks">
+                            {% trans %}sylius_happy_cms.page_builder.ai_translate_blocks{% endtrans %}
+                        </label>
+                        <div class="form-text">
+                            {% trans %}sylius_happy_cms.page_builder.ai_translate_blocks_help{% endtrans %}
+                            <a href="https://github.com/agence-adeliom/sylius-happy-cms-plugin/blob/2.x/docs/CONFIGURE_IA_AGENT.md" target="_blank" rel="noopener noreferrer">
+                                {% trans %}sylius_happy_cms.page_builder.ai_translate_learn_more{% endtrans %}
+                                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: baseline;">
+                                    <path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5z"/>
+                                    <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0v-5z"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <hr style="max-width: 400px; margin: 2rem auto;">
+                        <p class="text-muted mb-3">{% trans %}sylius_happy_cms.page_builder.or_add_new_block{% endtrans %}</p>
+                    </div>
+                {% endif %}
+
+                {# Always show browse blocks button #}
+                <p class="h2 mb-3">{% trans %}sylius_happy_cms.page_builder.add_content{% endtrans %}</p>
+
+                <div class="d-flex gap-3 flex-wrap justify-content-center">
+                    <button
+                        type="button"
+                        class="btn btn-primary btn-lg"
+                        data-action="live#action"
+                        data-live-action-param="prevent|openBlockBrowser"
+                        style="padding: 16px 32px; font-size: 16px;"
+                    >
+                        <svg width="20" height="20" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                              <rect x="1.5" y="2.5" width="7" height="1.2" rx="0.6" fill="currentColor"/>
+                              <rect x="1.5" y="6.4" width="7" height="1.2" rx="0.6" fill="currentColor"/>
+                              <rect x="1.5" y="10.3" width="7" height="1.2" rx="0.6" fill="currentColor"/>
+                              <circle cx="11.3" cy="9.3" r="2.1" stroke="currentColor" stroke-width="0.9" fill="none"/>
+                              <path d="M13.0 11.0 L14.2 12.2" stroke="currentColor" stroke-width="0.9" stroke-linecap="round"/>
+                            </svg>
+                        <span class="mr-2">{% trans %}sylius_happy_cms.page_builder.browse_blocks{% endtrans %}</span>
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn btn-primary btn-lg"
+                        data-action="live#action"
+                        data-live-action-param="prevent|openAIGenerator"
+                        style="padding: 16px 32px; font-size: 16px;"
+                    >
+                        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 8px; vertical-align: text-bottom;" aria-hidden="true" focusable="false">
+                            <rect x="2" y="4" width="12" height="8" rx="2" ry="2"/>
+                            <rect x="4.25" y="6.5" width="1.25" height="1.25" rx="0.25" fill="#fff"/>
+                            <rect x="10.5" y="6.5" width="1.25" height="1.25" rx="0.25" fill="#fff"/>
+                            <path d="M8 2.2v1.1" stroke="currentColor" stroke-width="0.9" stroke-linecap="round" fill="none"/>
+                            <circle cx="8" cy="10.5" r="0.9" fill="currentColor"/>
+                            <path d="M5 11.5c0-.8.9-1.3 2-1.3s2 .5 2 1.3" fill="none" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/>
+                        </svg>
+                        <span class="mr-2">{% trans %}sylius_happy_cms.page_builder.generate_ai_content{% endtrans %}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    {% endif %}
+
+    {# Block Browser Layer #}
+    {% if this.showBlockBrowser %}
+        {% set filteredBlocksData = this.filteredBlocks %}
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: white; z-index: 1000; display: flex; flex-direction: column; overflow: hidden;">
+            {# Header #}
+            <div style="padding: 1.5rem; border-bottom: 1px solid #dee2e6; flex-shrink: 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h5 style="margin: 0;">
+                        {% trans %}sylius_happy_cms.page_builder.browse_blocks{% endtrans %}
+                    </h5>
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-action="live#action"
+                        data-live-action-param="prevent|closeBlockBrowser"
+                        aria-label="Close"
+                    ></button>
+                </div>
+
+                {# Filter controls #}
+                <div class="row">
+                    <div class="col-md-6">
+                        <input
+                            type="text"
+                            class="form-control"
+                            placeholder="{% trans %}sylius_happy_cms.editor.filter{% endtrans %}"
+                            data-model="blockFilterText"
+                        >
+                    </div>
+                    <div class="col-md-6">
+                        <select class="form-select" data-model="blockFilterCategory">
+                            <option value="all_blocks">{% trans %}sylius_happy_cms.blocks.tabs.all_blocks{% endtrans %}</option>
+                            {% for tab in filteredBlocksData.tabs %}
+                                {% set tabKey = tab|replace({' ': '_'})|lower %}
+                                <option value="{{ tabKey }}">{{ tab|trans }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            {# Content #}
+            <div style="flex: 1; overflow-y: auto; padding: 1.5rem;">
+                {% if filteredBlocksData.blocks|length > 0 %}
+                    {# Blocks grid #}
+                    <div class="row">
+                        {% for type, blockData in filteredBlocksData.blocks %}
+                            {% set block = blockData.block %}
+                            <div class="col-md-4 col-lg-3 mb-3">
+                                <div class="card h-100">
+                                    {# Block icon/preview #}
+                                    <div class="card-img-top d-flex align-items-center justify-content-center" style="height: 150px; background-color: #f8f9fa;">
+                                        {% if block.icon is iterable %}
+                                            {% set firstIcon = block.icon|first %}
+                                            {% if firstIcon starts with '<' %}
+                                                {{ firstIcon|raw }}
+                                            {% else %}
+                                                <img src="{{ firstIcon }}" alt="{{ block.name }}" class="img-fluid" style="max-height: 130px;">
+                                            {% endif %}
+                                        {% elseif block.icon is not iterable and (block.icon starts with '<span' or block.icon starts with '<i ' or block.icon starts with '<svg' or block.icon starts with '<img') %}
+                                            {{ block.icon|raw }}
+                                        {% elseif block.icon is defined and block.icon != '' %}
+                                            {{ block.icon|raw }}
+                                        {% else %}
+                                            <svg width="80" height="80" viewBox="0 0 16 16" fill="currentColor" style="color: #6c757d;">
+                                                <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+                                                <path d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.235.235 0 0 1 .02-.022z"/>
+                                            </svg>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="card-body d-flex flex-column">
+                                        <h6 class="card-title">{{ block.name|trans }}</h6>
+                                        <div class="mt-auto">
+                                            <button
+                                                type="button"
+                                                class="btn btn-primary btn-sm w-100"
+                                                data-action="live#action"
+                                                data-live-action-param="prevent|addBlock"
+                                                data-live-block-type-param="{{ type }}"
+                                            >
+                                                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 4px; vertical-align: text-bottom;">
+                                                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                                </svg>
+                                                {% trans %}sylius_happy_cms.editor.add{% endtrans %}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {# No results message #}
+                    <div class="alert alert-info" role="alert">
+                        {% trans %}sylius_happy_cms.page_builder.no_blocks_found{% endtrans %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
+    {# AI Content Generator Layer #}
+    {% if this.showAIGenerator %}
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: white; z-index: 1001; display: flex; flex-direction: column; overflow: hidden;">
+            {# Header #}
+            <div style="padding: 1.5rem; border-bottom: 1px solid #dee2e6; flex-shrink: 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h5 style="margin: 0;">
+                        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 8px; vertical-align: text-bottom;">
+                            <path d="M5 2V0H3v2H1.5A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2H13V0h-2v2H5zm-4.5 1h13a.5.5 0 0 1 .5.5v1H0v-1a.5.5 0 0 1 .5-.5zM14 5v8.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V5h14z"/>
+                            <path d="M4.5 7a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5h-1zm3 0a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5h-1zm3 0a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5h-1z"/>
+                        </svg>
+                        {% trans %}sylius_happy_cms.page_builder.generate_ai_content{% endtrans %}
+                    </h5>
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-action="live#action"
+                        data-live-action-param="prevent|closeAIGenerator"
+                        aria-label="Close"
+                    ></button>
+                </div>
+            </div>
+
+            {# Content #}
+            <div style="flex: 1; overflow-y: auto; padding: 2rem;">
+                <div style="max-width: 800px; margin: 0 auto;">
+                    {% if this.isAIGenerationAvailable %}
+                        <div data-loading="action(generateAIContent)|show">
+                            {% trans %}sylius_happy_cms.page_builder.ai_loading{% endtrans %}
+                            <br />
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"/>
+                                <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466"/>
+                            </svg>
+                        </div>
+                        <div data-loading="action(generateAIContent)|hide">
+                            {% if this.errorMessage %}
+                                <div class="alert alert-error mb-4">
+                                    <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 8px; vertical-align: text-bottom;">
+                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
+                                        <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"></path>
+                                    </svg>
+                                    {{ this.errorMessage }}</div>
+                            {% endif %}
+                            {# AI Generation Form #}
+                            <div class="alert alert-info mb-4">
+                                <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 8px; vertical-align: text-bottom;">
+                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                    <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                                </svg>
+                                {% trans %}sylius_happy_cms.page_builder.ai_generator_description{% endtrans %}
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="aiPrompt" class="form-label fw-bold">
+                                    {% trans %}sylius_happy_cms.page_builder.ai_prompt_label{% endtrans %}
+                                </label>
+                                <textarea
+                                    id="aiPrompt"
+                                    class="form-control"
+                                    rows="6"
+                                    data-model="aiPrompt"
+                                    placeholder="{% trans %}sylius_happy_cms.page_builder.ai_prompt_placeholder{% endtrans %}"
+                                ></textarea>
+                                <div class="form-text">
+                                    {% trans %}sylius_happy_cms.page_builder.ai_prompt_help{% endtrans %}
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="aiBlockCount" class="form-label fw-bold">
+                                    {% trans %}sylius_happy_cms.page_builder.ai_block_count_label{% endtrans %}
+                                </label>
+                                <input
+                                    type="number"
+                                    id="aiBlockCount"
+                                    class="form-control"
+                                    min="1"
+                                    max="10"
+                                    data-model="aiBlockCount"
+                                    style="max-width: 150px;"
+                                >
+                                <div class="form-text">
+                                    {% trans %}sylius_happy_cms.page_builder.ai_block_count_help{% endtrans %}
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button
+                                    type="button"
+                                    class="btn btn-primary"
+                                    data-action="live#action"
+                                    data-live-action-param="prevent|generateAIContent"
+                                >
+                                    <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 8px; vertical-align: text-bottom;">
+                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                        <path d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445z"/>
+                                    </svg>
+                                    {% trans %}sylius_happy_cms.page_builder.generate_button{% endtrans %}
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary"
+                                    data-action="live#action"
+                                    data-live-action-param="prevent|closeAIGenerator"
+                                >
+                                    {% trans %}sylius_happy_cms.page_builder.cancel{% endtrans %}
+                                </button>
+                            </div>
+                        </div>
+                    {% else %}
+                        {# AI Bundle not installed message #}
+                        <div class="alert alert-warning">
+                            <h6 class="alert-heading">
+                                <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 8px; vertical-align: text-bottom;">
+                                    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                                </svg>
+                                {% trans %}sylius_happy_cms.page_builder.ai_not_configured{% endtrans %}
+                            </h6>
+                            <p class="mb-2">{% trans %}sylius_happy_cms.page_builder.ai_not_configured_description{% endtrans %}</p>
+                            <hr>
+                            <p class="mb-0">
+                                <a href="https://github.com/agence-adeliom/sylius-happy-cms-plugin/blob/2.x/docs/CONFIGURE_IA_AGENT.md" target="_blank" rel="noopener noreferrer" class="alert-link">
+                                    {% trans %}sylius_happy_cms.page_builder.ai_learn_more{% endtrans %}
+                                    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: baseline; margin-left: 4px;">
+                                        <path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5z"/>
+                                        <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0v-5z"/>
+                                    </svg>
+                                </a>
+                            </p>
+                        </div>
+
+                        <div class="mt-4">
+                            <button
+                                type="button"
+                                class="btn btn-outline-secondary btn-lg"
+                                data-action="live#action"
+                                data-live-action-param="prevent|closeAIGenerator"
+                            >
+                                {% trans %}sylius_happy_cms.page_builder.close{% endtrans %}
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>

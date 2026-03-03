@@ -2,6 +2,7 @@
     <tinymce-editor
             id="{{ id }}"
             name="{{ full_name }}"
+            height="{{ attr.height|default(300) }}"
             {{ required ? "required" : "" }}
             {% with { attr: tinymce_attributes(attr) } %}
                 {{ block('attributes') }}
@@ -9,7 +10,7 @@
             src="/bundles/tinymce/ext/tinymce/tinymce.min.js"
     >{{ value }}</tinymce-editor>
     {% include '@Tinymce/partial/default_tinymce_config.html.twig' %}
-    <script src="/bundles/tinymce/ext/tinymce-webcomponent.js" type="module"></script>
+    {# The tinymce-webcomponent.js script is now loaded by assets/tinymce/field.js to handle AJAX/Live components #}
     <noscript>
 		<textarea id="{{ id }}-noscript"
                   name="{{ full_name }}"

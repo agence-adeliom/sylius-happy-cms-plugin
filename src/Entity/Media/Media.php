@@ -107,7 +107,7 @@ class Media implements MediaInterface, \Stringable
 
     public function getMeta(string $key, string|null $default = null): string|null
     {
-        if ($this->metas[$key] && is_string($this->metas[$key])) {
+        if (isset($this->metas[$key]) && is_string($this->metas[$key])) {
             return $this->metas[$key];
         }
 

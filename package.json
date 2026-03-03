@@ -13,6 +13,7 @@
     "@agence-adeliom/sylius-happy-cms-assets" : "file:./assets"
   },
   "devDependencies": {
+    "autoprefixer": "^10.4.23",
     "@symfony/webpack-encore": "^2.0",
     "buffer": "^6.0.3",
     "eslint": "^8.56.0",
@@ -40,7 +41,7 @@
     "lottie-web": "^5.7.11",
     "music-metadata-browser": "^2.2.6",
     "notie": "^4.3.1",
-    "plyr": "^3.6.8",
+    "plyr": "^3.7.8",
     "postcss-loader": "^6.2.1",
     "tailwindcss": "^2.2.4",
     "vue": "^2.6.14",
@@ -78,6 +79,12 @@
       },
       "menu-item-tree-delete": {
         "main": "controllers/DeleteMenuItemController.js",
+        "webpackMode": "lazy",
+        "fetch": "lazy",
+        "enabled": true
+      },
+      "builder-block-editor": {
+        "main": "controllers/BlockEditor.js",
         "webpackMode": "lazy",
         "fetch": "lazy",
         "enabled": true

@@ -18,13 +18,42 @@
 
 ## Overview
 
-Happy CMS is a Content Management System (CMS) plugin for Sylius that enables you to create and manage dynamic, routable Sylius resources content with ease. It provides a flexible framework for building pages, managing blocks of content, and defining custom routable entities, all integrated seamlessly into your Sylius e-commerce platform.
+Happy CMS is a simple Content Management System (CMS) plugin for Sylius that enables you to create and manage dynamic pages based on Sylius custom and routable resources. 
 
-### A duo: Happy CMS + Easy CRUD
-
-This plugin is built to work hand in hand with [Sylius Easy CRUD Plugin]() to provide a seamless experience for managing CMS routable resources in front, and CRUD admin interfaces easily within Sylius.
-
+The plugin brings awesome CMS features to Sylius, including:
+- **Page Builder**: A back-office visual interface for preview and managing pages content with various content blocks.
+- **Media Management**: Organize and manage media files (images, videos, documents) used in your CMS pages. Built with Flysystem storage abstraction layer.
+- **SEO**: Built-in SEO management for optimizing your pages for search engines.
+- **Multilingue**: Full support for multiple languages and locales.
+- **Custom Routable Resource**: Define your own entities (blog, faq, etc...) that can be routed and displayed as CMS pages with specific logic, routes and templates.
+- **Menu Management**: Create and manage menus for your site navigation.
+- **Flexible Blocks**: Use default (or create custom) various types of content blocks (text, images, videos, etc.) within your pages.
+- **Shared Blocks**: Reusable content blocks that can be used across multiple pages.
+- **Helpers**:
+    - Commands to generate entities, repositories and admin classes for your custom routable resources.
+    - Commands to generate blocks easily.
+- **AI**: Leverage AI to assist in generating content for your pages (requires API key).
+- **CRUD**: Integrated with [Sylius Easy CRUD Plugin](https://github.com/agence-adeliom/sylius-easy-crud-plugin) for simplified Sylius resources CRUD management.
 ---
+
+## Installation and documentation
+
+1.  [Install this plugin](#installation)
+2.  [Explore documentation](#documentation)
+
+## Versions
+
+| Plugin Version | Sylius     | Php           | Symfony  | New - Guide                                                                                                                                                              | Support    |
+|----------------|------------|---------------|----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| 1.13, 1.14     | 1.13, 1.14 | 8.2, 8.3, 8.4 | 6.4, 7.x | [See installation guide](https://github.com/agence-adeliom/sylius-happy-cms-plugin/tree/v1.14.12?tab=readme-ov-file#installation)                                        | No (Alpha) |
+| ^2.0.0         | ^2.0.0     | 8.2, 8.3, 8.4 | 6.4, 7.x | - Sylius 2.0 [BC] [Migrate from v1 guide](./docs/migration/SYLIUS_2.md)                                                                                                  | No (Béta)  |
+| ^2.1.0         | ^2.0.0     | 8.3, 8.4, 8.5 | 7.4      | - [See installation guide](#installation)<br/>- New content model persistence, new page builder [BC]  - [Migrate from ^2.0.0 version](./docs/migration/CONTENT_BLOCK.md) | Yes        |
+
+## Feature preview
+
+![Page Builder preview](docs/screens/content-manager.png "Page Builder preview")
+
+![Page Builder preview](docs/screens/media-manager.png "Media manager preview")
 
 ## Installation
 
@@ -73,6 +102,27 @@ sylius_easy_crud:
   resource: "@SyliusEasyCrudPlugin/config/routes.yaml"
 ```
 
+### 5. Configure your firewall to protect preview routes
+
+All admin users with ROLE_ALLOWED_TO_SWITCH AND ROLE_HAPPY_CMS_CONTENT_BUILDER will be able to preview CMS routable entities.
+
+In config/packages/security.yaml
+
+```yaml 
+security:
+    firewalls:
+        #... 
+        admin_happy_cms_content_builder:
+            switch_user: { role: ROLE_ALLOWED_TO_SWITCH }
+            context: admin
+            pattern: "%sylius.security.shop_regex%"
+            request_matcher: Adeliom\SyliusHappyCMSPlugin\Security\PreviewRequestMatcher
+            provider: sylius_admin_user_provider
+    #... 
+    role_hierarchy:
+        ROLE_ADMINISTRATION_ACCESS: [ ROLE_HAPPY_CMS_CONTENT_BUILDER ]
+```
+
 ### 5. Generate default files in your project (entities, repositories and admin classes) :
 
 Actually, we don't have Symfony recipes, so we created a command to generate files automatically.
@@ -102,17 +152,53 @@ php bin/console doc:mig:mig
 php bin/console cache:clear
 ```
 
-At this point, the plugin should be installed and ready to use!
+### 8. (Optional) Configure AI Development Guides
+
+If you're using AI assistants (like Claude Code, GitHub Copilot, or Cursor), configure them to use the plugin's specialized guides:
+
+#### For Claude Code users:
+
+Create or update `CLAUDE.md` in your project root:
+
+```markdown
+# Project Instructions
+
+[Your existing project instructions...]
+
+## Sylius Happy CMS Plugin
+
+This project uses [Sylius Happy CMS Plugin](https://github.com/agence-adeliom/sylius-happy-cms-plugin) for content management.
+
+### AI Development Guides
+
+Import the AI development guides for efficient development:
+
+- **Happy CMS development guides**: `vendor/agence-adeliom/sylius-happy-cms-plugin/docs/agents/CLAUDE.md`
+```
+
+#### For other AI assistants:
+
+Create or update `.cursorrules`, `AGENTS.md`, or your AI configuration file with similar content pointing to the guides in `vendor/agence-adeliom/sylius-happy-cms-plugin/docs/agents/`.
+
+Add "See @CLAUDE.md"
 
 ---
 
 ## Documentation
 
-- **[Configure Homepage](./docs/HOMEPAGE.md)**
-- **[Create custom routable entities](./docs/CREATE_ROUTABLE_ENTITIES.md)**
-- **[Create custom CMS blocks](./docs/CREATE_BLOCK.md)**
-- **[Detailed default configuration](./docs/DETAILED_CONFIG.md)**
-- **[How routing work](./docs/ROUTING.md)**
+- **[Override default Sylius homepage](./docs/homepage.md)**
+- **[Routing](./docs/routing.md)**
+- **[Seo](./docs/seo.md)**
+- **[Medias](./docs/medias.md)**
+- **[Blocks](./docs/blocks.md)**
+- **[Menu](./docs/menu.md)**
+- **[AI](./docs/ai.md)**
+- **[Full plugin configuration](./docs/configuration.md)**
+- **[Contribution](./docs/contribution.md)**
+
+Start by read the documentation, then you can : 
+- Use bundles commands to create new routable resources (blog, faq, brand pages, etc.) [see here](./docs/commands/generate-cms-model.md)
+- Use bundle commands to create new content blocks (flex or shared)
 
 ---
 
@@ -124,7 +210,7 @@ Made with ❤️ by [Adeliom](https://www.adeliom.com/)
 
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![PHP Version](https://img.shields.io/badge/php-%5E8.2-blue)](https://php.net)
+[![PHP Version](https://img.shields.io/badge/php-%5E8.3-blue)](https://php.net)
 [![Sylius Version](https://img.shields.io/badge/sylius-%5E2.0-blue)](https://sylius.com)
 [![Latest Version](https://img.shields.io/packagist/v/agence-adeliom/sylius-easy-crud-plugin)](https://packagist.org/packages/agence-adeliom/sylius-happy-cms-plugin)
 

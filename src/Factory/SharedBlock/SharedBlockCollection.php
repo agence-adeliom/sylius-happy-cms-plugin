@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock;
 
+use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableInterface;
 use Sylius\Resource\Model\ResourceInterface;
 
 class SharedBlockCollection
@@ -46,6 +47,8 @@ class SharedBlockCollection
     public function getAllowedBlocks(?ResourceInterface $resource = null): array
     {
         $blocks = $this->getBlocks();
+
+        assert($resource instanceof ContentEditableInterface || null === $resource);
 
         return array_filter(
             $blocks,

@@ -5,10 +5,16 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\Block;
 
 use Adeliom\SyliusHappyCMSPlugin\Asset\AssetHappyCMSPackage;
+use Adeliom\SyliusHappyCMSPlugin\Attribute\AIGeneratable;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\AbstractBlock;
 use Adeliom\SyliusHappyCMSPlugin\Form\TinymceBridgeType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+#[AIGeneratable(
+    description: 'A simple rich text content block with WYSIWYG editor',
+    useCases: ['articles', 'blog posts', 'text content', 'descriptions', 'informational pages'],
+    priority: 200,
+)]
 class WysiwygBlockType extends AbstractBlock
 {
     public function buildBlock(FormBuilderInterface $builder, array $options): void

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Factory\Block;
 
+use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableInterface;
 use Sylius\Resource\Model\ResourceInterface;
 
 class BlockCollection
@@ -56,6 +57,8 @@ class BlockCollection
         if (empty($blockTypes)) {
             $blockTypes = $blocks ? array_keys($blocks) : [];
         }
+
+        assert($resource instanceof ContentEditableInterface || null === $resource);
 
         return array_filter(
             $blocks,

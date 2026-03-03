@@ -72,15 +72,15 @@ interface CmsRoutableInterface extends ChannelAwareInterface
 
     public function getRouteHost(TranslationInterface $translation): ?string;
 
-    public function getRouteStaticPrefix(TranslationInterface $translation, bool $isPreview): string;
+    public function getRouteStaticPrefix(TranslationInterface $translation): string;
 
-    public function getVariablePattern(TranslationInterface $translation, bool $isPreview): string;
+    public function getVariablePattern(TranslationInterface $translation): string;
 
     public function getRouteTemplate(): ?string;
 
     public function getRouteController(): ?string;
 
-    public function getOnlineRoute(): ?RouteObjectInterface;
+    public function getOnlineRoute(?string $locale = null): ?RouteObjectInterface;
 
     public function getPreviewRoute(): ?RouteObjectInterface;
 
@@ -100,4 +100,6 @@ interface CmsRoutableInterface extends ChannelAwareInterface
      * Remove a route from the collection.
      */
     public function removeRoute(RouteInterface $route): void;
+
+    public function setCurrentLocale(string $currentLocale): void;
 }

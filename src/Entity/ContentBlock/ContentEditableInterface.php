@@ -1,0 +1,54 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock;
+
+use Doctrine\Common\Collections\Collection;
+use Sylius\Resource\Model\ResourceInterface;
+
+interface ContentEditableInterface extends ResourceInterface
+{
+    /**
+     * Get all content blocks for this entity.
+     *
+     * @return Collection<int, ContentBlockInterface>
+     */
+    public function getContentBlocks(): Collection;
+
+    /**
+     * Get entity content block class.
+     *
+     * @return class-string<ContentBlockInterface>
+     */
+    public static function getContentBlockClass(): string;
+
+    /**
+     * Add a content block.
+     */
+    public function addContentBlock(ContentBlockInterface $contentBlock): void;
+
+    /**
+     * Remove a content block.
+     */
+    public function removeContentBlock(ContentBlockInterface $contentBlock): void;
+
+    /**
+     * Check if the entity has a specific content block.
+     */
+    public function hasContentBlock(ContentBlockInterface $contentBlock): bool;
+
+    /**
+     * Get published content blocks for a specific locale.
+     *
+     * @return Collection<int, ContentBlockInterface>
+     */
+    public function getPublishedContentBlocks(string $locale, ?string $layer = null): Collection;
+
+    /**
+     * Get preview content blocks for a specific locale.
+     *
+     * @return Collection<int, ContentBlockInterface>
+     */
+    public function getContentBlocksForPreview(string $locale, ?string $layer = null): Collection;
+}

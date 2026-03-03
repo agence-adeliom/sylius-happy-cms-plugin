@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\Admin\Page;
 
 use Adeliom\SyliusEasyCrudPlugin\Admin\AbstractAdmin;
+use Adeliom\SyliusEasyCrudPlugin\Admin\Field\CheckboxField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\ColumnField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\EnumField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\ResourceChoiceField;
@@ -20,6 +21,7 @@ use Adeliom\SyliusEasyCrudPlugin\Enum\ThreeStateStatusEnum;
 use Adeliom\SyliusHappyCMSPlugin\Admin\Field\FlexibleContentField;
 use Adeliom\SyliusHappyCMSPlugin\Admin\Field\SEOField;
 use Sylius\Bundle\GridBundle\Builder\Filter\StringFilter;
+use Sylius\Resource\Model\ResourceInterface;
 
 abstract class AbstractPageAdmin extends AbstractAdmin implements PageAdminInterface
 {
@@ -53,19 +55,30 @@ abstract class AbstractPageAdmin extends AbstractAdmin implements PageAdminInter
         $clearCacheAction = Action::new('cache', 'sylius_happy_cms.page.admin.action.clear_cache', 'tabler:world-check')
             ->linkToRoute('sylius_happy_cms_admin_page_clear_cache');
 
-        $contentAction = Action::new('content', 'sylius_happy_cms.page.admin.action.manage_content', 'bxs:book-content');
-        foreach ($locales as $locale) {
-            $contentAction->addSubAction(
-                Action::new($locale->getCode(), $locale->getCode(), 'bxs:book-content')
-                    ->linkToRoute('sylius_happy_cms_admin_page_update', [
-                        'context' => 'flexible_content:' . $locale->getCode(),
-                    ]),
-            );
-        }
+        /** @var ResourceInterface|null $resource */
+        $resource = $this->getResource();
 
-        $actions->addItemAction(Crud::PAGE_INDEX, $contentAction);
-        $actions->addItemAction(Crud::PAGE_DETAIL, $contentAction);
-        $actions->addItemAction(Crud::PAGE_EDIT, $contentAction);
+        if ($resource) {
+            $contentAction = Action::new(
+                'content',
+                'sylius_happy_cms.page.admin.action.manage_content',
+                'bi:card-heading',
+            )->linkToRoute('sylius_happy_cms_admin_page_builder', [
+                'resource' => $this->getResourceAlias(),
+                'id' => $resource->getId(),
+            ]);
+            $actions->addItemAction(Crud::PAGE_DETAIL, $contentAction);
+            $actions->addItemAction(Crud::PAGE_EDIT, $contentAction);
+        } else {
+            $contentAction = Action::new(
+                'content',
+                'sylius_happy_cms.page.admin.action.manage_content',
+                'bi:card-heading',
+            )->linkToRoute('sylius_happy_cms_admin_page_builder', [
+                'resource' => $this->getResourceAlias() ?? 'sylius_happy_cms.page',
+            ]);
+            $actions->addItemAction(Crud::PAGE_INDEX, $contentAction);
+        }
 
         $actions->addGlobalAction(Crud::PAGE_INDEX, $clearCacheAction);
 
@@ -80,14 +93,11 @@ abstract class AbstractPageAdmin extends AbstractAdmin implements PageAdminInter
             yield ResourceChoiceField::new('parent', 'sylius_happy_cms.page.admin.field.parent')
                 ->setMultiple(false)
                 ->setRequired(false)
+                ->onlyOnForms()
                 ->setResourceAlias('sylius_happy_cms.page');
 
             yield Field::new('name', 'sylius_happy_cms.page.admin.field.name')
                 ->setSortablePath('translations.name')
-                ->onlyOnIndex();
-
-            yield Field::new('slug', 'sylius_happy_cms.page.admin.field.slug')
-                ->setSortablePath('translations.slug')
                 ->onlyOnIndex();
 
             yield ColumnField::new('sylius_happy_cms.page.admin.panel.metadatas')
@@ -116,8 +126,10 @@ abstract class AbstractPageAdmin extends AbstractAdmin implements PageAdminInter
                 ->setEnum(ThreeStateStatusEnum::class)
                 ->setRequired(false)
                 ->setFormTypeOption('placeholder', false)
-                ->hideOnIndex()
                 ->renderExpanded(true);
+
+            yield CheckboxField::new('homepage', 'sylius_happy_cms.page.admin.field.homepage')
+                ->setRequired(false);
 
             yield TabField::new('seo', 'sylius_happy_cms.page.admin.tab.seo');
 
