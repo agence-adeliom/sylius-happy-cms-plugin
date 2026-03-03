@@ -292,4 +292,153 @@ class FileValidator
     {
         return self::ALLOWED_MIME_TYPES;
     }
+
+    /**
+     * Validate file size
+     *
+     * @param UploadedFile $file File to validate
+     * @param int $maxSizeMb Maximum size in MB (0 = no limit)
+     *
+     * @throws \InvalidArgumentException If file size exceeds limit
+     */
+    public function validateFileSize(UploadedFile $file, int $maxSizeMb = 0): void
+    {
+        // Skip if no limit configured
+        if ($maxSizeMb <= 0) {
+            return;
+        }
+
+        $fileSizeBytes = $file->getSize();
+        $maxSizeBytes = $maxSizeMb * 1024 * 1024;
+
+        if ($fileSizeBytes > $maxSizeBytes) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'File size (%s) exceeds maximum allowed size of %d MB',
+                    $this->formatBytes($fileSizeBytes),
+                    $maxSizeMb,
+                ),
+            );
+        }
+    }
+
+    /**
+     * Validate total upload size for multiple files
+     *
+     * @param UploadedFile[] $files Files to validate
+     * @param int $maxTotalSizeMb Maximum total size in MB (0 = no limit)
+     *
+     * @throws \InvalidArgumentException If total size exceeds limit
+     */
+    public function validateTotalSize(array $files, int $maxTotalSizeMb = 0): void
+    {
+        // Skip if no limit configured
+        if ($maxTotalSizeMb <= 0) {
+            return;
+        }
+
+        $totalSize = 0;
+        foreach ($files as $file) {
+            if ($file instanceof UploadedFile) {
+                $totalSize += $file->getSize();
+            }
+        }
+
+        $maxTotalSizeBytes = $maxTotalSizeMb * 1024 * 1024;
+
+        if ($totalSize > $maxTotalSizeBytes) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Total upload size (%s) exceeds maximum allowed size of %d MB',
+                    $this->formatBytes($totalSize),
+                    $maxTotalSizeMb,
+                ),
+            );
+        }
+    }
+
+    /**
+     * Validate number of files in upload
+     *
+     * @param UploadedFile[] $files Files to validate
+     * @param int $maxCount Maximum number of files (0 = no limit)
+     *
+     * @throws \InvalidArgumentException If file count exceeds limit
+     */
+    public function validateFileCount(array $files, int $maxCount = 0): void
+    {
+        // Skip if no limit configured
+        if ($maxCount <= 0) {
+            return;
+        }
+
+        $count = count($files);
+
+        if ($count > $maxCount) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Too many files (%d). Maximum %d files allowed per upload',
+                    $count,
+                    $maxCount,
+                ),
+            );
+        }
+    }
+
+    /**
+     * Format bytes to human-readable format
+     */
+    private function formatBytes(int $bytes, int $precision = 2): string
+    {
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+
+        $bytes = max($bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
+
+        $bytes /= (1024 ** $pow);
+
+        return round($bytes, $precision) . ' ' . $units[$pow];
+    }
+
+    /**
+     * Get PHP upload max file size in bytes
+     *
+     * @return int Maximum upload size in bytes from PHP configuration
+     */
+    public function getPhpMaxUploadSize(): int
+    {
+        $uploadMax = $this->parseSize(ini_get('upload_max_filesize') ?: '');
+        $postMax = $this->parseSize(ini_get('post_max_size') ?: '');
+
+        // Return the smaller of the two limits
+        if ($postMax > 0 && $postMax < $uploadMax) {
+            return $postMax;
+        }
+
+        return $uploadMax;
+    }
+
+    /**
+     * Parse PHP size string (e.g., "10M", "2G") to bytes
+     */
+    private function parseSize(string $size): int
+    {
+        $size = trim($size);
+        $unit = strtolower($size[strlen($size) - 1]);
+        $value = (int) $size;
+
+        switch ($unit) {
+            case 'g':
+                $value *= 1024;
+                // no break
+            case 'm':
+                $value *= 1024;
+                // no break
+            case 'k':
+                $value *= 1024;
+        }
+
+        return $value;
+    }
 }

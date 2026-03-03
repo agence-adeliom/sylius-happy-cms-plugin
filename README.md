@@ -25,7 +25,7 @@ The plugin brings awesome CMS features to Sylius, including:
 - **Media Management**: Organize and manage media files (images, videos, documents) used in your CMS pages. Built with Flysystem storage abstraction layer.
 - **SEO**: Built-in SEO management for optimizing your pages for search engines.
 - **Multilingue**: Full support for multiple languages and locales.
-- **Custom Routable Resource**: Define your own entities that can be routed and displayed as CMS pages with specific routes and templates.
+- **Custom Routable Resource**: Define your own entities (blog, faq, etc...) that can be routed and displayed as CMS pages with specific logic, routes and templates.
 - **Menu Management**: Create and manage menus for your site navigation.
 - **Flexible Blocks**: Use default (or create custom) various types of content blocks (text, images, videos, etc.) within your pages.
 - **Shared Blocks**: Reusable content blocks that can be used across multiple pages.

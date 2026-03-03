@@ -1,0 +1,17 @@
+# Example security configuration for SyliusHappyCMSPlugin
+# This file shows how to configure upload limits and rate limiting
+
+sylius_happy_cms:
+    media:
+        # File size limits (in MB, 0 = no limit)
+        max_file_size: 10                  # Maximum 10 MB per file
+        max_total_upload_size: 50          # Maximum 50 MB total per request
+        max_files_per_upload: 20           # Maximum 20 files per upload
+
+        # Rate limiting for upload requests
+        rate_limiting:
+            enabled: true                  # Enable rate limiting
+            max_requests: 60               # 60 uploads per period
+            period: 60                     # Period in seconds (60 = 1 minute)
+            ban_duration: 300              # Ban for 5 minutes after exceeding limit
+            cache_pool: 'cache.app'        # Cache pool for rate limit storage

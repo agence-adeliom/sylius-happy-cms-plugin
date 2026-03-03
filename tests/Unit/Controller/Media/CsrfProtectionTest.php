@@ -202,6 +202,13 @@ class CsrfProtectionTest extends TestCase
         ];
 
         foreach ($tokens as $wrongToken) {
+
+            $session = $request->getSession();
+            $session->set('_csrf_token', [
+                'token' => $wrongToken,
+                'timestamp' => time() - 10800, // 3 hours ago
+            ]);
+
             $request = $this->createRequestWithSession($request->getSession());
             $request->setMethod('POST');
             $request->request->set('_csrf_token', $wrongToken);

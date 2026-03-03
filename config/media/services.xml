@@ -17,6 +17,16 @@
         </service>
         <service id="Adeliom\SyliusHappyCMSPlugin\Services\Media\FileValidator" alias="happy.cms.media.file_validator" public="true"/>
 
+        <service id="happy.cms.media.upload_rate_limiter" class="Adeliom\SyliusHappyCMSPlugin\Services\Media\UploadRateLimiter" public="true" lazy="true">
+            <argument key="$enabled">false</argument>
+            <argument key="$maxRequests">60</argument>
+            <argument key="$period">60</argument>
+            <argument key="$banDuration">300</argument>
+            <argument key="$cache" type="service" id="cache.app"/>
+            <argument key="$logger" type="service" id="logger" on-invalid="null"/>
+        </service>
+        <service id="Adeliom\SyliusHappyCMSPlugin\Services\Media\UploadRateLimiter" alias="happy.cms.media.upload_rate_limiter" public="true"/>
+
         <service id="happy.cms.media.url_validator" class="Adeliom\SyliusHappyCMSPlugin\Services\Media\UrlValidator" public="true" autowire="true">
         </service>
         <service id="Adeliom\SyliusHappyCMSPlugin\Services\Media\UrlValidator" alias="happy.cms.media.url_validator" public="true"/>
