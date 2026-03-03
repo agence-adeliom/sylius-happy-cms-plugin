@@ -150,6 +150,9 @@ php bin/console assets:install
 php bin/console doc:mig:diff
 php bin/console doc:mig:mig
 php bin/console cache:clear
+# To compile our symfony UX components, you need to re run npm install and npm run build in the root of your project
+npm install
+npm run build
 ```
 
 ### 8. (Optional) Configure AI Development Guides
