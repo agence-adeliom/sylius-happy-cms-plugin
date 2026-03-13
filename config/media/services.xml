@@ -7,8 +7,13 @@
     <services>
         <defaults autowire="true" autoconfigure="true"/>
 
+        <service id="easy_media.entity_manager_provider" class="Adeliom\SyliusHappyCMSPlugin\Services\Doctrine\DefaultEntityManagerProvider" public="true">
+            <argument key="$em" type="service" id="doctrine.orm.entity_manager"/>
+        </service>
+
         <service id="happy.cms.media.controller" class="Adeliom\SyliusHappyCMSPlugin\Controller\Media\MediaController" public="true" autowire="true">
             <argument key="$manager" type="service" id="happy.cms.media.manager"/>
+            <argument key="$entityManagerProvider" type="service" id="easy_media.entity_manager_provider"/>
             <tag name="controller.service_arguments"/>
         </service>
         <service id="Adeliom\SyliusHappyCMSPlugin\Controller\Media\MediaController" alias="happy.cms.media.controller" public="true"/>
@@ -34,7 +39,7 @@
         <service id="happy.cms.media.manager" class="Adeliom\SyliusHappyCMSPlugin\Services\Media\MediaManager" public="true" autowire="true">
             <argument key="$filesystem" type="service" id="happy.cms.media.storage"/>
             <argument key="$helper" type="service" id="happy.cms.media.helper"/>
-            <argument key="$em" type="service" id="doctrine.orm.entity_manager"/>
+            <argument key="$entityManagerProvider" type="service" id="easy_media.entity_manager_provider"/>
             <argument key="$parameters" type="service" id="parameter_bag"/>
             <argument key="$translator" type="service" id="translator"/>
             <argument key="$eventDispatcher" type="service" id="event_dispatcher"/>
@@ -45,7 +50,7 @@
 
         <service id="happy.cms.media.helper" class="Adeliom\SyliusHappyCMSPlugin\Services\Media\MediaHelper" public="true" autowire="true">
             <argument key="$parameters" type="service" id="parameter_bag"/>
-            <argument key="$em" type="service" id="doctrine.orm.entity_manager"/>
+            <argument key="$entityManagerProvider" type="service" id="easy_media.entity_manager_provider"/>
         </service>
         <service id="Adeliom\SyliusHappyCMSPlugin\Services\Media\MediaHelper" alias="happy.cms.media.helper" public="true"/>
 

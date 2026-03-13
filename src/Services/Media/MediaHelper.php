@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\Services\Media;
 
 use Adeliom\SyliusHappyCMSPlugin\Entity\Media\FolderInterface;
-use Adeliom\SyliusHappyCMSPlugin\Entity\Media\Media;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Media\MediaInterface;
 use Adeliom\SyliusHappyCMSPlugin\Repository\Media\MediaRepositoryInterface;
+use Adeliom\SyliusHappyCMSPlugin\Services\Doctrine\EntityManagerProviderInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Psr\Container\ContainerExceptionInterface;
@@ -19,9 +19,14 @@ class MediaHelper
 {
     public function __construct(
         protected ContainerBagInterface $parameters,
-        protected EntityManagerInterface $em,
+        protected EntityManagerProviderInterface $entityManagerProvider,
         protected RouterInterface $router,
     ) {
+    }
+
+    public function getEntityManager(): EntityManagerInterface
+    {
+        return $this->entityManagerProvider->getEntityManager();
     }
 
     public function getFolderClassName(): string
@@ -39,7 +44,7 @@ class MediaHelper
     {
         $class = $this->getFolderClassName();
         if (class_exists($class) && in_array(FolderInterface::class, class_implements($class))) {
-            return $this->em->getRepository($class);
+            return $this->getEntityManager()->getRepository($class);
         }
 
         return null;
@@ -57,7 +62,7 @@ class MediaHelper
     {
         $class = $this->getMediaClassName();
         if (class_exists($class) && in_array(MediaInterface::class, class_implements($class))) {
-            $repo = $this->em->getRepository($class);
+            $repo = $this->getEntityManager()->getRepository($class);
 
             return $repo instanceof MediaRepositoryInterface ? $repo : null;
         }

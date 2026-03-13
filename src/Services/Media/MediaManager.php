@@ -14,6 +14,7 @@ use Adeliom\SyliusHappyCMSPlugin\Exceptions\Media\FolderAlreadyExist;
 use Adeliom\SyliusHappyCMSPlugin\Exceptions\Media\FolderNotExist;
 use Adeliom\SyliusHappyCMSPlugin\Exceptions\Media\NoFile;
 use Adeliom\SyliusHappyCMSPlugin\Exceptions\Media\ProviderNotFound;
+use Adeliom\SyliusHappyCMSPlugin\Services\Doctrine\EntityManagerProviderInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Embed\Embed;
 use Illuminate\Support\Str;
@@ -33,7 +34,7 @@ class MediaManager
     public function __construct(
         protected FilesystemOperator $filesystem,
         protected MediaHelper $helper,
-        public EntityManagerInterface $em,
+        protected EntityManagerProviderInterface $entityManagerProvider,
         protected ContainerBagInterface $parameters,
         protected TranslatorInterface $translator,
         protected EventDispatcherInterface $eventDispatcher,
@@ -50,6 +51,11 @@ class MediaManager
     public function getHelper(): MediaHelper
     {
         return $this->helper;
+    }
+
+    public function getEntityManager(): EntityManagerInterface
+    {
+        return $this->entityManagerProvider->getEntityManager();
     }
 
     public function getPath(MediaInterface $media): ?string
@@ -249,7 +255,7 @@ class MediaManager
      */
     public function delete(MediaInterface|FolderInterface $item, ?bool $flush = true): void
     {
-        $this->em->remove($item);
+        $this->getEntityManager()->remove($item);
 
         if ($item instanceof FolderInterface) {
             $this->filesystem->deleteDirectory($item->getPath());
@@ -260,15 +266,15 @@ class MediaManager
         }
 
         if ($flush) {
-            $this->em->flush();
+            $this->getEntityManager()->flush();
         }
     }
 
     public function save(MediaInterface|FolderInterface $item, ?bool $flush = true): void
     {
-        $this->em->persist($item);
+        $this->getEntityManager()->persist($item);
         if ($flush) {
-            $this->em->flush();
+            $this->getEntityManager()->flush();
         }
     }
 
