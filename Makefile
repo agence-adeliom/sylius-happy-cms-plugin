@@ -4,6 +4,20 @@ DOCKER_COMPOSE ?= docker compose
 DOCKER_USER ?= "$(shell id -u):$(shell id -g)"
 ENV ?= "dev"
 
+# Auto-detect whether the PHP container is already running.
+# If yes, use "exec" (zero container startup overhead).
+# If no, fall back to "run --rm" (creates an ephemeral container).
+PHP_RUNNING := $(shell $(DOCKER_COMPOSE) ps --status=running php 2>/dev/null | grep -c 'php')
+ifeq ($(strip $(PHP_RUNNING)),0)
+  PHP_CMD      = ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php
+  PHP_CMD_TEST = ENV=test DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php
+  PHP_CMD_ROOT = ENV=test DOCKER_USER=root $(DOCKER_COMPOSE) run --rm php
+else
+  PHP_CMD      = $(DOCKER_COMPOSE) exec -T php
+  PHP_CMD_TEST = $(DOCKER_COMPOSE) exec -T -e APP_ENV=test php
+  PHP_CMD_ROOT = $(DOCKER_COMPOSE) exec -T -u root -e APP_ENV=test php
+endif
+
 reset:
 	@make -s clean
 	@rm -rf vendor composer.lock node_modules var/cache var/log
@@ -46,8 +60,8 @@ frontend-clear:
 #	cp -R assets/controllers/* vendor/sylius/test-application/node_modules/@agence-adeliom/sylius-happy-cms-plugin/controllers
 #	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm nodejs "cd vendor/sylius/test-application && yarn install" || true
 #	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm nodejs "cd vendor/sylius/test-application && yarn run build" || true
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console assets:install
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php ln -sf /srv/sylius/public/bundles vendor/sylius/test-application/public
+	@$(PHP_CMD) vendor/bin/console assets:install
+	@$(PHP_CMD) ln -sf /srv/sylius/public/bundles vendor/sylius/test-application/public
 
 configure-preview-mode:
 	# Set up Sylius Test Application with preview route firewall
@@ -102,46 +116,46 @@ ddev-check:
 	@$(DDEV) poweroff >/dev/null 2>&1 && echo "You are using ddev, we need to stop it to free needed ports" || (echo "DDEV is not installed, no port conflicts detected")
 
 database-init:
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console doctrine:database:drop -n --force --if-exists
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console doctrine:database:create -n
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm -i php rm vendor/sylius/test-application/migrations/*.php || true
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console doctrine:migrations:migrate -n
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console doctrine:migrations:diff -n || true
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console doctrine:migrations:migrate -n || true
+	@$(PHP_CMD) vendor/bin/console doctrine:database:drop -n --force --if-exists
+	@$(PHP_CMD) vendor/bin/console doctrine:database:create -n
+	@$(PHP_CMD) rm -f vendor/sylius/test-application/migrations/*.php || true
+	@$(PHP_CMD) vendor/bin/console doctrine:migrations:migrate -n
+	@$(PHP_CMD) vendor/bin/console doctrine:migrations:diff -n || true
+	@$(PHP_CMD) vendor/bin/console doctrine:migrations:migrate -n || true
 
 database-reset:
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console doctrine:database:drop -n --force --if-exists
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console doctrine:database:create -n
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console doctrine:migrations:migrate -n
+	@$(PHP_CMD) vendor/bin/console doctrine:database:drop -n --force --if-exists
+	@$(PHP_CMD) vendor/bin/console doctrine:database:create -n
+	@$(PHP_CMD) vendor/bin/console doctrine:migrations:migrate -n
 
 load-fixtures:
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console sylius:fixtures:load -n
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console dbal:run-sql 'INSERT INTO sylius_channel_locales SET locale_id = 2, channel_id = 1' -n
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console dbal:run-sql 'INSERT INTO sylius_channel_locales SET locale_id = 3, channel_id = 1' -n
+	@$(PHP_CMD) vendor/bin/console sylius:fixtures:load -n
+	@$(PHP_CMD) vendor/bin/console dbal:run-sql 'INSERT INTO sylius_channel_locales SET locale_id = 2, channel_id = 1' -n
+	@$(PHP_CMD) vendor/bin/console dbal:run-sql 'INSERT INTO sylius_channel_locales SET locale_id = 3, channel_id = 1' -n
 
 load-demo-content:
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console happycms:starter:create-demo-pages -n
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console happycms:starter:create-demo-menu
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console happycms:migrate:content-to-blocks
+	@$(PHP_CMD) vendor/bin/console happycms:starter:create-demo-pages -n
+	@$(PHP_CMD) vendor/bin/console happycms:starter:create-demo-menu
+	@$(PHP_CMD) vendor/bin/console happycms:migrate:content-to-blocks
 
 phpstan:
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/phpstan analyse -c phpstan.neon
+	@$(PHP_CMD) vendor/bin/phpstan analyse -c phpstan.neon
 
 ecs:
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/ecs check src
+	@$(PHP_CMD) vendor/bin/ecs check src
 
 ecs-fix:
-	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/ecs check src --fix --clear-cache
+	@$(PHP_CMD) vendor/bin/ecs check src --fix --clear-cache
 
 phpunit:
 	rm -rf tests/Entity
 	rm -rf tests/Repository
 	rm -rf tests/Admin
 	rm -rf tests/Controller
-	@ENV=test DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/phpunit
+	@$(PHP_CMD_TEST) vendor/bin/phpunit
 
 behat:
-	@ENV=test DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console doctrine:database:drop -n --force --if-exists
-	@ENV=test DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console doctrine:database:create -n
-	@ENV=test DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console doctrine:migrations:migrate -n
-	@ENV=test DOCKER_USER=root $(DOCKER_COMPOSE) run --rm php vendor/bin/behat
+	@$(PHP_CMD_TEST) vendor/bin/console doctrine:database:drop -n --force --if-exists
+	@$(PHP_CMD_TEST) vendor/bin/console doctrine:database:create -n
+	@$(PHP_CMD_TEST) vendor/bin/console doctrine:migrations:migrate -n
+	@$(PHP_CMD_ROOT) vendor/bin/behat
