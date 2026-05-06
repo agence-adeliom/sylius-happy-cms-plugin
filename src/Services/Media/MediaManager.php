@@ -93,7 +93,7 @@ class MediaManager
         return $this->publicUrl($media);
     }
 
-    public function getFolder(int $id): ?FolderInterface
+    public function getFolder(int|string $id): ?FolderInterface
     {
         $folder = null;
         $folderRepository = $this->getHelper()->getFolderRepository();

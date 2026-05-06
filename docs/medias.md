@@ -325,8 +325,8 @@ sylius_happy_cms:
         # display file last modification time as
         last_modified_format: Y-m-d
         
-        # hide file extension in files list
-        hide_files_ext:       true
+        # hide files matching the following extensions in files list
+        hide_files_ext:       []
         
         # loaded chunk amount "pagination"
         pagination_amount:    50

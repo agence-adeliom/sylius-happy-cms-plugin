@@ -35,12 +35,12 @@ trait GetContent
 
         /**
          * @var array{
-         *     folder: int|null,
+         *     folder: int|string|null,
          *     path: string|null,
          *     search: string|null
          * } $data
          */
-        $data = json_decode($request->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        $data = $request->query->all();
         $folder = null;
         $path = '/';
         if (!empty($data['folder'])) {

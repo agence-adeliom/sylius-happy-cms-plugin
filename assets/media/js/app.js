@@ -1,81 +1,14 @@
-import Vue from 'vue';
-import notie from 'notie';
+import { EasyMedia } from '@adeliom/easy-media-manager';
+import '@adeliom/easy-media-manager/style.css';
 
-window.Vue = Vue;
-require('./manager');
-Vue.component('HappyCmsMediaModal', require('./components/happy-cms-media-modal').default)
-Vue.component('HappyCmsMediaDisplay', require('./components/happy-cms-media-display').default)
-
-function dynamicallyLoadScript(url) {
-    var script = document.createElement("script");
-    script.src = url;
-    document.head.appendChild(script);
-}
-
-dynamicallyLoadScript("https://cdnjs.cloudflare.com/ajax/libs/camanjs/4.1.2/caman.full.min.js");
-
-if (!String.prototype.includes) {
-    String.prototype.includes = function(search, start) {
-        'use strict';
-        if (typeof start !== 'number') {
-            start = 0;
-        }
-
-        if (start + search.length > this.length) {
-            return false;
-        } else {
-            return this.indexOf(search, start) !== -1;
-        }
-    };
-}
-
-window.loadMediaManager = function(event, widgetId = null) {
-    window.EventHub.listen("showNotif", (obj) => {
-        const types = {
-            "danger": "error",
-            "info": "info",
-            "success": "success",
-            "warning": "warning",
-            "link": "neutral",
-        }
-        let type = types[obj.type] ? types[obj.type] : types.link;
-        let duration = obj.duration ? obj.duration : 5;
-        notie.alert({type: type, text: '<small>' + obj.body + '</small>', time: duration})
-    })
-
-    document.querySelectorAll("#media-holder").forEach((elm) => {
-        elm.style.display = 'block';
-        new Vue({ el: elm });
-    })
-
-    if(widgetId){
-        document.querySelectorAll(".happy-cms-media-widget[data-widget='"+widgetId+"']").forEach((elm) => {
-            new Vue({ el: elm })
-        })
+// Intercept fetch to inject CSRF token from <meta name="csrf-token">
+const originalFetch = window.fetch;
+window.fetch = function (input, init = {}) {
+    const token = document.querySelector('meta[name="csrf-token"]')?.content;
+    if (token) {
+        init.headers = { ...init.headers, 'X-CSRF-Token': token };
     }
-}
+    return originalFetch(input, init);
+};
 
-if (document.readyState == 'loading') {
-  // still loading, wait for the event
-  window.addEventListener("DOMContentLoaded", () => {
-      loadMediaManager();
-  });
-} else {
-  // DOM is ready!
-  loadMediaManager();
-}
-
-// When render in the page builder
-window.addEventListener('sylius-crud:dynamic:reload', (event) => {
-  console.log('Media Field: Reinitializing after AJAX load');
-  var vueElements = document.querySelectorAll(".happy-cms-media-widget");
-  vueElements.forEach(vueElement => {
-    // If the element has a similar widget, we first remove it.
-    if (vueElement.previousElementSibling && vueElement.previousElementSibling.classList.contains('happy-cms-media-widget')) {
-      vueElement.previousElementSibling.remove();
-    }
-    if(vueElement && !vueElement.__vue__ && window.Vue) {
-      new window.Vue({ el: vueElement });
-    }
-  })
-});
+window.EasyMedia = EasyMedia;

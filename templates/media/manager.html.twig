@@ -1,343 +1,68 @@
 {% set is_modal = (modal is defined and modal) ? true : false %}
 {% set is_browser = (browser is defined and browser) ? true : false %}
 
-{# sylius_happy_cms.media.base_url #}
-{% set options = {
-    baseUrl: sylius_happy_cms.media.base_url,
-    hideFilesExt: sylius_happy_cms.media.hide_files_ext,
-    mimeTypes: sylius_happy_cms.media.extended_mimes,
-    broadcasting: sylius_happy_cms.media.enable_broadcasting,
-    generatingAlts: sylius_happy_cms.media.enable_generating_alts,
-    locales: sylius_happy_cms.media.locales,
+{% set features = {
+    enableEditor:        (editor is defined and editor is not null) ? editor : true,
+    enableUpload:        (upload is defined and upload is not null) ? upload : true,
+    enableMove:          (move is defined and move is not null) ? move : true,
+    enableRename:        (rename is defined and rename is not null) ? rename : true,
+    enableMetas:         (metas is defined and metas is not null) ? metas : true,
+    enableDelete:        (delete is defined and delete is not null) ? delete : true,
+    enableBulkSelection: (bulk_selection is defined and bulk_selection is not null) ? bulk_selection : true,
+    enableGeneratingAlts: sylius_happy_cms.media.enable_generating_alts,
 } %}
 
-{% set routes = {
-    files: path('media.get_files'),
-    upload: path('media.upload'),
+{% set pick_options = {
+    restrictions: {
+        path: restrict.path|default(null),
+        uploadTypes: restrict.uploadTypes|default(null),
+        uploadSize: restrict.uploadSize|default(null),
+    },
 } %}
-
-{% set translations = {
-    add_to_list: 'sylius_happy_cms.media.add.list'|trans({}, 'SyliusHappyCMSPlugin'),
-    added: 'sylius_happy_cms.media.add.added'|trans({}, 'SyliusHappyCMSPlugin'),
-    already_exists: 'sylius_happy_cms.media.error.already_exists'|trans({}, 'SyliusHappyCMSPlugin'),
-    application: 'sylius_happy_cms.media.application'|trans({}, 'SyliusHappyCMSPlugin'),
-    pdf: 'sylius_happy_cms.media.filter.type.pdf'|trans({}, 'SyliusHappyCMSPlugin'),
-    oembed: 'sylius_happy_cms.media.filter.type.oembed'|trans({}, 'SyliusHappyCMSPlugin'),
-    audio: 'sylius_happy_cms.media.audio.main'|trans({}, 'SyliusHappyCMSPlugin'),
-    bm_add_to_list: 'sylius_happy_cms.media.bookmarks.add'|trans({}, 'SyliusHappyCMSPlugin'),
-    bm: 'sylius_happy_cms.media.bookmarks.main'|trans({}, 'SyliusHappyCMSPlugin'),
-    clear: 'sylius_happy_cms.media.clear'|trans({attr: 'sylius_happy_cms.media.crop.selection'|trans({}, 'SyliusHappyCMSPlugin')}, 'SyliusHappyCMSPlugin'),
-    copy_success: 'sylius_happy_cms.media.copy.success'|trans({}, 'SyliusHappyCMSPlugin'),
-    copy: 'sylius_happy_cms.media.copy.main'|trans({}, 'SyliusHappyCMSPlugin'),
-    create_folder_notif: 'sylius_happy_cms.media.new.create_folder_notif'|trans({}, 'SyliusHappyCMSPlugin'),
-    create_success: 'sylius_happy_cms.media.create_success'|trans({}, 'SyliusHappyCMSPlugin'),
-    crop_apply: 'sylius_happy_cms.media.crop.apply'|trans({}, 'SyliusHappyCMSPlugin'),
-    crop_flip_horizontal: 'sylius_happy_cms.media.crop.flip_horizontal'|trans({}, 'SyliusHappyCMSPlugin'),
-    crop_flip_vertical: 'sylius_happy_cms.media.crop.flip_vertical'|trans({}, 'SyliusHappyCMSPlugin'),
-    crop_reset_filters: 'sylius_happy_cms.media.crop.reset_filters'|trans({}, 'SyliusHappyCMSPlugin'),
-    crop_reset: 'sylius_happy_cms.media.crop.reset'|trans({}, 'SyliusHappyCMSPlugin'),
-    crop_cancel: 'sylius_happy_cms.media.crop.cancel'|trans({}, 'SyliusHappyCMSPlugin'),
-    crop_rotate_left: 'sylius_happy_cms.media.crop.rotate_left'|trans({}, 'SyliusHappyCMSPlugin'),
-    crop_rotate_right: 'sylius_happy_cms.media.crop.rotate_right'|trans({}, 'SyliusHappyCMSPlugin'),
-    crop_zoom_in: 'sylius_happy_cms.media.crop.zoom_in'|trans({}, 'SyliusHappyCMSPlugin'),
-    crop_zoom_out: 'sylius_happy_cms.media.crop.zoom_out'|trans({}, 'SyliusHappyCMSPlugin'),
-    crop: 'sylius_happy_cms.media.crop.main'|trans({}, 'SyliusHappyCMSPlugin'),
-    delete_success: 'sylius_happy_cms.media.delete.success'|trans({}, 'SyliusHappyCMSPlugin'),
-    delete: 'sylius_happy_cms.media.delete.main'|trans({}, 'SyliusHappyCMSPlugin'),
-    description: 'sylius_happy_cms.media.description'|trans({}, 'SyliusHappyCMSPlugin'),
-    diff: 'sylius_happy_cms.media.editor.diff'|trans({}, 'SyliusHappyCMSPlugin'),
-    dimension: 'sylius_happy_cms.media.dimension'|trans({}, 'SyliusHappyCMSPlugin'),
-    downloaded: 'sylius_happy_cms.media.download.downloaded'|trans({}, 'SyliusHappyCMSPlugin'),
-    editor: 'sylius_happy_cms.media.editor.main'|trans({}, 'SyliusHappyCMSPlugin'),
-    error_altered_fwli: 'sylius_happy_cms.media.error.altered_fwli'|trans({}, 'SyliusHappyCMSPlugin'),
-    filter_by: 'sylius_happy_cms.media.filter.by'|trans({attr: 'sylius_happy_cms.media.'}, 'SyliusHappyCMSPlugin'),
-    filtration: 'sylius_happy_cms.media.filter.filtration'|trans({}, 'SyliusHappyCMSPlugin'),
-    find: 'sylius_happy_cms.media.find'|trans({}, 'SyliusHappyCMSPlugin'),
-    folder: 'sylius_happy_cms.media.folder'|trans({}, 'SyliusHappyCMSPlugin'),
-    found: 'sylius_happy_cms.media.found'|trans({}, 'SyliusHappyCMSPlugin'),
-    go_to_folder: 'sylius_happy_cms.media.go_to_folder'|trans({}, 'SyliusHappyCMSPlugin'),
-    image: 'sylius_happy_cms.media.image'|trans({}, 'SyliusHappyCMSPlugin'),
-    last_modified: 'sylius_happy_cms.media.last_modified'|trans({}, 'SyliusHappyCMSPlugin'),
-    locked: 'sylius_happy_cms.media.locked'|trans({}, 'SyliusHappyCMSPlugin'),
-    move_clear: 'sylius_happy_cms.media.move.clear_list'|trans({}, 'SyliusHappyCMSPlugin'),
-    move_success: 'sylius_happy_cms.media.move.success'|trans({}, 'SyliusHappyCMSPlugin'),
-    move: 'sylius_happy_cms.media.move.main'|trans({}, 'SyliusHappyCMSPlugin'),
-    name: 'sylius_happy_cms.media.name'|trans({}, 'SyliusHappyCMSPlugin'),
-    new_uploads_notif: 'sylius_happy_cms.media.upload.new_uploads_notif'|trans({}, 'SyliusHappyCMSPlugin'),
-    no_val: 'sylius_happy_cms.media.no_val'|trans({}, 'SyliusHappyCMSPlugin'),
-    non: 'sylius_happy_cms.media.non'|trans({}, 'SyliusHappyCMSPlugin'),
-    nothing_found: 'sylius_happy_cms.media.nothing_found'|trans({}, 'SyliusHappyCMSPlugin'),
-    open: 'sylius_happy_cms.media.open'|trans({}, 'SyliusHappyCMSPlugin'),
-    close: 'sylius_happy_cms.media.close'|trans({}, 'SyliusHappyCMSPlugin'),
-    options: 'sylius_happy_cms.media.options'|trans({}, 'SyliusHappyCMSPlugin'),
-    presets: 'sylius_happy_cms.media.crop.presets'|trans({}, 'SyliusHappyCMSPlugin'),
-    refresh_notif: 'sylius_happy_cms.media.refresh_notif'|trans({}, 'SyliusHappyCMSPlugin'),
-    rename_success: 'sylius_happy_cms.media.rename.success'|trans({}, 'SyliusHappyCMSPlugin'),
-    rename: 'sylius_happy_cms.media.rename.main'|trans({}, 'SyliusHappyCMSPlugin'),
-    reset: 'sylius_happy_cms.media.move.reset'|trans({}, 'SyliusHappyCMSPlugin'),
-    save_success: 'sylius_happy_cms.media.save.success'|trans({}, 'SyliusHappyCMSPlugin'),
-    save: 'sylius_happy_cms.media.save.main'|trans({}, 'SyliusHappyCMSPlugin'),
-    selected: 'sylius_happy_cms.media.select.selected'|trans({}, 'SyliusHappyCMSPlugin'),
-    sep_download: 'sylius_happy_cms.media.download.sep'|trans({}, 'SyliusHappyCMSPlugin'),
-    size: 'sylius_happy_cms.media.size'|trans({}, 'SyliusHappyCMSPlugin'),
-    sort_by: 'sylius_happy_cms.media.sort_by'|trans({}, 'SyliusHappyCMSPlugin'),
-    stand_by: 'sylius_happy_cms.media.stand_by'|trans({}, 'SyliusHappyCMSPlugin'),
-    text: 'sylius_happy_cms.media.text'|trans({}, 'SyliusHappyCMSPlugin'),
-    to_cp: 'sylius_happy_cms.media.copy.to_cp'|trans({}, 'SyliusHappyCMSPlugin'),
-    upload_in_progress: 'sylius_happy_cms.media.upload.in_progress'|trans({}, 'SyliusHappyCMSPlugin'),
-    upload_success: 'sylius_happy_cms.media.upload.success'|trans({}, 'SyliusHappyCMSPlugin'),
-    video: 'sylius_happy_cms.media.video'|trans({}, 'SyliusHappyCMSPlugin'),
-    clarity: 'sylius_happy_cms.media.editor.clarity'|trans({}, 'SyliusHappyCMSPlugin'),
-    pinhole: 'sylius_happy_cms.media.editor.pinhole'|trans({}, 'SyliusHappyCMSPlugin'),
-    love: 'sylius_happy_cms.media.editor.love'|trans({}, 'SyliusHappyCMSPlugin'),
-    jarques: 'sylius_happy_cms.media.editor.jarques'|trans({}, 'SyliusHappyCMSPlugin'),
-    orange_peel: 'sylius_happy_cms.media.editor.orange_peel'|trans({}, 'SyliusHappyCMSPlugin'),
-    sin_city: 'sylius_happy_cms.media.editor.sin_city'|trans({}, 'SyliusHappyCMSPlugin'),
-    grungy: 'sylius_happy_cms.media.editor.grungy'|trans({}, 'SyliusHappyCMSPlugin'),
-    old_boot: 'sylius_happy_cms.media.editor.old_boot'|trans({}, 'SyliusHappyCMSPlugin'),
-    lomo: 'sylius_happy_cms.media.editor.lomo'|trans({}, 'SyliusHappyCMSPlugin'),
-    vintage: 'sylius_happy_cms.media.editor.vintage'|trans({}, 'SyliusHappyCMSPlugin'),
-    cross_process: 'sylius_happy_cms.media.editor.cross_process'|trans({}, 'SyliusHappyCMSPlugin'),
-    concentrate: 'sylius_happy_cms.media.editor.concentrate'|trans({}, 'SyliusHappyCMSPlugin'),
-    glowing_sun: 'sylius_happy_cms.media.editor.glowing_sun'|trans({}, 'SyliusHappyCMSPlugin'),
-    sunrise: 'sylius_happy_cms.media.editor.sunrise'|trans({}, 'SyliusHappyCMSPlugin'),
-    nostalgia: 'sylius_happy_cms.media.editor.nostalgia'|trans({}, 'SyliusHappyCMSPlugin'),
-    hemingway: 'sylius_happy_cms.media.editor.hemingway'|trans({}, 'SyliusHappyCMSPlugin'),
-    her_majesty: 'sylius_happy_cms.media.editor.her_majesty'|trans({}, 'SyliusHappyCMSPlugin'),
-    hazy_days: 'sylius_happy_cms.media.editor.hazy_days'|trans({}, 'SyliusHappyCMSPlugin'),
-    brightness: 'sylius_happy_cms.media.editor.brightness'|trans({}, 'SyliusHappyCMSPlugin'),
-    contrast: 'sylius_happy_cms.media.editor.contrast'|trans({}, 'SyliusHappyCMSPlugin'),
-    saturation: 'sylius_happy_cms.media.editor.saturation'|trans({}, 'SyliusHappyCMSPlugin'),
-    vibrance: 'sylius_happy_cms.media.editor.vibrance'|trans({}, 'SyliusHappyCMSPlugin'),
-    exposure: 'sylius_happy_cms.media.editor.exposure'|trans({}, 'SyliusHappyCMSPlugin'),
-    hue: 'sylius_happy_cms.media.editor.hue'|trans({}, 'SyliusHappyCMSPlugin'),
-    sepia: 'sylius_happy_cms.media.editor.sepia'|trans({}, 'SyliusHappyCMSPlugin'),
-    gamma: 'sylius_happy_cms.media.editor.gamma'|trans({}, 'SyliusHappyCMSPlugin'),
-    noise: 'sylius_happy_cms.media.editor.noise'|trans({}, 'SyliusHappyCMSPlugin'),
-    clip: 'sylius_happy_cms.media.editor.clip'|trans({}, 'SyliusHappyCMSPlugin'),
-    sharpen: 'sylius_happy_cms.media.editor.sharpen'|trans({}, 'SyliusHappyCMSPlugin'),
-    stack_blur: 'sylius_happy_cms.media.editor.stack_blur'|trans({}, 'SyliusHappyCMSPlugin'),
-    greyscale: 'sylius_happy_cms.media.editor.greyscale'|trans({}, 'SyliusHappyCMSPlugin'),
-    invert: 'sylius_happy_cms.media.editor.invert'|trans({}, 'SyliusHappyCMSPlugin'),
-    public: 'sylius_happy_cms.media.visibility.public'|trans({}, 'SyliusHappyCMSPlugin'),
-    private: 'sylius_happy_cms.media.visibility.private'|trans({}, 'SyliusHappyCMSPlugin'),
-    'seo.title': 'sylius_happy_cms.media.seo.title'|trans({}, 'SyliusHappyCMSPlugin'),
-    'seo.alt': 'sylius_happy_cms.media.seo.alt'|trans({}, 'SyliusHappyCMSPlugin'),
-    'seo.description': 'sylius_happy_cms.media.seo.description'|trans({}, 'SyliusHappyCMSPlugin'),
-    edit_metas_success: 'sylius_happy_cms.media.seo.edit_metas'|trans({}, 'SyliusHappyCMSPlugin'),
-    generate_alt: 'sylius_happy_cms.media.alt.generate_alt'|trans({}, 'SyliusHappyCMSPlugin'),
-    generate_alt_success: 'sylius_happy_cms.media.alt.generate_alt_success'|trans({}, 'SyliusHappyCMSPlugin'),
-    generate_alt_no_change: 'sylius_happy_cms.media.alt.generate_alt_no_change'|trans({}, 'SyliusHappyCMSPlugin'),
-    generate_all_alt: 'sylius_happy_cms.media.alt.generate_alt',
-    languages: 'sylius_happy_cms.media.languages',
-} %}
-
 
 <div class="page-wrapper">
-<div id="media-holder">
-<media-manager inline-template
-               v-cloak
-               class="hide-native-scrollbar"
-               :config="{{ options|json_encode }}"
-               :routes="{{ routes|json_encode }}"
-               :translations="{{ translations|json_encode }}"
-               :in-modal="{{ modal|default(null) ? 'true' : 'false' }}"
-               :hide-ext="{{ hideExt|default(null) ? hideExt|json_encode : '[]' }}"
-               :hide-path="{{ hidePath|default(null) ? hidePath|json_encode : '[]' }}"
-               :restrict="{{ restrict|default(null) ? restrict|json_encode : '{}' }}"
-               :user-id="{{ sylius_happy_cms.media.enable_broadcasting ? app.user.id : 0 }}"
-               :upload-panel-img-list="{{ patterns|default(null) ?: '[]' }}"
-               :enable-editor="{{ (editor is defined and not editor) ? 'false' : 'true' }}"
-               :enable-upload="{{ (upload is defined and not upload) ? 'false' : 'true' }}"
-               :enable-move="{{ (move is defined and not move) ? 'false' : 'true' }}"
-               :enable-rename="{{ (rename is defined and not rename) ? 'false' : 'true' }}"
-               :enable-metas="{{ (metas is defined and not metas) ? 'false' : 'true' }}"
-               :enable-delete="{{ (delete is defined and not delete) ? 'false' : 'true' }}"
-               :enable-bulk-selection="{{ (bulk_selection is defined and not bulk_selection) ? 'false' : 'true' }}"
-               :enable-generating-alts="{{ sylius_happy_cms.media.enable_generating_alts ? 'true' : 'false' }}"
->
-
-    <div class="media-manager" >
-
-        {# top toolbar #}
-        {{ include('@SyliusHappyCMSPlugin/media/partials/manager/toolbar.html.twig') }}
-        {# ====================================================================== #}
-
-        {# dropzone #}
-        {{ include('@SyliusHappyCMSPlugin/media/partials/manager/dropzone.html.twig') }}
-        {# ====================================================================== #}
-
-        <!--<div class="level-right">
-            {# upload preview info #}
-            <div class="level-item" v-if="waitingForUpload">
-                <nav class="breadcrumb">
-                    <ul>
-                        <li><p class="level has-text-weight-bold">{% verbatim %}{{ uploadPreviewList.length }}{% endverbatim %} File's</p></li>
-                        <li><p class="level has-text-weight-bold">{% verbatim %}{{ uploadPreviewListSize }}{% endverbatim %}</p></li>
-                    </ul>
-                </nav>
-            </div>
-
-            {# toggle sidebar #}
-            <div class="level-item" v-show="!isLoading && !waitingForUpload">
-                {# show/hide toolbar #}
-                <div class="block sm:hidden">
-                    <button type="button" class="button is-link __stack-left-toolbarToggle" @click.stop="toolBar = !toolBar">
-                        <span class="icon"><icon :name="toolBar ? 'times' : 'bars'"></icon></span>
-                    </button>
-                </div>
-            </div>
-        </div>-->
-
-        <div class="media-manager__stack">
-            {# path toolbar #}
-            {{ include('@SyliusHappyCMSPlugin/media/partials/manager/breadcrumb.html.twig') }}
-            {# ====================================================================== #}
-
-            <section class="__stack-container">
-                {# upload preview #}
-                {{ include('@SyliusHappyCMSPlugin/media/partials/manager/upload-preview.html.twig') }}
-
-                {# loadings #}
-                {{ include('@SyliusHappyCMSPlugin/media/partials/manager/loadings.html.twig') }}
-
-                {# overlay #}
-                <container-click-overlay></container-click-overlay>
-
-                <div class="extra-func-btns" v-if="enableMove">
-                    {# intro #}
-{# <usage-intro-btn v-show="!isLoading && !waitingForUpload"></usage-intro-btn> #}
-
-                    {# movable list #}
-                    <v-touch v-if="allItemsCount && !isLoading && !waitingForUpload && !inMovableList()"
-                             class="movable-list"
-                             v-tippy="{arrow: true, hideOnClick: false}"
-                             :title="'{{ 'sylius_happy_cms.media.add.list'|trans({}, 'SyliusHappyCMSPlugin') }} (c / x)'"
-                             @tap="addToMovableList()">
-                        <span class="icon is-large">
-                            <icon name="plus" scale="1.2"></icon>
-                        </span>
-                    </v-touch>
-
-                    <v-touch v-if="allItemsCount && movableItemsCount && !isLoading && !waitingForUpload"
-                             class="movable-list mt-4"
-                             v-tippy="{arrow: true, hideOnClick: false}"
-                             :title="'{{ 'sylius_happy_cms.show.list'|trans({}, 'SyliusHappyCMSPlugin') }}'"
-                             @tap="showMovableList()"
-                             @hold="clearMovableList()">
-                        <span class="icon is-large">
-                            <icon name="list-ul" scale="1.2"></icon>
-                        </span>
-                        <span class="counter">{% verbatim %}{{ movableItemsCount || null }}{% endverbatim %}</span>
-                    </v-touch>
-                </div>
-
-                {# ====================================================================== #}
-
-                {# files box #}
-                <v-touch class="__stack-files mm-animated"
-                         :class="{'__stack-sidebar-hidden' : !infoSidebar}"
-                         ref="__stack-files"
-                         @swiperight="goToPrevFolder()"
-                         @swipeleft="goToPrevFolder()"
-                         @hold="containerClick($event)"
-                         @dbltap="containerClick($event)"
-                         @pinchin="containerClick($event)">
-
-                    {# no search #}
-                    <section>
-                        <div id="no_search" v-show="no_search">
-                            <div id="no_search_anim" data-json="/bundles/syliushappycmsplugin/dist/lottie/ice_cream.json"></div>
-                            <h3>{{ 'sylius_happy_cms.nothing_found'|trans({}, 'SyliusHappyCMSPlugin') }}</h3>
-                        </div>
-                    </section>
-
-                    {# files #}
-                    <ul class="__files-boxs" ref="filesList">
-                        <li v-for="(file, index) in orderBy(allFiles, sortName, sortDirection)"
-                            :key="file.name"
-                            :data-file-index="index"
-                            @click.stop="setSelected(file, index, $event)">
-                            <v-touch class="__file-box mm-animated"
-                                     :class="{'bulk-selected': IsInBulkList(file), 'selected' : isSelected(file)}"
-                                     @swipeup="swipGesture($event, file, index)"
-                                     @swipedown="swipGesture($event, file, index)"
-                                     @swiperight="swipGesture($event, file, index)"
-                                     @swipeleft="swipGesture($event, file, index)"
-                                     @hold="pressGesture($event, file, index)"
-                                     @dbltap="pressGesture($event, file, index)">
-
-                                {# copy file link #}
-                                <div v-if="!fileTypeIs(file, 'folder') && !fileTypeIs(file, 'oembed')"
-                                     class="__box-copy-link icon"
-                                     @click.stop="copyLink(file.path)"
-                                     :title="linkCopied ? trans('copied') : trans('to_cp')"
-                                     v-tippy="{arrow: true, hideOnClick: false}"
-                                     @hidden="linkCopied = false">
-                                    <icon name="regular/clone" scale="0.9"></icon>
-                                </div>
-
-                                <div class="__box-data">
-                                    <div class="__box-preview">
-                                        <template v-if="fileTypeIs(file, 'image')">
-                                            <image-intersect
-                                                    :file="file"
-                                                    :check-for-dimensions="checkForDimensions"
-                                                    :browser-support="browserSupport"
-                                                    root-el=".__stack-files">
-                                            </image-intersect>
-                                        </template>
-
-                                        <template v-else-if="fileTypeIs(file, 'oembed')">
-                                            <img v-if="file.metas.icon" :src="file.metas.icon">
-                                            <icon v-else name="external-link-alt" scale="2.6"></icon>
-                                        </template>
-
-                                        <span v-else class="icon is-large">
-                                            <icon v-if="fileTypeIs(file, 'folder')" name="folder" scale="2.6"></icon>
-                                            <icon v-else-if="fileTypeIs(file, 'application')" name="cogs" scale="2.6"></icon>
-                                            <icon v-else-if="fileTypeIs(file, 'compressed')" name="regular/file-archive" scale="2.6"></icon>
-                                            <icon v-else-if="fileTypeIs(file, 'video')" name="film" scale="2.6"></icon>
-                                            <icon v-else-if="fileTypeIs(file, 'audio')" name="music" scale="2.6"></icon>
-                                            <icon v-else-if="fileTypeIs(file, 'pdf')" name="regular/file-pdf" scale="2.6"></icon>
-                                            <icon v-else-if="fileTypeIs(file, 'text')" name="regular/file-alt" scale="2.6"></icon>
-                                        </span>
-                                    </div>
-
-                                    <div class="__box-info">
-                                        {# folder #}
-                                        <template v-if="fileTypeIs(file, 'folder')">
-                                            <h4>{% verbatim %}{{ file.name }}{% endverbatim %}</h4>
-                                        </template>
-
-                                        {# any other #}
-                                        <template v-else>
-                                            <h4>{% verbatim %}{{ file.name }}{% endverbatim %}</h4>
-                                            <small class="__info-file-size" v-if="file.size">{% verbatim %}{{ getFileSize(file.size) }}{% endverbatim %}</small>
-                                        </template>
-                                    </div>
-                                </div>
-                            </v-touch>
-                        </li>
-                    </ul>
-
-                    <infinite-loading v-if="firstRun && files.next"
-                                      spinner="waveDots"
-                                      @infinite="loadPaginatedFiles">
-                        <span slot="no-more"></span>
-                    </infinite-loading>
-                </v-touch>
-
-            </section>
-
-        </div>
-
-        {# ====================================================================== #}
-
-        {# modals #}
-        {{ include('@SyliusHappyCMSPlugin/media/partials/modal/ops.html.twig') }}
-    </div>
-</media-manager>
-
+    <div id="happy-cms-media-manager"></div>
 </div>
-</div>
+
+<script>
+(function () {
+    var locale = '{{ app.request.locale|default('fr') }}';
+    var config = {{ {
+        baseUrl: sylius_happy_cms.media.base_url,
+        hideFilesExt: sylius_happy_cms.media.hide_files_ext,
+        mimeTypes: sylius_happy_cms.media.extended_mimes,
+        generatingAlts: sylius_happy_cms.media.enable_generating_alts,
+    }|json_encode|raw }};
+    var features = {{ features|json_encode|raw }};
+    var routes = {
+        files:            '{{ path('media.get_files') }}',
+        upload:           '{{ path('media.upload') }}',
+        fileInfos:        '{{ path('media.get_file_info') }}',
+        uploadCropped:    '{{ path('media.uploadCropped') }}',
+        uploadLink:       '{{ path('media.uploadLink') }}',
+        newFolder:        '{{ path('media.new_folder') }}',
+        deleteFile:       '{{ path('media.delete_file') }}',
+        moveFile:         '{{ path('media.move_file') }}',
+        renameFile:       '{{ path('media.rename_file') }}',
+        editMetas:        '{{ path('media.edit_metas_file') }}',
+        generateAlt:      '{{ path('media.generate_alt_file') }}',
+        generateAltGroup: '{{ path('media.generate_alt_group') }}',
+        generateAllAlt:   '{{ path('media.generate_all_alt') }}',
+        globalSearch:     '{{ path('media.global_search') }}',
+        folderDownload:   '{{ path('media.folder_download') }}',
+        filesDownload:    '{{ path('media.files_download') }}',
+    };
+
+    function initManager() {
+        if (!window.EasyMedia) return;
+        window.EasyMedia.configure({ locale: locale, config: config, features: features, routes: routes });
+        window.EasyMedia.mount({ target: '#happy-cms-media-manager' });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initManager);
+    } else {
+        initManager();
+    }
+})();
+</script>

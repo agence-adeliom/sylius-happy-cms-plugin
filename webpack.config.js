@@ -1,5 +1,4 @@
 var Encore = require('@symfony/webpack-encore');
-const path = require("path");
 
 Encore
     .setOutputPath('./resources/public/')
@@ -11,13 +10,8 @@ Encore
     .enableVersioning(Encore.isProduction())
     .disableSingleRuntimeChunk()
     .enableSassLoader()
-    .enableVueLoader()
+    .enableReactPreset()
     .enablePostCssLoader()
-
-    .copyFiles({
-        from: './assets/media/dist',
-        to: 'dist/[path][name].[ext]',
-    })
 
     .copyFiles({
         from: './assets/blocks/dist',
@@ -32,12 +26,4 @@ Encore
     .addEntry('page-builder', './assets/page-builder/entrypoint.js')
 ;
 
-const webpackConfig = Encore.getWebpackConfig();
-
-// Configure webpack to use browser build for plyr instead of ES module sources
-webpackConfig.resolve.alias = {
-    ...webpackConfig.resolve.alias,
-    'plyr': path.resolve(__dirname, 'node_modules/plyr/dist/plyr.min.js')
-};
-
-module.exports = webpackConfig;
+module.exports = Encore.getWebpackConfig();

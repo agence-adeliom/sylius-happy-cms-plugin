@@ -18,9 +18,9 @@
            controller="Adeliom\SyliusHappyCMSPlugin\Controller\Media\MediaController::uploadLink"
            path="/admin/happy-cms-media/medias/upload-link"/>
 
-    <route methods="POST" id="media.get_files" controller="Adeliom\SyliusHappyCMSPlugin\Controller\Media\MediaController::getFiles"
+    <route methods="GET" id="media.get_files" controller="Adeliom\SyliusHappyCMSPlugin\Controller\Media\MediaController::getFiles"
            path="/admin/happy-cms-media/medias/get-files"/>
-    <route methods="POST" id="media.get_file_info"
+    <route methods="GET" id="media.get_file_info"
            controller="Adeliom\SyliusHappyCMSPlugin\Controller\Media\MediaController::getItemInfos"
            path="/admin/happy-cms-media/medias/get-file-info"/>
     <route methods="POST" id="media.new_folder"

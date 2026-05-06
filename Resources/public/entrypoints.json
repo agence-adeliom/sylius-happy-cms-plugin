@@ -2,44 +2,44 @@
   "entrypoints": {
     "flexible-content": {
       "css": [
-        "/bundles/syliushappycmsplugin/flexible-content.4e7e726a.css"
+        "/bundles/syliushappycmsplugin/flexible-content.css"
       ],
       "js": [
-        "/bundles/syliushappycmsplugin/flexible-content.26e202f1.js"
+        "/bundles/syliushappycmsplugin/flexible-content.js"
       ]
     },
     "media-form": {
       "css": [
-        "/bundles/syliushappycmsplugin/media-form.3b516d59.css"
+        "/bundles/syliushappycmsplugin/media-form.css"
       ],
       "js": [
-        "/bundles/syliushappycmsplugin/media-form.90314678.js"
+        "/bundles/syliushappycmsplugin/media-form.js"
       ]
     },
     "seo-block-type": {
       "css": [
-        "/bundles/syliushappycmsplugin/seo-block-type.f13b7af5.css"
+        "/bundles/syliushappycmsplugin/seo-block-type.css"
       ],
       "js": [
-        "/bundles/syliushappycmsplugin/seo-block-type.874b6111.js"
+        "/bundles/syliushappycmsplugin/seo-block-type.js"
       ]
     },
     "accordion-block-type": {
       "js": [
-        "/bundles/syliushappycmsplugin/accordion-block-type.961856ec.js"
+        "/bundles/syliushappycmsplugin/accordion-block-type.js"
       ]
     },
     "tiny-mce": {
       "js": [
-        "/bundles/syliushappycmsplugin/tiny-mce.8a757ac5.js"
+        "/bundles/syliushappycmsplugin/tiny-mce.js"
       ]
     },
     "page-builder": {
       "css": [
-        "/bundles/syliushappycmsplugin/page-builder.252b7b70.css"
+        "/bundles/syliushappycmsplugin/page-builder.css"
       ],
       "js": [
-        "/bundles/syliushappycmsplugin/page-builder.39dba83c.js"
+        "/bundles/syliushappycmsplugin/page-builder.js"
       ]
     }
   }

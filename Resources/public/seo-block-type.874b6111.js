@@ -1,1 +1,0 @@
-(()=>{"use strict";window.addEventListener("DOMContentLoaded",function(){document.querySelectorAll("[js-seo-block-content]").forEach(function(e){e.querySelector("[js-seo-block-opener]").addEventListener("click",function(){e.classList.toggle("is-open")})})})})();
