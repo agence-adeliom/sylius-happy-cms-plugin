@@ -1,5 +1,15 @@
 sylius_twig_hooks:
   hooks:
+    'sylius_admin.base#javascripts':
+      easy_media_init:
+        template: '@SyliusHappyCMSPlugin/admin/shared/layout/easy_media_init.html.twig'
+        priority: -100
+
+    'sylius_admin.base#stylesheets':
+      easy_media_styles:
+        template: '@SyliusHappyCMSPlugin/admin/shared/layout/easy_media_styles.html.twig'
+        priority: -100
+
     'sylius_shop.base#metatags':
       happy_seo_metas:
         template: "@SyliusHappyCMSPlugin/front/template_block/seo_metas.html.twig"

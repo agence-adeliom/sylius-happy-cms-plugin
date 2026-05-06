@@ -1,0 +1,52 @@
+<script src="{{ asset('media-form.js', 'sylius.happy.cms.assets.package') }}"></script>
+<script>
+(function () {
+    function configureEasyMedia() {
+        if (!window.EasyMedia || window._easyMediaConfigured) return;
+        window._easyMediaConfigured = true;
+        window.EasyMedia.configure({
+            locale: '{{ app.request.locale|default('fr') }}',
+            config: {{ {
+                baseUrl: sylius_happy_cms.media.base_url,
+                hideFilesExt: sylius_happy_cms.media.hide_files_ext,
+                mimeTypes: sylius_happy_cms.media.extended_mimes,
+                generatingAlts: sylius_happy_cms.media.enable_generating_alts,
+            }|json_encode|raw }},
+            features: {
+                enableEditor: true,
+                enableUpload: true,
+                enableMove: true,
+                enableRename: true,
+                enableMetas: true,
+                enableDelete: true,
+                enableBulkSelection: true,
+                enableGeneratingAlts: {{ sylius_happy_cms.media.enable_generating_alts ? 'true' : 'false' }},
+            },
+            routes: {
+                files:            '{{ path('media.get_files') }}',
+                upload:           '{{ path('media.upload') }}',
+                fileInfos:        '{{ path('media.get_file_info') }}',
+                uploadCropped:    '{{ path('media.uploadCropped') }}',
+                uploadLink:       '{{ path('media.uploadLink') }}',
+                newFolder:        '{{ path('media.new_folder') }}',
+                deleteFile:       '{{ path('media.delete_file') }}',
+                moveFile:         '{{ path('media.move_file') }}',
+                renameFile:       '{{ path('media.rename_file') }}',
+                editMetas:        '{{ path('media.edit_metas_file') }}',
+                generateAlt:      '{{ path('media.generate_alt_file') }}',
+                generateAltGroup: '{{ path('media.generate_alt_group') }}',
+                generateAllAlt:   '{{ path('media.generate_all_alt') }}',
+                globalSearch:     '{{ path('media.global_search') }}',
+                folderDownload:   '{{ path('media.folder_download') }}',
+                filesDownload:    '{{ path('media.files_download') }}',
+            },
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', configureEasyMedia);
+    } else {
+        configureEasyMedia();
+    }
+})();
+</script>
