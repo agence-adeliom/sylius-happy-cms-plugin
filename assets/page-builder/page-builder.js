@@ -380,7 +380,7 @@ document.addEventListener('DOMContentLoaded', function() {
               const blockHeight = blockRect.height;
 
               // Set handle position and height
-              handle.style.top = blockTop + 'px';
+              handle.style.transform = `translateY(${blockTop}px)`;
               handle.style.height = blockHeight + 'px';
 
               // Check if block is visible in viewport
@@ -397,26 +397,11 @@ document.addEventListener('DOMContentLoaded', function() {
           });
         }
 
-        // Throttle function to limit scroll event frequency
-        function throttle(func, limit) {
-          let inThrottle;
-          return function() {
-            const args = arguments;
-            const context = this;
-            if (!inThrottle) {
-              func.apply(context, args);
-              inThrottle = true;
-              setTimeout(() => inThrottle = false, limit);
-            }
-          }
-        }
-
-        // Update positions on iframe scroll (throttled)
-        const throttledUpdate = throttle(updateBlockHandlesPositions, 50);
-        iframeWindow.addEventListener('scroll', throttledUpdate);
+        // Update positions on iframe scroll
+        iframeWindow.addEventListener('scroll', updateBlockHandlesPositions);
 
         // Update positions on iframe resize
-        iframeWindow.addEventListener('resize', throttledUpdate);
+        iframeWindow.addEventListener('resize', updateBlockHandlesPositions);
 
         // Initial positioning
         setTimeout(updateBlockHandlesPositions, 100);
