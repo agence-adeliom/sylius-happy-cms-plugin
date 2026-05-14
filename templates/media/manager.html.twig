@@ -55,7 +55,8 @@
 
     function initManager() {
         if (!window.EasyMedia) return;
-        window.EasyMedia.configure({ locale: locale, config: config, features: features, routes: routes });
+        var translations = (window.EasyMedia.translations && (window.EasyMedia.translations[locale] || window.EasyMedia.translations.en)) || {};
+        window.EasyMedia.configure({ locale: locale, translations: translations, config: config, features: features, routes: routes });
         window.EasyMedia.mount({ target: '#happy-cms-media-manager' });
     }
 

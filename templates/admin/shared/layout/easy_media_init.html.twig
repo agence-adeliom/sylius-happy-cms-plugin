@@ -1,11 +1,14 @@
 <script src="{{ asset('media-form.js', 'sylius.happy.cms.assets.package') }}"></script>
 <script>
 (function () {
+    var translations = (window.EasyMedia && window.EasyMedia.translations && (window.EasyMedia.translations['{{ app.request.locale|default('fr') }}'] || window.EasyMedia.translations.en)) || {};
+
     function configureEasyMedia() {
         if (!window.EasyMedia || window._easyMediaConfigured) return;
         window._easyMediaConfigured = true;
         window.EasyMedia.configure({
             locale: '{{ app.request.locale|default('fr') }}',
+            translations: translations,
             config: {{ {
                 baseUrl: sylius_happy_cms.media.base_url,
                 hideFilesExt: sylius_happy_cms.media.hide_files_ext,
