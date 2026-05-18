@@ -37,7 +37,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'sylius_happy_cms__<?= Str::asSnakeCase($classNameDetail->getShortName()) ?>')]
 class <?= $classNameDetail->getShortName() ?> extends Base<?= $classNameDetail->getShortName() ?> {
 <?php if ($addContentBlocks === true) { ?>
-    /** @var Collection<int, <?= $classNameDetail->getShortName() ?>ContentBlock> */
+
     #[ORM\OneToMany(targetEntity: <?= $classNameDetail->getShortName() ?>ContentBlock::class, mappedBy: 'contentOwner', cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[ORM\OrderBy(['position' => 'ASC'])]
     protected Collection $contentBlocks;
@@ -50,6 +50,7 @@ class <?= $classNameDetail->getShortName() ?> extends Base<?= $classNameDetail->
         return <?= $classNameDetail->getShortName() ?>ContentBlock::class;
     }
 <?php } ?>
+<?php if ($addTrans === true) { ?>
     protected function createTranslation(): <?= $classNameDetail->getShortName() ?>TranslationInterface
     {
         return new <?= $classNameDetail->getShortName() ?>Translation();
@@ -60,4 +61,5 @@ class <?= $classNameDetail->getShortName() ?> extends Base<?= $classNameDetail->
         return <?= $classNameDetail->getShortName() ?>Translation::class;
     }
 }
+<?php } ?>
 <?php } ?>
