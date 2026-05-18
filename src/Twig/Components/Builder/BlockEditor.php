@@ -19,6 +19,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
@@ -75,6 +76,7 @@ class BlockEditor extends AbstractController
         private readonly ParameterBagInterface $parameterBag,
         private readonly AIBundleDetector $aiBundleDetector,
         private readonly BlockContentGenerator $blockContentGenerator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -613,7 +615,7 @@ class BlockEditor extends AbstractController
         $searchText = strtolower($this->blockFilterText);
 
         foreach ($allBlocksData['blocks'] as $type => $blockData) {
-            $blockName = strtolower($blockData['block']->getName());
+            $blockName = strtolower($this->translator->trans($blockData['block']->getName()));
             $blockCategory = $blockData['tabKey'];
 
             // Check if matches text filter

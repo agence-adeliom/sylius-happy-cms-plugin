@@ -249,13 +249,7 @@
                         data-live-action-param="prevent|openBlockBrowser"
                         style="padding: 16px 32px; font-size: 16px;"
                     >
-                        <svg width="20" height="20" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-                              <rect x="1.5" y="2.5" width="7" height="1.2" rx="0.6" fill="currentColor"/>
-                              <rect x="1.5" y="6.4" width="7" height="1.2" rx="0.6" fill="currentColor"/>
-                              <rect x="1.5" y="10.3" width="7" height="1.2" rx="0.6" fill="currentColor"/>
-                              <circle cx="11.3" cy="9.3" r="2.1" stroke="currentColor" stroke-width="0.9" fill="none"/>
-                              <path d="M13.0 11.0 L14.2 12.2" stroke="currentColor" stroke-width="0.9" stroke-linecap="round"/>
-                            </svg>
+                        {{ ux_icon('tabler:blocks') }}
                         <span class="mr-2">{% trans %}sylius_happy_cms.page_builder.browse_blocks{% endtrans %}</span>
                     </button>
 
@@ -266,14 +260,7 @@
                         data-live-action-param="prevent|openAIGenerator"
                         style="padding: 16px 32px; font-size: 16px;"
                     >
-                        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 8px; vertical-align: text-bottom;" aria-hidden="true" focusable="false">
-                            <rect x="2" y="4" width="12" height="8" rx="2" ry="2"/>
-                            <rect x="4.25" y="6.5" width="1.25" height="1.25" rx="0.25" fill="#fff"/>
-                            <rect x="10.5" y="6.5" width="1.25" height="1.25" rx="0.25" fill="#fff"/>
-                            <path d="M8 2.2v1.1" stroke="currentColor" stroke-width="0.9" stroke-linecap="round" fill="none"/>
-                            <circle cx="8" cy="10.5" r="0.9" fill="currentColor"/>
-                            <path d="M5 11.5c0-.8.9-1.3 2-1.3s2 .5 2 1.3" fill="none" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/>
-                        </svg>
+                        {{ ux_icon('tabler:sparkles') }}
                         <span class="mr-2">{% trans %}sylius_happy_cms.page_builder.generate_ai_content{% endtrans %}</span>
                     </button>
                 </div>
@@ -311,7 +298,7 @@
                             data-model="blockFilterText"
                         >
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 mt-3 mt-md-0">
                         <select class="form-select" data-model="blockFilterCategory">
                             <option value="all_blocks">{% trans %}sylius_happy_cms.blocks.tabs.all_blocks{% endtrans %}</option>
                             {% for tab in filteredBlocksData.tabs %}
@@ -327,19 +314,19 @@
             <div style="flex: 1; overflow-y: auto; padding: 1.5rem;">
                 {% if filteredBlocksData.blocks|length > 0 %}
                     {# Blocks grid #}
-                    <div class="row">
+                    <div class="grid">
                         {% for type, blockData in filteredBlocksData.blocks %}
                             {% set block = blockData.block %}
-                            <div class="col-md-4 col-lg-3 mb-3">
-                                <div class="card h-100">
+                            <div class="g-col-6 g-col-sm-4 g-col-md-3">
+                                <div class="card">
                                     {# Block icon/preview #}
-                                    <div class="card-img-top d-flex align-items-center justify-content-center" style="height: 150px; background-color: #f8f9fa;">
+                                    <div class="card-img-top d-flex align-items-center justify-content-center">
                                         {% if block.icon is iterable %}
                                             {% set firstIcon = block.icon|first %}
                                             {% if firstIcon starts with '<' %}
                                                 {{ firstIcon|raw }}
                                             {% else %}
-                                                <img src="{{ firstIcon }}" alt="{{ block.name }}" class="img-fluid" style="max-height: 130px;">
+                                                <img src="{{ firstIcon }}" alt="{{ block.name }}" class="img-fluid">
                                             {% endif %}
                                         {% elseif block.icon is not iterable and (block.icon starts with '<span' or block.icon starts with '<i ' or block.icon starts with '<svg' or block.icon starts with '<img') %}
                                             {{ block.icon|raw }}
@@ -358,14 +345,12 @@
                                         <div class="mt-auto">
                                             <button
                                                 type="button"
-                                                class="btn btn-primary btn-sm w-100"
+                                                class="btn btn-outline-primary btn-md w-100"
                                                 data-action="live#action"
                                                 data-live-action-param="prevent|addBlock"
                                                 data-live-block-type-param="{{ type }}"
                                             >
-                                                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 4px; vertical-align: text-bottom;">
-                                                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-                                                </svg>
+                                                {{ ux_icon('tabler:plus') }}
                                                 {% trans %}sylius_happy_cms.editor.add{% endtrans %}
                                             </button>
                                         </div>
