@@ -61,6 +61,7 @@
         var widgetId = '{{ form.vars.id }}';
 
         function initMediaWidget(widget) {
+            debugger;
             if (!widget || widget.dataset.mediaInit) return;
             widget.dataset.mediaInit = '1';
 
@@ -90,6 +91,7 @@
             }
 
             btnPick.addEventListener('click', async function () {
+                debugger;
                 if (!window.EasyMedia) return;
                 var file = await window.EasyMedia.pick(pickOptions);
                 if (file) renderPreview(file);

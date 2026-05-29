@@ -2,9 +2,10 @@
 # yarn lockfile v1
 
 
-"@adeliom/easy-media-manager@github:agence-adeliom/easy-media-manager":
+"@adeliom/easy-media-manager@github:agence-adeliom/easy-media-manager#154161fdb905677c5d5cef79867bd6c66314dfe3":
   version "4.0.0"
-  resolved "git+ssh://git@github.com/agence-adeliom/easy-media-manager.git#9928c75a99b2910c9b1693f1cf14efca83316254"
+  resolved "git+ssh://git@github.com/agence-adeliom/easy-media-manager.git#154161fdb905677c5d5cef79867bd6c66314dfe3"
+  integrity sha512-oc80Qc8BdTUXFFlFMftXu5NxXWBTy4W2SpRue5CxkC50QxKjRgz5qhtlHaG+1GVpdOPnpPHpH2mA53SA6CCkRA==
   dependencies:
     "@dnd-kit/core" "^6.3.1"
     "@dnd-kit/sortable" "^10.0.0"
@@ -1112,6 +1113,16 @@
   version "2.5.1"
   resolved "https://registry.npmjs.org/@parcel/watcher-darwin-arm64/-/watcher-darwin-arm64-2.5.1.tgz"
   integrity sha512-eAzPv5osDmZyBhou8PoF4i6RQXAfeKL9tjb3QzYuccXFMQU0ruIc/POh30ePnaOyD1UXdlKguHBmsTs53tVoPw==
+
+"@parcel/watcher-linux-arm64-glibc@2.5.1":
+  version "2.5.1"
+  resolved "https://registry.npmjs.org/@parcel/watcher-linux-arm64-glibc/-/watcher-linux-arm64-glibc-2.5.1.tgz"
+  integrity sha512-LrGp+f02yU3BN9A+DGuY3v3bmnFUggAITBGriZHUREfNEzZh/GO06FF5u2kx8x+GBEUYfyTGamol4j3m9ANe8w==
+
+"@parcel/watcher-linux-arm64-musl@2.5.1":
+  version "2.5.1"
+  resolved "https://registry.npmjs.org/@parcel/watcher-linux-arm64-musl/-/watcher-linux-arm64-musl-2.5.1.tgz"
+  integrity sha512-cFOjABi92pMYRXS7AcQv9/M1YuKRw8SZniCDw0ssQb/noPkRzA+HBDkwmyOJYp5wXcsTrhxO0zq1U11cK9jsFg==
 
 "@parcel/watcher@^2.4.1":
   version "2.5.1"
