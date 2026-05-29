@@ -153,7 +153,7 @@ sylius_happy_cms:
       file_folder: 'New File/Folder Name'
       folder_name: 'New Folder Name'
     no_files_in_folder: 'No Files In This Folder'
-    no_val: 'Maybe You Should Add Something First !!!'
+    no_val: 'You may add a media'
     non: None
     not_allowed_file_ext: 'File Type Is Not Allowed'
     nothing_found: 'Nothing Found'

@@ -30,19 +30,21 @@
                 <div class="__box-preview">
                     <div class="__box-img"></div>
                 </div>
-                <div class="__box-info js-media-info">
-                    {{ 'sylius_happy_cms.media.no_val'|trans({}, 'SyliusHappyCMSPlugin') }}
+                <div class="__box-info">
+                    <h4 class="js-media-name">{{ 'sylius_happy_cms.media.no_val'|trans({}, 'SyliusHappyCMSPlugin') }}</h4>
+                    <small class="__info-file-size js-media-size" style="display:none"></small>
+                </div>
+                <div class="__box-update">
+                    <span class="ui red button js-media-pick">
+                        {{ 'sylius_happy_cms.media.select.file'|trans({}, 'SyliusHappyCMSPlugin') }}
+                    </span>
+                </div>
+                <div class="__box-delete js-media-delete" style="display:none">
+                    <span class="ui red button js-media-clear">
+                        {{ 'sylius_happy_cms.media.remove'|trans({}, 'SyliusHappyCMSPlugin') }}
+                    </span>
                 </div>
             </div>
-        </div>
-
-        <div class="__box-actions" style="display:flex;gap:.5rem;margin-bottom:.5rem">
-            <span class="ui button js-media-pick">
-                {{ 'sylius_happy_cms.media.select.file'|trans({}, 'SyliusHappyCMSPlugin') }}
-            </span>
-            <span class="ui red button js-media-clear" style="display:none">
-                {{ 'sylius_happy_cms.media.remove'|trans({}, 'SyliusHappyCMSPlugin') }}
-            </span>
         </div>
 
         {{ form_widget(form, {type: 'number', attr: {style: 'display:none', class: 'js-media-input'}}) }}
@@ -60,38 +62,52 @@
     (function () {
         var widgetId = '{{ form.vars.id }}';
 
+        function formatFileSize(bytes) {
+            if (bytes === null || bytes === undefined || isNaN(bytes)) return '';
+            if (bytes === 0) return '0 B';
+            var units = ['B', 'KB', 'MB', 'GB', 'TB'];
+            var i = Math.floor(Math.log(bytes) / Math.log(1024));
+            return (bytes / Math.pow(1024, i)).toFixed(2) + ' ' + units[i];
+        }
+
         function initMediaWidget(widget) {
-            debugger;
             if (!widget || widget.dataset.mediaInit) return;
             widget.dataset.mediaInit = '1';
 
             var pickOptions = JSON.parse(widget.dataset.pickOptions || '{}');
-            var input    = widget.querySelector('.js-media-input');
-            var preview  = widget.querySelector('.js-media-preview .__box-img');
-            var infoEl   = widget.querySelector('.js-media-info');
-            var btnPick  = widget.querySelector('.js-media-pick');
-            var btnClear = widget.querySelector('.js-media-clear');
+            var input      = widget.querySelector('.js-media-input');
+            var preview    = widget.querySelector('.js-media-preview .__box-img');
+            var nameEl     = widget.querySelector('.js-media-name');
+            var sizeEl     = widget.querySelector('.js-media-size');
+            var deleteWrap = widget.querySelector('.js-media-delete');
+            var btnPick    = widget.querySelector('.js-media-pick');
+            var btnClear   = widget.querySelector('.js-media-clear');
 
             function renderPreview(file) {
                 if (!file) {
                     if (preview) preview.innerHTML = '';
-                    if (infoEl) infoEl.textContent = '{{ 'sylius_happy_cms.media.no_val'|trans({}, 'SyliusHappyCMSPlugin') }}';
-                    if (btnClear) btnClear.style.display = 'none';
+                    if (nameEl) nameEl.textContent = '{{ 'sylius_happy_cms.media.no_val'|trans({}, 'SyliusHappyCMSPlugin') }}';
+                    if (sizeEl) { sizeEl.textContent = ''; sizeEl.style.display = 'none'; }
+                    if (deleteWrap) deleteWrap.style.display = 'none';
                     if (input) input.value = '';
                     return;
                 }
                 if (preview) {
                     preview.innerHTML = (file.type && file.type.startsWith('image/'))
-                        ? '<img src="' + file.download_url + '" loading="lazy" style="max-height:80px;max-width:100%">'
+                        ? '<img src="' + file.download_url + '" loading="lazy">'
                         : '';
                 }
-                if (infoEl) infoEl.textContent = file.name || '';
-                if (btnClear) btnClear.style.display = '';
+                if (nameEl) nameEl.textContent = file.name || '';
+                if (sizeEl) {
+                    var size = formatFileSize(file.size);
+                    sizeEl.textContent = size;
+                    sizeEl.style.display = size ? '' : 'none';
+                }
+                if (deleteWrap) deleteWrap.style.display = '';
                 if (input) input.value = file.id;
             }
 
             btnPick.addEventListener('click', async function () {
-                debugger;
                 if (!window.EasyMedia) return;
                 var file = await window.EasyMedia.pick(pickOptions);
                 if (file) renderPreview(file);
