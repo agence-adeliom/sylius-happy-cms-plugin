@@ -15,6 +15,7 @@ use Adeliom\SyliusHappyCMSPlugin\Controller\Media\Module\NewFolder;
 use Adeliom\SyliusHappyCMSPlugin\Controller\Media\Module\Rename;
 use Adeliom\SyliusHappyCMSPlugin\Controller\Media\Module\Upload;
 use Adeliom\SyliusHappyCMSPlugin\Controller\Media\Module\Utils;
+use Adeliom\SyliusHappyCMSPlugin\Services\Media\MediaCsrfTokenManager;
 use Adeliom\SyliusHappyCMSPlugin\Services\Media\MediaHelper;
 use Adeliom\SyliusHappyCMSPlugin\Services\Media\MediaManager;
 use Doctrine\Persistence\ManagerRegistry;
@@ -61,10 +62,11 @@ class MediaController extends AbstractController
 
     protected ManagerRegistry $managerRegistry;
 
-    public function __construct(MediaManager $manager, ManagerRegistry $managerRegistry, ParameterBagInterface $bag, EventDispatcherInterface $dispatcher, TranslatorInterface $translator)
+    public function __construct(MediaManager $manager, ManagerRegistry $managerRegistry, ParameterBagInterface $bag, EventDispatcherInterface $dispatcher, TranslatorInterface $translator, MediaCsrfTokenManager $mediaCsrfTokenManager)
     {
         $this->manager = $manager;
         $this->managerRegistry = $managerRegistry;
+        $this->mediaCsrfTokenManager = $mediaCsrfTokenManager;
         $this->em = $this->managerRegistry->getManager();
 
         if (is_string($bag->get('sylius_happy_cms.media.ignore_files'))) {

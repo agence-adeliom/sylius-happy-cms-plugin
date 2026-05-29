@@ -7,8 +7,15 @@
     <services>
         <defaults autowire="true" autoconfigure="true"/>
 
+        <service id="happy.cms.media.csrf_token_manager" class="Adeliom\SyliusHappyCMSPlugin\Services\Media\MediaCsrfTokenManager" public="true" autowire="true">
+            <argument key="$requestStack" type="service" id="request_stack"/>
+            <argument key="$translator" type="service" id="translator"/>
+        </service>
+        <service id="Adeliom\SyliusHappyCMSPlugin\Services\Media\MediaCsrfTokenManager" alias="happy.cms.media.csrf_token_manager" public="true"/>
+
         <service id="happy.cms.media.controller" class="Adeliom\SyliusHappyCMSPlugin\Controller\Media\MediaController" public="true" autowire="true">
             <argument key="$manager" type="service" id="happy.cms.media.manager"/>
+            <argument key="$mediaCsrfTokenManager" type="service" id="happy.cms.media.csrf_token_manager"/>
             <tag name="controller.service_arguments"/>
         </service>
         <service id="Adeliom\SyliusHappyCMSPlugin\Controller\Media\MediaController" alias="happy.cms.media.controller" public="true"/>
@@ -57,6 +64,7 @@
 
         <service id="happy.cms.media.twig.happy.cms.media_extension" class="Adeliom\SyliusHappyCMSPlugin\Twig\Media\MediaExtension" public="true" autowire="true">
             <argument key="$manager" type="service" id="happy.cms.media.manager"/>
+            <argument key="$csrfTokenManager" type="service" id="happy.cms.media.csrf_token_manager"/>
             <tag name="twig.extension" />
         </service>
 

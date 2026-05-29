@@ -8,12 +8,6 @@
     {% hook 'sylius_admin.happy_cms.medias' %}
 {% endblock %}
 
-{% block metatags %}
-    {{ parent() }}
-    {# CSRF Token for media manager #}
-    <meta name="csrf-token" content="{{ csrf_token }}">
-{% endblock %}
-
 {% block stylesheets %}
     {{ parent() }}
 

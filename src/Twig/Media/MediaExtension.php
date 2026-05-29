@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Twig\Media;
 
+use Adeliom\SyliusHappyCMSPlugin\Services\Media\MediaCsrfTokenManager;
 use Adeliom\SyliusHappyCMSPlugin\Services\Media\MediaManager;
 use Liip\ImagineBundle\Imagine\Filter\FilterManager;
 use Twig\Extension\AbstractExtension;
@@ -12,7 +13,7 @@ use Twig\TwigFunction;
 
 class MediaExtension extends AbstractExtension
 {
-    public function __construct(protected MediaManager $manager, protected FilterManager $filterManager)
+    public function __construct(protected MediaManager $manager, protected FilterManager $filterManager, protected MediaCsrfTokenManager $csrfTokenManager)
     {
     }
 
@@ -33,6 +34,12 @@ class MediaExtension extends AbstractExtension
             new TwigFunction('happy_cms_media', [MediaRuntime::class, 'media'], ['is_safe' => ['html']]),
             new TwigFunction('happy_cms_media_path', [MediaRuntime::class, 'path']),
             new TwigFunction('happy_cms_media_download_url', [MediaRuntime::class, 'downloadUrl']),
+            new TwigFunction('happy_cms_media_csrf_token', [$this, 'getCsrfToken']),
         ];
+    }
+
+    public function getCsrfToken(): string
+    {
+        return $this->csrfTokenManager->getToken();
     }
 }
