@@ -52,7 +52,7 @@ class SeoType extends AbstractType implements AdminFormTypeInterface
             ])
             ->add('robots', ChoiceType::class, [
                 'label' => 'sylius_happy_cms.seo.admin.field.robots',
-                'multiple' => 'true',
+                'multiple' => true,
                 'attr' => [
                     'data-ea-widget' => 'ea-autocomplete',
                 ],
