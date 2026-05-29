@@ -1,5 +1,6 @@
 import { EasyMedia } from '@adeliom/easy-media-manager';
 import '@adeliom/easy-media-manager/style.css';
+import '../sass/widget.scss';
 
 // Intercept fetch to inject CSRF token from <meta name="csrf-token">
 const originalFetch = window.fetch;
