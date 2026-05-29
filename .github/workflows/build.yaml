@@ -19,14 +19,18 @@ concurrency:
 jobs:
     tests:
         runs-on: ubuntu-latest
-            
+
+        # Symfony 8 jobs are allowed to fail: Sylius has no stable Symfony 8 release yet
+        # (see https://github.com/Sylius/Sylius/issues/18760). Flip this off once upstream ships.
+        continue-on-error: ${{ matrix.symfony == '^8.0' }}
+
         name: "Sylius ${{ matrix.sylius }}, PHP ${{ matrix.php }}, Symfony ${{ matrix.symfony }}, ${{ matrix.database }}"
-        
+
         strategy:
             fail-fast: false
             matrix:
                 php: [ "8.3", "8.4", "8.5" ]
-                symfony: [ "^7.4" ]
+                symfony: [ "^7.4", "^8.0" ]
                 sylius: [ "~2.0.0", "~2.1.0", "~2.2.0" ]
                 database: [ "mysql:8.4" ]
                 node: [ "22.x" ]
