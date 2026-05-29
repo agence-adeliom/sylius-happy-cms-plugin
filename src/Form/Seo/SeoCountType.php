@@ -18,7 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SeoCountType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('title', TextCounterType::class, [
@@ -42,7 +42,7 @@ class SeoCountType extends AbstractType
             ])
             ->add('robots', ChoiceType::class, [
                 'label' => 'sylius_happy_cms.seo.admin.field.robots',
-                'multiple' => 'true',
+                'multiple' => true,
                 'attr' => [
                     'data-ea-widget' => 'ea-autocomplete',
                 ],
@@ -60,7 +60,7 @@ class SeoCountType extends AbstractType
             ]);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'label' => false,
