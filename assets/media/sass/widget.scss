@@ -81,6 +81,31 @@
         .__box-delete {
             flex: none;
         }
+
+        // Boutons « Choisir un fichier » / « Supprimer » : reprise de l'ancien
+        // `.button` (field.scss) — blanc bordé, coins arrondis, texte foncé.
+        // On cible les classes JS pour être indépendant de `ui red button`.
+        .js-media-pick,
+        .js-media-clear {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            color: #1f2937;
+            background-color: #fff;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: border-color 0.15s, background-color 0.15s;
+
+            &:hover {
+                background-color: #f9fafb;
+                border-color: #9ca3af;
+            }
+        }
     }
 }
 
