@@ -83,3 +83,19 @@
         }
     }
 }
+
+// Remonte les overlays/modales du media-manager au-dessus des éléments de
+// l'admin Sylius. On cible le hook stable `data-easy-media-overlay` combiné à
+// la classe Tailwind de couche : (0,3,0) > `.easy-media .z-40` (0,2,0) de la
+// lib, donc l'override gagne sans dépendre de l'ordre de chargement.
+// Les deux sélecteurs couvrent le cas où l'overlay est l'élément `.easy-media`
+// lui-même et celui où il en est un descendant.
+.easy-media[data-easy-media-overlay="overlay"].z-40,
+.easy-media [data-easy-media-overlay="overlay"].z-40 {
+    z-index: 10000;
+}
+
+.easy-media[data-easy-media-overlay="overlay"].z-50,
+.easy-media [data-easy-media-overlay="overlay"].z-50 {
+    z-index: 10100;
+}

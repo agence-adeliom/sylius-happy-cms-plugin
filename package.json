@@ -13,7 +13,7 @@
     "@agence-adeliom/sylius-happy-cms-assets": "file:./assets"
   },
   "devDependencies": {
-    "@adeliom/easy-media-manager": "github:agence-adeliom/easy-media-manager#154161fdb905677c5d5cef79867bd6c66314dfe3",
+    "@adeliom/easy-media-manager": "github:agence-adeliom/easy-media-manager#a3a825d00f85b5682b471466fe714d68831578af",
     "@babel/preset-react": "^7.0.0",
     "@hotwired/stimulus": "^3.0.0",
     "@hotwired/stimulus-webpack-helpers": "^1.0.1",
