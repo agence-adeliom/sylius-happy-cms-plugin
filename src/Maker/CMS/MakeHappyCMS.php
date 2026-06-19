@@ -12,6 +12,7 @@ use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
 use Symfony\Bundle\MakerBundle\Str;
+use Symfony\Bundle\MakerBundle\Util\ClassNameDetails;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -353,11 +354,7 @@ final class MakeHappyCMS extends AbstractMaker
                 'hasRouting' => $hasRouting,
             ];
 
-            if ($this->attributesModeEnabled()) {
-                $adminVariables['asAdminAttribute'] = $this->buildAsAdminAttribute(ucfirst($scope));
-            }
-
-            $resourceConfigGenerator->generateAdmin(
+            $entryAdminDetails = $resourceConfigGenerator->generateAdmin(
                 className: $entryClassNameDetail->getFullName(),
                 templatePath: self::TPL_FILES['admin'],
                 variables: $adminVariables,
@@ -372,18 +369,14 @@ final class MakeHappyCMS extends AbstractMaker
                     'hasRouting' => $hasRouting,
                 ];
 
-                if ($this->attributesModeEnabled()) {
-                    $taxonomyVariables['asAdminAttribute'] = $this->buildAsAdminAttribute(ucfirst($scope));
-                }
-
-                $resourceConfigGenerator->generateAdmin(
+                $taxonomyAdminDetails = $resourceConfigGenerator->generateAdmin(
                     className:    $taxonomyClassNameDetail->getFullName(),
                     templatePath: self::TPL_FILES['admin'],
                     variables:    $taxonomyVariables,
                 );
             }
 
-            $resourceConfigGenerator->generateController(
+            $controllerDetails = $resourceConfigGenerator->generateController(
                 className: $entryClassNameDetail->getFullName(),
                 templatePath: self::TPL_FILES['controller'],
                 variables: [
@@ -432,7 +425,29 @@ final class MakeHappyCMS extends AbstractMaker
 
                 $io->note('Please copy the above configuration into the \'config/packages/sylius_resources.yaml\' file');
             } else {
-                $io->note('Resource configuration will be auto-discovered via #[AsAdmin] attributes on the Admin classes.');
+                // Attribute mode: declare via #[AsResource] (entity) + #[AsAdmin] (admin), reusing
+                // easy-crud's own generator so the result matches the legacy YAML blocks it replaces
+                // (same alias/grid/controller). The entry resource carries its custom controller;
+                // the taxonomy resource uses the default easy-crud controller.
+                $this->declareViaAttributes(
+                    $resourceConfigGenerator,
+                    $entryClassNameDetail,
+                    $entryAdminDetails,
+                    $controllerDetails->getFullName(),
+                    $io,
+                );
+
+                if ($hasTaxonomy && $taxonomyClassNameDetail && isset($taxonomyAdminDetails)) {
+                    $this->declareViaAttributes(
+                        $resourceConfigGenerator,
+                        $taxonomyClassNameDetail,
+                        $taxonomyAdminDetails,
+                        null,
+                        $io,
+                    );
+                }
+
+                $io->note('Resources declared via #[AsResource] + #[AsAdmin] attributes (auto-discovered).');
             }
         } catch (\Exception $exception) {
             $io->error($exception->getMessage());
@@ -454,28 +469,38 @@ final class MakeHappyCMS extends AbstractMaker
     }
 
     /**
-     * Build the AsAdmin attribute source code for a CMS model scope.
+     * Declare a generated CMS resource via attributes — #[AsResource] on the entity and
+     * #[AsAdmin] on the Admin — by delegating to easy-crud's CrudMakerService. Reusing
+     * easy-crud's own generator guarantees the alias/grid/controller match the legacy YAML
+     * blocks this replaces (so toggling sylius_easy_crud.attributes.enabled keeps routes stable).
      */
-    private function buildAsAdminAttribute(string $scope): string
-    {
-        $aliasScope = mb_strtolower(Str::asSnakeCase(Str::singularCamelCaseToPluralCamelCase($scope)));
+    private function declareViaAttributes(
+        CrudMakerService $generator,
+        ClassNameDetails $entity,
+        ClassNameDetails $admin,
+        ?string $controller,
+        ConsoleStyle $io,
+    ): void {
+        $entityPath = $generator->getGeneratedClassPath($entity->getFullName());
+        if (null !== $entityPath) {
+            $generator->addAsResourceAttributeToEntity($entityPath, $entity->getShortName());
+            $io->comment(sprintf('%s: %s (#[AsResource])', '<fg=yellow>updated</>', $entityPath));
+        }
 
-        $lines = ['#[AsAdmin('];
-        $lines[] = "    alias: 'happy_cms_admin_{$aliasScope}',";
-        $lines[] = "    subheader: 'happy_cms.{$scope}.admin.ui.subheader',";
-        $lines[] = "    breadcrumb: 'happy_cms.{$scope}.admin.ui.index',";
-        $lines[] = '    vars: [';
-        $lines[] = "        'index' => ['header' => 'happy_cms.{$scope}.admin.ui.index'],";
-        $lines[] = "        'create' => ['header' => 'happy_cms.{$scope}.admin.ui.create'],";
-        $lines[] = "        'update' => ['header' => 'happy_cms.{$scope}.admin.ui.update'],";
-        $lines[] = "        'show' => [";
-        $lines[] = "            'header' => 'happy_cms.{$scope}.admin.ui.show',";
-        $lines[] = "            'redirect' => ['route' => 'update', 'parameters' => ['context' => '\$context', 'id' => '\$id']],";
-        $lines[] = "            'route' => ['parameters' => ['context' => '\$context', 'id' => '\$id']],";
-        $lines[] = '        ],';
-        $lines[] = '    ],';
-        $lines[] = ')]';
+        $adminPath = $generator->getGeneratedClassPath($admin->getFullName());
+        if (null === $adminPath) {
+            return;
+        }
 
-        return implode("\n", $lines);
+        $customController = (null !== $controller && class_exists($controller)) ? $controller : null;
+
+        $generator->addEasyCrudAttributeToClass(
+            $adminPath,
+            $admin->getShortName(),
+            $customController,
+            Str::asClassName($entity->getShortName()),
+            'admin_' . mb_strtolower(Str::asSnakeCase($entity->getShortName())),
+        );
+        $io->comment(sprintf('%s: %s (#[AsAdmin])', '<fg=yellow>updated</>', $adminPath));
     }
 }
