@@ -141,8 +141,9 @@ final class InstallDefaultFiles extends AbstractMaker
         // templates['update']['breadcrumb']), not a "show" one.
         $updateVars = "'header' => 'sylius_happy_cms.{$aliasScope}.admin.ui.update'";
         if ($breadcrumbTemplate) {
+            // Mirror the legacy YAML update.templates exactly (form + breadcrumb).
             // $breadcrumbTemplate is already a quoted PHP literal (like $controller/$templates).
-            $updateVars .= ", 'templates' => ['breadcrumb' => {$breadcrumbTemplate}]";
+            $updateVars .= ", 'templates' => ['form' => '@SyliusEasyCrudPlugin\\\\crud\\\\form\\\\_form.html.twig', 'breadcrumb' => {$breadcrumbTemplate}]";
         }
         $lines[] = "        'update' => [{$updateVars}],";
 
@@ -172,7 +173,7 @@ final class InstallDefaultFiles extends AbstractMaker
         $asAdminAttribute = null;
         if ($this->attributesModeEnabled()) {
             $asAdminAttribute = $this->buildAsAdminAttribute($aliasScope, [
-                'controller' => 'Adeliom\SyliusHappyCMSPlugin\Controller\Page\PageResourceController::class',
+                'controller' => '\Adeliom\SyliusHappyCMSPlugin\Controller\Page\PageResourceController::class',
                 'templates' => "'@SyliusHappyCMSPlugin\\\\page\\\\crud'",
             ]);
         }
