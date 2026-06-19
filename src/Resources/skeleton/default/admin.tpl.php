@@ -18,7 +18,13 @@ namespace <?= Str::getNamespace($classNameDetail->getFullName()) ?>;
 use <?= str_replace('Admin', 'Entity', Str::getNamespace($classNameDetail->getFullName())) ?>\<?= str_replace('Admin', '', $classNameDetail->getShortName()) ?>;
 use Adeliom\SyliusHappyCMSPlugin\Admin\<?= $scope ?>\<?= $classNameDetail->getShortName() ?> as Base<?=
     $classNameDetail->getShortName() ?>;
+<?php if (isset($asAdminAttribute) && $asAdminAttribute) { ?>
+use Adeliom\SyliusEasyCrudPlugin\Metadata\AsAdmin;
+<?php } ?>
 
+<?php if (isset($asAdminAttribute) && $asAdminAttribute) { ?>
+<?= $asAdminAttribute ?>
+<?php } ?>
 class <?= $classNameDetail->getShortName() ?> extends Base<?= $classNameDetail->getShortName() ?><?php echo "\n"; ?>{
 
     public static function getSubscribedServices(): array

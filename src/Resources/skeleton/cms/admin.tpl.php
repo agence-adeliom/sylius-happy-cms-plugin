@@ -44,7 +44,13 @@ use Adeliom\SyliusEasyCrudPlugin\Enum\ColumnSizeEnum;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Validator\Constraints\Length;
+<?php if (isset($asAdminAttribute) && $asAdminAttribute) { ?>
+use Adeliom\SyliusEasyCrudPlugin\Metadata\AsAdmin;
+<?php } ?>
 
+<?php if (isset($asAdminAttribute) && $asAdminAttribute) { ?>
+<?= $asAdminAttribute ?>
+<?php } ?>
 final class <?= $classNameDetail->getShortName() ?>Admin extends AbstractAdmin implements ServiceSubscriberInterface
 {
     public static function getSubscribedServices(): array
