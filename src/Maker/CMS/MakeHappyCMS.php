@@ -345,29 +345,41 @@ final class MakeHappyCMS extends AbstractMaker
                 );
             }
 
+            $adminVariables = [
+                'classNameDetail' => $entryClassNameDetail,
+                'relationClassNameDetail' => $taxonomyClassNameDetail,
+                'scope' => ucfirst($scope),
+                'hasFlexibleContent' => $hasFlexibleContent,
+                'hasRouting' => $hasRouting,
+            ];
+
+            if ($this->attributesModeEnabled()) {
+                $adminVariables['asAdminAttribute'] = $this->buildAsAdminAttribute(ucfirst($scope));
+            }
+
             $resourceConfigGenerator->generateAdmin(
                 className: $entryClassNameDetail->getFullName(),
                 templatePath: self::TPL_FILES['admin'],
-                variables: [
-                    'classNameDetail' => $entryClassNameDetail,
-                    'relationClassNameDetail' => $taxonomyClassNameDetail,
-                    'scope' => ucfirst($scope),
-                    'hasFlexibleContent' => $hasFlexibleContent,
-                    'hasRouting' => $hasRouting,
-                ],
+                variables: $adminVariables,
             );
 
             if ($hasTaxonomy && $taxonomyClassNameDetail) {
+                $taxonomyVariables = [
+                    'classNameDetail' => $taxonomyClassNameDetail,
+                    'relationClassNameDetail' => $entryClassNameDetail,
+                    'scope' => ucfirst($scope),
+                    'hasFlexibleContent' => $hasFlexibleContent,
+                    'hasRouting' => $hasRouting,
+                ];
+
+                if ($this->attributesModeEnabled()) {
+                    $taxonomyVariables['asAdminAttribute'] = $this->buildAsAdminAttribute(ucfirst($scope));
+                }
+
                 $resourceConfigGenerator->generateAdmin(
                     className:    $taxonomyClassNameDetail->getFullName(),
                     templatePath: self::TPL_FILES['admin'],
-                    variables:    [
-                                      'classNameDetail' => $taxonomyClassNameDetail,
-                                      'relationClassNameDetail' => $entryClassNameDetail,
-                                      'scope' => ucfirst($scope),
-                                      'hasFlexibleContent' => $hasFlexibleContent,
-                                      'hasRouting' => $hasRouting,
-                                  ],
+                    variables:    $taxonomyVariables,
                 );
             }
 
@@ -382,42 +394,46 @@ final class MakeHappyCMS extends AbstractMaker
 
             $resourceConfigGenerator->generateMenuListener($entryClassNameDetail->getFullName());
 
-            $io->confirm(
-                'Press any key to continue and see the configuration to copy into the \'routes.yaml\' file',
-                true,
-            );
-            $config = $resourceConfigGenerator->generateRoute(true, $entryClassNameDetail->getFullName());
-            $io->text($config);
-            if ($hasTaxonomy && $taxonomyClassNameDetail) {
-                $configTaxonomy = $resourceConfigGenerator->generateRoute(true, $taxonomyClassNameDetail->getFullName());
-                $io->newLine();
-                $io->text($configTaxonomy);
-            }
-            $io->note('Please copy the above configuration into the \'config/routes.yaml\' file');
-            $io->note("Don't forget to add the new route _index into the Sylius administration menu");
-
-            $io->confirm(
-                'Press any key to continue and see the configuration to copy into the \'packages/sylius_resources.yaml\' file',
-                true,
-            );
-            $config = $resourceConfigGenerator->generateResource(
-                true,
-                $entryClassNameDetail->getFullName(),
-                $entryClassNameTranslationDetail->getFullName(),
-            );
-            $io->text($config);
-
-            if ($hasTaxonomy && $taxonomyClassNameDetail && $taxonomyClassNameTranslationDetail) {
-                $configTaxonomy = $resourceConfigGenerator->generateResource(
+            if (!$this->attributesModeEnabled()) {
+                $io->confirm(
+                    'Press any key to continue and see the configuration to copy into the \'routes.yaml\' file',
                     true,
-                    $taxonomyClassNameDetail->getFullName(),
-                    $taxonomyClassNameTranslationDetail->getFullName(),
                 );
-                $io->newLine();
-                $io->text(str_replace(['sylius_resource:', 'resources:'], ['', ''], $configTaxonomy));
-            }
+                $config = $resourceConfigGenerator->generateRoute(true, $entryClassNameDetail->getFullName());
+                $io->text($config);
+                if ($hasTaxonomy && $taxonomyClassNameDetail) {
+                    $configTaxonomy = $resourceConfigGenerator->generateRoute(true, $taxonomyClassNameDetail->getFullName());
+                    $io->newLine();
+                    $io->text($configTaxonomy);
+                }
+                $io->note('Please copy the above configuration into the \'config/routes.yaml\' file');
+                $io->note("Don't forget to add the new route _index into the Sylius administration menu");
 
-            $io->note('Please copy the above configuration into the \'config/packages/sylius_resources.yaml\' file');
+                $io->confirm(
+                    'Press any key to continue and see the configuration to copy into the \'packages/sylius_resources.yaml\' file',
+                    true,
+                );
+                $config = $resourceConfigGenerator->generateResource(
+                    true,
+                    $entryClassNameDetail->getFullName(),
+                    $entryClassNameTranslationDetail->getFullName(),
+                );
+                $io->text($config);
+
+                if ($hasTaxonomy && $taxonomyClassNameDetail && $taxonomyClassNameTranslationDetail) {
+                    $configTaxonomy = $resourceConfigGenerator->generateResource(
+                        true,
+                        $taxonomyClassNameDetail->getFullName(),
+                        $taxonomyClassNameTranslationDetail->getFullName(),
+                    );
+                    $io->newLine();
+                    $io->text(str_replace(['sylius_resource:', 'resources:'], ['', ''], $configTaxonomy));
+                }
+
+                $io->note('Please copy the above configuration into the \'config/packages/sylius_resources.yaml\' file');
+            } else {
+                $io->note('Resource configuration will be auto-discovered via #[AsAdmin] attributes on the Admin classes.');
+            }
         } catch (\Exception $exception) {
             $io->error($exception->getMessage());
         }
@@ -429,5 +445,37 @@ final class MakeHappyCMS extends AbstractMaker
     public function configureDependencies(DependencyBuilder $dependencies): void
     {
         // No dependencies needed
+    }
+
+    private function attributesModeEnabled(): bool
+    {
+        return $this->parameterBag->has('sylius_easy_crud.attributes.enabled') &&
+            true === $this->parameterBag->get('sylius_easy_crud.attributes.enabled');
+    }
+
+    /**
+     * Build the AsAdmin attribute source code for a CMS model scope.
+     */
+    private function buildAsAdminAttribute(string $scope): string
+    {
+        $aliasScope = mb_strtolower(Str::asSnakeCase(Str::singularCamelCaseToPluralCamelCase($scope)));
+
+        $lines = ['#[AsAdmin('];
+        $lines[] = "    alias: 'happy_cms_admin_{$aliasScope}',";
+        $lines[] = "    subheader: 'happy_cms.{$scope}.admin.ui.subheader',";
+        $lines[] = "    breadcrumb: 'happy_cms.{$scope}.admin.ui.index',";
+        $lines[] = '    vars: [';
+        $lines[] = "        'index' => ['header' => 'happy_cms.{$scope}.admin.ui.index'],";
+        $lines[] = "        'create' => ['header' => 'happy_cms.{$scope}.admin.ui.create'],";
+        $lines[] = "        'update' => ['header' => 'happy_cms.{$scope}.admin.ui.update'],";
+        $lines[] = "        'show' => [";
+        $lines[] = "            'header' => 'happy_cms.{$scope}.admin.ui.show',";
+        $lines[] = "            'redirect' => ['route' => 'update', 'parameters' => ['context' => '\$context', 'id' => '\$id']],";
+        $lines[] = "            'route' => ['parameters' => ['context' => '\$context', 'id' => '\$id']],";
+        $lines[] = '        ],';
+        $lines[] = '    ],';
+        $lines[] = ')]';
+
+        return implode("\n", $lines);
     }
 }
