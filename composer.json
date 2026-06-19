@@ -22,7 +22,7 @@
         "ext-exif": "*",
         "ext-intl": "*",
         "ext-json": "*",
-        "agence-adeliom/sylius-easy-crud-plugin": "^v2.0.4",
+        "agence-adeliom/sylius-easy-crud-plugin": "^2.1",
         "emileperron/tinymce-bundle": "^3.0",
         "illuminate/support": "^v11.33.2",
         "james-heinrich/getid3": "^1.9",

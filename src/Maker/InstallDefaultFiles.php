@@ -100,9 +100,67 @@ final class InstallDefaultFiles extends AbstractMaker
         //}
     }
 
+    private function attributesModeEnabled(): bool
+    {
+        return $this->parameterBag->has('sylius_easy_crud.attributes.enabled') &&
+            true === $this->parameterBag->get('sylius_easy_crud.attributes.enabled');
+    }
+
+    /**
+     * Build the AsAdmin attribute source code for a given resource scope.
+     */
+    private function buildAsAdminAttribute(string $aliasScope, array $options = []): string
+    {
+        $controller = $options['controller'] ?? null;
+        $templates = $options['templates'] ?? null;
+        $except = $options['except'] ?? null;
+        $breadcrumbTemplate = $options['breadcrumbTemplate'] ?? null;
+
+        $lines = ['#[AsAdmin('];
+        $lines[] = "    alias: 'sylius_happy_cms.{$aliasScope}',";
+        $lines[] = "    subheader: 'sylius_happy_cms.{$aliasScope}.admin.ui.subheader',";
+        $lines[] = "    breadcrumb: 'sylius_happy_cms.{$aliasScope}.admin.ui.index',";
+
+        if ($controller) {
+            $lines[] = "    controller: {$controller},";
+        }
+
+        if ($templates) {
+            $lines[] = "    templates: {$templates},";
+        }
+
+        if ($except) {
+            $lines[] = "    except: {$except},";
+        }
+
+        $lines[] = '    vars: [';
+        $lines[] = "        'index' => ['header' => 'sylius_happy_cms.{$aliasScope}.admin.ui.index'],";
+        $lines[] = "        'create' => ['header' => 'sylius_happy_cms.{$aliasScope}.admin.ui.create'],";
+
+        // The breadcrumb template is an "update" action template (mirrors generateRoute()'s
+        // templates['update']['breadcrumb']), not a "show" one.
+        $updateVars = "'header' => 'sylius_happy_cms.{$aliasScope}.admin.ui.update'";
+        if ($breadcrumbTemplate) {
+            // $breadcrumbTemplate is already a quoted PHP literal (like $controller/$templates).
+            $updateVars .= ", 'templates' => ['breadcrumb' => {$breadcrumbTemplate}]";
+        }
+        $lines[] = "        'update' => [{$updateVars}],";
+
+        $showVars = "'header' => 'sylius_happy_cms.{$aliasScope}.admin.ui.show'";
+        $showVars .= ", 'redirect' => ['route' => 'update', 'parameters' => ['context' => '\$context', 'id' => '\$id']]";
+        $showVars .= ", 'route' => ['parameters' => ['context' => '\$context', 'id' => '\$id']]";
+
+        $lines[] = "        'show' => [{$showVars}],";
+        $lines[] = '    ],';
+        $lines[] = ')]';
+
+        return implode("\n", $lines);
+    }
+
     private function generatePage(ConsoleStyle $io, Generator $generator): void
     {
         $scope = 'page';
+        $aliasScope = 'page';
         $files = [
             ['prefix' => 'Entity', 'suffix' => '', 'addRepo' => true, 'addTrans' => true, 'addContentBlocks' => true],
             ['prefix' => 'Entity', 'suffix' => 'Translation'],
@@ -110,13 +168,24 @@ final class InstallDefaultFiles extends AbstractMaker
             ['prefix' => 'Repository', 'suffix' => 'Repository'],
             ['prefix' => 'Admin', 'suffix' => 'Admin'],
         ];
-        $this->generateScope($scope, $files, $io, $generator);
 
-        $this->generateRoute($scope, $io, [
-            'default' => '@SyliusHappyCMSPlugin\\\\page\\\\crud',
-        ]);
+        $asAdminAttribute = null;
+        if ($this->attributesModeEnabled()) {
+            $asAdminAttribute = $this->buildAsAdminAttribute($aliasScope, [
+                'controller' => 'Adeliom\SyliusHappyCMSPlugin\Controller\Page\PageResourceController::class',
+                'templates' => "'@SyliusHappyCMSPlugin\\\\page\\\\crud'",
+            ]);
+        }
 
-        $this->generateSyliusResource($scope, $io);
+        $this->generateScope($scope, $files, $io, $generator, $asAdminAttribute);
+
+        if (!$this->attributesModeEnabled()) {
+            $this->generateRoute($scope, $io, [
+                'default' => '@SyliusHappyCMSPlugin\\\\page\\\\crud',
+            ]);
+
+            $this->generateSyliusResource($scope, $io);
+        }
 
         $this->generateHappyCMSConfig($scope, $io);
     }
@@ -124,17 +193,25 @@ final class InstallDefaultFiles extends AbstractMaker
     private function generateConfig(ConsoleStyle $io, Generator $generator): void
     {
         $scope = 'config';
+        $aliasScope = 'config';
         $files = [
             ['prefix' => 'Entity', 'suffix' => '', 'addRepo' => true, 'addTrans' => true],
             ['prefix' => 'Entity', 'suffix' => 'Translation'],
             ['prefix' => 'Repository', 'suffix' => 'Repository'],
             ['prefix' => 'Admin', 'suffix' => 'Admin'],
         ];
-        $this->generateScope($scope, $files, $io, $generator);
 
-        $this->generateRoute($scope, $io);
+        $asAdminAttribute = null;
+        if ($this->attributesModeEnabled()) {
+            $asAdminAttribute = $this->buildAsAdminAttribute($aliasScope);
+        }
 
-        $this->generateSyliusResource($scope, $io);
+        $this->generateScope($scope, $files, $io, $generator, $asAdminAttribute);
+
+        if (!$this->attributesModeEnabled()) {
+            $this->generateRoute($scope, $io);
+            $this->generateSyliusResource($scope, $io);
+        }
 
         $this->generateHappyCMSConfig($scope, $io);
     }
@@ -167,52 +244,82 @@ final class InstallDefaultFiles extends AbstractMaker
     private function generateMenu(ConsoleStyle $io, Generator $generator): void
     {
         $scope = 'menu';
+        $aliasScope = 'menu';
         $files = [
             ['prefix' => 'Entity', 'suffix' => '', 'entityName' => 'menu', 'addRepo' => true],
             ['prefix' => 'Repository', 'suffix' => 'Repository', 'entityName' => 'menu'],
             ['prefix' => 'Admin', 'suffix' => 'Admin', 'entityName' => 'menu'],
         ];
-        $this->generateScope($scope, $files, $io, $generator);
 
-        $this->generateRoute($scope, $io);
+        $asAdminAttribute = null;
+        if ($this->attributesModeEnabled()) {
+            $asAdminAttribute = $this->buildAsAdminAttribute($aliasScope);
+        }
 
-        $this->generateSyliusResource($scope, $io);
+        $this->generateScope($scope, $files, $io, $generator, $asAdminAttribute);
+
+        if (!$this->attributesModeEnabled()) {
+            $this->generateRoute($scope, $io);
+            $this->generateSyliusResource($scope, $io);
+        }
 
         $this->generateHappyCMSConfig($scope, $io);
 
+        // Menu Item generation
         $entityName = 'menuItem';
+        $aliasScope = 'menu_item';
         $files = [
             ['prefix' => 'Entity', 'suffix' => '', 'entityName' => $entityName, 'addRepo' => true, 'addTrans' => true],
             ['prefix' => 'Entity', 'suffix' => 'Translation', 'entityName' => $entityName],
             ['prefix' => 'Repository', 'suffix' => 'Repository', 'entityName' => $entityName],
             ['prefix' => 'Admin', 'suffix' => 'Admin', 'entityName' => $entityName],
         ];
-        $this->generateScope($scope, $files, $io, $generator);
 
-        $this->generateRoute($scope . '_item', $io, [
-            'default' => '@SyliusHappyCMSPlugin\\\\menu_item\\\\crud',
-            'update' => [
-                'form' => '@SyliusEasyCrudPlugin\\\\crud\\\\form\\\\_form.html.twig',
-                'breadcrumb' => '@SyliusHappyCMSPlugin\\\\menu_item\\\\crud\\\\_breadcrumb.html.twig',
-            ],
-            'create' => [],
-        ], $scope, "except: ['index']\n");
+        $asAdminAttribute = null;
+        if ($this->attributesModeEnabled()) {
+            $asAdminAttribute = $this->buildAsAdminAttribute($aliasScope, [
+                'templates' => "'@SyliusHappyCMSPlugin\\\\menu_item\\\\crud'",
+                'except' => "['index']",
+                'breadcrumbTemplate' => "'@SyliusHappyCMSPlugin\\\\menu_item\\\\crud\\\\_breadcrumb.html.twig'",
+            ]);
+        }
+
+        $this->generateScope($scope, $files, $io, $generator, $asAdminAttribute);
+
+        if (!$this->attributesModeEnabled()) {
+            $this->generateRoute($scope . '_item', $io, [
+                'default' => '@SyliusHappyCMSPlugin\\\\menu_item\\\\crud',
+                'update' => [
+                    'form' => '@SyliusEasyCrudPlugin\\\\crud\\\\form\\\\_form.html.twig',
+                    'breadcrumb' => '@SyliusHappyCMSPlugin\\\\menu_item\\\\crud\\\\_breadcrumb.html.twig',
+                ],
+                'create' => [],
+            ], $scope, "except: ['index']\n");
+        }
     }
 
     private function generateBlock(ConsoleStyle $io, Generator $generator): void
     {
         $scope = 'sharedBlock';
+        $aliasScope = 'shared_block';
         $files = [
             ['prefix' => 'Entity', 'suffix' => '', 'entityName' => 'sharedBlock', 'addRepo' => true, 'addTrans' => true],
             ['prefix' => 'Entity', 'suffix' => 'Translation', 'entityName' => 'sharedBlock'],
             ['prefix' => 'Repository', 'suffix' => 'Repository', 'entityName' => 'sharedBlock'],
             ['prefix' => 'Admin', 'suffix' => 'Admin', 'entityName' => 'sharedBlock'],
         ];
-        $this->generateScope($scope, $files, $io, $generator);
 
-        $this->generateRoute('shared_block', $io);
+        $asAdminAttribute = null;
+        if ($this->attributesModeEnabled()) {
+            $asAdminAttribute = $this->buildAsAdminAttribute($aliasScope);
+        }
 
-        $this->generateSyliusResource('shared_block', $io);
+        $this->generateScope($scope, $files, $io, $generator, $asAdminAttribute);
+
+        if (!$this->attributesModeEnabled()) {
+            $this->generateRoute('shared_block', $io);
+            $this->generateSyliusResource('shared_block', $io);
+        }
 
         $this->generateHappyCMSConfig('shared_block', $io);
     }
@@ -220,16 +327,24 @@ final class InstallDefaultFiles extends AbstractMaker
     private function generateEntityRoute(ConsoleStyle $io, Generator $generator): void
     {
         $scope = 'Cmf';
+        $aliasScope = 'route';
         $files = [
             ['prefix' => 'Entity', 'suffix' => '', 'entityName' => 'route', 'addRepo' => true, 'addTrans' => false],
             ['prefix' => 'Repository', 'suffix' => 'Repository', 'entityName' => 'route'],
             ['prefix' => 'Admin', 'suffix' => 'Admin', 'entityName' => 'route'],
         ];
-        $this->generateScope($scope, $files, $io, $generator);
 
-        $this->generateRoute(scope: 'route', io: $io, baseScope: 'Cmf');
+        $asAdminAttribute = null;
+        if ($this->attributesModeEnabled()) {
+            $asAdminAttribute = $this->buildAsAdminAttribute($aliasScope);
+        }
 
-        $this->generateSyliusResource('route', $io);
+        $this->generateScope($scope, $files, $io, $generator, $asAdminAttribute);
+
+        if (!$this->attributesModeEnabled()) {
+            $this->generateRoute(scope: 'route', io: $io, baseScope: 'Cmf');
+            $this->generateSyliusResource('route', $io);
+        }
 
         $this->generateHappyCMSConfig('route', $io);
     }
@@ -237,16 +352,24 @@ final class InstallDefaultFiles extends AbstractMaker
     private function generateRedirectRoute(ConsoleStyle $io, Generator $generator): void
     {
         $scope = 'Cmf';
+        $aliasScope = 'redirect_route';
         $files = [
             ['prefix' => 'Entity', 'suffix' => '', 'entityName' => 'redirectRoute', 'addRepo' => true, 'addTrans' => false],
             ['prefix' => 'Repository', 'suffix' => 'Repository', 'entityName' => 'redirectRoute'],
             ['prefix' => 'Admin', 'suffix' => 'Admin', 'entityName' => 'redirectRoute'],
         ];
-        $this->generateScope($scope, $files, $io, $generator);
 
-        $this->generateRoute(scope: 'redirect_route', io: $io, baseScope: 'Cmf');
+        $asAdminAttribute = null;
+        if ($this->attributesModeEnabled()) {
+            $asAdminAttribute = $this->buildAsAdminAttribute($aliasScope);
+        }
 
-        $this->generateSyliusResource('redirect_route', $io);
+        $this->generateScope($scope, $files, $io, $generator, $asAdminAttribute);
+
+        if (!$this->attributesModeEnabled()) {
+            $this->generateRoute(scope: 'redirect_route', io: $io, baseScope: 'Cmf');
+            $this->generateSyliusResource('redirect_route', $io);
+        }
 
         $this->generateHappyCMSConfig('redirect_route', $io);
     }
@@ -254,7 +377,7 @@ final class InstallDefaultFiles extends AbstractMaker
     /**
      * @param array<int, array<string, bool|string>> $files
      */
-    private function generateScope(string $scope, array $files, ConsoleStyle $io, Generator $generator): void
+    private function generateScope(string $scope, array $files, ConsoleStyle $io, Generator $generator, ?string $asAdminAttribute = null): void
     {
         foreach ($files as $data) {
             $namespacePrefix = $data['prefix'] . '\HappyCMS\\' . ucfirst($scope);
@@ -277,17 +400,24 @@ final class InstallDefaultFiles extends AbstractMaker
                         ? $data['templateName']
                         : strtolower(is_string($data['prefix']) ? $data['prefix'] : '');
 
+                    $templateVariables = [
+                        'classNameDetail' => $classNameDetail,
+                        'scope' => ucfirst($scope),
+                        'addRepo' => $data['addRepo'] ?? false,
+                        'addTrans' => $data['addTrans'] ?? false,
+                        'addContentBlocks' => $data['addContentBlocks'] ?? false,
+                        'parentClassName' => $data['parentClassName'] ?? ucfirst($scope),
+                    ];
+
+                    // Add asAdminAttribute only for Admin classes when in attributes mode
+                    if ($asAdminAttribute && $data['prefix'] === 'Admin') {
+                        $templateVariables['asAdminAttribute'] = $asAdminAttribute;
+                    }
+
                     $generator->generateClass(
                         $classNameDetail->getFullName(),
                         __DIR__ . '/../Resources/skeleton/default/' . $templateName . '.tpl.php',
-                        [
-                            'classNameDetail' => $classNameDetail,
-                            'scope' => ucfirst($scope),
-                            'addRepo' => $data['addRepo'] ?? false,
-                            'addTrans' => $data['addTrans'] ?? false,
-                            'addContentBlocks' => $data['addContentBlocks'] ?? false,
-                            'parentClassName' => $data['parentClassName'] ?? ucfirst($scope),
-                        ],
+                        $templateVariables,
                     );
                     $generator->writeChanges();
                 }
