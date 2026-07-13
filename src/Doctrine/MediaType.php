@@ -48,4 +48,15 @@ class MediaType extends Type
     {
         return self::TYPE;
     }
+
+    /**
+     * Sans ce commentaire SQL, Doctrine\DBAL\Schema\Comparator::diffColumn() compare les types par
+     * get_class() : l'introspection de la base reconstruit un BigIntType natif au lieu de MediaType
+     * (la SQL déclaration des deux est identique, BIGINT), ce qui génère un diff de schéma fantôme
+     * (ALTER ... TYPE BIGINT) à chaque doctrine:schema:validate, quelle que soit la migration appliquée.
+     */
+    public function requiresSQLCommentHint(AbstractPlatform $platform): bool
+    {
+        return true;
+    }
 }
