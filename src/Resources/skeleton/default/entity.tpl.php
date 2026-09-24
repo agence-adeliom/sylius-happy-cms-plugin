@@ -60,6 +60,6 @@ class <?= $classNameDetail->getShortName() ?> extends Base<?= $classNameDetail->
     {
         return <?= $classNameDetail->getShortName() ?>Translation::class;
     }
-}
 <?php } ?>
+}
 <?php } ?>

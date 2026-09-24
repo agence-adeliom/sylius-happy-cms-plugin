@@ -258,6 +258,7 @@ sylius_happy_cms_route_admin:
         alias: sylius_happy_cms.route
         section: admin
         templates: "@SyliusEasyCrudPlugin\\crud"
+        only: ['index', 'show']
         redirect: update
         grid: sylius_happy_cms_route_admin
         form:

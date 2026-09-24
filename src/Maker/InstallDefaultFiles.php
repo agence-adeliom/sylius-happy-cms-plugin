@@ -227,7 +227,7 @@ final class InstallDefaultFiles extends AbstractMaker
         ];
         $this->generateScope($scope, $files, $io, $generator);
 
-        $this->generateRoute(scope: 'route', io: $io, baseScope: 'Cmf');
+        $this->generateRoute(scope: 'route', io: $io, baseScope: 'Cmf', customConfigurations: "only: ['index', 'show']\n");
 
         $this->generateSyliusResource('route', $io);
 
