@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\Services\Media;
 
 use Adeliom\SyliusHappyCMSPlugin\Entity\Media\FolderInterface;
-use Adeliom\SyliusHappyCMSPlugin\Entity\Media\Media;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Media\MediaInterface;
 use Adeliom\SyliusHappyCMSPlugin\Event\Media\MediaBeforeSetMetas;
 use Adeliom\SyliusHappyCMSPlugin\Exceptions\Media\AlreadyExist;
