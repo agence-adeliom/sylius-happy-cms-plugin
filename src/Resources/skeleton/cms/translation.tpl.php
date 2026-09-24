@@ -27,7 +27,7 @@ use Sylius\Resource\Model\ResourceInterface;
 use Sylius\Resource\Model\TranslationInterface;
 use Sylius\Resource\Model\AbstractTranslation;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\HasLifecycleCallbacks]

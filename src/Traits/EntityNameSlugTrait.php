@@ -6,7 +6,7 @@ namespace Adeliom\SyliusHappyCMSPlugin\Traits;
 
 use Doctrine\ORM\Mapping\Column;
 use Gedmo\Mapping\Annotation\Slug;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
