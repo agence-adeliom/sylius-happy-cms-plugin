@@ -48,7 +48,7 @@ class SharedBlockCollection
     {
         $blocks = $this->getBlocks();
 
-        if($resource instanceof ContentEditableInterface) {
+        if ($resource instanceof ContentEditableInterface) {
             return array_filter(
                 $blocks,
                 static fn (SharedBlockTypeInterface $block, string $type) => $block->supports($resource),

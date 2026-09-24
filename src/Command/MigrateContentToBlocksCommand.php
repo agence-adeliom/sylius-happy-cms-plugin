@@ -73,7 +73,6 @@ class MigrateContentToBlocksCommand extends Command
 
         $io->section('Scanning for CmsRoutable entities...');
 
-        /** @var array<string, mixed> $resources */
         $eligibleEntities = $this->findEligibleEntities($resources, $io);
 
         if (empty($eligibleEntities)) {
@@ -133,9 +132,9 @@ class MigrateContentToBlocksCommand extends Command
     /**
      * Find all entities that implement CmsRoutableInterface, ResourceInterface and TranslatableInterface.
      *
-     * @param array<string, mixed> $resources
+     * @param array<mixed> $resources
      *
-     * @return array<string, class-string>
+     * @return array<array-key, class-string>
      */
     private function findEligibleEntities(array $resources, SymfonyStyle $io): array
     {
@@ -255,9 +254,11 @@ class MigrateContentToBlocksCommand extends Command
                     continue;
                 }
 
-                /** @var array{block_type: string, position?: int, block_published?: string} $blockData */
+                /** @var array{block_type: string, position?: int, block_published?: string} $typedBlockData */
+                $typedBlockData = $blockData;
+
                 try {
-                    $this->createContentBlock($entity, $entityClass, $blockData, $locale, $dryRun, $naturalPosition);
+                    $this->createContentBlock($entity, $entityClass, $typedBlockData, $locale, $dryRun, $naturalPosition);
                     ++$naturalPosition;
                     ++$migrated;
                 } catch (\Exception $e) {
