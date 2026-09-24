@@ -14,6 +14,8 @@ interface PageInterface extends ResourceInterface, TranslatableInterface, CmsRou
 {
     public const HOMEPAGE = 'homepage';
 
+    public function getId(): int;
+
     public function getPublishState(): ?string;
 
     public function getSlug(): ?string;

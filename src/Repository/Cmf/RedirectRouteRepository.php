@@ -7,12 +7,8 @@ namespace Adeliom\SyliusHappyCMSPlugin\Repository\Cmf;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RedirectRouteInterface;
 use Doctrine\ORM\QueryBuilder;
 use Sylius\Bundle\ResourceBundle\Doctrine\ORM\EntityRepository;
-use Sylius\Resource\Doctrine\Persistence\RepositoryInterface;
 
-/**
- * @implements RepositoryInterface<RedirectRouteInterface>
- */
-class RedirectRouteRepository extends EntityRepository implements RepositoryInterface, RedirectRouteRepositoryInterface
+class RedirectRouteRepository extends EntityRepository implements RedirectRouteRepositoryInterface
 {
     protected bool $cacheEnabled = false;
 

@@ -215,7 +215,8 @@ trait EntityRouteTrait
         // 1. Le slug de la page en cours
         $current = '';
         if (!$isHomepage && method_exists($translation, 'getSlug')) {
-            $current = '/' . $translation->getSlug();
+            $slug = $translation->getSlug();
+            $current = '/' . (is_string($slug) ? $slug : '');
         }
 
         // 2. Le slug des parents

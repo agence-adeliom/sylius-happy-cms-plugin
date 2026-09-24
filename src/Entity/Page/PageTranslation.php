@@ -70,16 +70,13 @@ class PageTranslation extends AbstractTranslation implements PageTranslationInte
     public function getTree(string $separator = '/', bool $name = false): string
     {
         $tree = '';
+        $locale = $this->getLocale();
 
         $current = $this;
         do {
-            $slug = (is_object($current) && method_exists($current, 'getPageSlug')) ? $current->getPageSlug() : $current->getSlug();
-            $tree = $name ? $current->getName() . $separator . $tree : $slug . $separator . $tree;
-            if (null !== $current->getTranslatable()) {
-                $current = $current->getTranslatable()->getParent() ?? null;
-            } else {
-                $current = null;
-            }
+            $segment = $name ? $current->getName() : $current->getSlug();
+            $tree = $segment . $separator . $tree;
+            $current = self::getParentPage($current)?->getTranslation($locale);
         } while ($current);
 
         return trim($tree, $separator);
@@ -89,17 +86,20 @@ class PageTranslation extends AbstractTranslation implements PageTranslationInte
     {
         $tree = ' ' . $this->getName();
 
-        $current = $this;
+        $current = $this->getTranslatable();
         do {
             $tree = '―' . $tree;
-            if (null !== $current->getTranslatable()) {
-                $current = $current->getTranslatable()->getParent() ?? null;
-            } else {
-                $current = null;
-            }
+            $current = $current instanceof PageInterface ? $current->getParent() : null;
         } while ($current);
 
         return mb_substr($tree, 1);
+    }
+
+    private static function getParentPage(PageTranslationInterface $translation): ?PageInterface
+    {
+        $page = $translation->getTranslatable();
+
+        return $page instanceof PageInterface ? $page->getParent() : null;
     }
 
     #[PrePersist]

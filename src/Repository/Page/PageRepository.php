@@ -305,9 +305,8 @@ class PageRepository extends NestedTreeRepository implements PageRepositoryInter
             $hasNonPageElement = false;
             $allItemsPublished = true;
 
-            $itemSlug = method_exists($item, 'getPageSlug') ?
-                $item->getPageSlug() : (method_exists($item, 'getTranslation') ? $item->getTranslation($locale)->getSlug() : '');
-            $tempConstructedTree[$itemSlug] = $item;
+            $itemSlug = $item->getTranslation($locale)->getSlug();
+            $tempConstructedTree[(string) $itemSlug] = $item;
 
             while ($item->getParent()) {
                 $item = $item->getParent();

@@ -8,6 +8,8 @@ use Sylius\Resource\Model\ResourceInterface;
 
 interface FolderInterface extends ResourceInterface
 {
+    public function getParent(): ?self;
+
     public function setParent(?self $parent = null): void;
 
     public function getPath(string $separator = '/'): string;

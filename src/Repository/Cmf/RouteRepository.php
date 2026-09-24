@@ -7,12 +7,8 @@ namespace Adeliom\SyliusHappyCMSPlugin\Repository\Cmf;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
 use Doctrine\ORM\QueryBuilder;
 use Sylius\Bundle\ResourceBundle\Doctrine\ORM\EntityRepository;
-use Sylius\Resource\Doctrine\Persistence\RepositoryInterface;
 
-/**
- * @implements RepositoryInterface<RouteInterface>
- */
-class RouteRepository extends EntityRepository implements RepositoryInterface, RouteRepositoryInterface
+class RouteRepository extends EntityRepository implements RouteRepositoryInterface
 {
     protected bool $cacheEnabled = false;
 

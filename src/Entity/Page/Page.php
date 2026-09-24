@@ -216,14 +216,11 @@ class Page implements PageInterface
      */
     public function getChildren(): Collection
     {
-        return !isset($this->children) ? new ArrayCollection() : $this->children;
+        return $this->children;
     }
 
     public function addChildren(PageInterface $page): void
     {
-        if (!isset($this->children)) {
-            $this->children = new ArrayCollection();
-        }
         $this->children->add($page);
 
         if ($page->getParent() !== $this) {
