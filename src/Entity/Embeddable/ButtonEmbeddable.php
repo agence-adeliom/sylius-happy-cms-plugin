@@ -22,6 +22,9 @@ class ButtonEmbeddable implements ButtonEmbeddableInterface
     #[ORM\Column(type: Types::STRING, length: 100, nullable: true)]
     private ?string $action = null;
 
+    /**
+     * @param array<string, string|null> $data
+     */
     public static function new(array $data): self
     {
         $button = new self();

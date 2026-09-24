@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Controller\PageBuilder;
 
+use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\AssetDto;
 use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentBlockInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableInterface;
@@ -323,24 +324,24 @@ class PageBuilderController extends AbstractController
                 if (isset($blockAssets['css'])) {
                     foreach ($blockAssets['css'] as $asset) {
                         // Use asset value as key to avoid duplicates
-                        $key = is_object($asset) && method_exists($asset, 'getValue') ? $asset->getValue() : (string) $asset;
-                        $assets['css'][$key] = is_object($asset) && method_exists($asset, 'getAsDto') ? $asset->getAsDto() : (string) $asset;
+                        $key = (string) $asset;
+                        $assets['css'][$key] = $asset instanceof Asset ? $asset->getAsDto() : $asset;
                     }
                 }
 
                 // Merge JS assets
                 if (isset($blockAssets['js'])) {
                     foreach ($blockAssets['js'] as $asset) {
-                        $key = is_object($asset) && method_exists($asset, 'getValue') ? $asset->getValue() : (string) $asset;
-                        $assets['js'][$key] = is_object($asset) && method_exists($asset, 'getAsDto') ? $asset->getAsDto() : (string) $asset;
+                        $key = (string) $asset;
+                        $assets['js'][$key] = $asset instanceof Asset ? $asset->getAsDto() : $asset;
                     }
                 }
 
                 // Merge Webpack assets
                 if (isset($blockAssets['webpack'])) {
                     foreach ($blockAssets['webpack'] as $asset) {
-                        $key = is_object($asset) && method_exists($asset, 'getValue') ? $asset->getValue() : (string) $asset;
-                        $assets['webpack'][$key] = is_object($asset) && method_exists($asset, 'getAsDto') ? $asset->getAsDto() : (string) $asset;
+                        $key = (string) $asset;
+                        $assets['webpack'][$key] = $asset instanceof Asset ? $asset->getAsDto() : $asset;
                     }
                 }
             }
