@@ -91,11 +91,86 @@ function injectTinyMCEStyles(editor) {
 }
 
 /**
+ * Light / dark variants of the TinyMCE skins shipped with the bundle.
+ * Custom skins not listed here are left untouched.
+ */
+const SKIN_VARIANTS = {
+    'oxide': 'oxide-dark',
+    'tinymce-5': 'tinymce-5-dark',
+    'appstack_light': 'appstack_dark',
+};
+const CONTENT_CSS_VARIANTS = {
+    'default': 'dark',
+    'tinymce-5': 'tinymce-5-dark',
+    'appstack_light': 'appstack_dark',
+};
+
+function isDarkTheme() {
+    return document.documentElement.getAttribute('data-bs-theme') === 'dark';
+}
+
+/**
+ * Resolve the variant of a skin value for the given theme
+ */
+function resolveVariant(value, variants, dark) {
+    const lightValue = Object.keys(variants).find(light => light === value || variants[light] === value);
+    if (lightValue === undefined) {
+        return value;
+    }
+
+    return dark ? variants[lightValue] : lightValue;
+}
+
+/**
+ * Align the skin and content_css attributes of an editor with the Sylius admin theme.
+ * Returns true when an attribute has been changed.
+ */
+function applyThemeAttributes(editor) {
+    const dark = isDarkTheme();
+    let changed = false;
+
+    [['skin', SKIN_VARIANTS], ['content_css', CONTENT_CSS_VARIANTS]].forEach(([attribute, variants]) => {
+        const current = editor.getAttribute(attribute) || Object.keys(variants)[0];
+        const expected = resolveVariant(current, variants, dark);
+        if (expected !== editor.getAttribute(attribute)) {
+            editor.setAttribute(attribute, expected);
+            changed = true;
+        }
+    });
+
+    return changed;
+}
+
+/**
+ * Skin and content_css are only read by the webcomponent at init:
+ * replace an initialized editor by a fresh clone carrying the current content.
+ */
+function syncEditorTheme(editor) {
+    if (!applyThemeAttributes(editor) || !editor._editor) {
+        return;
+    }
+
+    const content = editor._editor.getContent();
+    const clone = editor.cloneNode(false);
+    clone.textContent = content;
+    // disconnectedCallback removes the old instance, connectedCallback initializes the clone
+    editor.replaceWith(clone);
+
+    setTimeout(() => {
+        injectTinyMCEStyles(clone);
+        setupLiveComponentCallback(clone);
+    }, 500);
+}
+
+/**
  * Initialize or reinitialize TinyMCE editors
  * @param {HTMLElement|null} scope - Optional scope to limit search (for AJAX contexts)
  */
 function initializeTinyMCE() {
     const searchRoot = document;
+
+    // Set the theme attributes before the webcomponent initializes the editors
+    searchRoot.querySelectorAll('tinymce-editor').forEach(editor => applyThemeAttributes(editor));
 
     // Ensure the TinyMCE webcomponent script is loaded
     loadScriptIfNeeded('/bundles/tinymce/ext/tinymce-webcomponent.js')
@@ -185,6 +260,16 @@ if (document.readyState === 'loading') {
     initializeTinyMCE();
   }, 100);
 }
+
+/**
+ * Follow the Sylius theme switcher (and the page builder, which forwards it to the form iframes)
+ */
+new MutationObserver(() => {
+    document.querySelectorAll('tinymce-editor').forEach(editor => syncEditorTheme(editor));
+}).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-bs-theme'],
+});
 
 /**
  * Reinitialize when loaded in the page builder or other AJAX contexts

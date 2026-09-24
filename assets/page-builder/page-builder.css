@@ -63,6 +63,19 @@
 }
 
 /*
+ * Secondary outline buttons: Tabler fills them with --tblr-secondary on hover (white text on light gray in
+ * dark mode). Use a subtle surface on hover and the accent for the active / open state instead.
+ */
+.page-builder .btn-outline-secondary {
+    --tblr-btn-hover-color: var(--hcms-text);
+    --tblr-btn-hover-bg: var(--hcms-surface-muted);
+    --tblr-btn-hover-border-color: var(--hcms-border);
+    --tblr-btn-active-color: var(--hcms-accent);
+    --tblr-btn-active-bg: var(--hcms-accent-subtle);
+    --tblr-btn-active-border-color: var(--hcms-accent);
+}
+
+/*
  * Square icon-only buttons. Tabler's .btn-icon relies on a min-width computed from the button line-height,
  * which is unitless for .btn-sm (invalid calc): the buttons would collapse to a zero width.
  */

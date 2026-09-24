@@ -31,12 +31,12 @@
     },
     "tiny-mce": {
       "js": [
-        "/bundles/syliushappycmsplugin/tiny-mce.8a757ac5.js"
+        "/bundles/syliushappycmsplugin/tiny-mce.e934b23c.js"
       ]
     },
     "page-builder": {
       "css": [
-        "/bundles/syliushappycmsplugin/page-builder.734604ce.css"
+        "/bundles/syliushappycmsplugin/page-builder.d433d83a.css"
       ],
       "js": [
         "/bundles/syliushappycmsplugin/page-builder.d3152c67.js"
