@@ -243,7 +243,13 @@ $manager->delete($entity, $flush = true);
 
 ### Use the Doctrine type (optional)
 
-It automatically converts the stored path into a Media entity
+It stores a reference to a media as its id (`BIGINT` column, no foreign key).
+It is designed for places where a Doctrine association is not possible, such as `#[ORM\Embeddable]` classes (e.g. `Seo::$cover`).
+
+- On write, it accepts a `MediaInterface`, an int or a numeric string (the value submitted by the media form field) and persists the media id.
+- On read, the property contains the raw id, **not** a Media entity. Resolve it when rendering, e.g. with `{{ happy_cms_media(entity.file, 'sylius_small') }}`.
+
+If you need a real Media entity on your own (non-embeddable) entity, prefer a regular `ManyToOne` association.
 
 ```yaml
 # config/packages/doctrine.yaml
@@ -259,7 +265,7 @@ In your entity
 class Article
 {
     #[ORM\Column(type: 'happy_cms_media_type', nullable: true)]
-    private Media|string|null $file;
+    private MediaInterface|int|null $file;
     
     ...
 ```

@@ -1,6 +1,6 @@
 services:
     php:
-        image: ghcr.io/sylius/sylius-php:8.3-fixuid-xdebug-alpine
+        image: ghcr.io/sylius/sylius-php:8.5-fixuid-xdebug-alpine
         user: ${DOCKER_USER:-1000:1000}
         depends_on:
             mysql:
