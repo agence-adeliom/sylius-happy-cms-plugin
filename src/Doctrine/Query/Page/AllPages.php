@@ -33,7 +33,7 @@ final class AllPages implements AllPagesInterface
         $queryBuilder = $this->entityManager->getConnection()->createQueryBuilder();
 
         $queryBuilder
-            ->select([
+            ->select(
                 'page.id as id',
                 'page.root as tree_root',
                 'page.parent_id as parent_id',
@@ -43,7 +43,7 @@ final class AllPages implements AllPagesInterface
                 'page.lvl as tree_level',
                 'page.position as position',
                 'COALESCE(current_translation.name, fallback_translation.name) as name',
-            ])
+            )
             ->from('sylius_happy_cms__page', 'page')
             ->leftJoin(
                 'page',

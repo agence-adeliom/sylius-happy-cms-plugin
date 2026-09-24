@@ -33,7 +33,7 @@ final class AllMenuItems implements AllMenuItemsInterface
         $queryBuilder = $this->entityManager->getConnection()->createQueryBuilder();
 
         $queryBuilder
-            ->select([
+            ->select(
                 'menu_item.id as id',
                 'menu_item.root as tree_root',
                 'menu_item.parent_id as parent_id',
@@ -42,7 +42,7 @@ final class AllMenuItems implements AllMenuItemsInterface
                 'menu_item.lvl as tree_level',
                 'menu_item.position as position',
                 'COALESCE(current_translation.name, fallback_translation.name) as name',
-            ])
+            )
             ->from('sylius_happy_cms__menu_item', 'menu_item')
             ->leftJoin(
                 'menu_item',
