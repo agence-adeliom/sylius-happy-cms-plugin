@@ -244,14 +244,16 @@ class MediaRuntime implements RuntimeExtensionInterface
             'title' => $media->getMeta('title', $media->getName()),
         ];
 
-        /**
-         * @var array{width: int|null, height: int|null, ratio: float|null}|null $box
-         */
-        $box = $media->getMeta('dimensions');
+        $dimensions = $media->getMetas()['dimensions'] ?? null;
 
-        if (!$box) {
-            $box = ['width' => false, 'height' => false, 'ratio' => false];
-        }
+        /** @var array{width?: int|null, height?: int|null, ratio?: float|int|null} $dimensions */
+        $dimensions = is_array($dimensions) ? $dimensions : [];
+
+        $box = [
+            'width' => $dimensions['width'] ?? false,
+            'height' => $dimensions['height'] ?? false,
+            'ratio' => $dimensions['ratio'] ?? false,
+        ];
 
         $params += [
             'ratio' => $box['ratio'] ?: null,

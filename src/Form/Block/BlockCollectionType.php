@@ -58,7 +58,7 @@ class BlockCollectionType extends CollectionType implements AdminFormTypeInterfa
                 if (
                     is_string($prototypeOptions['label']) &&
                     '' !== $prototypeOptions['label'] &&
-                    str_contains('label__', $prototypeOptions['label'])
+                    str_contains($prototypeOptions['label'], 'label__')
                 ) {
                     $prototypeOptions['label'] = $name . 'label__';
                 }
