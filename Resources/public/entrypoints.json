@@ -2,7 +2,7 @@
   "entrypoints": {
     "flexible-content": {
       "css": [
-        "/bundles/syliushappycmsplugin/flexible-content.4e7e726a.css"
+        "/bundles/syliushappycmsplugin/flexible-content.48d6f615.css"
       ],
       "js": [
         "/bundles/syliushappycmsplugin/flexible-content.26e202f1.js"
@@ -36,10 +36,10 @@
     },
     "page-builder": {
       "css": [
-        "/bundles/syliushappycmsplugin/page-builder.62a950da.css"
+        "/bundles/syliushappycmsplugin/page-builder.734604ce.css"
       ],
       "js": [
-        "/bundles/syliushappycmsplugin/page-builder.845afac7.js"
+        "/bundles/syliushappycmsplugin/page-builder.d3152c67.js"
       ]
     }
   }

@@ -152,6 +152,75 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Block editor closed');
   }
 
+  // Theme tokens forwarded to the shop preview iframe, which knows nothing about the admin theme variables
+  const PREVIEW_THEME_TOKENS = ['--hcms-accent', '--hcms-accent-hover', '--hcms-warning', '--hcms-danger'];
+
+  /**
+   * Declare the resolved admin theme tokens in the preview document.
+   * Empty values are skipped so the inline fallbacks of the overlays still apply.
+   */
+  function applyPreviewTheme(iframeDocument) {
+    if (!iframeDocument || !iframeDocument.head) return;
+
+    const rootStyles = getComputedStyle(document.documentElement);
+    const declarations = PREVIEW_THEME_TOKENS
+      .map(token => [token, rootStyles.getPropertyValue(token).trim()])
+      .filter(([, value]) => value !== '')
+      .map(([token, value]) => `${token}: ${value};`)
+      .join(' ');
+
+    let style = iframeDocument.getElementById('page-builder-theme');
+    if (!style) {
+      style = iframeDocument.createElement('style');
+      style.id = 'page-builder-theme';
+      iframeDocument.head.appendChild(style);
+    }
+    style.textContent = `:root { ${declarations} }`;
+  }
+
+  /**
+   * Propagate the admin theme (light / dark) to the block form iframes and refresh the preview tokens.
+   * The form iframe is recreated by the Live Component, so it is queried on every call.
+   */
+  function syncTheme() {
+    const theme = document.documentElement.getAttribute('data-bs-theme') || 'light';
+
+    document.querySelectorAll('.block-editor-form-iframe').forEach(formIframe => {
+      try {
+        const formDocument = formIframe.contentDocument;
+        if (formDocument && formDocument.documentElement) {
+          formDocument.documentElement.setAttribute('data-bs-theme', theme);
+        }
+      } catch (error) {
+        // Iframe not accessible yet
+      }
+    });
+
+    const previewIframe = document.querySelector('[data-page-builder-target="iframe"]');
+    try {
+      if (previewIframe && isCurrentIframeUrlValid()) {
+        applyPreviewTheme(previewIframe.contentDocument);
+      }
+    } catch (error) {
+      // Preview not accessible (cross-origin or navigating)
+    }
+  }
+
+  // Sylius theme switcher only toggles data-bs-theme on <html>
+  new MutationObserver(syncTheme).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-bs-theme'],
+  });
+
+  // Align every newly loaded form iframe with the current admin theme (load does not bubble: capture)
+  if (editorPanel) {
+    editorPanel.addEventListener('load', function(e) {
+      if (e.target instanceof HTMLIFrameElement && e.target.classList.contains('block-editor-form-iframe')) {
+        syncTheme();
+      }
+    }, true);
+  }
+
   if (iframe) {
 
     // Prevent navigation in iframe and re-initialize events on reload
@@ -206,45 +275,49 @@ document.addEventListener('DOMContentLoaded', function() {
             return false;
           }, true);
 
+          // Forward the admin theme tokens (accent, warning, danger) to the preview
+          applyPreviewTheme(iframeDocument);
+
           // Inject CSS for hover effect in iframe (only if not already present)
           if (!iframeDocument.getElementById('page-builder-styles')) {
             const style = iframeDocument.createElement('style');
             style.id = 'page-builder-styles';
             style.textContent = `
-                                    /* Minimal height for blocks (some are blank) */
-                                    .content-block-wrapper {
-                                      min-height: 150px;
-                                    }
-                                    /* Show outline and shadow on hover */
-                                    .content-block-wrapper.is-hovered {
-                                        outline: 3px solid #1e74fd !important;
-                                        outline-offset: -3px !important;
-                                        box-shadow: 0 0 0 3px rgba(30, 116, 253, 0.2) !important;
-                                        z-index: 100 !important;
-                                    }
+              /* Minimal height for blocks (some are blank) */
+              .content-block-wrapper {
+                min-height: 150px;
+              }
 
-                                    /* Show hover overlay when hovering */
-                                    .content-block-wrapper.is-hovered .content-block-hover-overlay {
-                                        display: flex !important;
-                                    }
+              /* Show outline and shadow on hover */
+              .content-block-wrapper.is-hovered {
+                outline: 3px solid var(--hcms-accent, #22b99a) !important;
+                outline-offset: -3px !important;
+                box-shadow: 0 0 0 3px color-mix(in srgb, var(--hcms-accent, #22b99a) 20%, transparent) !important;
+                z-index: 100 !important;
+              }
 
-                                    /* Hide hover overlay for unpublished blocks (they have their own overlay) */
-                                    .content-block-wrapper[data-published="false"] .content-block-hover-overlay {
-                                        display: none !important;
-                                    }
+              /* Show hover overlay when hovering */
+              .content-block-wrapper.is-hovered .content-block-hover-overlay {
+                display: flex !important;
+              }
 
-                                    /* Hide hover overlay for deleted blocks (they have their own overlay) */
-                                    .content-block-wrapper[data-deleted="true"] .content-block-hover-overlay {
-                                        display: none !important;
-                                    }
+              /* Hide hover overlay for unpublished blocks (they have their own overlay) */
+              .content-block-wrapper[data-published="false"] .content-block-hover-overlay {
+                display: none !important;
+              }
 
-                                    /* Button hover effect */
-                                    .content-block-edit-button:hover {
-                                        background: #0056d6 !important;
-                                        transform: translateY(-2px) !important;
-                                        box-shadow: 0 6px 16px rgba(30, 116, 253, 0.5) !important;
-                                    }
-                                `;
+              /* Hide hover overlay for deleted blocks (they have their own overlay) */
+              .content-block-wrapper[data-deleted="true"] .content-block-hover-overlay {
+                display: none !important;
+              }
+
+              /* Button hover effect */
+              .content-block-edit-button:hover {
+                background: var(--hcms-accent-hover, #1d9d83) !important;
+                transform: translateY(-2px) !important;
+                box-shadow: 0 6px 16px color-mix(in srgb, var(--hcms-accent, #22b99a) 50%, transparent) !important;
+              }
+            `;
             iframeDocument.head.appendChild(style);
           }
 
