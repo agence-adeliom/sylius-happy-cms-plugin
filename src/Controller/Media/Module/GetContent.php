@@ -206,9 +206,6 @@ trait GetContent
             throw new \RuntimeException('Media Repository not found');
         }
 
-        if (!method_exists($folderRepository, 'createQueryBuilder')) {
-            return [];
-        }
         if (!method_exists($mediaRepository, 'createQueryBuilder')) {
             return [];
         }

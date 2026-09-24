@@ -110,7 +110,7 @@ class Helper
         /** @var ?SharedBlockInterface $sharedBlock */
         $sharedBlock = $this->entityManager->getRepository(SharedBlockInterface::class)->find($data['block']);
         if ($sharedBlock instanceof SharedBlockInterface && $this->requestStack->getCurrentRequest()) {
-            /** @var ?SharedBlockTranslationInterface $translation */
+            /** @var SharedBlockTranslationInterface $translation */
             $translation = $sharedBlock->getTranslation($this->requestStack->getCurrentRequest()->getLocale());
             /** @var ?SharedBlockTranslationInterface $translation */
             $firstTranslation = $sharedBlock->getTranslations()->first();
@@ -118,6 +118,7 @@ class Helper
                 $translation = $firstTranslation;
             }
             if ($firstTranslation instanceof SharedBlockTranslationInterface && $translation instanceof SharedBlockTranslationInterface) {
+                /** @var array<string, mixed> $block */
                 $block = array_merge(
                     $firstTranslation->getContent() ?? [],
                     $translation->getContent() ?? [],
@@ -133,7 +134,7 @@ class Helper
             return null;
         }
 
-        $blockType = $this->collection->getBlocks()[$sharedBlock->getType()];
+        $blockType = $this->collection->getBlocks()[(string) $sharedBlock->getType()];
 
         $stats = $this->startTracing($sharedBlock);
         $defaultSetting = call_user_func([$blockType, 'getDefaultSettings']);

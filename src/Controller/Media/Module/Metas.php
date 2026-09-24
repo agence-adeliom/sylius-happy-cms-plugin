@@ -87,6 +87,7 @@ trait Metas
             $object = $this->manager->getMedia($file['id']);
             if ($object instanceof MediaInterface) {
                 $metas = $object->getMetas();
+                /** @var string $oldAlt */
                 $oldAlt = $metas['alt'];
                 $event = $this->eventDispatcher->dispatch(
                     new MediaGenerateAlt($object, $data['path'] ?? '', $oldAlt),

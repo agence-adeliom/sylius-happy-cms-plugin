@@ -50,6 +50,7 @@ final class MediaCsrfContext implements Context
     public function theCsrfTokenShouldBeA64CharacterHexadecimalString(): void
     {
         $token = $this->sharedStorage->get('csrf_token');
+        Assert::string($token);
 
         Assert::regex($token, '/^[a-f0-9]{64}$/', 'CSRF token is not a 64-character hexadecimal string');
     }
@@ -118,6 +119,7 @@ final class MediaCsrfContext implements Context
     public function iUploadAFileNamedWithTheValidCsrfToken(string $filename): void
     {
         $token = $this->sharedStorage->get('csrf_token');
+        Assert::string($token);
 
         // Create a blob file in JavaScript
         $this->session->executeScript("
@@ -156,11 +158,14 @@ final class MediaCsrfContext implements Context
             $response = $response[0];
         }
 
+        Assert::isArray($response, 'No response found');
+
         Assert::keyExists($response, 'success', 'Response does not have success key');
         Assert::false($response['success'], 'Operation succeeded when it should have failed');
 
         Assert::keyExists($response, 'message', 'Response does not have message key');
 
+        Assert::string($response['message']);
         $message = strtolower($response['message']);
 
         Assert::contains($message, strtolower($text), sprintf(
@@ -182,10 +187,12 @@ final class MediaCsrfContext implements Context
             $response = $response[0];
         }
 
+        Assert::isArray($response, 'No response found');
+
         Assert::keyExists($response, 'success', 'Response does not have success key');
         Assert::true($response['success'], sprintf(
             'Operation failed: %s',
-            $response['message'] ?? 'Unknown error'
+            \is_string($response['message'] ?? null) ? $response['message'] : 'Unknown error'
         ));
     }
 
@@ -197,9 +204,13 @@ final class MediaCsrfContext implements Context
         // For now, we rely on the error response
         $response = $this->session->evaluateScript('return window.lastResponse;');
 
+        Assert::isArray($response, 'No response found');
+
         if (isset($response[0])) {
             $response = $response[0];
         }
+
+        Assert::isArray($response, 'No response found');
 
         Assert::false($response['success'] ?? true, 'File was uploaded when it should not have been');
     }
@@ -209,9 +220,13 @@ final class MediaCsrfContext implements Context
     {
         $response = $this->session->evaluateScript('return window.lastResponse;');
 
+        Assert::isArray($response, 'No response found');
+
         if (isset($response[0])) {
             $response = $response[0];
         }
+
+        Assert::isArray($response, 'No response found');
 
         Assert::true($response['success'] ?? false, 'File was not uploaded');
         Assert::same($filename, $response['file_name'] ?? null, 'Uploaded filename does not match');
@@ -260,6 +275,7 @@ final class MediaCsrfContext implements Context
     public function iDeleteWithTheValidCsrfToken(string $filename): void
     {
         $token = $this->sharedStorage->get('csrf_token');
+        Assert::string($token);
         $media = $this->sharedStorage->get('test_media_' . $filename);
 
         $this->session->executeScript("

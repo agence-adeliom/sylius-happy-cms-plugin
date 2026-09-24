@@ -49,7 +49,7 @@ class TreeComponent
     {
         assert($this->requestStack->getCurrentRequest() instanceof Request, 'Current request must be instance of Request');
 
-        assert($this->menuItemRepository instanceof NestedTreeRepository && $this->menuItemRepository instanceof MenuItemRepositoryInterface, 'Page repository must be instance of NestedTreeRepository');
+        assert($this->menuItemRepository instanceof NestedTreeRepository, 'Page repository must be instance of NestedTreeRepository');
 
         $menuItemToBeMoved = $this->menuItemRepository->find($menuItemId);
 
@@ -77,7 +77,7 @@ class TreeComponent
     {
         assert($this->requestStack->getCurrentRequest() instanceof Request, 'Current request must be instance of Request');
 
-        assert($this->menuItemRepository instanceof NestedTreeRepository && $this->menuItemRepository instanceof MenuItemRepositoryInterface, 'Page repository must be instance of NestedTreeRepository');
+        assert($this->menuItemRepository instanceof NestedTreeRepository, 'Page repository must be instance of NestedTreeRepository');
 
         $menuItemToBeMoved = $this->menuItemRepository->find($menuItemId);
 
@@ -105,7 +105,7 @@ class TreeComponent
     {
         assert($this->requestStack->getCurrentRequest() instanceof Request, 'Current request must be instance of Request');
 
-        assert($this->menuItemRepository instanceof NestedTreeRepository && $this->menuItemRepository instanceof MenuItemRepositoryInterface, 'Page repository must be instance of NestedTreeRepository');
+        assert($this->menuItemRepository instanceof NestedTreeRepository, 'Page repository must be instance of NestedTreeRepository');
 
         $menuItemToBeMoved = $this->menuItemRepository->find($menuItemId);
 
@@ -132,7 +132,7 @@ class TreeComponent
     {
         assert($this->requestStack->getCurrentRequest() instanceof Request, 'Current request must be instance of Request');
 
-        assert($this->menuItemRepository instanceof NestedTreeRepository && $this->menuItemRepository instanceof MenuItemRepositoryInterface, 'Page repository must be instance of NestedTreeRepository');
+        assert($this->menuItemRepository instanceof NestedTreeRepository, 'Page repository must be instance of NestedTreeRepository');
 
         $menuItemToBeMoved = $this->menuItemRepository->find($menuItemId);
 

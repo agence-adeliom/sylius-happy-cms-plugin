@@ -8,6 +8,7 @@ use Adeliom\SyliusHappyCMSPlugin\Entity\SharedBlock\SharedBlockInterface;
 use Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock\Helper;
 use Adeliom\SyliusHappyCMSPlugin\Repository\SharedBlock\SharedBlockRepositoryInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -52,17 +53,20 @@ class SharedBlockExtension extends AbstractExtension
                 throw new \InvalidArgumentException(sprintf('The resource "%s" must implement "%s".', $resourceName, SharedBlockInterface::class));
             }
 
-            /** @var SharedBlockRepositoryInterface|null $repository */
+            /** @var EntityRepository<SharedBlockInterface>&SharedBlockRepositoryInterface $repository */
             $repository = $this->manager->getRepository($modelClass);
 
-            if (null === $repository || !method_exists($repository, 'getByKey')) {
+            if (!method_exists($repository, 'getByKey')) {
                 throw new \InvalidArgumentException(sprintf('The resource "%s" repository must have a method "%s".', $resourceName, 'getByKey'));
             }
 
             /** @var SharedBlockInterface|null $object */
             $object = $repository->getByKey($key);
             if (null !== $object) {
-                return $object->getId();
+                /** @var int|null $id */
+                $id = $object->getId();
+
+                return $id;
             }
 
             return null;

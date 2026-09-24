@@ -12,6 +12,8 @@ use Symfony\Component\Form\FormInterface;
 
 /**
  * Adapted from Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener
+ *
+ * @phpstan-type BlockData array{block_type?: string|null, position: mixed}
  */
 class ResizeFormListener implements EventSubscriberInterface
 {
@@ -47,6 +49,7 @@ class ResizeFormListener implements EventSubscriberInterface
     public function preSetData(FormEvent $event): void
     {
         $form = $event->getForm();
+        /** @var array<string, BlockData>|(\Traversable<string, BlockData>&\ArrayAccess<string, BlockData>) $data */
         $data = $event->getData() ?? [];
 
         if (!\is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
@@ -97,6 +100,7 @@ class ResizeFormListener implements EventSubscriberInterface
         // Add all additional rows
         if ($this->allowAdd) {
             foreach ($data as $name => $value) {
+                /** @var array{block_type: string|null} $value */
                 if (!$form->has($name)) {
                     $form->add($name, $value['block_type'], array_replace([
                       'property_path' => '[' . $name . ']',
@@ -109,6 +113,7 @@ class ResizeFormListener implements EventSubscriberInterface
     public function onSubmit(FormEvent $event): void
     {
         $form = $event->getForm();
+        /** @var array<string, BlockData>|(\Traversable<string, BlockData>&\ArrayAccess<string, BlockData>) $data */
         $data = $event->getData() ?? [];
 
         // At this point, $data is an array or an array-like object that already contains the

@@ -315,7 +315,7 @@ class PageRepository extends NestedTreeRepository implements PageRepositoryInter
                 if ($item->getPublishState() === ThreeStateStatusEnum::UNPUBLISHED) {
                     $allItemsPublished = false;
                 }
-                $tempConstructedTree = array_merge([$itemSlug => $item], $tempConstructedTree);
+                $tempConstructedTree = array_merge([(string) $itemSlug => $item], $tempConstructedTree);
             }
 
             $constructedKeys = array_keys($tempConstructedTree);
@@ -379,7 +379,7 @@ class PageRepository extends NestedTreeRepository implements PageRepositoryInter
 
             $resultsSortedBySlug = [];
             foreach ($results as $page) {
-                $resultsSortedBySlug[$page->getTranslation($locale)->getSlug()] = $page;
+                $resultsSortedBySlug[(string) $page->getTranslation($locale)->getSlug()] = $page;
             }
 
             $pages = $resultsSortedBySlug;

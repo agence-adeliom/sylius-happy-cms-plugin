@@ -7,10 +7,10 @@ namespace Adeliom\SyliusHappyCMSPlugin\EventListener;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
 use Adeliom\SyliusHappyCMSPlugin\Event\Route\CalculateRouteStaticPrefixEvent;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\PostPersistEventArgs;
 use Doctrine\ORM\Event\PostUpdateEventArgs;
-use Doctrine\ORM\PersistentCollection;
 use Doctrine\Persistence\ObjectManager;
 use Sylius\Resource\Model\TranslationInterface;
 use Symfony\Cmf\Bundle\RoutingBundle\Doctrine\Orm\ContentRepository;
@@ -74,6 +74,7 @@ class EntityRouteIndexer
 
     private function manageRoutes(CmsRoutableInterface $entity, ObjectManager $objectManager): void
     {
+        /** @var array<string, string> $routesChanges */
         $routesChanges = [];
 
         $this->computeRoutes($routesChanges, $entity, self::ROUTE_ONLINE, $objectManager);
@@ -99,6 +100,9 @@ class EntityRouteIndexer
     //    }
     //}
 
+    /**
+     * @param array<string, string> $routesChanges
+     */
     private function computeRoutes(
         array &$routesChanges,
         CmsRoutableInterface &$entity,
@@ -165,7 +169,7 @@ class EntityRouteIndexer
                                 '{{current_entity_path}}',
                             ],
                     [
-                                $locale,
+                                (string) $locale,
                                 $otherEntityPath,
                                 $currentEntityPath,
                             ],
@@ -195,17 +199,17 @@ class EntityRouteIndexer
      * This method will find all routes that start with the previous static prefix and update them to use the new
      * TODO: replace findAll() with an optimized query to avoid loading all routes
      *
-     * @param PersistentCollection<int, RouteInterface> $excludedRoutes
+     * @param Collection<int, RouteInterface> $excludedRoutes
      */
     private function rewriteOtherStaticPrefix(
         string $staticPrefix,
         string $previousStaticPrefix,
-        PersistentCollection $excludedRoutes,
+        Collection $excludedRoutes,
     ): void {
         if ($previousStaticPrefix && $previousStaticPrefix !== $staticPrefix) {
             $allRoutes = $this->manager->getRepository(RouteInterface::class)->findAll();
 
-            if (is_array($allRoutes) && count($allRoutes) > 0) {
+            if (count($allRoutes) > 0) {
                 $routesToUpdate = array_filter($allRoutes, function (RouteInterface $route) use ($previousStaticPrefix) {
                     return str_starts_with($route->getStaticPrefix(), $previousStaticPrefix);
                 });

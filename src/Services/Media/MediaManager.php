@@ -112,7 +112,10 @@ class MediaManager
 
     public function directoryExists(string $path): bool
     {
-        return is_dir($this->parameters->get('kernel.project_dir') . \DIRECTORY_SEPARATOR . 'public' . $this->helper->getBaseUrl() . \DIRECTORY_SEPARATOR . $path);
+        /** @var string $projectDir */
+        $projectDir = $this->parameters->get('kernel.project_dir');
+
+        return is_dir($projectDir . \DIRECTORY_SEPARATOR . 'public' . $this->helper->getBaseUrl() . \DIRECTORY_SEPARATOR . $path);
     }
 
     /**
@@ -303,6 +306,7 @@ class MediaManager
 
         /** @phpstan-ignore-next-line */
         if (($oembed = $infos->getOEmbed()) && !empty($infos->getOEmbed()->all())) {
+            /** @var string|null $name */
             $name = $entity->getName() ?: $oembed->get('title');
             $entity->setName($name);
             $entity->setMime('application/json+oembed');
@@ -437,13 +441,13 @@ class MediaManager
             $entity->setName($name);
         }
 
-        /** @var array|null $unAllowedMimes */
+        /** @var array<string>|null $unAllowedMimes */
         $unAllowedMimes = $this->parameters->get('sylius_happy_cms.media.unallowed_mimes');
 
         $ignore = array_merge($unAllowedMimes ?? [], ['application/octet-stream']);
 
         // check for mime type
-        if (is_string($file_type) && Str::contains($file_type, $ignore)) {
+        if (Str::contains($file_type, $ignore)) {
             throw new ExtNotAllowed($this->translator->trans('not_allowed_file_ext', [], 'SyliusHappyCMSPlugin'));
         }
 
@@ -506,10 +510,6 @@ class MediaManager
             $source = new File($source);
         }
 
-        if (!($source instanceof File)) {
-            throw new NoFile();
-        }
-
         if ($source instanceof UploadedFile) {
             // SECURITY: Validate uploaded file BEFORE processing
             try {
@@ -556,10 +556,10 @@ class MediaManager
         $entity->setSize($source->getSize());
         $entity->setLastModified($source->getMTime());
 
-        /** @var array|null $unAllowedMimes */
+        /** @var array<string>|null $unAllowedMimes */
         $unAllowedMimes = $this->parameters->get('sylius_happy_cms.media.unallowed_mimes');
 
-        /** @var array|null $unAllowedExt */
+        /** @var array<string>|null $unAllowedExt */
         $unAllowedExt = $this->parameters->get('sylius_happy_cms.media.unallowed_ext');
 
         // check for mime type
@@ -585,6 +585,14 @@ class MediaManager
         try {
             if ($this->helper->fileIsType($entity->getMime(), 'video') || $this->helper->fileIsType($entity->getMime(), 'audio')) {
                 $getID3 = new \getID3();
+                /**
+                 * @var array{
+                 *     playtime_seconds: float|int,
+                 *     video?: array{frame_rate: float|int, resolution_x: int, resolution_y: int},
+                 *     audio?: array<string, mixed>,
+                 *     id3v1?: array{title?: string, artist?: string, album?: string, year?: string}
+                 * } $id3Datas
+                 */
                 $id3Datas = $getID3->analyze($source->getPathname());
 
                 if (isset($id3Datas['video']) && $this->helper->fileIsType($entity->getMime(), 'video')) {

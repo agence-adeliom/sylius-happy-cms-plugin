@@ -34,7 +34,7 @@ class SharedBlockCollection
     }
 
     /**
-     * @return SharedBlockTypeInterface[]
+     * @return array<string, SharedBlockTypeInterface>
      */
     public function getBlocks(): array
     {
@@ -42,7 +42,7 @@ class SharedBlockCollection
     }
 
     /**
-     * @return array<SharedBlockTypeInterface>
+     * @return array<string, SharedBlockTypeInterface>
      */
     public function getAllowedBlocks(?ResourceInterface $resource = null): array
     {

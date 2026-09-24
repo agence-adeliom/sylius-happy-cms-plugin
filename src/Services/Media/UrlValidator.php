@@ -205,7 +205,9 @@ class UrlValidator
         $maskBin = '';
 
         for ($i = 0; $i < $maxBits; $i += 8) {
-            $maskBin .= \chr((int) bindec(substr($binaryMask, $i, 8)));
+            /** @var int<0, 255> $byte */
+            $byte = (int) bindec(substr($binaryMask, $i, 8));
+            $maskBin .= \chr($byte);
         }
 
         // Compare masked IP with masked subnet

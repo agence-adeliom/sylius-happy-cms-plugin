@@ -26,7 +26,10 @@ final class BlockCollector extends AbstractDataCollector
      */
     public function getBlocks(): array
     {
-        return $this->data['blocks'] ?: [];
+        /** @var BlockTypeInterface[] $blocks */
+        $blocks = $this->data['blocks'] ?: [];
+
+        return $blocks;
     }
 
     public function getName(): string

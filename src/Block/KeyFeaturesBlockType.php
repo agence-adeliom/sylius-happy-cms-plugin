@@ -53,7 +53,10 @@ class KeyFeaturesBlockType extends AbstractBlock
     public function configureAdminAssets(): array
     {
         // Sub formType asset has to be declared manually
-        return array_merge_recursive(parent::configureAdminAssets(), IconType::configureAdminAssets());
+        /** @var array<string, array<int,string|Asset>> $assets */
+        $assets = array_merge_recursive(parent::configureAdminAssets(), IconType::configureAdminAssets());
+
+        return $assets;
     }
 
     /**

@@ -69,7 +69,9 @@ abstract class AbstractContentCommand extends Command
                 );
 
                 if (is_array($metas)) {
-                    $media->setMetas(array_merge($media->getMetas(), $metas));
+                    /** @var array<string, mixed> $mergedMetas */
+                    $mergedMetas = array_merge($media->getMetas(), $metas);
+                    $media->setMetas($mergedMetas);
                     $manager->save($media);
                 }
 

@@ -189,6 +189,11 @@ abstract class AbstractBlock extends AbstractType implements BlockTypeInterface
         return true;
     }
 
+    /**
+     * @param string[] $adminFormThemes
+     *
+     * @return string[]
+     */
     private function getAdminFormThemesRecursive(FormBuilderInterface $builder, array $adminFormThemes = []): array
     {
         if (!$builder->getCompound()) {
@@ -227,6 +232,11 @@ abstract class AbstractBlock extends AbstractType implements BlockTypeInterface
         return $adminFormThemes;
     }
 
+    /**
+     * @param string[] $adminFormThemes
+     *
+     * @return string[]
+     */
     private function getAdminFormThemes(string $formTypeClass, array $adminFormThemes): array
     {
         if (method_exists($formTypeClass, 'configureAdminFormThemes')) {
@@ -234,6 +244,7 @@ abstract class AbstractBlock extends AbstractType implements BlockTypeInterface
             if (is_callable($callable)) {
                 $formThemes = call_user_func($callable);
                 if (is_array($formThemes)) {
+                    /** @var string[] $adminFormThemes */
                     $adminFormThemes = array_merge($adminFormThemes, $formThemes);
                 }
             }

@@ -7,6 +7,7 @@ namespace Adeliom\SyliusHappyCMSPlugin\Services\Cmf;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RedirectRouteInterface;
 use Adeliom\SyliusHappyCMSPlugin\Repository\Cmf\RedirectRouteRepositoryInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -48,7 +49,7 @@ class RedirectionManager implements RedirectionManagerInterface
             ));
         }
 
-        /** @var RedirectRouteRepositoryInterface $redirectRouteRepository * */
+        /** @var EntityRepository<RedirectRouteInterface>&RedirectRouteRepositoryInterface $redirectRouteRepository * */
         $redirectRouteRepository = $this->manager->getRepository($modelClass);
 
         // A redirect route is already persisted?

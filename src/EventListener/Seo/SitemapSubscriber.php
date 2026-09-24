@@ -96,6 +96,7 @@ class SitemapSubscriber implements EventSubscriberInterface
         );
 
         if (is_callable($replaceUrlCallback) && $updatedUrl = $replaceUrlCallback($url, $entity)) {
+            /** @var string $url */
             $url = $updatedUrl;
         }
 

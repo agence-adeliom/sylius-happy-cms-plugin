@@ -50,17 +50,23 @@ class ExampleType extends AbstractSharedBlockType implements SharedBlockTypeInte
 
     public function configureAdminAssets(): array
     {
-        return array_merge_recursive(
+        /** @var array<string, array<string>> $assets */
+        $assets = array_merge_recursive(
             MediaType::configureAdminAssets(),
             IconType::configureAdminAssets(),
         );
+
+        return $assets;
     }
 
     public function configureAdminFormThemes(): array
     {
-        return array_merge_recursive(
+        /** @var array<string> $formThemes */
+        $formThemes = array_merge_recursive(
             MediaType::configureAdminFormThemes(),
             IconType::configureAdminFormThemes(),
         );
+
+        return $formThemes;
     }
 }

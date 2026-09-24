@@ -212,8 +212,9 @@ abstract class AbstractMenuItemAdmin extends AbstractAdmin implements MenuItemAd
 
         if ($resource instanceof MenuItemInterface && null !== $resource->getMenu()) {
             $request->attributes->set('menu_id', $resource->getMenu()->getId());
+            $resourceMenuId = $resource->getMenu()->getId();
 
-            return $resource->getMenu()->getId();
+            return is_int($resourceMenuId) ? $resourceMenuId : null;
         }
 
         $menuId = (int) $this->getResourceFieldValueInRequest(formName: 'menu_item_admin', fieldName: 'menu');

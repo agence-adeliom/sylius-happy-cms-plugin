@@ -29,9 +29,7 @@ trait ContentEditableTrait
     {
         if (!$this->contentBlocks->contains($contentBlock)) {
             $this->contentBlocks->add($contentBlock);
-            if (method_exists($contentBlock, 'setContentOwner')) {
-                $contentBlock->setContentOwner($this);
-            }
+            $contentBlock->setContentOwner($this);
         }
     }
 
@@ -39,9 +37,7 @@ trait ContentEditableTrait
     {
         if ($this->contentBlocks->contains($contentBlock)) {
             $this->contentBlocks->removeElement($contentBlock);
-            if (method_exists($contentBlock, 'setContentOwner')) {
-                $contentBlock->setContentOwner(null);
-            }
+            $contentBlock->setContentOwner(null);
         }
     }
 
@@ -57,13 +53,13 @@ trait ContentEditableTrait
     {
         // Filtrer via une closure puis trier par position asc
         $filtered = $this->contentBlocks->filter(function (ContentBlockInterface $contentBlock) use ($locale, $layer): bool {
-            if (method_exists($contentBlock, 'getLocale') && $contentBlock->getLocale() !== $locale) {
+            if ($contentBlock->getLocale() !== $locale) {
                 return false;
             }
-            if (method_exists($contentBlock, 'isPublished') && !$contentBlock->isPublished()) {
+            if (!$contentBlock->isPublished()) {
                 return false;
             }
-            if (null !== $layer && method_exists($contentBlock, 'getLayer') && $contentBlock->getLayer() !== $layer) {
+            if (null !== $layer && $contentBlock->getLayer() !== $layer) {
                 return false;
             }
 
@@ -90,11 +86,11 @@ trait ContentEditableTrait
     {
         // Filter by locale and layer, include blocks based on preview publish state
         $filtered = $this->contentBlocks->filter(function (ContentBlockInterface $contentBlock) use ($locale, $layer): bool {
-            if (method_exists($contentBlock, 'getLocale') && $contentBlock->getLocale() !== $locale) {
+            if ($contentBlock->getLocale() !== $locale) {
                 return false;
             }
 
-            if (null !== $layer && method_exists($contentBlock, 'getLayer') && $contentBlock->getLayer() !== $layer) {
+            if (null !== $layer && $contentBlock->getLayer() !== $layer) {
                 return false;
             }
 

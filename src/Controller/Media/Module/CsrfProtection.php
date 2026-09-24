@@ -62,6 +62,8 @@ trait CsrfProtection
         if (
             is_array($tokenData) &&
             isset($tokenData['token'], $tokenData['timestamp']) &&
+            is_string($tokenData['token']) &&
+            is_int($tokenData['timestamp']) &&
             (time() - $tokenData['timestamp']) < self::CSRF_TOKEN_LIFETIME
         ) {
             return $tokenData['token'];
@@ -93,8 +95,8 @@ trait CsrfProtection
         if (!empty($content)) {
             try {
                 $data = json_decode($content, true, 512, \JSON_THROW_ON_ERROR);
-                if (is_array($data) && isset($data[$tokenKey])) {
-                    $submittedToken = $data[$tokenKey];
+                if (is_array($data) && isset($data[(string) $tokenKey])) {
+                    $submittedToken = $data[(string) $tokenKey];
                 }
             } catch (\JsonException $e) {
                 // Not JSON, try other methods
@@ -122,7 +124,12 @@ trait CsrfProtection
         $tokenData = $session->get(self::CSRF_TOKEN_SESSION_KEY);
 
         // Validate token exists
-        if (!is_array($tokenData) || !isset($tokenData['token'], $tokenData['timestamp'])) {
+        if (
+            !is_array($tokenData) ||
+            !isset($tokenData['token'], $tokenData['timestamp']) ||
+            !is_string($tokenData['token']) ||
+            !is_int($tokenData['timestamp'])
+        ) {
             throw new BadRequestException(
                 $this->translator->trans('error.csrf_token_invalid', [], 'SyliusHappyCMSPlugin'),
             );

@@ -194,7 +194,10 @@ final class SeoCollector extends AbstractDataCollector
      */
     public function getTitle(): array
     {
-        return $this->data['title'] ?? [];
+        /** @var array<string,string> $title */
+        $title = $this->data['title'] ?? [];
+
+        return $title;
     }
 
     /**
@@ -202,7 +205,10 @@ final class SeoCollector extends AbstractDataCollector
      */
     public function getDescription(): array
     {
-        return $this->data['description'] ?? [];
+        /** @var array<string,string> $description */
+        $description = $this->data['description'] ?? [];
+
+        return $description;
     }
 
     public function __get(string $name): mixed

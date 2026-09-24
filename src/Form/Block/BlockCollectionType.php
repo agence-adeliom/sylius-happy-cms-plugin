@@ -26,7 +26,7 @@ class BlockCollectionType extends CollectionType implements AdminFormTypeInterfa
      *     allow_delete: bool,
      *     allow_drag: bool,
      *     delete_empty: bool,
-     *     entry_options: array,
+     *     entry_options: array<string, mixed>,
      *     entry_type: class-string,
      *     prototype: ?string,
      *     prototype_name: string,
@@ -92,7 +92,7 @@ class BlockCollectionType extends CollectionType implements AdminFormTypeInterfa
      *     allow_delete: bool,
      *     allow_drag: bool,
      *     delete_empty: bool,
-     *     entry_options: array,
+     *     entry_options: array<string, mixed>,
      *     entry_type: class-string,
      *     prototype: ?string,
      *     prototype_name: string,
@@ -128,6 +128,7 @@ class BlockCollectionType extends CollectionType implements AdminFormTypeInterfa
     public function configureOptions(OptionsResolver $resolver): void
     {
         $entryOptionsNormalizer = static function (Options $options, $value) {
+            /** @var array<string, mixed> $value */
             $value['block_name'] = 'entry';
 
             return $value;
@@ -178,14 +179,20 @@ class BlockCollectionType extends CollectionType implements AdminFormTypeInterfa
         }
 
         foreach ($view as $entryView) {
-            array_splice($entryView->vars['block_prefixes'], $prefixOffset, 0, 'editor_collection_entry');
+            /** @var string[] $blockPrefixes */
+            $blockPrefixes = $entryView->vars['block_prefixes'];
+            array_splice($blockPrefixes, $prefixOffset, 0, 'editor_collection_entry');
+            $entryView->vars['block_prefixes'] = $blockPrefixes;
         }
 
         /** @var FormInterface[] $prototypes */
         $prototypes = $form->getConfig()->getAttribute('prototypes');
         if ($prototypes) {
+            /** @var FormView[] $prototypeViews */
+            $prototypeViews = $view->vars['prototypes'];
             foreach ($prototypes as $type => $prototype) {
-                if ($view->vars['prototypes'][$type]->vars['multipart']) {
+                $prototypeView = $prototypeViews[$type];
+                if ($prototypeView->vars['multipart']) {
                     $view->vars['multipart'] = true;
                 }
 
@@ -193,7 +200,10 @@ class BlockCollectionType extends CollectionType implements AdminFormTypeInterfa
                     --$prefixOffset;
                 }
 
-                array_splice($view->vars['prototypes'][$type]->vars['block_prefixes'], $prefixOffset, 0, 'editor_collection_entry');
+                /** @var string[] $blockPrefixes */
+                $blockPrefixes = $prototypeView->vars['block_prefixes'];
+                array_splice($blockPrefixes, $prefixOffset, 0, 'editor_collection_entry');
+                $prototypeView->vars['block_prefixes'] = $blockPrefixes;
             }
         }
     }

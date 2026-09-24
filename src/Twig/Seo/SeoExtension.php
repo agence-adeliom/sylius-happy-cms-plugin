@@ -82,14 +82,14 @@ class SeoExtension extends AbstractExtension implements GlobalsInterface
         return new Markup($this->twig->render('@SyliusHappyCMSPlugin/front/seo/block-breadcrumb.html.twig', ['data' => $result->getArgument('items')]), 'UTF-8');
     }
 
-    public function renderSeoTitle(string|SEO $seo): string
+    public function renderSeoTitle(string|Seo $seo): string
     {
         $title = '';
         if (is_string($seo)) {
             $title = $seo;
         }
 
-        if ($seo instanceof SEO) {
+        if ($seo instanceof Seo) {
             $title = $seo->title;
         }
 
@@ -110,7 +110,7 @@ class SeoExtension extends AbstractExtension implements GlobalsInterface
         return $title ?? '';
     }
 
-    public function renderSeoMetas(?SEO $seo): ?Markup
+    public function renderSeoMetas(?Seo $seo): ?Markup
     {
         if (null === $seo) {
             return null;

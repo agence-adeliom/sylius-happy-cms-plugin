@@ -388,7 +388,7 @@ class MediaHelper
         if ($type instanceof MediaInterface) {
             $type = $type->getMime();
         }
-        /** @var array|false|null $mimes */
+        /** @var array<string, array<string>>|false|null $mimes */
         $mimes = $this->parameters->get('sylius_happy_cms.media.extended_mimes');
         if ($type && is_array($mimes)) {
             foreach (['image', 'video', 'audio'] as $test) {

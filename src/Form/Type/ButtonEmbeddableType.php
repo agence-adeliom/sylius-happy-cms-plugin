@@ -19,6 +19,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ButtonEmbeddableType extends AbstractType implements FormTypeInterface
 {
+    /**
+     * @param array{fields: string[], requiredFields: string[], data?: array<string, mixed>|null} $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         parent::buildForm($builder, $options);
@@ -30,6 +33,7 @@ class ButtonEmbeddableType extends AbstractType implements FormTypeInterface
 
         $builder->addModelTransformer(
             new CallbackTransformer(
+                /** @param array<string, string|null>|null $data */
                 function (?array $data) {
                     return ButtonEmbeddable::new($data ?? []);
                 },
@@ -52,6 +56,9 @@ class ButtonEmbeddableType extends AbstractType implements FormTypeInterface
         ]);
     }
 
+    /**
+     * @param array{fields: string[], requiredFields: string[], data?: array<string, mixed>|null} $options
+     */
     private function addLabelField(array $options, FormBuilderInterface $builder): void
     {
         if (\in_array('label', $options['fields'], true)) {
@@ -74,6 +81,9 @@ class ButtonEmbeddableType extends AbstractType implements FormTypeInterface
         }
     }
 
+    /**
+     * @param array{fields: string[], requiredFields: string[], data?: array<string, mixed>|null} $options
+     */
     private function addLinkField(array $options, FormBuilderInterface $builder): void
     {
         if (\in_array('link', $options['fields'], true)) {
@@ -96,6 +106,9 @@ class ButtonEmbeddableType extends AbstractType implements FormTypeInterface
         }
     }
 
+    /**
+     * @param array{fields: string[], requiredFields: string[], data?: array<string, mixed>|null} $options
+     */
     private function addActionField(array $options, FormBuilderInterface $builder): void
     {
         if (\in_array('action', $options['fields'], true)) {
@@ -114,7 +127,7 @@ class ButtonEmbeddableType extends AbstractType implements FormTypeInterface
             }
 
             if (in_array('action', $options['requiredFields'], true)) {
-                $attrs['constraints'][] = new NotBlank();
+                $attrs['constraints'] = [new NotBlank()];
             }
 
             $builder->add('action', ChoiceType::class, $attrs);
@@ -123,6 +136,9 @@ class ButtonEmbeddableType extends AbstractType implements FormTypeInterface
         }
     }
 
+    /**
+     * @param array{fields: string[], requiredFields: string[], data?: array<string, mixed>|null} $options
+     */
     private function addIconField(array $options, FormBuilderInterface $builder): void
     {
         if (\in_array('icon', $options['fields'], true)) {
@@ -138,7 +154,7 @@ class ButtonEmbeddableType extends AbstractType implements FormTypeInterface
             ];
 
             if (in_array('icon', $options['requiredFields'], true)) {
-                $attrs['constraints'][] = new NotBlank();
+                $attrs['constraints'] = [new NotBlank()];
             }
 
             $builder->add('icon', IconType::class, $attrs);

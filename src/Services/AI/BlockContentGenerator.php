@@ -159,7 +159,7 @@ PROMPT;
         // Validate and normalize blocks
         $normalizedBlocks = [];
         foreach ($blocks as $index => $block) {
-            if (!isset($block['block_type'], $block['data'])) {
+            if (!is_array($block) || !isset($block['block_type'], $block['data'])) {
                 throw new \RuntimeException("Block at index {$index} is missing required fields (block_type, data)");
             }
 
@@ -171,6 +171,9 @@ PROMPT;
             ];
         }
 
-        return new GeneratedBlocksOutput($normalizedBlocks);
+        /** @var array<int, array{block_type: string, position: int, block_published: bool, data: array<string, mixed>}> $outputBlocks */
+        $outputBlocks = $normalizedBlocks;
+
+        return new GeneratedBlocksOutput($outputBlocks);
     }
 }

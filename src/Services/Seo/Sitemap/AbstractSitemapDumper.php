@@ -33,8 +33,11 @@ abstract class AbstractSitemapDumper implements SitemapDumperInterface
 
     public function getLastModifiedDate(CmsRoutableInterface $entity): ?\DateTimeInterface
     {
-        if (class_implements($entity) && in_array(EntityTimestampableTrait::class, class_implements($entity)) && method_exists($entity, 'getUpdatedAt') && is_object($entity)) {
-            return $entity->getUpdatedAt();
+        if (class_implements($entity) && in_array(EntityTimestampableTrait::class, class_implements($entity)) && method_exists($entity, 'getUpdatedAt')) {
+            /** @var \DateTimeInterface|null $updatedAt */
+            $updatedAt = $entity->getUpdatedAt();
+
+            return $updatedAt;
         }
 
         return null;

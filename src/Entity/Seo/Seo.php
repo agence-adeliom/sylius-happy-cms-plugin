@@ -33,7 +33,7 @@ class Seo implements SeoInterface, \Stringable
     #[ORM\Column(type: Types::BOOLEAN)]
     public ?bool $sitemap = true;
 
-    /** @var array<int, string> */
+    /** @var string[] */
     #[ORM\Column(type: Types::JSON)]
     public array $robots = [];
 

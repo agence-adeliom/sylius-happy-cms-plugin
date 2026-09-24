@@ -270,6 +270,7 @@ class MediaRuntime implements RuntimeExtensionInterface
         $formats = $this->getFormat($format);
 
         if (isset($options['srcset']) || isset($options['picture'])) {
+            /** @var array<int|string, string>|string|null $set */
             $set = $options['srcset'] ?? $options['picture'];
             if (\is_array($set)) {
                 $srcSetFormats = [];
@@ -424,10 +425,13 @@ class MediaRuntime implements RuntimeExtensionInterface
     }
 
     /**
-     * @return array<int, mixed>
+     * @return array<string, mixed>
      */
     private function getFormat(string $format): array
     {
-        return array_filter($this->filterManager->getFilterConfiguration()->all(), static fn ($config, $key) => 'default' === $key || str_starts_with((string) $key, $format), \ARRAY_FILTER_USE_BOTH);
+        /** @var array<string, mixed> $filters */
+        $filters = $this->filterManager->getFilterConfiguration()->all();
+
+        return array_filter($filters, static fn ($config, $key) => 'default' === $key || str_starts_with((string) $key, $format), \ARRAY_FILTER_USE_BOTH);
     }
 }

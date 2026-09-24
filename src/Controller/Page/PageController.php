@@ -35,7 +35,6 @@ class PageController extends AbstractController
         $locale = $request->attributes->get('_locale', $request->getLocale());
         $request->setLocale($locale);
 
-        /** @var ?PageRepositoryInterface $pageRepository */
         $pageRepository = $this->entityManager->getRepository(PageInterface::class);
         if ($pageRepository instanceof PageRepositoryInterface) {
             $page = $pageRepository

@@ -73,6 +73,7 @@ class MigrateContentToBlocksCommand extends Command
 
         $io->section('Scanning for CmsRoutable entities...');
 
+        /** @var array<string, mixed> $resources */
         $eligibleEntities = $this->findEligibleEntities($resources, $io);
 
         if (empty($eligibleEntities)) {
@@ -141,11 +142,15 @@ class MigrateContentToBlocksCommand extends Command
         $eligibleEntities = [];
 
         foreach ($resources as $resourceName => $resourceConfig) {
-            if (!is_array($resourceConfig) || !isset($resourceConfig['classes']['model'])) {
+            if (!is_array($resourceConfig) || !is_array($resourceConfig['classes'] ?? null) || !isset($resourceConfig['classes']['model'])) {
                 continue;
             }
 
             $entityClass = $resourceConfig['classes']['model'];
+
+            if (!is_string($entityClass)) {
+                continue;
+            }
 
             if (!class_exists($entityClass)) {
                 $io->warning(sprintf('Entity class "%s" not found, skipping...', $entityClass));
@@ -198,7 +203,8 @@ class MigrateContentToBlocksCommand extends Command
                     $migrated += $result;
                 }
             } catch (\Exception $e) {
-                $io->error(sprintf('  Error migrating entity ID %s: %s', method_exists($entity, 'getId') ? $entity->getId() : 'unknown', $e->getMessage()));
+                $entityId = method_exists($entity, 'getId') ? $entity->getId() : 'unknown';
+                $io->error(sprintf('  Error migrating entity ID %s: %s', is_scalar($entityId) || null === $entityId || $entityId instanceof \Stringable ? (string) $entityId : 'unknown', $e->getMessage()));
                 ++$errors;
             }
             $io->progressAdvance();
@@ -249,6 +255,7 @@ class MigrateContentToBlocksCommand extends Command
                     continue;
                 }
 
+                /** @var array{block_type: string, position?: int, block_published?: string} $blockData */
                 try {
                     $this->createContentBlock($entity, $entityClass, $blockData, $locale, $dryRun, $naturalPosition);
                     ++$naturalPosition;
@@ -319,7 +326,7 @@ class MigrateContentToBlocksCommand extends Command
         }
 
         // Link to entity
-        if (method_exists($contentBlock, 'setContentOwner') && $entity instanceof ResourceInterface) {
+        if ($entity instanceof ResourceInterface) {
             $contentBlock->setContentOwner($entity);
         }
 

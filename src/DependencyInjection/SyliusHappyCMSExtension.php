@@ -24,6 +24,7 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
     public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();
+        /** @var array<string, array<string, mixed>> $config */
         $config = $this->processConfiguration($configuration, $configs);
 
         $this->processPageConfiguration($config['page'], $container);
@@ -153,17 +154,19 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
 
         $configs = $container->getExtensionConfig('media');
         $configuration = $this->getConfiguration($configs, $container);
+        /** @var array<string, array<string, mixed>> $config */
         $config = $this->processConfiguration($configuration, $configs);
         $config = $config['media'];
 
         $container->prependExtensionConfig('media', $config);
-        $twigConfig = [];
-        $twigConfig['paths'][__DIR__ . '/../../templates/media'] = 'media';
-        $twigConfig['globals']['sylius_happy_cms'] = [];
-        $twigConfig['globals']['sylius_happy_cms']['media'] = [];
+        $mediaGlobals = [];
         foreach ($config as $k => $v) {
-            $twigConfig['globals']['sylius_happy_cms']['media'][$k] = $v;
+            $mediaGlobals[$k] = $v;
         }
+        $twigConfig = [
+            'paths' => [__DIR__ . '/../../templates/media' => 'media'],
+            'globals' => ['sylius_happy_cms' => ['media' => $mediaGlobals]],
+        ];
 
         $container->prependExtensionConfig('twig', $twigConfig);
     }

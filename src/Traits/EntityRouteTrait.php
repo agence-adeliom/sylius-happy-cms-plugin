@@ -53,7 +53,7 @@ trait EntityRouteTrait
     {
         foreach ($this->routes as $route) {
             if (
-                null === $locale || (is_string($locale) && $locale == $route->getDefault('_locale'))
+                null === $locale || $locale == $route->getDefault('_locale')
             ) {
                 $route->setContent($this);
 
@@ -233,6 +233,7 @@ trait EntityRouteTrait
                 $parentSlug = '';
                 if ($accessor->isReadable($parent, 'translation') && method_exists($parent, 'getTranslation')) {
                     $parentTranslation = $parent->getTranslation($translation->getLocale());
+                    assert(is_object($parentTranslation));
                     $parentSlug = $accessor->getValue($parentTranslation, 'slug');
                 } elseif ($accessor->isReadable($parent, 'slug')) {
                     $parentSlug = $accessor->getValue($parent, 'slug');
@@ -241,7 +242,7 @@ trait EntityRouteTrait
                 if ($accessor->isReadable($parent, 'isHomePage')) {
                     $isHomepage = $accessor->getValue($parent, 'isHomePage');
                 }
-                if ($parentSlug && !$isHomepage) {
+                if ($parentSlug && is_string($parentSlug) && !$isHomepage) {
                     $parents[] = $parentSlug;
                 }
                 // Next loop, until parent is null

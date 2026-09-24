@@ -62,6 +62,7 @@ class MediaType extends AbstractType implements AdminFormTypeInterface
     {
         $builder->addModelTransformer(new CallbackTransformer(
             function ($media) {
+                /** @var MediaInterface|int|string|null $media */
                 if (empty($media)) {
                     return null;
                 }
@@ -78,6 +79,7 @@ class MediaType extends AbstractType implements AdminFormTypeInterface
                 return $media->getId();
             },
             function ($mediaId) {
+                /** @var int|string|null $mediaId */
                 if (!$mediaId) {
                     return null;
                 }

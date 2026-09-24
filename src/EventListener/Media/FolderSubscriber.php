@@ -37,8 +37,12 @@ class FolderSubscriber
         }
 
         if ($args->hasChangedField('slug')) {
-            $oldPath = basename($folder->getPath()) . \DIRECTORY_SEPARATOR . $args->getOldValue('slug');
-            $newPath = basename($folder->getPath()) . \DIRECTORY_SEPARATOR . $args->getNewValue('slug');
+            /** @var string|null $oldSlug */
+            $oldSlug = $args->getOldValue('slug');
+            /** @var string|null $newSlug */
+            $newSlug = $args->getNewValue('slug');
+            $oldPath = basename($folder->getPath()) . \DIRECTORY_SEPARATOR . $oldSlug;
+            $newPath = basename($folder->getPath()) . \DIRECTORY_SEPARATOR . $newSlug;
             $this->manager->move($oldPath, $newPath);
         }
     }

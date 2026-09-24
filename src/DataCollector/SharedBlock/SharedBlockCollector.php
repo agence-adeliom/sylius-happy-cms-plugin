@@ -26,7 +26,10 @@ final class SharedBlockCollector extends AbstractDataCollector
      */
     public function getBlocks(): array
     {
-        return $this->data['blocks'] ?: [];
+        /** @var array<string, SharedBlockTypeInterface> $blocks */
+        $blocks = $this->data['blocks'] ?: [];
+
+        return $blocks;
     }
 
     public function getName(): string

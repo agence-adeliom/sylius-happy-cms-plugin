@@ -9,9 +9,11 @@ use Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuItemInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuItemTranslationInterface;
 use Adeliom\SyliusHappyCMSPlugin\Services\Media\MediaManager;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Sylius\Component\Channel\Model\ChannelInterface;
+use Sylius\Component\Locale\Model\LocaleInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -108,12 +110,14 @@ class CreateDemoMenuCommand extends AbstractContentCommand
         }
 
         // Get locale for the channel
+        /** @var Collection<array-key, LocaleInterface> $locales */
         $locales = $channel->getLocales();
         if ($locales->isEmpty()) {
             $output->writeln('<error>No locale found for channel. Please configure a locale for the channel.</error>');
 
             return Command::FAILURE;
         }
+        /** @var LocaleInterface $locale */
         $locale = $locales->first();
         $localeCode = $locale->getCode() ?? 'en_US';
 

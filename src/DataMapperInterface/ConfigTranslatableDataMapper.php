@@ -34,6 +34,7 @@ class ConfigTranslatableDataMapper implements DataMapperInterface
         $forms['type']->setData($configType);
 
         // pour chaque type de champ translation (code, email, number, etc...) on met a jour les données existantes si elles existent sinon on met a null
+        /** @var list<string> $typeKeys */
         $typeKeys = array_values(ConfigTypeEnum::toArray());
         foreach ($typeKeys as $typeKey) {
             $forms[sprintf('translations_%s', $typeKey)]->setData($typeKey === $configType ? $viewData->getTranslations() : null);
@@ -72,7 +73,7 @@ class ConfigTranslatableDataMapper implements DataMapperInterface
                         $locale = $translation->getLocale();
                         /** @var ConfigTranslationInterface $viewTranslation */
                         $viewTranslation = $viewData->getTranslation($locale);
-                        $viewTranslation->setValue($newTranslations[$locale]->getValue());
+                        $viewTranslation->setValue($translationLocalesToKeep[(string) $locale]->getValue());
                     }
                 }
             }

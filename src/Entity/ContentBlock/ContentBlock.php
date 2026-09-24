@@ -133,7 +133,7 @@ abstract class ContentBlock implements ContentBlockInterface
 
     public function getPreviewPosition(): int
     {
-        return $this->previewPosition ?? $this->position;
+        return $this->previewPosition;
     }
 
     public function setPreviewPosition(int $previewPosition): void

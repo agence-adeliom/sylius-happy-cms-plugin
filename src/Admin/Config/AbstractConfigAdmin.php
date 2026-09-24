@@ -52,6 +52,7 @@ abstract class AbstractConfigAdmin extends AbstractAdmin implements ConfigAdminI
         yield ColumnField::new('sylius_happy_cms.config.admin.tab.value')
             ->setSize(ColumnSizeEnum::WIDE_6_OF_12);
 
+        /** @var list<string> $typeKeys */
         $typeKeys = array_values(ConfigTypeEnum::toArray());
         $transTypeKeys = preg_filter('/^/', 'sylius_happy_cms.config.admin.type.', $typeKeys);
 

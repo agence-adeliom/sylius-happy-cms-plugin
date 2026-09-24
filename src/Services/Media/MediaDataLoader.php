@@ -27,8 +27,6 @@ class MediaDataLoader implements LoaderInterface
 
             $mimeType = $this->filesystem->mimeType($path);
 
-            assert(is_string($mimeType), 'Mime type cannot be found');
-
             $extension = $this->getExtension($mimeType);
 
             return new Binary(

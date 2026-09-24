@@ -10,9 +10,11 @@ use Adeliom\SyliusHappyCMSPlugin\Entity\Page\PageTranslationInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Seo\Seo;
 use Adeliom\SyliusHappyCMSPlugin\Entity\SharedBlock\SharedBlockInterface;
 use Adeliom\SyliusHappyCMSPlugin\Services\Media\MediaManager;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Sylius\Component\Channel\Model\ChannelInterface;
+use Sylius\Component\Locale\Model\LocaleInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -98,12 +100,14 @@ class CreateDemoPagesCommand extends AbstractContentCommand
             return Command::FAILURE;
         }
 
+        /** @var Collection<array-key, LocaleInterface> $locales */
         $locales = $channel->getLocales();
         if ($locales->isEmpty()) {
             $output->writeln('<error>No locale found for channel. Please configure a locale for the channel.</error>');
 
             return Command::FAILURE;
         }
+        /** @var LocaleInterface $locale */
         $locale = $locales->first();
         $localeCode = $locale->getCode() ?? 'fr_FR';
 

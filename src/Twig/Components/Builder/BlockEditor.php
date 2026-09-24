@@ -449,7 +449,7 @@ class BlockEditor extends AbstractController
 
         $resourceConfig = $resources[$resource];
 
-        if (!is_array($resourceConfig) || !isset($resourceConfig['classes']['model'])) {
+        if (!is_array($resourceConfig) || !isset($resourceConfig['classes']) || !is_array($resourceConfig['classes']) || !isset($resourceConfig['classes']['model'])) {
             throw new NotFoundHttpException(
                 sprintf('Invalid resource configuration for "%s".', $resource),
             );
@@ -527,6 +527,7 @@ class BlockEditor extends AbstractController
         $this->entity = $this->loadEntity($entityClass, $this->entityId);
 
         // Get all blocks from collection
+        /** @var array<string, BlockTypeInterface> $allBlocks */
         $allBlocks = $this->blockCollection->getBlocks();
 
         $blocks = [];

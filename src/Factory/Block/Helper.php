@@ -101,14 +101,15 @@ class Helper
         }
 
         $blocks = $this->collection->getBlocks();
-        if (isset($blocks[$data['block_type']])) {
-            $block = $blocks[$data['block_type']];
+        /** @var string $blockType */
+        $blockType = $data['block_type'] ?? '';
+        if (isset($blocks[$blockType])) {
+            $block = $blocks[$blockType];
         } else {
             return null;
         }
 
         $stats = $this->startTracing($block);
-        $blockType = $data['block_type'];
         $defaultAssets = $block->configureAssets();
 
         $event = $this->eventDispatcher->dispatch(new BlockRender($block, $data, $defaultAssets), 'happy_cms_block.render_block');

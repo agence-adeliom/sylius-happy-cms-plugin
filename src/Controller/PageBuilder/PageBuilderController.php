@@ -279,7 +279,7 @@ class PageBuilderController extends AbstractController
     private function getSharedBlockList(ContentEditableInterface $entity): void
     {
         global $allowedSharedBlockTypesForResource;
-        if ($entity instanceof ResourceInterface && empty($allowedSharedBlockTypesForResource)) {
+        if (empty($allowedSharedBlockTypesForResource)) {
             // Get all shared allowed blocks type for current resource
             // Then put as global variable to be used in sub files (shared block type)
             $sharedBlocksCollection = $this->sharedBlockCollection->enabledSupportFilter();
@@ -428,7 +428,7 @@ class PageBuilderController extends AbstractController
 
         $resourceConfig = $resources[$resource];
 
-        if (!is_array($resourceConfig) || !isset($resourceConfig['classes']['model'])) {
+        if (!is_array($resourceConfig) || !isset($resourceConfig['classes']) || !is_array($resourceConfig['classes']) || !isset($resourceConfig['classes']['model'])) {
             throw new NotFoundHttpException(
                 sprintf('Invalid resource configuration for "%s".', $resource),
             );

@@ -398,7 +398,7 @@ class FileValidator
 
         $bytes /= (1024 ** $pow);
 
-        return round($bytes, $precision) . ' ' . $units[$pow];
+        return round($bytes, $precision) . ' ' . $units[(int) $pow];
     }
 
     /**
