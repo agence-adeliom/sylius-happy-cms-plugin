@@ -112,7 +112,7 @@ class CreateDemoPagesCommand extends AbstractContentCommand
         $localeCode = $locale->getCode() ?? 'fr_FR';
 
         /** @var PageInterface|null $page */
-        $page = $this->manager->getRepository($pageClass)->findOneBy(['channel' => $channel, 'template' => PageInterface::HOMEPAGE]);
+        $page = $this->manager->getRepository($pageClass)->findOneBy(['channel' => $channel, 'homepage' => true]);
         if (!$page instanceof PageInterface) {
             $page = new $pageClass();
         }

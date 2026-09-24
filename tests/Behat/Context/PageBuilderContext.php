@@ -33,25 +33,32 @@ final class PageBuilderContext implements Context
     public function thereIsAPageWithTemplate(string $template): void
     {
         // Check if page already exists
-        /** @var PageInterface|null $page */
-        $page = $this->entityManager->getRepository(PageInterface::class)->findOneBy([
-            'template' => $template,
-        ]);
+        $page = $this->findPageByTemplate($template);
 
         if (null === $page) {
             // Execute the command to create demo pages
             $input = new ArrayInput([]);
             $output = new BufferedOutput();
 
-            $this->createDemoPagesCommand->run($input, $output);
+            $exitCode = $this->createDemoPagesCommand->run($input, $output);
+            Assert::same($exitCode, 0, sprintf('Demo pages creation failed: %s', $output->fetch()));
 
             // Fetch the page again
-            $page = $this->entityManager->getRepository(PageInterface::class)->findOneBy([
-                'template' => $template,
-            ]);
+            $page = $this->findPageByTemplate($template);
         }
 
         $this->lastPage = $page;
+    }
+
+    private function findPageByTemplate(string $template): ?PageInterface
+    {
+        // Homepage is identified by the "homepage" flag since plugin version 2.1
+        $criteria = PageInterface::HOMEPAGE === $template ? ['homepage' => true] : ['template' => $template];
+
+        /** @var PageInterface|null $page */
+        $page = $this->entityManager->getRepository(PageInterface::class)->findOneBy($criteria);
+
+        return $page;
     }
 
     #[When('I go to the page builder')]
