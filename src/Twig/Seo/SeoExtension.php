@@ -56,7 +56,7 @@ class SeoExtension extends AbstractExtension implements GlobalsInterface
     {
         return [
             new TwigFunction('seo_metas', \Closure::fromCallable(fn (?Seo $seo) => $this->renderSeoMetas($seo))),
-            new TwigFunction('seo_title', \Closure::fromCallable(fn ($seo) => $this->renderSeoTitle($seo))),
+            new TwigFunction('seo_title', $this->renderSeoTitle(...)),
             new TwigFunction('seo_breadcrumb', \Closure::fromCallable(fn () => $this->renderBreadcrumb())),
         ];
     }

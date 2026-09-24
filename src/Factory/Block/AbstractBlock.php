@@ -137,8 +137,9 @@ abstract class AbstractBlock extends AbstractType implements BlockTypeInterface
         if (null !== $this->tempBuilder) {
             foreach ($this->tempBuilder->getForm() as $child) {
                 $formTypeClass = get_class($child->getConfig()->getType()->getInnerType());
-                if (method_exists($formTypeClass, 'configureAdminAssets')) {
-                    $assets = call_user_func([$formTypeClass, 'configureAdminAssets']);
+                $configureAdminAssets = [$formTypeClass, 'configureAdminAssets'];
+                if (is_callable($configureAdminAssets)) {
+                    $assets = call_user_func($configureAdminAssets);
                     if (is_array($assets)) {
                         /** @var array{js: array<string|Asset>|null, css: array<string|Asset>|null, webpack: array<string|Asset>|null} $mergedAssets */
                         $mergedAssets = array_merge_recursive($adminAssets, $assets);

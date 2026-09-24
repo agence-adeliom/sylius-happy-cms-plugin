@@ -146,7 +146,7 @@ class Helper
         // Add a way to automatically set an ID (base on loop index when the page is rendered)
         if (empty($blockSettings['attr_id'])) {
             global $blockLoopIndex;
-            if (empty($blockLoopIndex)) {
+            if (!is_int($blockLoopIndex)) {
                 $blockLoopIndex = 0;
             }
 

@@ -15,4 +15,8 @@ interface MenuInterface extends ResourceInterface, \Stringable
     public function setName(?string $name): void;
 
     public function setStatus(bool $status = false): void;
+
+    public function getRootItem(): ?MenuItemInterface;
+
+    public function setRootItem(?MenuItemInterface $rootItem): void;
 }

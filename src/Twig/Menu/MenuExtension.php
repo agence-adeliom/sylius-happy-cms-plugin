@@ -8,6 +8,7 @@ use Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuItemInterface;
 use Adeliom\SyliusHappyCMSPlugin\Exceptions\Menu\MenuNotFoundException;
 use Adeliom\SyliusHappyCMSPlugin\Exceptions\Menu\TemplateNotFoundException;
+use Adeliom\SyliusHappyCMSPlugin\Repository\Menu\MenuRepositoryInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Twig\Environment;
 use Twig\Error\LoaderError;
@@ -36,7 +37,7 @@ class MenuExtension extends AbstractExtension
         return [
             new TwigFunction(
                 'happy_cms_menu',
-                (fn (Environment $env, array $context, $code, array $extra = []): Markup => $this->renderMenu($env, $context, $code, $extra))(...),
+                $this->renderMenu(...),
                 ['is_safe' => ['js', 'html'], 'needs_context' => true, 'needs_environment' => true],
             ),
         ];
@@ -53,7 +54,7 @@ class MenuExtension extends AbstractExtension
     public function renderMenu(Environment $env, array $context, string $code, array $extra = []): Markup
     {
         $repo = $this->em->getRepository(MenuInterface::class);
-        if (!method_exists($repo, 'findOneByCode')) {
+        if (!$repo instanceof MenuRepositoryInterface) {
             throw new MenuNotFoundException($code);
         }
 

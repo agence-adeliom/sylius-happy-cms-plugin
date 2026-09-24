@@ -56,8 +56,9 @@ class BlockCollectionType extends CollectionType implements AdminFormTypeInterfa
             foreach ($options['blocks'] as $type => $block) {
                 $name = sprintf('__block_%s__', $block->getBlockPrefix());
                 if (
-                    !empty($prototypeOptions['label']) &&
-                    str_contains('label__', (string) $prototypeOptions['label'])
+                    is_string($prototypeOptions['label']) &&
+                    '' !== $prototypeOptions['label'] &&
+                    str_contains('label__', $prototypeOptions['label'])
                 ) {
                     $prototypeOptions['label'] = $name . 'label__';
                 }

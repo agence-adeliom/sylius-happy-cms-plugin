@@ -503,7 +503,7 @@ class MediaManager
      * @throws NoFile
      * @throws ExtNotAllowed
      */
-    private function createFromFile(MediaInterface $entity, string|File|UploadedFile $source): Media
+    private function createFromFile(MediaInterface $entity, string|File|UploadedFile $source): MediaInterface
     {
         $datas = [];
         if (is_string($source)) {
@@ -583,7 +583,7 @@ class MediaManager
         }
 
         try {
-            if ($this->helper->fileIsType($entity->getMime(), 'video') || $this->helper->fileIsType($entity->getMime(), 'audio')) {
+            if ($this->helper->fileIsType($entity, 'video') || $this->helper->fileIsType($entity, 'audio')) {
                 $getID3 = new \getID3();
                 /**
                  * @var array{
@@ -595,7 +595,7 @@ class MediaManager
                  */
                 $id3Datas = $getID3->analyze($source->getPathname());
 
-                if (isset($id3Datas['video']) && $this->helper->fileIsType($entity->getMime(), 'video')) {
+                if (isset($id3Datas['video']) && $this->helper->fileIsType($entity, 'video')) {
                     $datas = [
                         'duration' => $id3Datas['playtime_seconds'],
                         'frame_rate' => $id3Datas['video']['frame_rate'],
@@ -607,7 +607,7 @@ class MediaManager
                     ];
                 }
 
-                if (isset($id3Datas['audio']) && $this->helper->fileIsType($entity->getMime(), 'audio')) {
+                if (isset($id3Datas['audio']) && $this->helper->fileIsType($entity, 'audio')) {
                     $datas = [
                         'duration' => $id3Datas['playtime_seconds'],
                         'tags' => [],
