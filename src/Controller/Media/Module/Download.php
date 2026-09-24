@@ -10,7 +10,6 @@ use League\Flysystem\StorageAttributes;
 use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use ZipStream\Option\Archive;
 use ZipStream\ZipStream;
 
 trait Download
@@ -64,14 +63,7 @@ trait Download
     protected function zipAndDownload(string $name, array $list): StreamedResponse
     {
         return new StreamedResponse(function () use ($name, $list): void {
-            $zipOption = new Archive();
-            $zipOption->setDeflateLevel(9);
-            $zipOption->setSendHttpHeaders(true);
-            $zipOption->setContentType('application/octet-stream');
-            $zip = new ZipStream(
-                sprintf('%s.zip', $name),
-                $zipOption,
-            );
+            $zip = $this->createZipStream($name);
 
             foreach ($list as $file) {
                 $name = $file['name'];
@@ -92,14 +84,7 @@ trait Download
     protected function zipAndDownloadDir(string $name, DirectoryListing $list): StreamedResponse
     {
         return new StreamedResponse(function () use ($name, $list): void {
-            $zipOption = new Archive();
-            $zipOption->setDeflateLevel(9);
-            $zipOption->setSendHttpHeaders(true);
-            $zipOption->setContentType('application/octet-stream');
-            $zip = new ZipStream(
-                sprintf('%s.zip', $name),
-                $zipOption,
-            );
+            $zip = $this->createZipStream($name);
 
             foreach ($list->toArray() as $file) {
                 $path = $file->path();
@@ -112,6 +97,16 @@ trait Download
 
             $zip->finish();
         });
+    }
+
+    protected function createZipStream(string $name): ZipStream
+    {
+        return new ZipStream(
+            defaultDeflateLevel: 9,
+            sendHttpHeaders: true,
+            outputName: sprintf('%s.zip', $name),
+            contentType: 'application/octet-stream',
+        );
     }
 
     /**

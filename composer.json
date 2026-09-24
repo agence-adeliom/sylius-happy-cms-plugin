@@ -28,7 +28,7 @@
         "james-heinrich/getid3": "^1.9",
         "league/flysystem-bundle": "^2.4.0 || ^3.0",
         "liip/imagine-bundle": "^2.8",
-        "maennchen/zipstream-php": "^2.1.0",
+        "maennchen/zipstream-php": "^3.1",
         "presta/sitemap-bundle": "^v4.1.1",
         "stof/doctrine-extensions-bundle": "^1.6",
         "sylius/sylius": "^v2.3.0-alpha.1",
