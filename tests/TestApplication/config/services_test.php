@@ -9,8 +9,8 @@ return function (ContainerConfigurator $container) {
 
     if (str_starts_with($env, 'test')) {
 
-        $container->import('../../../vendor/sylius/sylius/src/Sylius/Behat/Resources/config/services.xml');
-        $container->import('@SyliusHappyCMSPlugin/tests/Behat/Resources/services.xml');
+        $container->import('../../../vendor/sylius/sylius/src/Sylius/Behat/Resources/config/services.php');
+        $container->import('@SyliusHappyCMSPlugin/tests/Behat/Resources/services.php');
 
         // Define behat.mink.parameters service BEFORE importing Sylius Behat services
         // This service is normally provided by Behat\MinkExtension during Behat execution

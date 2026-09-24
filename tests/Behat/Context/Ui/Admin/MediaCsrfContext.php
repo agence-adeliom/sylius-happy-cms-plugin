@@ -6,6 +6,9 @@ namespace Tests\Adeliom\SyliusHappyCMSPlugin\Behat\Context\Ui\Admin;
 
 use Behat\Behat\Context\Context;
 use Behat\Mink\Session;
+use Behat\Step\Given;
+use Behat\Step\Then;
+use Behat\Step\When;
 use Sylius\Behat\Service\SharedStorageInterface;
 use Webmozart\Assert\Assert;
 
@@ -22,17 +25,13 @@ final class MediaCsrfContext implements Context
         $this->sharedStorage = $sharedStorage;
     }
 
-    /**
-     * @When I go to the media manager page
-     */
+    #[When('I go to the media manager page')]
     public function iGoToTheMediaManagerPage(): void
     {
         $this->session->visit('/admin/happy-cms-media/medias');
     }
 
-    /**
-     * @Then I should see a CSRF token in the page metadata
-     */
+    #[Then('I should see a CSRF token in the page metadata')]
     public function iShouldSeeACsrfTokenInThePageMetadata(): void
     {
         $metaTag = $this->session->getPage()->find('css', 'meta[name="csrf-token"]');
@@ -47,9 +46,7 @@ final class MediaCsrfContext implements Context
         $this->sharedStorage->set('csrf_token', $token);
     }
 
-    /**
-     * @Then the CSRF token should be a 64-character hexadecimal string
-     */
+    #[Then('the CSRF token should be a 64-character hexadecimal string')]
     public function theCsrfTokenShouldBeA64CharacterHexadecimalString(): void
     {
         $token = $this->sharedStorage->get('csrf_token');
@@ -57,9 +54,7 @@ final class MediaCsrfContext implements Context
         Assert::regex($token, '/^[a-f0-9]{64}$/', 'CSRF token is not a 64-character hexadecimal string');
     }
 
-    /**
-     * @Given there is a valid CSRF token
-     */
+    #[Given('there is a valid CSRF token')]
     public function thereIsAValidCsrfToken(): void
     {
         $metaTag = $this->session->getPage()->find('css', 'meta[name="csrf-token"]');
@@ -72,9 +67,7 @@ final class MediaCsrfContext implements Context
         }
     }
 
-    /**
-     * @When I attempt to upload a file without providing a CSRF token
-     */
+    #[When('I attempt to upload a file without providing a CSRF token')]
     public function iAttemptToUploadAFileWithoutProvidingACsrfToken(): void
     {
         $this->session->executeScript("
@@ -99,9 +92,7 @@ final class MediaCsrfContext implements Context
         $this->session->wait(2000);
     }
 
-    /**
-     * @When I attempt to upload a file with an invalid CSRF token
-     */
+    #[When('I attempt to upload a file with an invalid CSRF token')]
     public function iAttemptToUploadAFileWithAnInvalidCsrfToken(): void
     {
         $this->session->executeScript("
@@ -123,9 +114,7 @@ final class MediaCsrfContext implements Context
         $this->session->wait(2000);
     }
 
-    /**
-     * @When I upload a file named :filename with the valid CSRF token
-     */
+    #[When('I upload a file named :filename with the valid CSRF token')]
     public function iUploadAFileNamedWithTheValidCsrfToken(string $filename): void
     {
         $token = $this->sharedStorage->get('csrf_token');
@@ -155,9 +144,7 @@ final class MediaCsrfContext implements Context
         $this->session->wait(2000);
     }
 
-    /**
-     * @Then I should see an error message containing :text
-     */
+    #[Then('I should see an error message containing :text')]
     public function iShouldSeeAnErrorMessageContaining(string $text): void
     {
         $response = $this->session->evaluateScript('return window.lastResponse;');
@@ -183,9 +170,7 @@ final class MediaCsrfContext implements Context
         ));
     }
 
-    /**
-     * @Then I should see a success message
-     */
+    #[Then('I should see a success message')]
     public function iShouldSeeASuccessMessage(): void
     {
         $response = $this->session->evaluateScript('return window.lastResponse;');
@@ -204,10 +189,8 @@ final class MediaCsrfContext implements Context
         ));
     }
 
-    /**
-     * @Then the file should not be uploaded
-     * @Then the file :filename should not be uploaded
-     */
+    #[Then('the file should not be uploaded')]
+    #[Then('the file :filename should not be uploaded')]
     public function theFileShouldNotBeUploaded(?string $filename = null): void
     {
         // This would require checking the actual media library
@@ -221,9 +204,7 @@ final class MediaCsrfContext implements Context
         Assert::false($response['success'] ?? true, 'File was uploaded when it should not have been');
     }
 
-    /**
-     * @Then the file :filename should be uploaded
-     */
+    #[Then('the file :filename should be uploaded')]
     public function theFileShouldBeUploaded(string $filename): void
     {
         $response = $this->session->evaluateScript('return window.lastResponse;');
@@ -236,9 +217,7 @@ final class MediaCsrfContext implements Context
         Assert::same($filename, $response['file_name'] ?? null, 'Uploaded filename does not match');
     }
 
-    /**
-     * @Given there is a media file :filename in the media library
-     */
+    #[Given('there is a media file :filename in the media library')]
     public function thereIsAMediaFileInTheMediaLibrary(string $filename): void
     {
         // This would require actual media creation via fixtures or API
@@ -251,9 +230,7 @@ final class MediaCsrfContext implements Context
         ]);
     }
 
-    /**
-     * @When I attempt to delete :filename without providing a CSRF token
-     */
+    #[When('I attempt to delete :filename without providing a CSRF token')]
     public function iAttemptToDeleteWithoutProvidingACsrfToken(string $filename): void
     {
         $media = $this->sharedStorage->get('test_media_' . $filename);
@@ -279,9 +256,7 @@ final class MediaCsrfContext implements Context
         $this->session->wait(2000);
     }
 
-    /**
-     * @When I delete :filename with the valid CSRF token
-     */
+    #[When('I delete :filename with the valid CSRF token')]
     public function iDeleteWithTheValidCsrfToken(string $filename): void
     {
         $token = $this->sharedStorage->get('csrf_token');
@@ -301,10 +276,8 @@ final class MediaCsrfContext implements Context
         $this->session->wait(2000);
     }
 
-    /**
-     * @Then the file :filename should still exist
-     * @Then the file :filename should not exist
-     */
+    #[Then('the file :filename should still exist')]
+    #[Then('the file :filename should not exist')]
     public function theFileExistenceCheck(string $filename): void
     {
         // This would require checking actual file system or database

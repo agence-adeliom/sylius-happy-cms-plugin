@@ -8,6 +8,7 @@ sylius_resource:
                 controller: Adeliom\SyliusHappyCMSPlugin\Controller\Page\PageResourceController
                 repository: Tests\Adeliom\SyliusHappyCMSPlugin\Repository\HappyCMS\Page\PageRepository
                 form: Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\Page\PageAdmin
+                factory: Sylius\Resource\Factory\TranslatableFactory
             translation:
                 classes:
                     model: Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Page\PageTranslation
@@ -22,6 +23,7 @@ sylius_resource:
                 controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
                 repository: Tests\Adeliom\SyliusHappyCMSPlugin\Repository\HappyCMS\Config\ConfigRepository
                 form: Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\Config\ConfigAdmin
+                factory: Sylius\Resource\Factory\TranslatableFactory
             translation:
                 classes:
                     model: Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Config\ConfigTranslation
@@ -57,6 +59,7 @@ sylius_resource:
                 controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
                 repository: Tests\Adeliom\SyliusHappyCMSPlugin\Repository\HappyCMS\Menu\MenuItemRepository
                 form: Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\Menu\MenuItemAdmin
+                factory: Sylius\Resource\Factory\TranslatableFactory
             translation:
                 classes:
                     model: Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Menu\MenuItemTranslation
@@ -71,6 +74,7 @@ sylius_resource:
                 controller: Adeliom\SyliusEasyCrudPlugin\Controller\SyliusCrudResourceController
                 repository: Tests\Adeliom\SyliusHappyCMSPlugin\Repository\HappyCMS\SharedBlock\SharedBlockRepository
                 form: Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\SharedBlock\SharedBlockAdmin
+                factory: Sylius\Resource\Factory\TranslatableFactory
             translation:
                 classes:
                     model: Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\SharedBlock\SharedBlockTranslation

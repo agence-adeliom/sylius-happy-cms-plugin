@@ -312,7 +312,6 @@ class Configuration implements ConfigurationInterface
             ->end()
             ->scalarNode('media_entity')
             ->defaultValue(Media::class)
-            ->isRequired()
             ->validate()
             ->ifString()
             ->then(static function ($value) {
@@ -326,7 +325,6 @@ class Configuration implements ConfigurationInterface
             ->end()
             ->scalarNode('folder_entity')
             ->defaultValue(Folder::class)
-            ->isRequired()
             ->validate()
             ->ifString()
             ->then(static function ($value) {
@@ -378,8 +376,8 @@ class Configuration implements ConfigurationInterface
             ->arrayNode('extended_mimes')
             ->addDefaultsIfNotSet()
             ->children()
-            ->arrayNode('image')->scalarPrototype()->end()->isRequired()->defaultValue(['binary/octet-stream'])->end()
-            ->arrayNode('archive')->scalarPrototype()->end()->isRequired()->defaultValue(['application/x-tar', 'application/zip'])->end()
+            ->arrayNode('image')->scalarPrototype()->end()->defaultValue(['binary/octet-stream'])->end()
+            ->arrayNode('archive')->scalarPrototype()->end()->defaultValue(['application/x-tar', 'application/zip'])->end()
             ->end()
             ->end()
             ->scalarNode('sanitized_text')

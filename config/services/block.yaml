@@ -7,7 +7,7 @@ services:
     autoconfigure: true
     public: true
     arguments:
-      - !tagged sylius.happy_cms.block
+      - !tagged_iterator sylius.happy_cms.block
 
   sylius.happy_cms.block_collection:
     alias: Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockCollection
@@ -91,7 +91,7 @@ services:
     autoconfigure: true
     public: true
     arguments:
-      - !tagged sylius.happy_cms.shared_block
+      - !tagged_iterator sylius.happy_cms.shared_block
 
   sylius.happy_cms.shared_block.block_collection:
     alias: Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock\SharedBlockCollection

@@ -13,8 +13,8 @@ class MediaLoader extends Loader
     {
         $routes = new RouteCollection();
 
-        $resource = '@SyliusHappyCMSPlugin/config/media/routes.xml';
-        $type = 'xml';
+        $resource = '@SyliusHappyCMSPlugin/config/media/routes.php';
+        $type = 'php';
 
         $importedRoutes = $this->import($resource, $type);
 

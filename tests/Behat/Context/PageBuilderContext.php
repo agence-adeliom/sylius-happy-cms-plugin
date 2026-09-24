@@ -8,6 +8,9 @@ use Adeliom\SyliusHappyCMSPlugin\Command\Starter\CreateDemoPagesCommand;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Page\PageInterface;
 use Behat\Behat\Context\Context;
 use Behat\Mink\Session;
+use Behat\Step\Given;
+use Behat\Step\Then;
+use Behat\Step\When;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -26,9 +29,7 @@ final class PageBuilderContext implements Context
     ) {
     }
 
-    /**
-     * @Given there is a page with template :template
-     */
+    #[Given('there is a page with template :template')]
     public function thereIsAPageWithTemplate(string $template): void
     {
         // Check if page already exists
@@ -53,9 +54,7 @@ final class PageBuilderContext implements Context
         $this->lastPage = $page;
     }
 
-    /**
-     * @When I go to the page builder
-     */
+    #[When('I go to the page builder')]
     public function iGoToThePageBuilder(): void
     {
         $actualId = $this->lastPage?->getId();
@@ -70,9 +69,7 @@ final class PageBuilderContext implements Context
         $this->session->visit($url);
     }
 
-    /**
-     * @Then I should be on the page builder page
-     */
+    #[Then('I should be on the page builder page')]
     public function iShouldBeOnThePageBuilderPage(): void
     {
         $statusCode = $this->session->getStatusCode();

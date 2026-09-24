@@ -38,3 +38,10 @@ services:
       tags:
         - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addAdminMenuItems }
 
+
+    # Workaround: symfony/ai-* 0.3 pulls phpdocumentor/reflection-docblock, which enables API Platform's
+    # PhpStanExtractor. symfony/type-info 8.1 then crashes on gedmo's "@phpstan-template T of Loggable|object"
+    # (AbstractLogEntry) while warming up the API routes. Redefining the service drops its extractor tag.
+    api_platform.property_info.phpstan_extractor:
+      class: Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor
+      autoconfigure: false

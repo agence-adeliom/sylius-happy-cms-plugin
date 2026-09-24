@@ -7,6 +7,7 @@ namespace Adeliom\SyliusHappyCMSPlugin\Security;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class ContentDocumentVoter implements VoterInterface
@@ -21,7 +22,7 @@ class ContentDocumentVoter implements VoterInterface
     /**
      * @param array<string, mixed> $attributes
      */
-    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
+    public function vote(TokenInterface $token, mixed $subject, array $attributes, ?Vote $vote = null): int
     {
         if (!($subject instanceof CmsRoutableInterface)) {
             return VoterInterface::ACCESS_ABSTAIN;
