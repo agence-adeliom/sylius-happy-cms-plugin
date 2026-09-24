@@ -25,16 +25,13 @@ trait Download
         $name = $request->request->get('name');
         $folders = $request->request->get('folders');
 
-        /** @var DirectoryListing<StorageAttributes> $allPaths */
-        $allPaths = $this->filesystem->listContents(sprintf('%s/%s', $folders, $name))
-            ->filter(static fn (StorageAttributes $attributes) => $attributes->isFile())
-            ->map(static fn (StorageAttributes $attributes) => $attributes->path())
-            ->toArray();
+        $files = $this->filesystem->listContents(sprintf('%s/%s', $folders, $name))
+            ->filter(static fn (StorageAttributes $attributes) => $attributes->isFile());
 
         if (is_string($name)) {
             return $this->zipAndDownloadDir(
                 $name,
-                $allPaths,
+                $files,
             );
         }
 
