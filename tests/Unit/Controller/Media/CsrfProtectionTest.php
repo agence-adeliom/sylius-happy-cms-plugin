@@ -194,21 +194,15 @@ class CsrfProtectionTest extends TestCase
         $request = $this->createRequestWithSession();
         $correctToken = $this->generateCsrfToken($request);
 
-        // Create tokens that differ at different positions
-        $tokens = [
-            'a' . substr($correctToken, 1), // differs at first char
-            substr($correctToken, 0, 32) . 'a' . substr($correctToken, 33), // differs at middle
-            substr($correctToken, 0, -1) . 'a', // differs at last char
-        ];
+        // Create tokens that differ at different positions (replacement char must differ from the original one)
+        $tokens = array_map(static function (int $position) use ($correctToken): string {
+            $wrongToken = $correctToken;
+            $wrongToken[$position] = '0' === $correctToken[$position] ? '1' : '0';
+
+            return $wrongToken;
+        }, [0, 32, 63]);
 
         foreach ($tokens as $wrongToken) {
-
-            $session = $request->getSession();
-            $session->set('_csrf_token', [
-                'token' => $wrongToken,
-                'timestamp' => time() - 10800, // 3 hours ago
-            ]);
-
             $request = $this->createRequestWithSession($request->getSession());
             $request->setMethod('POST');
             $request->request->set('_csrf_token', $wrongToken);
