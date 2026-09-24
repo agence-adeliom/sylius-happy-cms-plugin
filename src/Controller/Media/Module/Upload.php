@@ -306,7 +306,7 @@ trait Upload
         /** @var string[] $warnings */
         $warnings = [];
 
-        $dzuuid = $request->get('dzuuid', '');
+        $dzuuid = $request->request->get('dzuuid', '');
         assert(is_string($dzuuid));
 
         $identifier = trim($dzuuid);
@@ -320,25 +320,25 @@ trait Upload
         $filename = $info['filename'];
 
         /** @var int|string $totalSize */
-        $totalSize = $request->get('dztotalfilesize', 0);
+        $totalSize = $request->request->get('dztotalfilesize', 0);
         if (!is_int($totalSize)) {
             $totalSize = (int) $totalSize;
         }
 
         /** @var int|string $totalChunks */
-        $totalChunks = $request->get('dztotalchunkcount', 0);
+        $totalChunks = $request->request->get('dztotalchunkcount', 0);
         if (!is_int($totalChunks)) {
             $totalChunks = (int) $totalChunks;
         }
 
         /** @var int|string $chunkInd */
-        $chunkInd = $request->get('dzchunkindex', 0);
+        $chunkInd = $request->request->get('dzchunkindex', 0);
         if (!is_int($chunkInd)) {
             $chunkInd = (int) $chunkInd;
         }
 
-        //$chunkSize = $request->get('dzchunksize', 0);
-        //$startByte = $request->get('dzchunkbyteoffset', 0);
+        //$chunkSize = $request->request->get('dzchunksize', 0);
+        //$startByte = $request->request->get('dzchunkbyteoffset', 0);
 
         $chunkFile = sprintf('%s/%s.part%d', $fileChunksFolder, $filename, $chunkInd);
 

@@ -78,7 +78,7 @@ class RouteRenderService extends AbstractController
         }
 
         /** @var bool $preview */
-        $preview = $request->get('happy_cms_preview') && $request->get('happy_cms_preview') === '1';
+        $preview = $request->query->get('happy_cms_preview') === '1';
 
         if ($preview) {
             try {

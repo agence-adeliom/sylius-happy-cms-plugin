@@ -37,8 +37,9 @@ class TreeComponent
     {
         assert($this->requestStack->getCurrentRequest() instanceof Request, 'Current request must be instance of Request');
 
+        $request = $this->requestStack->getCurrentRequest();
         /** @var string $id */
-        $id = $this->requestStack->getCurrentRequest()->get('menu_id') ?: '0';
+        $id = $request->attributes->get('menu_id') ?? $request->query->get('menu_id') ?: '0';
 
         return $this->buildTree($this->allMenuItems->getArrayResult((int) $id));
     }

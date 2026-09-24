@@ -2,7 +2,7 @@
     <div class="container-xl">
         <div class="row">
             <div class="col-12 col-lg-4">
-                {% set menuId = app.request.get('id')|default(null) %}
+                {% set menuId = (app.request.attributes.get('id') ?? app.request.query.get('id'))|default(null) %}
                 {% hook 'sections#left' %}
             </div>
             <div class="col-12 col-lg-8">

@@ -18,7 +18,7 @@ class MenuItemController
 
     public function indexAction(Request $request): Response
     {
-        $route = $request->get('route');
+        $route = $request->attributes->get('route');
         assert(is_string($route), 'Route must be a string');
 
         return new RedirectResponse($this->router->generate($route));
