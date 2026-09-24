@@ -35,7 +35,8 @@
         "symfony-cmf/routing-bundle": "^3.0",
         "symfony/filesystem": "^7.4 || ^8.0",
         "symfony/options-resolver": "^7.4 || ^8.0",
-        "symfony/property-access": "^7.4 || ^8.0"
+        "symfony/property-access": "^7.4 || ^8.0",
+        "symfony/serializer": "^7.4 || ^8.0"
     },
     "require-dev": {
         "behat/behat": "^3.16 || ^4.0@alpha",
