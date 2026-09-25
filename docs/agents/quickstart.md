@@ -155,6 +155,13 @@ php bin/console doctrine:mapping:info
 - Verify template file exists
 - Clear cache
 
+### Page builder preview blank / `SecurityError ... 'href'` in page-builder.js
+- **Cause**: the preview iframe is refused because of `X-Frame-Options` (`DENY`, or duplicated headers like `DENY, SAMEORIGIN`).
+- **Fix**: send a single `X-Frame-Options: SAMEORIGIN` on admin and front pages, from one source only (NelmioSecurityBundle `clickjacking: '^/.*': SAMEORIGIN`, remove `sylius.event_subscriber.x_frame_options` and the `Header set X-Frame-Options` line of `public/.htaccess`). See README, step "5.1 Allow the page builder iframes".
+```bash
+curl -skI https://your-shop.local/en_US/ | grep -i x-frame-options   # exactly one SAMEORIGIN line
+```
+
 ### Database out of sync
 ```bash
 php bin/console doctrine:schema:validate

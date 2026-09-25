@@ -124,6 +124,47 @@ security:
         ROLE_ADMINISTRATION_ACCESS: [ ROLE_HAPPY_CMS_CONTENT_BUILDER ]
 ```
 
+### 5.1 Allow the page builder iframes (X-Frame-Options)
+
+The page builder displays admin **and front** pages (preview) inside iframes, so every response must allow same-origin framing.
+Send a single `X-Frame-Options: SAMEORIGIN` header, from one source only:
+
+- If you use [NelmioSecurityBundle](https://github.com/nelmio/NelmioSecurityBundle), use `SAMEORIGIN`, not `DENY`, on the whole site:
+
+  ```yaml
+  # config/packages/nelmio_security.yaml
+  nelmio_security:
+      clickjacking:
+          paths:
+              '^/.*': SAMEORIGIN
+  ```
+
+  and remove the Sylius subscriber, which also sets this header on every response (`src/Kernel.php`):
+
+  ```php
+  final class Kernel extends BaseKernel implements CompilerPassInterface
+  {
+      use MicroKernelTrait;
+
+      public function process(ContainerBuilder $container): void
+      {
+          $container->removeDefinition('sylius.event_subscriber.x_frame_options');
+      }
+  }
+  ```
+
+- Remove `Header set X-Frame-Options SAMEORIGIN` from `public/.htaccess` (Sylius recipe, Apache) and do not set the header in the web server (Caddyfile, nginx) or the ingress either.
+- Serve the admin and the shop on the same host, otherwise `SAMEORIGIN` blocks the preview (use CSP `frame-ancestors` in that case).
+
+Two conflicting headers (`DENY, SAMEORIGIN`) make the browser fall back to `DENY`, and the page builder breaks with:
+
+```
+Refused to display '…' in a frame because it set multiple 'X-Frame-Options' headers with conflicting values ('DENY, SAMEORIGIN'). Falling back to 'deny'.
+page-builder.js: Uncaught SecurityError: Failed to read a named property 'href' from 'Location': Blocked a frame with origin "…" from accessing a cross-origin frame.
+```
+
+Check with `curl -skI https://your-shop.local/en_US/ | grep -i x-frame-options`: exactly one `SAMEORIGIN` line is expected.
+
 ### 5. Generate default files in your project (entities, repositories and admin classes) :
 
 Actually, we don't have Symfony recipes, so we created a command to generate files automatically.
