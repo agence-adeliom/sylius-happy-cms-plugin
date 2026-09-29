@@ -1,16 +1,17 @@
 <div align="center">
 
-# Sylius Happy CMS Plugin
+# Sylius Happy CMS Plugin — CMS & Page Builder for Sylius
 
+**Visual page builder in the Sylius admin, content blocks, media manager, menus, SEO and multilingual pages for Sylius 1.13 / 1.14 and Sylius 2.x.**
 
 </div>
 
 
-![Happy CMS banner](docs/screens/happy_cms.jpg "Happy CMS banner")
+![Happy CMS, CMS and page builder plugin for Sylius](docs/screens/happy_cms.jpg "Happy CMS, CMS and page builder plugin for Sylius")
 
 <div align="center">
 
-[Overview](#overview) • [Installation](#installation) • [Documentation](#documentation)
+[Overview](#overview) • [Versions](#versions) • [Installation](#installation) • [Documentation](#documentation)
 
 </div>
 
@@ -18,45 +19,67 @@
 
 ## Overview
 
-Happy CMS is a simple Content Management System (CMS) plugin for Sylius that enables you to create and manage dynamic pages based on Sylius custom and routable resources. 
+Happy CMS is a **CMS plugin for Sylius** with a **visual page builder in the back office (Sylius admin)**. Merchants and content editors build and edit pages from content blocks and see a live preview of the shop page, without writing code. Developers keep full control: pages are Sylius routable resources, blocks are Symfony form types and Twig templates.
 
-The plugin brings awesome CMS features to Sylius, including:
-- **Page Builder**: A back-office visual interface for preview and managing pages content with various content blocks.
-- **Media Management**: Organize and manage media files (images, videos, documents) used in your CMS pages. Built with Flysystem storage abstraction layer.
-- **SEO**: Built-in SEO management for optimizing your pages for search engines.
-- **Multilingue**: Full support for multiple languages and locales.
-- **Custom Routable Resource**: Define your own entities (blog, faq, etc...) that can be routed and displayed as CMS pages with specific logic, routes and templates.
-- **Menu Management**: Create and manage menus for your site navigation.
-- **Flexible Blocks**: Use default (or create custom) various types of content blocks (text, images, videos, etc.) within your pages.
-- **Shared Blocks**: Reusable content blocks that can be used across multiple pages.
-- **Helpers**:
-    - Commands to generate entities, repositories and admin classes for your custom routable resources.
-    - Commands to generate blocks easily.
-- **AI**: Leverage AI to assist in generating content for your pages (requires API key).
-- **CRUD**: Integrated with [Sylius Easy CRUD Plugin](https://github.com/agence-adeliom/sylius-easy-crud-plugin) for simplified Sylius resources CRUD management.
+It works with **Sylius 1.13, 1.14, 2.0, 2.1, 2.2 and 2.3**: each Sylius version has its own plugin branch (see [Versions](#versions)).
+
+### Back-office page builder
+
+- **Visual editor in the Sylius admin**: compose pages with flexible content blocks (text, WYSIWYG, image, gallery, CTA, accordion, key features…).
+- **Live preview**: the real shop page is rendered next to the editor, in an iframe, while you edit.
+- **Responsive preview**: switch between desktop, tablet and mobile resolutions.
+- **Per-locale editing**: edit and preview every translation of a page.
+- **Shared blocks**: reusable blocks (reassurance banner, footer CTA…) used across several pages.
+
+### CMS features
+
+- **Pages and custom routable resources**: create your own entities (blog, FAQ, brand pages, landing pages…) with their own URLs, routes, templates and logic.
+- **Media Management**: organize images, videos and documents used in CMS pages, built on the Flysystem storage abstraction layer.
+- **SEO**: meta title, meta description, robots, sitemap and URL management for every page.
+- **Multilingual**: full support for Sylius locales and translated URLs.
+- **Menu Management**: hierarchical menus for the shop navigation.
+- **Custom blocks**: use the default blocks, override them, or create your own.
+- **Developer helpers**: Maker commands to generate entities, repositories, admin CRUD and blocks.
+- **AI**: AI assistant to help write page content (requires an API key).
+- **CRUD**: integrated with [Sylius Easy CRUD Plugin](https://github.com/agence-adeliom/sylius-easy-crud-plugin) for simplified Sylius resource CRUD management.
+
 ---
 
 ## Installation and documentation
 
-1.  [Install this plugin](#installation)
-2.  [Explore documentation](#documentation)
+1.  [Pick the plugin version matching your Sylius version](#versions)
+2.  [Install this plugin](#installation)
+3.  [Explore documentation](#documentation)
 
 ## Versions
 
-| Plugin Version | Sylius         | Php           | Symfony  | New - Guide                                                                                                                                                              | Support |
-|----------------|----------------|---------------|----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
-| 1.13, 1.14     | 1.13, 1.14     | 8.2, 8.3, 8.4 | 6.4, 7.x | [See installation guide](https://github.com/agence-adeliom/sylius-happy-cms-plugin/tree/v1.14.12?tab=readme-ov-file#installation)                                        | No      |
-| ^2.0.0         | ^2.0.0         | 8.2, 8.3, 8.4 | 6.4, 7.x | - Sylius 2.0 [BC] [Migrate from v1 guide](./docs/migration/SYLIUS_2.md)                                                                                                  | No      |
-| ^2.1.0         | ^2.1.0, ^2.2.0 | 8.3, 8.4, 8.5 | 6.4, 7.x | - [See installation guide](#installation)<br/>- New content model persistence, new page builder [BC]  - [Migrate from ^2.0.0 version](./docs/migration/CONTENT_BLOCK.md) | Yes     |
-| ^2.3.0         | ^2.3.0         | 8.4, 8.5      | 7.4, 8.x | - [See installation guide](#installation)<br/>- Sylius 2.3 / Symfony 8 support                                                                                                   | Yes     |
+> **The plugin supports Sylius 1.x and every Sylius 2.x minor release, not only Sylius 2.3.**
+> The `2.3.x` branch (the one you are probably reading) targets Sylius 2.3 only. Older Sylius versions are supported by older plugin versions, each maintained on its own Git branch with its own README.
+
+Pick the line matching the Sylius version of your project. Running `composer require agence-adeliom/sylius-happy-cms-plugin` without a constraint also lets Composer select the compatible version.
+
+| Your Sylius version | Plugin version | Composer constraint | Git branch | PHP           | Symfony  | Maintained | Installation guide                                                                                                             |
+|---------------------|----------------|---------------------|------------|---------------|----------|------------|--------------------------------------------------------------------------------------------------------------------------------|
+| 2.3                 | 2.3.x          | `^2.3`              | [`2.3.x`](https://github.com/agence-adeliom/sylius-happy-cms-plugin/tree/2.3.x) | 8.4, 8.5      | 7.4, 8.x | Yes        | [This README](#installation)                                                                                                   |
+| 2.1, 2.2            | 2.1.x          | `~2.1.0`            | [`2.1.x`](https://github.com/agence-adeliom/sylius-happy-cms-plugin/tree/2.1.x) | 8.3, 8.4, 8.5 | 7.4      | Yes        | [2.1.x README](https://github.com/agence-adeliom/sylius-happy-cms-plugin/tree/2.1.x?tab=readme-ov-file#installation)          |
+| 2.0                 | 2.0.x          | `~2.0.0`            | [`2.0.x`](https://github.com/agence-adeliom/sylius-happy-cms-plugin/tree/2.0.x) | 8.2, 8.3, 8.4 | 6.4, 7.x | No         | [2.0.x README](https://github.com/agence-adeliom/sylius-happy-cms-plugin/tree/2.0.x?tab=readme-ov-file#installation)          |
+| 1.13, 1.14          | 1.14.x         | `^1.14`             | [`1.x`](https://github.com/agence-adeliom/sylius-happy-cms-plugin/tree/1.x)     | 8.2, 8.3, 8.4 | 6.4, 7.x | No         | [v1.14.12 README](https://github.com/agence-adeliom/sylius-happy-cms-plugin/tree/v1.14.12?tab=readme-ov-file#installation)    |
+
+### Upgrading between versions
+
+- **Sylius 1.x → Sylius 2.0** (plugin 1.14 → 2.0, BC break): [Sylius 2 migration guide](./docs/migration/SYLIUS_2.md).
+- **Plugin 2.0 → 2.1** (new content model persistence and new page builder, BC break): [content block migration guide](./docs/migration/CONTENT_BLOCK.md).
+- **Plugin 2.1 → 2.3** (Sylius 2.3 / Symfony 8 support): upgrade Sylius to 2.3, then require `agence-adeliom/sylius-happy-cms-plugin:^2.3`.
 
 ## Feature preview
 
-![Page Builder preview](docs/screens/content-manager.png "Page Builder preview")
+![Sylius admin page builder with live preview](docs/screens/content-manager.png "Sylius admin page builder with live preview")
 
-![Page Builder preview](docs/screens/media-manager.png "Media manager preview")
+![Sylius CMS media manager](docs/screens/media-manager.png "Sylius CMS media manager")
 
 ## Installation
+
+These steps install the **2.3.x** version (Sylius 2.3). For another Sylius version, follow the installation guide linked in the [Versions](#versions) table.
 
 ### 1. Install via Composer
 
@@ -255,8 +278,8 @@ Made with ❤️ by [Adeliom](https://www.adeliom.com/)
 
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![PHP Version](https://img.shields.io/badge/php-%5E8.3-blue)](https://php.net)
-[![Sylius Version](https://img.shields.io/badge/sylius-%5E2.0-blue)](https://sylius.com)
-[![Latest Version](https://img.shields.io/packagist/v/agence-adeliom/sylius-easy-crud-plugin)](https://packagist.org/packages/agence-adeliom/sylius-happy-cms-plugin)
+[![PHP Version](https://img.shields.io/badge/php-%5E8.2-blue)](https://php.net)
+[![Sylius Version](https://img.shields.io/badge/sylius-1.13%20%7C%201.14%20%7C%202.x-blue)](https://sylius.com)
+[![Latest Version](https://img.shields.io/packagist/v/agence-adeliom/sylius-happy-cms-plugin)](https://packagist.org/packages/agence-adeliom/sylius-happy-cms-plugin)
 
 </div>
