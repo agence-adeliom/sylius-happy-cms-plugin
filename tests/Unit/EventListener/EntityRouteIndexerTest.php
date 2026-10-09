@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Adeliom\SyliusHappyCMSPlugin\Unit\EventListener;
 
 use Adeliom\SyliusHappyCMSPlugin\Event\Route\CalculateRouteStaticPrefixEvent;
-use Adeliom\SyliusHappyCMSPlugin\EventListener\EntityRouteIndexer;
+use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\EventListener\Fixtures\Routing\CategoryPathResolver;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\EventListener\Fixtures\Routing\RouteIndexerTestCase;
 
 final class EntityRouteIndexerTest extends RouteIndexerTestCase
@@ -55,7 +55,7 @@ final class EntityRouteIndexerTest extends RouteIndexerTestCase
 
     public function testRepeatedSlashesAreCollapsedWithTheCollapseOption(): void
     {
-        $this->registerIndexer([EntityRouteIndexer::DEFAULT_URL_PATTERN, true]);
+        $this->registerIndexer(['collapseSlashes' => true]);
         $this->dispatcher->addListener(CalculateRouteStaticPrefixEvent::class, static function (CalculateRouteStaticPrefixEvent $event): void {
             $event->setRouteStaticPrefix('/' . $event->getEntity()->category . '/');
         });
@@ -73,5 +73,31 @@ final class EntityRouteIndexerTest extends RouteIndexerTestCase
         $this->savePage('home', homepage: true);
 
         self::assertSame(['/about/', '/'], array_values($this->storedPrefixes()));
+    }
+
+    public function testTheFirstSupportingParentPathResolverPlacesTheRouteUnderAParentOfAnotherType(): void
+    {
+        $this->registerIndexer(['urlPattern' => '{{other_entity_path}}{{current_entity_path}}', 'parentPathResolvers' => [
+            new CategoryPathResolver('/never'),
+            new CategoryPathResolver(),
+            new CategoryPathResolver('/too-late'),
+        ]]);
+
+        $this->savePage('about', category: 'company');
+        $this->savePage('contact');
+
+        self::assertSame(['/company/about', '/contact'], array_values($this->storedPrefixes()));
+    }
+
+    public function testListenersReceiveTheResolvedParentPath(): void
+    {
+        $this->registerIndexer(['urlPattern' => '{{other_entity_path}}{{current_entity_path}}', 'parentPathResolvers' => [new CategoryPathResolver()]]);
+        $this->dispatcher->addListener(CalculateRouteStaticPrefixEvent::class, static function (CalculateRouteStaticPrefixEvent $event): void {
+            $event->setRouteStaticPrefix('/shop' . $event->getRouteStaticPrefix());
+        });
+
+        $this->savePage('about', category: 'company');
+
+        self::assertSame(['/shop/company/about'], array_values($this->storedPrefixes()));
     }
 }
