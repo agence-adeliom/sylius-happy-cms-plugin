@@ -62,22 +62,42 @@ final class SeoExtensionTest extends TestCase
         self::assertSame(' | Shop', $this->render('{{ seo_title(null) }}'), 'null used to throw a TypeError');
     }
 
+    public function testTheMetasAndBreadcrumbTemplatesCanBeReplaced(): void
+    {
+        $seo = new ProjectSeo();
+        $seo->setDescription('Project description');
+        $breadcrumb = new BreadcrumbCollection();
+        $breadcrumb->addSimpleItem('Home', '/');
+
+        $templates = [
+            'project/metas.html.twig' => 'project metas: {{ data.description }}',
+            'project/breadcrumb.html.twig' => 'project breadcrumb: {{ data|map(item => item.linkName)|join(",") }}',
+        ];
+        $options = ['templates' => ['metas' => 'project/metas.html.twig', 'breadcrumb' => 'project/breadcrumb.html.twig'], 'breadcrumb' => $breadcrumb];
+
+        self::assertSame('project metas: Project description', $this->render('{{ seo_metas(seo) }}', ['seo' => $seo], $templates, $options));
+        self::assertSame('project breadcrumb: Home', $this->render('{{ seo_breadcrumb() }}', [], $templates, $options));
+    }
+
     /**
      * @param array<string, mixed> $context
+     * @param array<string, string> $extraTemplates
+     * @param array{templates?: array{metas?: string, breadcrumb?: string}, breadcrumb?: BreadcrumbCollection} $options
      */
-    private function render(string $template, array $context = []): string
+    private function render(string $template, array $context = [], array $extraTemplates = [], array $options = []): string
     {
         $twig = new Environment(new ArrayLoader([
             'page' => $template,
-            '@SyliusHappyCMSPlugin/front/seo/block-metas.html.twig' => (string) file_get_contents(__DIR__ . '/../../../../templates/front/seo/block-metas.html.twig'),
-        ]));
+            SeoExtension::DEFAULT_METAS_TEMPLATE => (string) file_get_contents(__DIR__ . '/../../../../templates/front/seo/block-metas.html.twig'),
+        ] + $extraTemplates));
 
         $twig->addExtension(new SeoExtension(
             $twig,
             new EventDispatcher(),
-            new BreadcrumbCollection(),
+            $options['breadcrumb'] ?? new BreadcrumbCollection(),
             ['separator' => '|', 'suffix' => 'Shop'],
             [],
+            $options['templates'] ?? [],
         ));
         // stands for the media extension of the plugin, out of the scope of these tests
         $twig->addFilter(new TwigFilter('resolve_media', static fn (mixed $media): ?string => null));

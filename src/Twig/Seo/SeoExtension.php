@@ -36,12 +36,17 @@ class SeoExtension extends AbstractExtension implements GlobalsInterface
      */
     public const MAX_DESCRITION_LENGTH = 155;
 
+    public const DEFAULT_METAS_TEMPLATE = '@SyliusHappyCMSPlugin/front/seo/block-metas.html.twig';
+
+    public const DEFAULT_BREADCRUMB_TEMPLATE = '@SyliusHappyCMSPlugin/front/seo/block-breadcrumb.html.twig';
+
     /**
      * @param array{
      *      separator: string,
      *     suffix: string
      *  } $titleConfig
      * @param array<string, mixed> $breadcrumbConfig
+     * @param array{metas?: string, breadcrumb?: string} $templates
      */
     public function __construct(
         protected Environment $twig,
@@ -49,6 +54,7 @@ class SeoExtension extends AbstractExtension implements GlobalsInterface
         protected BreadcrumbCollection $breadcrumb,
         protected array $titleConfig,
         protected array $breadcrumbConfig,
+        protected array $templates = [],
     ) {
     }
 
@@ -79,7 +85,7 @@ class SeoExtension extends AbstractExtension implements GlobalsInterface
          */
         $result = $this->eventDispatcher->dispatch($event, 'sylius_happy_cms.seo.breadcrumb');
 
-        return new Markup($this->twig->render('@SyliusHappyCMSPlugin/front/seo/block-breadcrumb.html.twig', ['data' => $result->getArgument('items')]), 'UTF-8');
+        return new Markup($this->twig->render($this->getTemplate('breadcrumb'), ['data' => $result->getArgument('items')]), 'UTF-8');
     }
 
     public function renderSeoTitle(string|SeoInterface|null $seo): string
@@ -122,6 +128,19 @@ class SeoExtension extends AbstractExtension implements GlobalsInterface
          */
         $result = $this->eventDispatcher->dispatch($event, 'sylius_happy_cms.seo.render_meta');
 
-        return new Markup($this->twig->render('@SyliusHappyCMSPlugin/front/seo/block-metas.html.twig', ['data' => ($result->getArgument('datas') ?: $seo)]), 'UTF-8');
+        return new Markup($this->twig->render($this->getTemplate('metas'), ['data' => ($result->getArgument('datas') ?: $seo)]), 'UTF-8');
+    }
+
+    /**
+     * @param 'metas'|'breadcrumb' $name
+     */
+    protected function getTemplate(string $name): string
+    {
+        $template = $this->templates[$name] ?? null;
+        if (is_string($template) && '' !== $template) {
+            return $template;
+        }
+
+        return 'metas' === $name ? self::DEFAULT_METAS_TEMPLATE : self::DEFAULT_BREADCRUMB_TEMPLATE;
     }
 }
