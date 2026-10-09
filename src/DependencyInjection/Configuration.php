@@ -28,6 +28,7 @@ use Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuItemInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Page\PageInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\SharedBlock\SharedBlockInterface;
+use Adeliom\SyliusHappyCMSPlugin\EventListener\EntityRouteIndexer;
 use Adeliom\SyliusHappyCMSPlugin\Repository\Cmf\RedirectRouteRepositoryInterface;
 use Adeliom\SyliusHappyCMSPlugin\Repository\Cmf\RouteRepository;
 use Adeliom\SyliusHappyCMSPlugin\Repository\Cmf\RouteRepositoryInterface;
@@ -580,6 +581,21 @@ class Configuration implements ConfigurationInterface
 
                 return $value;
             })
+            ->end()
+            ->end()
+            ->end()
+            ->end()
+
+            ->arrayNode('routing')
+            ->addDefaultsIfNotSet()
+            ->children()
+            ->scalarNode('url_pattern')
+            ->defaultValue(EntityRouteIndexer::DEFAULT_URL_PATTERN)
+            ->info('Path of the CMS routes. Placeholders: {{locale}}, {{other_entity_path}} (parent of another type), {{current_entity_path}} (required). Remove {{locale}} for URLs without locale prefix.')
+            ->example('{{other_entity_path}}{{current_entity_path}}')
+            ->validate()
+            ->ifTrue(static fn (mixed $value): bool => !is_string($value) || !str_contains($value, '{{current_entity_path}}'))
+            ->thenInvalid('The URL pattern must contain the "{{current_entity_path}}" placeholder, %s given.')
             ->end()
             ->end()
             ->end()
