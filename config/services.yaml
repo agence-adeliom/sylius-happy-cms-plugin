@@ -25,6 +25,7 @@ services:
       - "@event_dispatcher"
       - "@doctrine.orm.entity_manager"
       - '%sylius_happy_cms.routing.url_pattern%'
+      - '%sylius_happy_cms.routing.trailing_slash%'
     tags:
       -   name: 'doctrine.event_listener'
           event: 'postPersist'

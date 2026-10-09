@@ -598,6 +598,10 @@ class Configuration implements ConfigurationInterface
             ->thenInvalid('The URL pattern must contain the "{{current_entity_path}}" placeholder, %s given.')
             ->end()
             ->end()
+            ->booleanNode('trailing_slash')
+            ->defaultFalse()
+            ->info('End the CMS routes with "/" and redirect (301) the same URL without the final slash to them.')
+            ->end()
             ->end()
             ->end()
 

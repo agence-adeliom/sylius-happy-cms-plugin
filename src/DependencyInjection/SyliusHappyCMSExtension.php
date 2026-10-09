@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\DependencyInjection;
 
+use Adeliom\SyliusHappyCMSPlugin\EventListener\TrailingSlashRedirectListener;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockTypeInterface;
 use Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock\SharedBlockTypeInterface;
 use Adeliom\SyliusHappyCMSPlugin\Services\Seo\Sitemap\SitemapDumperInterface;
@@ -15,6 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
 
 final class SyliusHappyCMSExtension extends AbstractResourceExtension implements PrependExtensionInterface
 {
@@ -74,6 +76,13 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
         foreach ($config as $key => $value) {
             /** @phpstan-ignore-next-line */
             $container->setParameter('sylius_happy_cms.routing.' . $key, $value);
+        }
+
+        if (true === $config['trailing_slash']) {
+            $container->register(TrailingSlashRedirectListener::class, TrailingSlashRedirectListener::class)
+                ->setArguments([new Reference('cmf_routing.dynamic_router')])
+                ->addTag('kernel.event_listener', ['event' => 'kernel.exception', 'priority' => TrailingSlashRedirectListener::PRIORITY])
+            ;
         }
     }
 
