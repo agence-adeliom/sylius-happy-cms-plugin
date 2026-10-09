@@ -7,6 +7,7 @@ namespace Adeliom\SyliusHappyCMSPlugin\EventListener;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
 use Adeliom\SyliusHappyCMSPlugin\Event\Route\CalculateRouteStaticPrefixEvent;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
+use Adeliom\SyliusHappyCMSPlugin\Services\Cmf\RouteParentPathResolverInterface;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\PostPersistEventArgs;
@@ -35,6 +36,9 @@ class EntityRouteIndexer
 
     public array $entitiesToManage = [];
 
+    /**
+     * @param iterable<RouteParentPathResolverInterface> $parentPathResolvers
+     */
     public function __construct(
         protected ContentRepository $contentRepository,
         protected ParameterBag $parameterBag,
@@ -43,6 +47,7 @@ class EntityRouteIndexer
         protected string $urlPattern = self::DEFAULT_URL_PATTERN,
         protected bool $collapseSlashes = false,
         protected bool $trailingSlash = false,
+        protected iterable $parentPathResolvers = [],
     ) {
     }
 
@@ -156,10 +161,10 @@ class EntityRouteIndexer
             // slug "blog-slug" is a PageInterface entity slug
             // slug "slug-page is the PageInterface parent entity slug of "blog-slug"
 
-            // Get specific parent slug (for other entities)
-            $event = $this->dispatcher->dispatch(
-                new CalculateRouteStaticPrefixEvent($entity, $translation),
-            );
+            // Get specific parent slug (for other entities): resolvers first, then listeners
+            $event = new CalculateRouteStaticPrefixEvent($entity, $translation);
+            $event->setRouteStaticPrefix($this->resolveParentPath($entity, $translation));
+            $event = $this->dispatcher->dispatch($event);
 
             // Set all complete path for the current entity route
             $route->setStaticPrefix($this->buildStaticPrefix(
@@ -186,6 +191,17 @@ class EntityRouteIndexer
 
             $routesChanges[$previousStaticPrefix] = $route->getStaticPrefix();
         }
+    }
+
+    protected function resolveParentPath(CmsRoutableInterface $entity, TranslationInterface $translation): string
+    {
+        foreach ($this->parentPathResolvers as $resolver) {
+            if ($resolver->supports($entity, $translation)) {
+                return $resolver->resolveParentPath($entity, $translation);
+            }
+        }
+
+        return '';
     }
 
     /**
