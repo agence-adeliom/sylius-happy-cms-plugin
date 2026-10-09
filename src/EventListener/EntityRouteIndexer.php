@@ -72,7 +72,7 @@ class EntityRouteIndexer
         }
     }
 
-    private function manageRoutes(CmsRoutableInterface $entity, ObjectManager $objectManager): void
+    protected function manageRoutes(CmsRoutableInterface $entity, ObjectManager $objectManager): void
     {
         /** @var array<string, string> $routesChanges */
         $routesChanges = [];
@@ -103,7 +103,7 @@ class EntityRouteIndexer
     /**
      * @param array<string, string> $routesChanges
      */
-    private function computeRoutes(
+    protected function computeRoutes(
         array &$routesChanges,
         CmsRoutableInterface &$entity,
         string $routeNamePrefix,
@@ -146,7 +146,7 @@ class EntityRouteIndexer
             // slug "blog-slug" is a PageInterface entity slug
             // slug "slug-page is the PageInterface parent entity slug of "blog-slug"
 
-            $urlPattern = '/{{locale}}{{other_entity_path}}{{current_entity_path}}';
+            $urlPattern = '/{{locale}}{{calculated_static_prefix}}{{current_entity_path}}';
 
             // Get locale
             $locale = $translation->getLocale();
@@ -155,7 +155,7 @@ class EntityRouteIndexer
             $event = $this->dispatcher->dispatch(
                 new CalculateRouteStaticPrefixEvent($entity, $translation),
             );
-            $otherEntityPath = $event->getRouteStaticPrefix();
+            $calculatedStaticPrefix = $event->getRouteStaticPrefix();
 
             // Get current entity path
             $currentEntityPath = $entity->getRouteStaticPrefix($translation);
@@ -165,12 +165,12 @@ class EntityRouteIndexer
                 str_replace(
                     [
                                 '{{locale}}',
-                                '{{other_entity_path}}',
+                                '{{calculated_static_prefix}}',
                                 '{{current_entity_path}}',
                             ],
                     [
                                 (string) $locale,
-                                $otherEntityPath,
+                                $calculatedStaticPrefix,
                                 $currentEntityPath,
                             ],
                     $urlPattern,
@@ -201,7 +201,7 @@ class EntityRouteIndexer
      *
      * @param Collection<int, RouteInterface> $excludedRoutes
      */
-    private function rewriteOtherStaticPrefix(
+    protected function rewriteOtherStaticPrefix(
         string $staticPrefix,
         string $previousStaticPrefix,
         Collection $excludedRoutes,
