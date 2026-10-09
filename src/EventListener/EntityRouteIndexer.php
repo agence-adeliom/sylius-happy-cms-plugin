@@ -10,8 +10,10 @@ use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Adeliom\SyliusHappyCMSPlugin\Services\Cmf\RouteParentPathResolverInterface;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostPersistEventArgs;
 use Doctrine\ORM\Event\PostUpdateEventArgs;
+use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\ObjectManager;
 use Sylius\Resource\Model\TranslationInterface;
 use Symfony\Cmf\Bundle\RoutingBundle\Doctrine\Orm\ContentRepository;
@@ -19,6 +21,7 @@ use Symfony\Cmf\Bundle\RoutingBundle\Model\Route as RouteModel;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Route as SymfonyRoute;
 
 class EntityRouteIndexer
 {
@@ -34,7 +37,26 @@ class EntityRouteIndexer
      */
     public const DEFAULT_URL_PATTERN = '/{{locale}}{{other_entity_path}}{{current_entity_path}}';
 
+    /**
+     * Routable entities indexed during the current flush.
+     *
+     * @var CmsRoutableInterface[]
+     */
     public array $entitiesToManage = [];
+
+    /**
+     * True while the routes are computed inside a flush (onFlush): changes are then registered in the unit of work
+     * instead of being persisted for a later flush.
+     */
+    protected bool $insideFlush = false;
+
+    /**
+     * Routes created for entities without identifier yet (inserted in the current flush), by entity: their name and
+     * content id are completed in postPersist, once the identifier is known.
+     *
+     * @var array<int, array{entity: CmsRoutableInterface, routes: array<int, array{route: RouteInterface, namePrefix: string}>}>
+     */
+    protected array $routesAwaitingIdentifier = [];
 
     /**
      * @param iterable<RouteParentPathResolverInterface> $parentPathResolvers
@@ -50,40 +72,78 @@ class EntityRouteIndexer
     ) {
     }
 
-    public function postPersist(PostPersistEventArgs $event): void
+    /**
+     * Computes the routes of the routable entities (or of the translatable of the translations) inserted or updated
+     * by the current flush, and registers the route changes in the same unit of work: no flush() inside the flush.
+     */
+    public function onFlush(OnFlushEventArgs $event): void
     {
-        $entity = $event->getObject();
+        $unitOfWork = $this->manager->getUnitOfWork();
+        $this->entitiesToManage = [];
+        $this->insideFlush = true;
 
-        if ($entity instanceof TranslationInterface) {
-            $entity = $entity->getTranslatable();
-        }
+        try {
+            foreach ([...$unitOfWork->getScheduledEntityInsertions(), ...$unitOfWork->getScheduledEntityUpdates()] as $object) {
+                $entity = $object instanceof TranslationInterface ? $object->getTranslatable() : $object;
+                if (!$entity instanceof CmsRoutableInterface || in_array($entity, $this->entitiesToManage, true)) {
+                    continue;
+                }
 
-        if (!$entity instanceof CmsRoutableInterface) {
-            return;
-        }
-
-        if (!in_array($entity, $this->entitiesToManage)) {
-            $this->entitiesToManage[] = $entity;
-            $this->manageRoutes($entity, $event->getObjectManager());
+                $this->entitiesToManage[] = $entity;
+                $this->manageRoutes($entity, $this->manager);
+            }
+        } finally {
+            $this->insideFlush = false;
         }
     }
 
-    public function postUpdate(PostUpdateEventArgs $event): void
+    /**
+     * Completes the routes of an entity inserted by the current flush, now that its identifier is known: the
+     * route name and content id are written by an extra update of the same flush.
+     */
+    public function postPersist(PostPersistEventArgs $event): void
     {
-        $entity = $event->getObject();
-
-        if ($entity instanceof TranslationInterface) {
-            $entity = $entity->getTranslatable();
-        }
-
-        if (!$entity instanceof CmsRoutableInterface) {
+        $oid = spl_object_id($event->getObject());
+        if (!isset($this->routesAwaitingIdentifier[$oid])) {
             return;
         }
 
-        if (!in_array($entity, $this->entitiesToManage)) {
-            $this->entitiesToManage[] = $entity;
-            $this->manageRoutes($entity, $event->getObjectManager());
+        ['entity' => $entity, 'routes' => $routes] = $this->routesAwaitingIdentifier[$oid];
+        unset($this->routesAwaitingIdentifier[$oid]);
+        $unitOfWork = $this->manager->getUnitOfWork();
+
+        foreach ($routes as ['route' => $route, 'namePrefix' => $namePrefix]) {
+            if (!$route instanceof SymfonyRoute) {
+                continue;
+            }
+            $name = $route->getName();
+            $defaults = $route->getDefaults();
+            $route->setName($namePrefix . $entity->getRouteUnikName());
+            $route->setDefault(RouteObjectInterface::CONTENT_ID, $this->contentRepository->getContentId($entity));
+
+            $unitOfWork->scheduleExtraUpdate($route, [
+                'name' => [$name, $route->getName()],
+                'defaults' => [$defaults, $route->getDefaults()],
+            ]);
+            $unitOfWork->setOriginalEntityProperty(spl_object_id($route), 'name', $route->getName());
+            $unitOfWork->setOriginalEntityProperty(spl_object_id($route), 'defaults', $route->getDefaults());
         }
+    }
+
+    /**
+     * Routes are computed in onFlush since 2.3.x: kept for service definitions still listening to postUpdate.
+     */
+    public function postUpdate(PostUpdateEventArgs $event): void
+    {
+    }
+
+    /**
+     * Computes (creates or updates) the routes of an entity outside of a flush, e.g. after a change of a parent of
+     * another type, or to index existing entities. The routes are persisted: flush the entity manager afterwards.
+     */
+    public function index(CmsRoutableInterface $entity): void
+    {
+        $this->manageRoutes($entity, $this->manager);
     }
 
     protected function manageRoutes(CmsRoutableInterface $entity, ObjectManager $objectManager): void
@@ -92,11 +152,6 @@ class EntityRouteIndexer
         $routesChanges = [];
 
         $this->computeRoutes($routesChanges, $entity, self::ROUTE_ONLINE, $objectManager);
-
-        foreach ($entity->getRoutes() as $route) {
-            $this->manager->persist($route);
-        }
-        $this->manager->flush();
 
         foreach ($routesChanges as $previousStaticPrefix => $staticPrefix) {
             $this->rewriteOtherStaticPrefix($staticPrefix, $previousStaticPrefix, $entity->getRoutes());
@@ -181,15 +236,62 @@ class EntityRouteIndexer
             }
 
             $route->setLastModification(new \DateTime());
-            $route->setDefault(RouteObjectInterface::CONTENT_ID, $this->contentRepository->getContentId($entity));
+            $contentId = $this->contentRepository->getContentId($entity);
+            $route->setDefault(RouteObjectInterface::CONTENT_ID, $contentId);
+            if (null === $contentId) {
+                // Entity inserted by the current flush: unique temporary name, completed in postPersist
+                $route->setName($routeName . '_' . bin2hex(random_bytes(8)));
+                $this->routesAwaitingIdentifier[spl_object_id($entity)]['entity'] = $entity;
+                $this->routesAwaitingIdentifier[spl_object_id($entity)]['routes'][] = [
+                    'route' => $route,
+                    'namePrefix' => $routeNamePrefix . $translation->getLocale() . '_',
+                ];
+            }
 
             $entity->addRoute($route);
-
-            $this->manager->persist($route);
-            $this->manager->persist($entity);
+            $this->saveRoute($route);
 
             $routesChanges[$previousStaticPrefix] = $route->getStaticPrefix();
         }
+
+        $this->saveEntity($entity);
+    }
+
+    /**
+     * Inside a flush, registers the new or changed route in the unit of work; outside, persists it.
+     */
+    protected function saveRoute(RouteInterface $route): void
+    {
+        if (!$this->insideFlush) {
+            $this->manager->persist($route);
+
+            return;
+        }
+
+        $unitOfWork = $this->manager->getUnitOfWork();
+        $metadata = $this->manager->getClassMetadata($route::class);
+        if (UnitOfWork::STATE_NEW === $unitOfWork->getEntityState($route)) {
+            $this->manager->persist($route);
+            $unitOfWork->computeChangeSet($metadata, $route);
+
+            return;
+        }
+
+        $unitOfWork->recomputeSingleEntityChangeSet($metadata, $route);
+    }
+
+    /**
+     * Inside a flush, takes the route collection changes of the entity into account; outside, persists it.
+     */
+    protected function saveEntity(CmsRoutableInterface $entity): void
+    {
+        if (!$this->insideFlush) {
+            $this->manager->persist($entity);
+
+            return;
+        }
+
+        $this->manager->getUnitOfWork()->computeChangeSet($this->manager->getClassMetadata($entity::class), $entity);
     }
 
     protected function resolveParentPath(CmsRoutableInterface $entity, TranslationInterface $translation): string
@@ -253,7 +355,6 @@ class EntityRouteIndexer
                     return str_starts_with($route->getStaticPrefix(), $previousStaticPrefix);
                 });
 
-                $this->manager->getConnection()->beginTransaction();
                 foreach ($routesToUpdate as $routeToUpdate) {
                     if ($excludedRoutes->contains($routeToUpdate)) {
                         continue;
@@ -262,10 +363,8 @@ class EntityRouteIndexer
                     $routeToUpdate->setStaticPrefix(
                         str_replace($previousStaticPrefix, $staticPrefix, $routeToUpdate->getStaticPrefix()),
                     );
-                    $this->manager->persist($routeToUpdate);
+                    $this->saveRoute($routeToUpdate);
                 }
-                $this->manager->flush();
-                $this->manager->getConnection()->commit();
             }
         }
     }

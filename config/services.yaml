@@ -29,11 +29,11 @@ services:
       - !tagged_iterator sylius_happy_cms.route_parent_path_resolver
     tags:
       -   name: 'doctrine.event_listener'
-          event: 'postPersist'
+          event: 'onFlush'
           priority: 500
           connection: 'default'
       -   name: 'doctrine.event_listener'
-          event: 'postUpdate'
+          event: 'postPersist'
           priority: 500
           connection: 'default'
 

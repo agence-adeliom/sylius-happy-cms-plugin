@@ -12,6 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\Mapping\Driver\SimplifiedXmlDriver;
+use Doctrine\ORM\Mapping\Driver\XmlDriver;
 use Doctrine\ORM\ORMSetup;
 use Doctrine\ORM\Tools\ResolveTargetEntityListener;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -49,7 +50,7 @@ abstract class RouteIndexerTestCase extends TestCase
         $driver->addDriver($attributes, __NAMESPACE__);
         $driver->addDriver($attributes, 'Adeliom\SyliusHappyCMSPlugin\Entity\Cmf');
         $driver->addDriver(new SimplifiedXmlDriver([$vendor . '/symfony-cmf/routing-bundle/src/Resources/config/doctrine-model' => 'Symfony\Cmf\Bundle\RoutingBundle\Model']), 'Symfony\Cmf\Bundle\RoutingBundle\Model');
-        $driver->addDriver(new SimplifiedXmlDriver([$vendor . '/symfony-cmf/routing-bundle/src/Resources/config/doctrine-base' => 'Symfony\Component\Routing']), 'Symfony\Component\Routing');
+        $driver->addDriver(new XmlDriver($vendor . '/symfony-cmf/routing-bundle/src/Resources/config/doctrine-base', '.orm.xml'), 'Symfony\Component\Routing');
         $config->setMetadataDriverImpl($driver);
 
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true], $config);
@@ -94,7 +95,22 @@ abstract class RouteIndexerTestCase extends TestCase
      */
     protected static function listenedEvents(): array
     {
-        return [Events::postPersist, Events::postUpdate];
+        return [Events::onFlush, Events::postPersist];
+    }
+
+    protected function countFlushes(): object
+    {
+        $counter = new class() {
+            public int $count = 0;
+
+            public function postFlush(): void
+            {
+                ++$this->count;
+            }
+        };
+        $this->entityManager->getEventManager()->addEventListener([Events::postFlush], $counter);
+
+        return $counter;
     }
 
     protected function savePage(string $slug, ?string $category = null, string $locale = 'en_US', bool $homepage = false): IndexedPage
