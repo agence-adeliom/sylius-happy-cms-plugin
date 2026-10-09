@@ -7,6 +7,7 @@ namespace Adeliom\SyliusHappyCMSPlugin\DependencyInjection;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockTypeInterface;
 use Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock\SharedBlockTypeInterface;
 use Adeliom\SyliusHappyCMSPlugin\Services\Seo\Sitemap\SitemapDumperInterface;
+use Adeliom\SyliusHappyCMSPlugin\Twig\Seo\SeoExtension;
 use Sylius\Bundle\CoreBundle\DependencyInjection\PrependDoctrineMigrationsTrait;
 use Sylius\Bundle\ResourceBundle\DependencyInjection\Extension\AbstractResourceExtension;
 use Symfony\Component\Config\FileLocator;
@@ -19,6 +20,8 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 final class SyliusHappyCMSExtension extends AbstractResourceExtension implements PrependExtensionInterface
 {
     use PrependDoctrineMigrationsTrait;
+
+    public const NOT_FOUND_LISTENER = 'sylius.happy_cms.exception_listener';
 
     /** @psalm-suppress UnusedVariable */
     public function load(array $configs, ContainerBuilder $container): void
@@ -52,6 +55,22 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
 
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__ . '/../../config/media'));
         $loader->load('services.php');
+
+        $this->disableOptionalServices($config, $container);
+    }
+
+    /**
+     * @param array<string, array<string, mixed>> $config
+     */
+    private function disableOptionalServices(array $config, ContainerBuilder $container): void
+    {
+        if (false === ($config['seo']['enable_twig_extension'] ?? true)) {
+            $container->getDefinition(SeoExtension::class)->clearTag('twig.extension');
+        }
+
+        if (false === ($config['redirect_route']['enable_not_found_listener'] ?? true)) {
+            $container->removeDefinition(self::NOT_FOUND_LISTENER);
+        }
     }
 
     /**
