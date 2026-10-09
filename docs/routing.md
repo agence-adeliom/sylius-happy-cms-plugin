@@ -55,8 +55,12 @@ When you save a routable entity (Page, BlogPost, etc.), the plugin automatically
 
 1. Creates or updates database routes for each language
 2. Calculates URLs based on parent hierarchy
-3. Updates child routes when parent URLs change
+3. Updates child routes when parent URLs change: the routes whose path is the previous path or starts with the
+   previous path followed by `/` (renaming `/door` moves `/door/wooden`, not `/doors`)
 4. Stores routes in the `..._route` database table
+
+Routes are computed by `EntityRouteIndexer` during the flush that saves the entity (Doctrine `onFlush`), and written
+by that same flush: no second flush, one transaction.
 
 ### URL Structure
 
@@ -277,6 +281,33 @@ class BlogPostPrefixListener
 php bin/console make:happy-cms:generate-cms-model
 ```
 [Learn mode about this command usage here](./docs/commands/generate-cms-model.md)
+
+### Index existing entities
+
+Routes are only computed when an entity is saved. To create or update the routes of entities already in the
+database (data migration, import, change of the `routing` options):
+
+```bash
+php bin/console happycms:routes:index --dry-run -v   # list the computed routes, save nothing
+php bin/console happycms:routes:index                # every mapped routable entity
+php bin/console happycms:routes:index --class='App\Entity\HappyCMS\Page\Page' --batch-size=200
+```
+
+### Parent of another type changed
+
+When a route depends on a parent that is not a CMS route (see [parent path resolvers](#parent-path-resolvers)),
+move the routes below its previous path when its slug changes, from your own listener or handler:
+
+```php
+$this->entityRouteIndexer->rewriteStaticPrefix('/doors', '/entry-doors');
+// or recompute the routes of the children:
+foreach ($guides as $guide) {
+    $this->entityRouteIndexer->index($guide);
+}
+$this->entityManager->flush();
+```
+
+Call these methods outside of a Doctrine flush (not from a Doctrine listener), then flush.
 
 ## Breadcrumb Navigation
 

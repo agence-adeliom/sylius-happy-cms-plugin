@@ -28,3 +28,23 @@ fills `{{other_entity_path}}` before `CalculateRouteStaticPrefixEvent` is dispat
 - the constructor takes three new optional arguments (`$urlPattern`, `$trailingSlash`, `$parentPathResolvers`);
   a service definition overriding the indexer with the four original arguments keeps the current behaviour;
 - repeated slashes in a computed path are collapsed (`/en_US//about` → `/en_US/about`).
+
+### CMS routes computed within the flush, `happycms:routes:index`
+
+`EntityRouteIndexer` now listens to `onFlush` and `postPersist` (it used to listen to `postPersist` and `postUpdate`
+and flush the entity manager from them). If you redefined the `sylius.happy_cms.plugin.listener.entity_route_indexer`
+service, update its tags:
+
+```yaml
+tags:
+    - { name: 'doctrine.event_listener', event: 'onFlush', priority: 500, connection: 'default' }
+    - { name: 'doctrine.event_listener', event: 'postPersist', priority: 500, connection: 'default' }
+```
+
+`postUpdate()` is kept as a no-op. New public methods: `onFlush()`, `index()` and `rewriteStaticPrefix()`.
+
+Renaming a path now moves only the routes below it at a `/` boundary (`/door` no longer rewrites `/doors`), and
+only the leading part of their path is replaced.
+
+New command `happycms:routes:index` (`--class`, `--batch-size`, `--dry-run`) to index existing entities.
+
