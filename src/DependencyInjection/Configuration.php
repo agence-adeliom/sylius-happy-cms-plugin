@@ -634,6 +634,10 @@ class Configuration implements ConfigurationInterface
             ->defaultNull()
             ->info('true: collapse the repeated slashes of a computed route path ("/en_US//about" becomes "/en_US/about", an empty placeholder leaves no double slash). Not set or false: the path is kept as filled (deprecated). In 3.0 the option is removed and collapsing is the only behaviour.')
             ->end()
+            ->booleanNode('trailing_slash')
+            ->defaultFalse()
+            ->info('End the CMS routes with "/" and redirect (301) the same URL without the final slash to them.')
+            ->end()
             ->end()
             ->end()
 
