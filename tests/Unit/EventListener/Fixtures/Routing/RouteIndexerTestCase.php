@@ -97,10 +97,11 @@ abstract class RouteIndexerTestCase extends TestCase
         return [Events::postPersist, Events::postUpdate];
     }
 
-    protected function savePage(string $slug, ?string $category = null, string $locale = 'en_US'): IndexedPage
+    protected function savePage(string $slug, ?string $category = null, string $locale = 'en_US', bool $homepage = false): IndexedPage
     {
         $page = new IndexedPage($slug, $locale);
         $page->category = $category;
+        $page->isHomePage = $homepage;
         $this->entityManager->persist($page);
         $this->entityManager->flush();
 
