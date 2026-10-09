@@ -7,8 +7,10 @@ namespace Tests\Adeliom\SyliusHappyCMSPlugin\Unit\DependencyInjection;
 use Adeliom\SyliusHappyCMSPlugin\DependencyInjection\SyliusHappyCMSExtension;
 use Adeliom\SyliusHappyCMSPlugin\EventListener\EntityRouteIndexer;
 use Adeliom\SyliusHappyCMSPlugin\EventListener\TrailingSlashRedirectListener;
+use Adeliom\SyliusHappyCMSPlugin\Services\Cmf\RouteParentPathResolverInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Yaml\Yaml;
 
@@ -39,6 +41,17 @@ final class RoutingConfigurationTest extends TestCase
 
         self::assertTrue($container->getParameter('sylius_happy_cms.routing.trailing_slash'));
         self::assertTrue($container->getDefinition(TrailingSlashRedirectListener::class)->hasTag('kernel.event_listener'));
+    }
+
+    public function testParentPathResolversAreAutoconfiguredAndInjected(): void
+    {
+        $container = $this->load([]);
+
+        self::assertArrayHasKey(RouteParentPathResolverInterface::class, $container->getAutoconfiguredInstanceof());
+        self::assertTrue($container->getAutoconfiguredInstanceof()[RouteParentPathResolverInterface::class]->hasTag(RouteParentPathResolverInterface::TAG));
+        $resolvers = $container->getDefinition(self::INDEXER)->getArgument(6);
+        self::assertInstanceOf(TaggedIteratorArgument::class, $resolvers);
+        self::assertSame(RouteParentPathResolverInterface::TAG, $resolvers->getTag());
     }
 
     public function testTheUrlPatternCanBeChanged(): void

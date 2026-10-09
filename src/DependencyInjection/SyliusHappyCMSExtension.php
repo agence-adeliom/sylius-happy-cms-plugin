@@ -7,6 +7,7 @@ namespace Adeliom\SyliusHappyCMSPlugin\DependencyInjection;
 use Adeliom\SyliusHappyCMSPlugin\EventListener\TrailingSlashRedirectListener;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockTypeInterface;
 use Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock\SharedBlockTypeInterface;
+use Adeliom\SyliusHappyCMSPlugin\Services\Cmf\RouteParentPathResolverInterface;
 use Adeliom\SyliusHappyCMSPlugin\Services\Seo\Sitemap\SitemapDumperInterface;
 use Sylius\Bundle\CoreBundle\DependencyInjection\PrependDoctrineMigrationsTrait;
 use Sylius\Bundle\ResourceBundle\DependencyInjection\Extension\AbstractResourceExtension;
@@ -44,6 +45,10 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
 
         $container->registerForAutoconfiguration(SharedBlockTypeInterface::class)
             ->addTag('sylius.happy_cms.shared_block')
+        ;
+
+        $container->registerForAutoconfiguration(RouteParentPathResolverInterface::class)
+            ->addTag(RouteParentPathResolverInterface::TAG)
         ;
 
         $container->registerForAutoconfiguration(SitemapDumperInterface::class)
