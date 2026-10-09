@@ -127,4 +127,43 @@ final class EntityRouteIndexerTest extends RouteIndexerTestCase
         self::assertSame(['/en_US/about-us'], array_values($this->storedPrefixes()));
         self::assertCount(1, $page->getRoutes());
     }
+
+    public function testRenamingAPrefixRewritesTheDescendantRoutesOnly(): void
+    {
+        $this->registerIndexer(['{{other_entity_path}}{{current_entity_path}}', false, [new CategoryPathResolver()]]);
+        $door = $this->savePage('porte');
+        $this->savePage('portes-d-entree');
+        $this->savePage('porte-bois', category: 'porte');
+        $this->savePage('vitree', category: 'porte/porte');
+
+        $door->getTranslation()->setSlug('portail');
+        $this->entityManager->flush();
+
+        self::assertSame(['/portail', '/portes-d-entree', '/portail/porte-bois', '/portail/porte/vitree'], array_values($this->storedPrefixes()));
+    }
+
+    public function testRenamingAPrefixWithATrailingSlashRewritesTheDescendantRoutesOnly(): void
+    {
+        $this->registerIndexer(['{{other_entity_path}}{{current_entity_path}}', true, [new CategoryPathResolver()]]);
+        $door = $this->savePage('porte');
+        $this->savePage('portes-d-entree');
+        $this->savePage('porte-bois', category: 'porte');
+
+        $door->getTranslation()->setSlug('portail');
+        $this->entityManager->flush();
+
+        self::assertSame(['/portail/', '/portes-d-entree/', '/portail/porte-bois/'], array_values($this->storedPrefixes()));
+    }
+
+    public function testTheRoutesBelowAPathOfAnotherTypeCanBeMoved(): void
+    {
+        $indexer = $this->registerIndexer(['{{other_entity_path}}{{current_entity_path}}', false, [new CategoryPathResolver()]]);
+        $this->savePage('porte-bois', category: 'porte');
+        $this->savePage('portes-d-entree');
+
+        $indexer->rewriteStaticPrefix('/porte', '/portail');
+        $this->entityManager->flush();
+
+        self::assertSame(['/portail/porte-bois', '/portes-d-entree'], array_values($this->storedPrefixes()));
+    }
 }
