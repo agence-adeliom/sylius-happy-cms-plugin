@@ -1,0 +1,39 @@
+# Upgrade
+
+## Unreleased (2.3.x)
+
+### Media routes are imported explicitly (`MediaLoader` removed)
+
+The `Adeliom\SyliusHappyCMSPlugin\Routing\MediaLoader` route loader has been removed.
+
+It was registered for every route import of `type: attribute`, with a higher priority than the
+Symfony attribute loaders: an import such as
+
+```yaml
+controllers:
+    resource: ../src/Controller/
+    type: attribute
+```
+
+returned the 18 media manager routes instead of the project's own controller routes.
+
+The media routes must now be imported explicitly in your `config/routes.yaml`:
+
+```yaml
+# Media manager (admin): media.index, media.browse, media.upload…
+sylius_happy_cms_media:
+    resource: "@SyliusHappyCMSPlugin/config/media/routes.php"
+
+# Public download route media.file_download (/media/download/{path}),
+# needed when `sylius_happy_cms.media.base_url` is '/media/download'
+sylius_happy_cms_media_public:
+    resource: "@SyliusHappyCMSPlugin/config/media/public_routes.php"
+```
+
+- **You use the media manager**: add the first import, otherwise the `media.*` routes
+  (admin menu entry, media field, manager) are no longer defined.
+- **Your media URLs use `/media/download/…`** (`base_url: '/media/download'`, the value written by
+  `make:happy-cms:install`): add the second import. `config/media/public_routes.php` was never
+  loaded before, so this route did not exist until now.
+- **You had removed the `routing.loader` tag of `MediaLoader`** (compiler pass) to get your attribute
+  routes back: the workaround can be deleted.
