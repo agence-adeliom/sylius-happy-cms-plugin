@@ -33,6 +33,7 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
         $config = $this->processConfiguration($configuration, $configs);
 
         $this->processPageConfiguration($config['page'], $container);
+        $this->processRoutingConfiguration($config['routing'], $container);
         $this->processPageBuilderConfiguration($config['page_builder'], $container);
         $this->processSeoConfiguration($config['seo'], $container);
         $this->processConfigConfiguration($config['config'], $container);
@@ -94,6 +95,48 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
             /** @phpstan-ignore-next-line */
             $container->setParameter('sylius_happy_cms.page.' . $key, $value);
         }
+    }
+
+    /**
+     * @param array<string, mixed> $config
+     */
+    private function processRoutingConfiguration(array $config, ContainerBuilder $container): void
+    {
+        foreach ($config as $key => $value) {
+            /** @phpstan-ignore-next-line */
+            $container->setParameter('sylius_happy_cms.routing.' . $key, $value);
+        }
+
+        $container->setParameter('sylius_happy_cms.routing.collapse_slashes', $this->resolveRoutingFlag(
+            $config['collapse_slashes'] ?? null,
+            'collapse_slashes',
+            'collapsing the repeated slashes of a computed route path',
+        ));
+    }
+
+    /**
+     * Compatibility flag of the "sylius_happy_cms.routing" section: null (not set) or false keep the current behaviour
+     * and trigger a deprecation, true opts in the behaviour of 3.0.
+     */
+    private function resolveRoutingFlag(mixed $value, string $option, string $newBehaviour): bool
+    {
+        if (true === $value) {
+            return true;
+        }
+
+        trigger_deprecation(
+            'agence-adeliom/sylius-happy-cms-plugin',
+            '2.3.3',
+            sprintf(
+                '%s the "sylius_happy_cms.routing.%s" option %sis deprecated. It will be removed in 3.0, where %s is the only behaviour. Set it to true to opt in now (see UPGRADE.md).',
+                null === $value ? 'Not setting' : 'Setting',
+                $option,
+                null === $value ? '' : 'to false ',
+                $newBehaviour,
+            ),
+        );
+
+        return false;
     }
 
     /**

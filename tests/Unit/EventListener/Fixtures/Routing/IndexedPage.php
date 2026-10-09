@@ -36,6 +36,9 @@ class IndexedPage implements CmsRoutableInterface, TranslatableInterface
     #[ORM\Column(nullable: true)]
     public ?string $category = null;
 
+    #[ORM\Column]
+    public bool $isHomePage = false;
+
     public function __construct(string $slug, string $locale = 'en_US')
     {
         $this->initializeRoutes();
