@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Twig\Seo;
 
-use Adeliom\SyliusHappyCMSPlugin\Entity\Seo\Seo;
+use Adeliom\SyliusHappyCMSPlugin\Entity\Seo\SeoInterface;
 use Adeliom\SyliusHappyCMSPlugin\Services\Seo\BreadcrumbCollection;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -55,9 +55,9 @@ class SeoExtension extends AbstractExtension implements GlobalsInterface
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('seo_metas', \Closure::fromCallable(fn (?Seo $seo) => $this->renderSeoMetas($seo))),
+            new TwigFunction('seo_metas', $this->renderSeoMetas(...)),
             new TwigFunction('seo_title', $this->renderSeoTitle(...)),
-            new TwigFunction('seo_breadcrumb', \Closure::fromCallable(fn () => $this->renderBreadcrumb())),
+            new TwigFunction('seo_breadcrumb', $this->renderBreadcrumb(...)),
         ];
     }
 
@@ -82,15 +82,15 @@ class SeoExtension extends AbstractExtension implements GlobalsInterface
         return new Markup($this->twig->render('@SyliusHappyCMSPlugin/front/seo/block-breadcrumb.html.twig', ['data' => $result->getArgument('items')]), 'UTF-8');
     }
 
-    public function renderSeoTitle(string|Seo $seo): string
+    public function renderSeoTitle(string|SeoInterface|null $seo): string
     {
         $title = '';
         if (is_string($seo)) {
             $title = $seo;
         }
 
-        if ($seo instanceof Seo) {
-            $title = $seo->title;
+        if ($seo instanceof SeoInterface) {
+            $title = $seo->getTitle() ?? '';
         }
 
         if (!empty($this->titleConfig['suffix'])) {
@@ -107,10 +107,10 @@ class SeoExtension extends AbstractExtension implements GlobalsInterface
             return $result->getArgument('title');
         }
 
-        return $title ?? '';
+        return $title;
     }
 
-    public function renderSeoMetas(?Seo $seo): ?Markup
+    public function renderSeoMetas(?SeoInterface $seo): ?Markup
     {
         if (null === $seo) {
             return null;
