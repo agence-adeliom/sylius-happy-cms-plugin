@@ -79,6 +79,44 @@ final class SeoExtensionTest extends TestCase
         self::assertSame('project breadcrumb: Home', $this->render('{{ seo_breadcrumb() }}', [], $templates, $options));
     }
 
+    public function testTheBreadcrumbUsesHttpsSchemaOrgTypes(): void
+    {
+        $breadcrumb = new BreadcrumbCollection();
+        $breadcrumb->addSimpleItem('Home', '/');
+        $breadcrumb->addSimpleItem('Page');
+
+        $html = $this->render('{{ seo_breadcrumb() }}', [], [], ['breadcrumb' => $breadcrumb]);
+
+        self::assertStringContainsString('itemtype="https://schema.org/BreadcrumbList"', $html);
+        self::assertStringContainsString('itemtype="https://schema.org/ListItem"', $html);
+        self::assertStringNotContainsString('http://schema.org', $html);
+    }
+
+    public function testTheBreadcrumbKeepsAnAbsoluteFirstLink(): void
+    {
+        $breadcrumb = new BreadcrumbCollection();
+        $breadcrumb->addSimpleItem('Home', 'https://example.com/');
+        $breadcrumb->addSimpleItem('Page');
+
+        $html = $this->render('{{ seo_breadcrumb() }}', [], [], ['breadcrumb' => $breadcrumb]);
+
+        self::assertStringContainsString('href="https://example.com/"', $html);
+    }
+
+    public function testTheBreadcrumbStillCollapsesTheDoubleSlashOfARelativeFirstLink(): void
+    {
+        $breadcrumb = new BreadcrumbCollection();
+        $breadcrumb->addSimpleItem('Home', '//');
+        $breadcrumb->addSimpleItem('Page');
+
+        self::assertStringContainsString('href="/"', $this->render('{{ seo_breadcrumb() }}', [], [], ['breadcrumb' => $breadcrumb]));
+    }
+
+    public function testAnEmptyBreadcrumbRendersNothing(): void
+    {
+        self::assertSame('', trim($this->render('{{ seo_breadcrumb() }}')));
+    }
+
     /**
      * @param array<string, mixed> $context
      * @param array<string, string> $extraTemplates
@@ -89,6 +127,7 @@ final class SeoExtensionTest extends TestCase
         $twig = new Environment(new ArrayLoader([
             'page' => $template,
             SeoExtension::DEFAULT_METAS_TEMPLATE => (string) file_get_contents(__DIR__ . '/../../../../templates/front/seo/block-metas.html.twig'),
+            SeoExtension::DEFAULT_BREADCRUMB_TEMPLATE => (string) file_get_contents(__DIR__ . '/../../../../templates/front/seo/block-breadcrumb.html.twig'),
         ] + $extraTemplates));
 
         $twig->addExtension(new SeoExtension(
@@ -96,11 +135,12 @@ final class SeoExtensionTest extends TestCase
             new EventDispatcher(),
             $options['breadcrumb'] ?? new BreadcrumbCollection(),
             ['separator' => '|', 'suffix' => 'Shop'],
-            [],
+            ['class' => 'breadcrumb', 'item_class' => 'breadcrumb-item', 'link_class' => '', 'current_class' => 'active', 'separator' => '>'],
             $options['templates'] ?? [],
         ));
-        // stands for the media extension of the plugin, out of the scope of these tests
+        // stand for the media and translation extensions, out of the scope of these tests
         $twig->addFilter(new TwigFilter('resolve_media', static fn (mixed $media): ?string => null));
+        $twig->addFilter(new TwigFilter('trans', static fn (string $message): string => $message));
 
         return $twig->render('page', $context);
     }
