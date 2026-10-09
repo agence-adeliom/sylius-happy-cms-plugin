@@ -72,7 +72,7 @@ class EntityRouteIndexer
         }
     }
 
-    private function manageRoutes(CmsRoutableInterface $entity, ObjectManager $objectManager): void
+    protected function manageRoutes(CmsRoutableInterface $entity, ObjectManager $objectManager): void
     {
         /** @var array<string, string> $routesChanges */
         $routesChanges = [];
@@ -103,7 +103,7 @@ class EntityRouteIndexer
     /**
      * @param array<string, string> $routesChanges
      */
-    private function computeRoutes(
+    protected function computeRoutes(
         array &$routesChanges,
         CmsRoutableInterface &$entity,
         string $routeNamePrefix,
@@ -201,7 +201,7 @@ class EntityRouteIndexer
      *
      * @param Collection<int, RouteInterface> $excludedRoutes
      */
-    private function rewriteOtherStaticPrefix(
+    protected function rewriteOtherStaticPrefix(
         string $staticPrefix,
         string $previousStaticPrefix,
         Collection $excludedRoutes,
