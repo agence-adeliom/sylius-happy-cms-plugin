@@ -135,6 +135,38 @@ sylius_happy_cms:
 Leading and trailing `/` are removed (`/medias` and `medias` are the same). The routes are generated with `path()`, so templates and the media
 manager JavaScript follow it.
 
+### New option: URL pattern of the CMS routes
+
+```yaml
+sylius_happy_cms:
+    routing:
+        # default, the current routes
+        url_pattern: '/{{locale}}{{other_entity_path}}{{current_entity_path}}'
+```
+
+The pattern must contain `{{current_entity_path}}`. Remove `{{locale}}` for URLs without locale prefix. Changing it
+does not rewrite the stored routes: re-save the routable entities afterwards.
+
+`EntityRouteIndexer`: `manageRoutes()`, `computeRoutes()` and `rewriteOtherStaticPrefix()` are now `protected` (were
+`private`); the constructor takes two new optional arguments (`$urlPattern`, `$collapseSlashes`): a service definition
+overriding the indexer with the four original arguments keeps the current behaviour.
+
+### Deprecated: not setting `sylius_happy_cms.routing.collapse_slashes`
+
+```yaml
+sylius_happy_cms:
+    routing:
+        collapse_slashes: true
+```
+
+With `true`, repeated slashes in a computed route path are collapsed (`/en_US//about` becomes `/en_US/about`, when a
+`CalculateRouteStaticPrefixEvent` listener returns a path ending with `/`), so an empty placeholder never leaves a
+`//` and the homepage of a pattern without `{{locale}}` is `/`. Not set or `false`, the path is kept as filled (a
+deprecation is triggered). Stored routes are not rewritten when you opt in: re-save the routable entities whose path
+contained `//`.
+
+In 3.0 the option is removed and collapsing the repeated slashes is the only behaviour.
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required

@@ -115,6 +115,30 @@ public function getRouteStaticPrefix(TranslationInterface $translation): string
 }
 ```
 
+### URL pattern (locale prefix)
+
+The route path is built from a pattern, `/{{locale}}{{other_entity_path}}{{current_entity_path}}` by default:
+
+- `{{locale}}`: the translation locale (`en_US`);
+- `{{other_entity_path}}`: path of a parent of another type (see `CalculateRouteStaticPrefixEvent`);
+- `{{current_entity_path}}` (required): `getRouteStaticPrefix()` of the entity (its slug under its parents).
+
+```yaml
+sylius_happy_cms:
+    routing:
+        # URLs without locale prefix (one locale per host, or a single locale)
+        url_pattern: '{{other_entity_path}}{{current_entity_path}}'
+        # collapse the repeated slashes of the computed path (only behaviour in 3.0)
+        collapse_slashes: true
+```
+
+With `collapse_slashes: true`, repeated slashes are collapsed, so an empty placeholder leaves no `//` and the homepage
+is `/` without locale. Not set (deprecated) or `false`, the path is kept as filled, with a leading `/` added when the
+pattern does not start with one.
+
+Without `{{locale}}`, two translations with the same slug get the same path: keep the locale in the pattern for a
+multilingual site served on a single host.
+
 ### Custom Controller
 
 Forward routing to a custom controller:
