@@ -64,4 +64,14 @@ final class EntityRouteIndexerTest extends RouteIndexerTestCase
 
         self::assertSame(['/en_US/company/about'], array_values($this->storedPrefixes()));
     }
+
+    public function testTheRoutesCanEndWithASlash(): void
+    {
+        $this->registerIndexer(['urlPattern' => '{{other_entity_path}}{{current_entity_path}}', 'trailingSlash' => true]);
+
+        $this->savePage('about');
+        $this->savePage('home', homepage: true);
+
+        self::assertSame(['/about/', '/'], array_values($this->storedPrefixes()));
+    }
 }
