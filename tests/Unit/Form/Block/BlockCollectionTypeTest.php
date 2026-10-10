@@ -161,6 +161,24 @@ final class BlockCollectionTypeTest extends TestCase
         self::assertSame(['A'], $this->titles($form->getData()));
     }
 
+    public function testPrototypesOnlyHoldTheTechnicalFieldsByDefault(): void
+    {
+        $view = $this->collection([])->createView();
+
+        $prototype = $view->vars['prototypes'][TitleBlock::class];
+        self::assertSame(['block_type', 'block_published', 'position'], array_keys($prototype->children));
+        self::assertFalse($view->vars['complete_prototypes']);
+    }
+
+    public function testCompletePrototypesHoldEveryFieldOfTheBlock(): void
+    {
+        $view = $this->collection([], ['complete_prototypes' => true])->createView();
+
+        self::assertSame(['block_type', 'block_published', 'position', 'title'], array_keys($view->vars['prototypes'][TitleBlock::class]->children));
+        self::assertSame(['block_type', 'block_published', 'position', 'text'], array_keys($view->vars['prototypes'][RestrictedBlock::class]->children));
+        self::assertTrue($view->vars['complete_prototypes']);
+    }
+
     public function testANewBlockIsSavedWithItsFieldsAndItsPosition(): void
     {
         $form = $this->collection([]);

@@ -85,7 +85,8 @@
                         {% set block_data = block %}
                     {% endif %}
                 {% endfor %}
-                {{ _self.w_block(block_data.name, form_widget(child), loop.index) }}
+                {# a stored block whose type is not in the allowed list is still editable, under its class name #}
+                {{ _self.w_block(block_data is not null ? block_data.name : child.vars.value['block_type']|default(''), form_widget(child), loop.index) }}
                 {% set last_loop_index = loop.index %}
             {% endfor %}
         {% endif %}
@@ -183,7 +184,7 @@
                                                 data-block-type="{{ type }}"
                                                 data-block-icon="{{ block.icon is not iterable ? block.icon : '' }}"
                                                 data-block-name="{{ block.name|trans }}"
-                                                data-prototype='{{ (form_row(prototypes[type]) ~ please_save)|e('html_attr') }}'
+                                                data-prototype='{{ (form_row(prototypes[type]) ~ (complete_prototypes|default(false) ? '' : please_save))|e('html_attr') }}'
                                                 data-num-items='{{ form.children|length }}'
                                                 data-form-type-name-placeholder='{{ prototypes[type] is defined ? prototypes[type].vars.name : '' }}'
                                         >
