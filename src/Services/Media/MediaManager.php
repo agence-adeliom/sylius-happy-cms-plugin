@@ -18,6 +18,7 @@ use Embed\Embed;
 use Illuminate\Support\Str;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
+use League\Flysystem\StorageAttributes;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
@@ -109,12 +110,62 @@ class MediaManager
         return $this->getHelper()->getMedia($media);
     }
 
+    /**
+     * Tells whether a media folder exists, according to `sylius_happy_cms.media.directory_check`:
+     * - "public_dir" (default): public/{base_url}/{path} on the local disk. Only valid with a relative
+     *   base_url and a storage located in the public directory;
+     * - "storage": the Flysystem storage (any adapter, any base_url);
+     * - "database": a chain of folder rows matching the slugs of the path (object storages without directories).
+     *
+     * @throws FilesystemException
+     */
     public function directoryExists(string $path): bool
+    {
+        $path = trim($this->helper->clearDblSlash($path), '/');
+
+        return match ($this->getDirectoryCheck()) {
+            'storage' => '' === $path || $this->filesystem->directoryExists($path),
+            'database' => '' === $path || null !== $this->findFolderBySlugs($path),
+            default => $this->publicDirectoryExists($path),
+        };
+    }
+
+    protected function getDirectoryCheck(): string
+    {
+        if (!$this->parameters->has('sylius_happy_cms.media.directory_check')) {
+            return 'public_dir';
+        }
+
+        $check = $this->parameters->get('sylius_happy_cms.media.directory_check');
+
+        return is_string($check) ? $check : 'public_dir';
+    }
+
+    private function publicDirectoryExists(string $path): bool
     {
         /** @var string $projectDir */
         $projectDir = $this->parameters->get('kernel.project_dir');
 
         return is_dir($projectDir . \DIRECTORY_SEPARATOR . 'public' . $this->helper->getBaseUrl() . \DIRECTORY_SEPARATOR . $path);
+    }
+
+    private function findFolderBySlugs(string $path): ?FolderInterface
+    {
+        $folderRepository = $this->getHelper()->getFolderRepository();
+        if (null === $folderRepository) {
+            return null;
+        }
+
+        $parent = null;
+        foreach (array_values(array_filter(explode('/', $path), static fn (string $slug): bool => '' !== $slug)) as $slug) {
+            $folder = $folderRepository->findOneBy(['parent' => $parent, 'slug' => $slug]);
+            if (!$folder instanceof FolderInterface) {
+                return null;
+            }
+            $parent = $folder;
+        }
+
+        return $parent;
     }
 
     /**
@@ -281,9 +332,44 @@ class MediaManager
     {
         $source = $this->helper->clearDblSlash($oldPath);
         $destination = $this->helper->clearDblSlash($newPath);
-        if ($this->getFilesystem()->fileExists($source) || $this->directoryExists($source)) {
+        if ($this->getFilesystem()->fileExists($source)) {
             $this->getFilesystem()->move($source, $destination);
+
+            return;
         }
+
+        if ($this->directoryExists($source)) {
+            $this->moveDirectory($source, $destination);
+        }
+    }
+
+    /**
+     * Moves a folder entry by entry: Flysystem moves files only (most adapters cannot rename a directory).
+     *
+     * @throws FilesystemException
+     */
+    protected function moveDirectory(string $source, string $destination): void
+    {
+        $source = trim($source, '/');
+        $destination = trim($destination, '/');
+        if ('' === $source || $source === $destination) {
+            return;
+        }
+
+        $filesystem = $this->getFilesystem();
+        $filesystem->createDirectory($destination);
+        /** @var list<StorageAttributes> $entries */
+        $entries = $filesystem->listContents($source, true)->toArray();
+        foreach ($entries as $entry) {
+            $target = $destination . substr(trim($entry->path(), '/'), strlen($source));
+            if ($entry->isDir()) {
+                $filesystem->createDirectory($target);
+            } else {
+                $filesystem->move($entry->path(), $target);
+            }
+        }
+
+        $filesystem->deleteDirectory($source);
     }
 
     private function createFromOembed(MediaInterface $entity, string $source): MediaInterface
