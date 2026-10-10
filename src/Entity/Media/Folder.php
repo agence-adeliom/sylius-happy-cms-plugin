@@ -21,7 +21,8 @@ class Folder implements FolderInterface
     #[ORM\Column(type: Types::STRING, length: 255)]
     protected ?string $name = null;
 
-    #[ORM\Column(length: 100)]
+    // Same length as the name it is derived from: a long file or folder name no longer overflows the slug.
+    #[ORM\Column(length: 255)]
     protected ?string $slug = null;
 
     #[ORM\ManyToOne(targetEntity: FolderInterface::class, inversedBy: 'children')]
