@@ -135,6 +135,14 @@ sylius_happy_cms:
 Leading and trailing `/` are removed (`/medias` and `medias` are the same). The routes are generated with `path()`, so templates and the media
 manager JavaScript follow it.
 
+### Allowed blocks of a resource that is not content-editable
+
+Fixed without option: `BlockCollection::getAllowedBlocks()` no longer asserts that the resource implements
+`ContentEditableInterface`. A `FlexibleContentField` on another resource used to fail (`AssertionError` with
+assertions enabled, `TypeError` in `BlockTypeInterface::supports()` otherwise); for such a resource, the block types
+given to `allowedBlocks()` now decide alone and `supports()` is not called, as for shared blocks. Content-editable
+resources and `null` are filtered as before.
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required

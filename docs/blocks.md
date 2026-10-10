@@ -312,6 +312,11 @@ public function supports(?ContentEditableInterface $resource = null): bool
 }
 ```
 
+`supports()` is only asked for resources that implement `ContentEditableInterface` (or with `null`). For any other
+resource edited with a `FlexibleContentField`, list the allowed blocks on the field with
+`FlexibleContentField::new('content')->allowedBlocks([TextBlockType::class, GalleryBlockType::class])` (all registered
+blocks are offered when the list is omitted).
+
 ## Assets Management
 
 ### Frontend Assets
