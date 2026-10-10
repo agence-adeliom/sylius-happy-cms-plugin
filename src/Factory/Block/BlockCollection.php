@@ -38,7 +38,7 @@ class BlockCollection
     }
 
     /**
-     * @return array<BlockTypeInterface>
+     * @return array<string, BlockTypeInterface>
      */
     public function getBlocks(): array
     {
@@ -46,9 +46,13 @@ class BlockCollection
     }
 
     /**
-     * @param BlockTypeInterface[] $blockTypes
+     * Blocks allowed in a flexible content field: the given block types (all blocks when empty), filtered by
+     * BlockTypeInterface::supports() when the resource is content-editable (or null). A resource that is not
+     * content-editable cannot be passed to supports(): the list of block types alone decides, as for shared blocks.
      *
-     * @return BlockTypeInterface[]
+     * @param array<class-string|string>|null $blockTypes block classes (keys of getBlocks())
+     *
+     * @return array<string, BlockTypeInterface>
      */
     public function getAllowedBlocks(?array $blockTypes, ?ResourceInterface $resource): array
     {
@@ -58,11 +62,17 @@ class BlockCollection
             $blockTypes = $blocks ? array_keys($blocks) : [];
         }
 
-        assert($resource instanceof ContentEditableInterface || null === $resource);
+        if (null !== $resource && !$resource instanceof ContentEditableInterface) {
+            return array_filter(
+                $blocks,
+                static fn (string $type) => in_array($type, $blockTypes, true),
+                \ARRAY_FILTER_USE_KEY,
+            );
+        }
 
         return array_filter(
             $blocks,
-            static fn (BlockTypeInterface $block, string $type) => in_array($type, $blockTypes) && $block->supports($resource),
+            static fn (BlockTypeInterface $block, string $type) => in_array($type, $blockTypes, true) && $block->supports($resource),
             \ARRAY_FILTER_USE_BOTH,
         );
     }
