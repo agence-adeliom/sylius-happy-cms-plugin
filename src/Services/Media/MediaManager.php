@@ -132,13 +132,19 @@ class MediaManager
 
     protected function getDirectoryCheck(): string
     {
-        if (!$this->parameters->has('sylius_happy_cms.media.directory_check')) {
-            return 'public_dir';
-        }
-
-        $check = $this->parameters->get('sylius_happy_cms.media.directory_check');
+        $check = $this->getMediaParameter('directory_check');
 
         return is_string($check) ? $check : 'public_dir';
+    }
+
+    /**
+     * A `sylius_happy_cms.media.*` option, null when the parameter is not defined.
+     */
+    protected function getMediaParameter(string $name): mixed
+    {
+        $parameter = 'sylius_happy_cms.media.' . $name;
+
+        return $this->parameters->has($parameter) ? $this->parameters->get($parameter) : null;
     }
 
     private function publicDirectoryExists(string $path): bool
@@ -541,6 +547,9 @@ class MediaManager
 
         $file_type = image_type_to_mime_type($type);
         $ext_only = MediaHelper::mime2ext($file_type) ?: pathinfo($original, \PATHINFO_EXTENSION);
+        if (true === $this->getMediaParameter('keep_original_extension') && '' !== pathinfo($original, \PATHINFO_EXTENSION)) {
+            $ext_only = pathinfo($original, \PATHINFO_EXTENSION);
+        }
 
         $final_name_slug = strtolower((new AsciiSlugger())->slug(strtolower((string) $name))->toString() . sprintf('.%s', $ext_only));
         $entity->setSlug($final_name_slug);
@@ -630,11 +639,15 @@ class MediaManager
             $name = $entity->getName() ?: pathinfo($orig_name, \PATHINFO_FILENAME);
             $ext_only = pathinfo($orig_name, \PATHINFO_EXTENSION);
 
-            // SECURITY: Use real MIME type from file content, NOT client-provided header
-            $realMimeType = $this->fileValidator->getRealMimeType($source);
-            $entity->setMime($realMimeType);
+            // SECURITY: the allowed types were checked on the real MIME type (file content) above. The MIME type
+            // stored on the media is the real one, or the client one with mime_type_source: client.
+            $mimeType = $this->fileValidator->getRealMimeType($source);
+            if ('client' === $this->getMediaParameter('mime_type_source') && '' !== $source->getClientMimeType()) {
+                $mimeType = $source->getClientMimeType();
+            }
+            $entity->setMime($mimeType);
 
-            if ($ext = MediaHelper::mime2ext($realMimeType)) {
+            if ($ext = MediaHelper::mime2ext($mimeType)) {
                 $ext_only = $ext;
             }
 
@@ -657,6 +670,11 @@ class MediaManager
             if (empty($entity->getName())) {
                 $entity->setName($source->getFilename());
             }
+        }
+
+        $originalExtension = pathinfo($orig_name, \PATHINFO_EXTENSION);
+        if (true === $this->getMediaParameter('keep_original_extension') && '' !== $originalExtension) {
+            $ext_only = $originalExtension;
         }
 
         $final_name_slug = strtolower((new AsciiSlugger())->slug(strtolower((string) $name))->toString() . sprintf('.%s', $ext_only));
