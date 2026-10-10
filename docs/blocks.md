@@ -312,6 +312,28 @@ public function supports(?ContentEditableInterface $resource = null): bool
 }
 ```
 
+`supports()` is only asked for resources that implement `ContentEditableInterface` (or with `null`). For any other
+resource edited with a `FlexibleContentField`, list the allowed blocks on the field instead (see below).
+
+## Flexible content field (blocks stored as JSON)
+
+`FlexibleContentField` edits a JSON column holding a list of blocks; each entry is
+`{"block_type": "<block class>", "block_published": "1", "position": 0, ...block fields}`.
+
+```php
+FlexibleContentField::new('content')
+    // block classes allowed in this field (all registered blocks when omitted)
+    ->allowedBlocks([TextBlockType::class, GalleryBlockType::class])
+    // render every field of a block in its prototype: a new block can be filled before the first save
+    // (by default a new block only holds its technical fields and is filled after saving)
+    ->completePrototypes()
+;
+```
+
+On save, the entries are sorted by the positions written by the admin script, stored as a JSON **list** (never as an
+object keyed by form names) and their `position` is renumbered `0`, `1`, `2`… Entries without a numeric position go
+after the others. A stored entry whose block type is not in the allowed list stays editable.
+
 ## Assets Management
 
 ### Frontend Assets
