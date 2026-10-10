@@ -7,6 +7,7 @@ namespace Adeliom\SyliusHappyCMSPlugin\Factory\Block;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
 use Adeliom\SyliusEasyCrudPlugin\Services\AssetRenderer;
 use Adeliom\SyliusHappyCMSPlugin\Event\Block\BlockRender;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
 use Twig\Error\LoaderError;
@@ -36,9 +37,13 @@ class Helper
         private EventDispatcherInterface $eventDispatcher,
         private readonly BlockCollection $collection,
         private readonly AssetRenderer $assetRenderer,
-        //private readonly FormFactoryInterface $formFactory,
-        //private readonly EntityManagerInterface $entityManager,
-        //private readonly RequestStack $requestStack
+        private readonly ?LoggerInterface $logger = null,
+        /** Merge the Twig context of the calling template into the block template context */
+        private readonly bool $inheritContext = false,
+        /** Render a block whose data has no `block_published` key (data written outside the block form) */
+        private readonly bool $missingPublishedMeansPublished = false,
+        /** Log a block that fails to render and skip it instead of failing the whole page */
+        private readonly bool $swallowRenderErrors = false,
     ) {
     }
 
@@ -85,8 +90,13 @@ class Helper
     }
 
     /**
+     * Renders a flex block stored as an array (`block_type`, `position`, `block_published` and the block fields).
+     *
+     * Returns null when the block is not published (unless in preview), when its type is unknown, or when it fails
+     * to render and `swallow_render_errors` is enabled.
+     *
      * @param array<string, mixed> $data
-     * @param array<string, mixed> $extra
+     * @param array<string, mixed> $extra variables added to the block template context
      *
      * @throws LoaderError
      * @throws RuntimeError
@@ -94,12 +104,65 @@ class Helper
      */
     public function renderBlock(array $data, bool $preview = false, array $extra = []): ?Markup
     {
-        $blockPublished = $data['block_published'] ?? null;
+        return $this->renderBlockInContext([], $data, $preview, $extra);
+    }
 
-        if (!$blockPublished && $preview === false) {
+    /**
+     * Same as renderBlock(), called by the `happy_cms_block_render()` Twig function with the context of the calling
+     * template. When `inherit_context` is enabled, the block template receives that context (`page`, `resource`,
+     * loop variables…), overridden by the block variables (`block`, `preview`, `blockType`, `settings`), themselves
+     * overridden by `$extra`.
+     *
+     * @param array<string, mixed> $context
+     * @param array<string, mixed> $data
+     * @param array<string, mixed> $extra
+     *
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     */
+    public function renderBlockInContext(array $context, array $data, bool $preview = false, array $extra = []): ?Markup
+    {
+        if (!$this->isPublished($data) && $preview === false) {
             return null;
         }
 
+        if (!$this->swallowRenderErrors) {
+            return $this->doRenderBlock($context, $data, $preview, $extra);
+        }
+
+        try {
+            return $this->doRenderBlock($context, $data, $preview, $extra);
+        } catch (\Throwable $exception) {
+            $this->logger?->error('Failed to render the block "{block_type}" at position "{position}". The block has been skipped.', [
+                'block_type' => $data['block_type'] ?? null,
+                'position' => $data['position'] ?? null,
+                'exception' => $exception,
+            ]);
+
+            return null;
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function isPublished(array $data): bool
+    {
+        if (!array_key_exists('block_published', $data)) {
+            return $this->missingPublishedMeansPublished;
+        }
+
+        return (bool) $data['block_published'];
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     * @param array<string, mixed> $data
+     * @param array<string, mixed> $extra
+     */
+    private function doRenderBlock(array $context, array $data, bool $preview, array $extra): ?Markup
+    {
         $blocks = $this->collection->getBlocks();
         /** @var string $blockType */
         $blockType = $data['block_type'] ?? '';
@@ -149,11 +212,15 @@ class Helper
             $this->stopTracing($stats['id'], $stats);
         }
 
-        return new Markup($this->twig->render($block->getFrontEndTemplatePath(), array_merge([
-                                                                                                 'block' => $data,
-                                                                                                 'preview' => $preview,
-                                                                                                 'blockType' => $blockType,
-                                                                                                 'settings' => $blockData,
-                                                                                             ], $extra)), 'UTF-8');
+        return new Markup($this->twig->render($block->getFrontEndTemplatePath(), array_merge(
+            $this->inheritContext ? $context : [],
+            [
+                'block' => $data,
+                'preview' => $preview,
+                'blockType' => $blockType,
+                'settings' => $blockData,
+            ],
+            $extra,
+        )), 'UTF-8');
     }
 }
