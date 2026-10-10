@@ -312,6 +312,25 @@ public function supports(?ContentEditableInterface $resource = null): bool
 }
 ```
 
+## Flexible content prototypes
+
+By default, a block added to a `FlexibleContentField` only holds its technical fields (`block_type`,
+`block_published`, `position`) and a "please save" notice: it is filled after the first save. With
+`completePrototypes()` (form option `complete_prototypes`), the prototype of each block holds all its fields, so a new
+block can be filled and saved in one go:
+
+```php
+FlexibleContentField::new('content')
+    ->completePrototypes()
+;
+```
+
+The admin script needs no change (it replaces the prototype placeholder and runs the inline scripts of the new
+block). Check in a browser the blocks whose fields need a JavaScript initialization (WYSIWYG, media, nested
+collections) before enabling it.
+
+A stored block whose type is not in the allowed list of the field is rendered under its class name.
+
 ## Assets Management
 
 ### Frontend Assets
