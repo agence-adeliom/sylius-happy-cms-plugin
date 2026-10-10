@@ -456,6 +456,10 @@ class MediaHelper
      * This method validates that the path corresponds to a real media in the database,
      * preventing path traversal attacks.
      *
+     * The path is made of the folder slugs and the media slug: the folders are resolved level by level,
+     * then the media by its slug in the last one (no full scan of the media table). When slugs are
+     * duplicated, the media with the lowest id wins.
+     *
      * @return MediaInterface|null Returns the media if found, null otherwise
      */
     public function getMediaByPath(string $path): ?MediaInterface
@@ -472,14 +476,36 @@ class MediaHelper
             return null;
         }
 
-        // Get all media and check their computed paths
-        // We need to iterate because the path is computed, not stored directly
-        try {
-            $allMedia = $mediaRepository->findAll();
+        $slugs = explode('/', $path);
+        $mediaSlug = array_pop($slugs);
 
-            foreach ($allMedia as $media) {
-                if ($media instanceof MediaInterface && $media->getPath() === $path) {
-                    return $media;
+        try {
+            $folders = [null];
+            if ([] !== $slugs) {
+                $folderRepository = $this->getFolderRepository();
+                if (null === $folderRepository) {
+                    return null;
+                }
+
+                foreach ($slugs as $slug) {
+                    $children = [];
+                    foreach ($folders as $parent) {
+                        foreach ($folderRepository->findBy(['parent' => $parent, 'slug' => $slug], ['id' => 'ASC']) as $folder) {
+                            $children[] = $folder;
+                        }
+                    }
+                    if ([] === $children) {
+                        return null;
+                    }
+                    $folders = $children;
+                }
+            }
+
+            foreach ($folders as $folder) {
+                foreach ($mediaRepository->findBy(['folder' => $folder, 'slug' => $mediaSlug], ['id' => 'ASC']) as $media) {
+                    if ($media instanceof MediaInterface && $media->getPath() === $path) {
+                        return $media;
+                    }
                 }
             }
         } catch (\Exception $e) {
