@@ -12,6 +12,11 @@ services:
   sylius.happy_cms.block_collection:
     alias: Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockCollection
 
+  Adeliom\SyliusHappyCMSPlugin\Form\Block\BlockCollectionType:
+    arguments:
+      $saveAsList: '%sylius_happy_cms.flexible_content.save_as_list%'
+    tags: [ 'form.type' ]
+
   Adeliom\SyliusHappyCMSPlugin\Admin\Field\Configurator\FlexibleContentConfigurator:
     public: true
     arguments:
