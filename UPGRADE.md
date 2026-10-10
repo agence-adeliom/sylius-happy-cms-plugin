@@ -377,6 +377,16 @@ Bug fix, no option: `happy_cms_media()` of an oEmbed media rendered an empty blo
 the template reads as `options.html` / `options.ratio`). The code array is now passed to the template (`html`,
 `width`, `height`, `ratio`), as EasyMedia did; a string `code` (older imports) is passed as `html` too.
 
+### New option: complete prototypes in the flexible content field
+
+`FlexibleContentField::completePrototypes()` (form option `complete_prototypes` of `BlockCollectionType`, default
+`false`) renders all the fields of a block in its prototype, so a new block can be filled before the first save. The
+default prototypes are unchanged (technical fields and a "please save" notice).
+
+Fixed without option: the flexible content form theme no longer fails ("Impossible to access an attribute "name" on a
+null variable") on a stored block whose type is not in the allowed list of the field; the block is rendered under its
+class name.
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required
