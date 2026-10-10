@@ -7,7 +7,6 @@ namespace Adeliom\SyliusHappyCMSPlugin\Services\Media;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Media\FolderInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Media\Media;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Media\MediaInterface;
-use Adeliom\SyliusHappyCMSPlugin\Repository\Media\MediaRepositoryInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Psr\Container\ContainerExceptionInterface;
@@ -53,13 +52,22 @@ class MediaHelper
         return $mediaClass;
     }
 
-    public function getMediaRepository(): ?MediaRepositoryInterface
+    /**
+     * The Doctrine repository of the media entity, whatever its class: the plugin MediaRepository, a
+     * repository implementing MediaRepositoryInterface, or any EntityRepository / ServiceEntityRepository
+     * of the application. The media manager only calls the Doctrine methods (find, findBy, findOneBy,
+     * createQueryBuilder).
+     *
+     * @return EntityRepository<MediaInterface>|null null when the configured class is not a media entity
+     */
+    public function getMediaRepository(): ?EntityRepository
     {
         $class = $this->getMediaClassName();
         if (class_exists($class) && in_array(MediaInterface::class, class_implements($class))) {
-            $repo = $this->em->getRepository($class);
+            /** @var EntityRepository<MediaInterface> $repository */
+            $repository = $this->em->getRepository($class);
 
-            return $repo instanceof MediaRepositoryInterface ? $repo : null;
+            return $repository;
         }
 
         return null;
