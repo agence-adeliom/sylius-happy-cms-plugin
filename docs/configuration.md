@@ -15,6 +15,12 @@ sylius_happy_cms:
     # Optional: custom system prompt for AI content generation (learn more in docs/AI_CONTENT_GENERATION.md)
     ai_generate_content_prompt: null  
 
+  # Optional: rendering of blocks stored as JSON by happy_cms_block_render() (see docs/blocks.md)
+  block_render:
+    inherit_context: false
+    missing_published_means_published: false
+    swallow_render_errors: false
+
   seo:
     title:
       suffix: ACME
