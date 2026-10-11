@@ -30,6 +30,7 @@ services:
       - !tagged_iterator sylius_happy_cms.route_parent_path_resolver
       - '%sylius_happy_cms.routing.index_on_flush%'
       - '%sylius_happy_cms.routing.child_routes_prefix_boundary%'
+      - '%sylius_happy_cms.routing.rewrite_child_routes%'
     # postPersist + postUpdate (legacy); onFlush + postPersist with "sylius_happy_cms.routing.index_on_flush: true",
     # set by SyliusHappyCMSExtension
     tags:

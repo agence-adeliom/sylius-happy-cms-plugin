@@ -254,6 +254,19 @@ also applies to `rewriteStaticPrefix()`.
 
 In 3.0 the option is removed and the `/` boundary is the only behaviour.
 
+### New option: disable the rewriting of the routes below a renamed path
+
+```yaml
+sylius_happy_cms:
+    routing:
+        rewrite_child_routes: false # default: true, the current behaviour
+```
+
+`false` disables the automatic move of the routes below a renamed path, for projects where two contents of different
+types can have the same slug (their children share the prefix). The project then recomputes the children itself
+(`index()` or an explicit `rewriteStaticPrefix()`, still available). `EntityRouteIndexer` takes a new optional
+constructor argument, `$rewriteChildRoutes` (default `true`).
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required
