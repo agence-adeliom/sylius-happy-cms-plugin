@@ -36,7 +36,7 @@ abstract class RouteIndexerTestCase extends TestCase
 
     protected EventDispatcher $dispatcher;
 
-    private EntityRouteIndexer $indexer;
+    private ?EntityRouteIndexer $indexer = null;
 
     /** @var array<int|string, mixed> */
     private array $indexerArguments = [];
@@ -93,6 +93,10 @@ abstract class RouteIndexerTestCase extends TestCase
             ...$extraArguments,
         );
 
+        // one indexer at a time, like the service
+        if (null !== $this->indexer) {
+            $this->entityManager->getEventManager()->removeEventListener(self::listenedEvents(true === ($this->indexerArguments['indexOnFlush'] ?? false)), $this->indexer);
+        }
         $this->entityManager->getEventManager()->addEventListener(self::listenedEvents(true === ($extraArguments['indexOnFlush'] ?? false)), $indexer);
         $this->indexer = $indexer;
         $this->indexerArguments = $extraArguments;
@@ -107,7 +111,6 @@ abstract class RouteIndexerTestCase extends TestCase
     protected function restartProcess(): EntityRouteIndexer
     {
         $this->entityManager->clear();
-        $this->entityManager->getEventManager()->removeEventListener(self::listenedEvents(true === ($this->indexerArguments['indexOnFlush'] ?? false)), $this->indexer);
 
         return $this->registerIndexer($this->indexerArguments);
     }
