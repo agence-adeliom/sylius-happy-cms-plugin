@@ -34,6 +34,14 @@ services:
           priority: 500
           connection: 'default'
 
+  # Plugin models are Sylius resources: ORMMappedSuperClassSubscriber (priority 8192) removes their to-many
+  # associations from the mapped superclass, this listener restores their declaring class so that entities
+  # inheriting from a project entity (single table / joined inheritance) do not declare them twice.
+  sylius.happy_cms.doctrine.listener.mapped_superclass_association_declaring_class:
+    class: Adeliom\SyliusHappyCMSPlugin\EventListener\Doctrine\MappedSuperclassAssociationDeclaringClassListener
+    tags:
+      - { name: 'doctrine.event_listener', event: 'loadClassMetadata', priority: -100 }
+
   Adeliom\SyliusHappyCMSPlugin\Services\Cmf\RouteRenderService:
     alias: sylius.happy_cms.plugin.services.render
     public: true
