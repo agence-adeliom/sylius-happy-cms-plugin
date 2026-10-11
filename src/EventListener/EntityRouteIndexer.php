@@ -85,6 +85,19 @@ class EntityRouteIndexer
         }
     }
 
+    /**
+     * Computes (creates or updates) the routes of an entity outside of a flush, e.g. to index existing entities
+     * (happycms:routes:index). The routes are persisted, not flushed: flush the entity manager afterwards. The routes
+     * below its previous path are not rewritten.
+     */
+    public function index(CmsRoutableInterface $entity): void
+    {
+        /** @var array<string, string> $routesChanges */
+        $routesChanges = [];
+
+        $this->computeRoutes($routesChanges, $entity, self::ROUTE_ONLINE, $this->manager);
+    }
+
     protected function manageRoutes(CmsRoutableInterface $entity, ObjectManager $objectManager): void
     {
         /** @var array<string, string> $routesChanges */
