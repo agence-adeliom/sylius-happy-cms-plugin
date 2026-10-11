@@ -28,6 +28,7 @@ use Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuItemInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Page\PageInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\SharedBlock\SharedBlockInterface;
+use Adeliom\SyliusHappyCMSPlugin\EventListener\Menu\MenuCreationListener;
 use Adeliom\SyliusHappyCMSPlugin\Repository\Cmf\RedirectRouteRepositoryInterface;
 use Adeliom\SyliusHappyCMSPlugin\Repository\Cmf\RouteRepository;
 use Adeliom\SyliusHappyCMSPlugin\Repository\Cmf\RouteRepositoryInterface;
@@ -296,6 +297,20 @@ class Configuration implements ConfigurationInterface
             ->children()
             ->booleanNode('enabled')->defaultFalse()->end()
             ->integerNode('ttl')->defaultValue(300)->end()
+            ->end()
+            ->end()
+            ->arrayNode('root_item')
+            ->addDefaultsIfNotSet()
+            ->children()
+            ->booleanNode('auto_create')
+            ->info('Create the root item of every new menu (MenuCreationListener). Disable it when the project creates the root item itself.')
+            ->defaultTrue()
+            ->end()
+            ->scalarNode('label')
+            ->info('Name of the root item, translated in each available locale (messages domain); a text that is not a translation key is used as is.')
+            ->defaultValue(MenuCreationListener::DEFAULT_ROOT_ITEM_LABEL)
+            ->cannotBeEmpty()
+            ->end()
             ->end()
             ->end()
             ->end()

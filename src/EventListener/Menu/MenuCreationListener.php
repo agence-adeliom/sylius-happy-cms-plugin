@@ -18,10 +18,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class MenuCreationListener
 {
+    public const DEFAULT_ROOT_ITEM_LABEL = 'sylius_happy_cms.menu_item.admin.data.menu_item_root';
+
+    /**
+     * @param string $rootItemLabel translated in each available locale; a text that is not a translation key is kept as is
+     */
     public function __construct(
         protected LocaleProviderInterface $localeProvider,
         protected TranslatorInterface $translator,
         protected ParameterBagInterface $parameterBag,
+        protected string $rootItemLabel = self::DEFAULT_ROOT_ITEM_LABEL,
     ) {
     }
 
@@ -59,7 +65,7 @@ class MenuCreationListener
             if ($translation instanceof MenuItemTranslationInterface) {
                 $translation->setLocale($locale);
                 $translation->setName(
-                    $this->translator->trans('sylius_happy_cms.menu_item.admin.data.menu_item_root', locale: $locale),
+                    $this->translator->trans($this->rootItemLabel, locale: $locale),
                 );
                 $rootItem->addTranslation($translation);
             }

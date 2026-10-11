@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\DependencyInjection;
 
+use Adeliom\SyliusHappyCMSPlugin\EventListener\Menu\MenuCreationListener;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockTypeInterface;
 use Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock\SharedBlockTypeInterface;
 use Adeliom\SyliusHappyCMSPlugin\Services\Seo\Sitemap\SitemapDumperInterface;
@@ -52,6 +53,10 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
 
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__ . '/../../config/media'));
         $loader->load('services.php');
+
+        if (false === $container->getParameter('sylius_happy_cms.menu.root_item.auto_create')) {
+            $container->getDefinition(MenuCreationListener::class)->clearTag('doctrine.orm.entity_listener');
+        }
     }
 
     /**
