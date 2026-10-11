@@ -16,6 +16,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -123,7 +124,7 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
 
         if (true === $config['trailing_slash']) {
             $container->register(TrailingSlashRedirectListener::class, TrailingSlashRedirectListener::class)
-                ->setArguments([new Reference('cmf_routing.dynamic_router')])
+                ->setArguments([new Reference('cmf_routing.dynamic_router'), new Reference('cmf_routing.orm_content_repository', ContainerInterface::NULL_ON_INVALID_REFERENCE)])
                 ->addTag('kernel.event_listener', ['event' => 'kernel.exception', 'priority' => TrailingSlashRedirectListener::PRIORITY])
             ;
         }
