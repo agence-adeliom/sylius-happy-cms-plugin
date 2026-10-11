@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Tests\Adeliom\SyliusHappyCMSPlugin\Unit\EventListener;
 
 use Adeliom\SyliusHappyCMSPlugin\Event\Route\CalculateRouteStaticPrefixEvent;
+use Gedmo\Mapping\Driver\AttributeReader;
+use Gedmo\Sluggable\SluggableListener;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\EventListener\Fixtures\Routing\CategoryPathResolver;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\EventListener\Fixtures\Routing\IndexedPage;
@@ -219,5 +221,31 @@ final class EntityRouteIndexerTest extends RouteIndexerTestCase
         $this->entityManager->flush();
 
         self::assertSame(['/entry-doors/wooden', '/contact'], array_values($this->storedPrefixes()));
+    }
+
+    public function testAnEntityCreatedWithoutSlugGetsARouteWithTheSlugGeneratedInTheSameFlush(): void
+    {
+        $this->registerIndexerAndSluggableListenerInServiceOrder();
+
+        $page = new IndexedPage(null, name: 'About us');
+        $this->entityManager->persist($page);
+        $this->entityManager->flush();
+
+        self::assertSame('about-us', $page->getTranslation()->getSlug());
+        self::assertSame(['/en_US/about-us'], array_values($this->storedPrefixes()));
+    }
+
+    public function testWithoutIndexOnFlushAnEntityCreatedWithoutSlugGetsARouteWithTheGeneratedSlug(): void
+    {
+        $sluggable = new SluggableListener();
+        $sluggable->setAnnotationReader(new AttributeReader());
+        $this->entityManager->getEventManager()->addEventSubscriber($sluggable);
+        $this->registerIndexer();
+
+        $page = new IndexedPage(null, name: 'About us');
+        $this->entityManager->persist($page);
+        $this->entityManager->flush();
+
+        self::assertSame(['/en_US/about-us'], array_values($this->storedPrefixes()), 'Legacy listener: postPersist runs after the slug is generated.');
     }
 }
