@@ -93,6 +93,40 @@ final class RoutingConfigurationTest extends TestCase
         self::assertSame([], self::deprecationsOf('collapse_slashes', $deprecations));
     }
 
+    public function testTheIndexerListensToPostPersistAndPostUpdateAndIsDeprecatedByDefault(): void
+    {
+        [$container, $deprecations] = $this->loadCollectingDeprecations([]);
+
+        self::assertFalse($container->getParameter('sylius_happy_cms.routing.index_on_flush'));
+        self::assertSame('%sylius_happy_cms.routing.index_on_flush%', $container->getDefinition(self::INDEXER)->getArgument(8));
+        self::assertSame([
+            ['event' => 'postPersist', 'priority' => 500, 'connection' => 'default'],
+            ['event' => 'postUpdate', 'priority' => 500, 'connection' => 'default'],
+        ], $container->getDefinition(self::INDEXER)->getTag('doctrine.event_listener'));
+        self::assertContains('Since agence-adeliom/sylius-happy-cms-plugin 2.3.3: Not setting the "sylius_happy_cms.routing.index_on_flush" option is deprecated. It will be removed in 3.0, where computing the CMS routes within the flush that saves the entity is the only behaviour. Set it to true to opt in now (see UPGRADE.md).', $deprecations);
+    }
+
+    public function testDisablingIndexOnFlushExplicitlyIsDeprecated(): void
+    {
+        [$container, $deprecations] = $this->loadCollectingDeprecations(['routing' => ['index_on_flush' => false]]);
+
+        self::assertFalse($container->getParameter('sylius_happy_cms.routing.index_on_flush'));
+        self::assertSame(['postPersist', 'postUpdate'], array_column($container->getDefinition(self::INDEXER)->getTag('doctrine.event_listener'), 'event'));
+        self::assertContains('Since agence-adeliom/sylius-happy-cms-plugin 2.3.3: Setting the "sylius_happy_cms.routing.index_on_flush" option to false is deprecated. It will be removed in 3.0, where computing the CMS routes within the flush that saves the entity is the only behaviour. Set it to true to opt in now (see UPGRADE.md).', $deprecations);
+    }
+
+    public function testIndexOnFlushListensToOnFlushAfterTheSlugListeners(): void
+    {
+        [$container, $deprecations] = $this->loadCollectingDeprecations(['routing' => ['index_on_flush' => true]]);
+
+        self::assertTrue($container->getParameter('sylius_happy_cms.routing.index_on_flush'));
+        self::assertSame([
+            ['event' => 'onFlush', 'priority' => -100, 'connection' => 'default'],
+            ['event' => 'postPersist', 'priority' => 500, 'connection' => 'default'],
+        ], $container->getDefinition(self::INDEXER)->getTag('doctrine.event_listener'));
+        self::assertSame([], self::deprecationsOf('index_on_flush', $deprecations));
+    }
+
     /**
      * @param array<string, mixed> $projectConfig
      *

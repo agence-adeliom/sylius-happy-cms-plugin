@@ -39,11 +39,11 @@ class IndexedPage implements CmsRoutableInterface, TranslatableInterface
     #[ORM\Column]
     public bool $isHomePage = false;
 
-    public function __construct(string $slug, string $locale = 'en_US')
+    public function __construct(?string $slug, string $locale = 'en_US', string $name = 'Page')
     {
         $this->initializeRoutes();
         $this->translations = new ArrayCollection();
-        $this->addTranslation(new IndexedPageTranslation($locale, $slug));
+        $this->addTranslation(new IndexedPageTranslation($locale, $slug, $name));
     }
 
     public function getId(): ?int

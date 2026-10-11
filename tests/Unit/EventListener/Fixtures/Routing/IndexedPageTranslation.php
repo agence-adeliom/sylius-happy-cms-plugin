@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Adeliom\SyliusHappyCMSPlugin\Unit\EventListener\Fixtures\Routing;
 
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Sylius\Resource\Model\TranslatableInterface;
 use Sylius\Resource\Model\TranslationInterface;
 
@@ -23,8 +24,10 @@ class IndexedPageTranslation implements TranslationInterface
     public function __construct(
         #[ORM\Column]
         private ?string $locale,
-        #[ORM\Column]
-        private string $slug,
+        // generated from the name when left empty, if Gedmo's sluggable listener is registered
+        #[ORM\Column(nullable: true)]
+        #[Gedmo\Slug(fields: ['name'])]
+        private ?string $slug,
         #[ORM\Column]
         private string $name = 'Page',
     ) {
@@ -53,12 +56,12 @@ class IndexedPageTranslation implements TranslationInterface
         $this->locale = $locale;
     }
 
-    public function getSlug(): string
+    public function getSlug(): ?string
     {
         return $this->slug;
     }
 
-    public function setSlug(string $slug): void
+    public function setSlug(?string $slug): void
     {
         $this->slug = $slug;
     }
