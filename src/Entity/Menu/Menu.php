@@ -35,8 +35,13 @@ class Menu implements MenuInterface
     #[ORM\Column(name: 'name', type: Types::STRING, length: 255, nullable: true)]
     protected ?string $name = null;
 
+    /**
+     * `SET NULL`, not `CASCADE`: the root item also references the menu (`MenuItem#menu`), and a cascading key on both
+     * sides is a cycle the unit of work cannot order when the menu is removed with its items. Deleting the root item
+     * leaves the menu without root instead of deleting it.
+     */
     #[ORM\ManyToOne(targetEntity: MenuItemInterface::class, cascade: ['persist', 'detach'])]
-    #[ORM\JoinColumn(name: 'root_item_id', nullable: true, onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(name: 'root_item_id', nullable: true, onDelete: 'SET NULL')]
     protected ?MenuItemInterface $rootItem = null;
 
     /**
