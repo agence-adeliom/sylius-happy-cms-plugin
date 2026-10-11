@@ -16,7 +16,8 @@ sylius_happy_cms:
 Changing them does not rewrite the stored routes: re-save the routable entities (or re-index them) afterwards.
 
 With `trailing_slash: true`, the path without the final slash is redirected (301) to the CMS route only when its
-content is online (`CmsRoutableInterface::isOnline()`); otherwise it answers 404, like the route itself.
+content is online (`CmsRoutableInterface::isOnline()`, content loaded from the `_content_id` of the route when the
+dynamic router has no content enhancer); otherwise it answers 404, like the route itself.
 
 New extension point: `Adeliom\SyliusHappyCMSPlugin\Services\Cmf\RouteParentPathResolverInterface` (autoconfigured),
 fills `{{other_entity_path}}` before `CalculateRouteStaticPrefixEvent` is dispatched.
