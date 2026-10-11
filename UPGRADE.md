@@ -50,5 +50,7 @@ New option `sylius_happy_cms.routing.rewrite_child_routes` (default `true`, curr
 the automatic move of the routes below a renamed path, for projects where two contents of different types can have
 the same slug (their children share the prefix). The indexer takes it as an eighth optional constructor argument.
 
-New command `happycms:routes:index` (`--class`, `--batch-size`, `--dry-run`) to index existing entities.
+New command `happycms:routes:index` (`--class`, `--batch-size`, `--dry-run`, `--save-entities`) to index existing
+entities. It writes the route tables only and does not save the entities (no `updated_at` change, no update
+listener); `--save-entities` saves them as well.
 

@@ -311,6 +311,12 @@ php bin/console happycms:routes:index                # every mapped routable ent
 php bin/console happycms:routes:index --class='App\Entity\HappyCMS\Page\Page' --batch-size=200
 ```
 
+Only the route tables are written (the routes and the join rows to the new routes): the entities are **not saved**.
+Saving them would change their `updated_at` (and the `lastmod` of the sitemap) and run their update listeners
+(search index, cache invalidation, audit…) for every entity of the site, at deployment time, while only their routes
+change. If your listeners derive data from the routes (a search index storing the URL, for instance), add
+`--save-entities` to save the entities as well (one update per entity, listeners included).
+
 ### Parent of another type changed
 
 When a route depends on a parent that is not a CMS route (see [parent path resolvers](#parent-path-resolvers)),

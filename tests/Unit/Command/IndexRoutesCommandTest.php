@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Tests\Adeliom\SyliusHappyCMSPlugin\Unit\Command;
 
 use Adeliom\SyliusHappyCMSPlugin\Command\IndexRoutesCommand;
+use Doctrine\ORM\Event\PostUpdateEventArgs;
+use Doctrine\ORM\Events;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -44,6 +46,45 @@ final class IndexRoutesCommandTest extends RouteIndexerTestCase
         self::assertSame(['/about/'], array_values($this->storedPrefixes()));
     }
 
+    public function testOnlyTheRoutesAreWrittenTheEntitiesAreNotSaved(): void
+    {
+        $about = $this->savePage('about');
+        $contact = $this->savePage('contact');
+        $updated = $this->spyUpdates();
+
+        $tester = $this->command();
+        $tester->execute(['--batch-size' => '1']);
+        // second run: existing routes updated, links unchanged
+        $this->command(['{{other_entity_path}}{{current_entity_path}}', true])->execute([]);
+
+        $tester->assertCommandIsSuccessful();
+        self::assertNotContains(IndexedPage::class, $updated->classes, 'No update of the entities: their listeners (timestamps, search index, sitemap) do not run.');
+        self::assertSame(['/about/', '/contact/'], array_values($this->storedPrefixes()));
+        $this->entityManager->clear();
+        foreach ([$about->getId() => '/about/', $contact->getId() => '/contact/'] as $id => $path) {
+            $page = $this->entityManager->find(IndexedPage::class, $id);
+            self::assertInstanceOf(IndexedPage::class, $page);
+            self::assertCount(1, $page->getRoutes(), 'The entity is linked to its route.');
+            self::assertSame($path, $page->getRoutes()->first()->getStaticPrefix());
+        }
+    }
+
+    public function testTheEntitiesCanBeSavedOnRequest(): void
+    {
+        $about = $this->savePage('about');
+        $updated = $this->spyUpdates();
+
+        $tester = $this->command();
+        $tester->execute(['--save-entities' => true]);
+
+        $tester->assertCommandIsSuccessful();
+        self::assertContains(IndexedPage::class, $updated->classes);
+        $this->entityManager->clear();
+        $page = $this->entityManager->find(IndexedPage::class, $about->getId());
+        self::assertInstanceOf(IndexedPage::class, $page);
+        self::assertCount(1, $page->getRoutes());
+    }
+
     public function testADryRunListsTheRoutesWithoutSavingThem(): void
     {
         $this->savePage('about');
@@ -61,6 +102,22 @@ final class IndexRoutesCommandTest extends RouteIndexerTestCase
         $tester = $this->command();
 
         self::assertSame(Command::INVALID, $tester->execute(['--class' => [IndexedPageTranslation::class]]));
+    }
+
+    private function spyUpdates(): object
+    {
+        $spy = new class() {
+            /** @var list<class-string> */
+            public array $classes = [];
+
+            public function postUpdate(PostUpdateEventArgs $event): void
+            {
+                $this->classes[] = $event->getObject()::class;
+            }
+        };
+        $this->entityManager->getEventManager()->addEventListener([Events::postUpdate], $spy);
+
+        return $spy;
     }
 
     /**
