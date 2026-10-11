@@ -145,7 +145,12 @@ sylius_happy_cms:
 
 Routes then end with `/` (`/about/team/`; the variable pattern gets the slash when the route has one), and a `GET`/
 `HEAD` request for the same path without the slash, which ends in a 404, is redirected (301, query string kept) when
-the CMS router matches the path with the slash (`TrailingSlashRedirectListener`).
+the CMS router matches the path with the slash (`TrailingSlashRedirectListener`) and the content of that route is
+online (`CmsRoutableInterface::isOnline()`, the check `RouteRenderService` makes before rendering). The route of an
+unpublished content, or of a content outside of its publication dates, stays in the database and answers 404: the
+path without the slash answers 404 as well, instead of a 301 to a 404 that would disclose the URL of the unpublished
+content and be cached as permanent by browsers and search engines. A route without a `CmsRoutableInterface` content
+(e.g. a redirect route) is redirected as soon as it matches.
 
 Existing routes are not rewritten when the option changes: re-save the entities, or re-index them.
 
