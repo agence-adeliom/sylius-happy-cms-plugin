@@ -7,6 +7,7 @@ namespace Tests\Adeliom\SyliusHappyCMSPlugin\Unit\EventListener;
 use Adeliom\SyliusHappyCMSPlugin\EventListener\TrailingSlashRedirectListener;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use PHPUnit\Framework\TestCase;
+use Symfony\Cmf\Component\Routing\ContentRepositoryInterface;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -55,6 +56,20 @@ final class TrailingSlashRedirectListenerTest extends TestCase
         self::assertNull($preview->getResponse());
     }
 
+    public function testTheContentIsLoadedFromItsIdWhenNoEnhancerAddedIt(): void
+    {
+        // a project whose dynamic router has no ContentRepositoryEnhancer: the match only holds "_content_id"
+        $unpublished = $this->notFound(Request::create('/about/team'));
+        $published = $this->notFound(Request::create('/about/team'));
+
+        $this->listenerWithContentId($this->content(online: false))->onKernelException($unpublished);
+        $this->listenerWithContentId($this->content(online: true))->onKernelException($published);
+
+        self::assertNull($unpublished->getResponse());
+        self::assertInstanceOf(RedirectResponse::class, $published->getResponse());
+        self::assertSame('/about/team/', $published->getResponse()->getTargetUrl());
+    }
+
     public function testNothingHappensWhenThePathWithASlashIsNotACmsRouteEither(): void
     {
         $event = $this->notFound(Request::create('/unknown'));
@@ -98,6 +113,16 @@ final class TrailingSlashRedirectListenerTest extends TestCase
         });
 
         return new TrailingSlashRedirectListener($router);
+    }
+
+    private function listenerWithContentId(CmsRoutableInterface $content): TrailingSlashRedirectListener
+    {
+        $router = $this->createStub(RequestMatcherInterface::class);
+        $router->method('matchRequest')->willReturn(['_route' => 'cms_about_team', RouteObjectInterface::CONTENT_ID => 'App\Entity\Page:12']);
+        $contentRepository = $this->createMock(ContentRepositoryInterface::class);
+        $contentRepository->expects(self::once())->method('findById')->with('App\Entity\Page:12')->willReturn($content);
+
+        return new TrailingSlashRedirectListener($router, $contentRepository);
     }
 
     private function content(bool $online): CmsRoutableInterface
