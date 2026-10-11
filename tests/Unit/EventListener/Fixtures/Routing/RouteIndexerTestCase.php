@@ -18,11 +18,14 @@ use Doctrine\ORM\Tools\ResolveTargetEntityListener;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
+use Gedmo\Mapping\Driver\AttributeReader;
+use Gedmo\Sluggable\SluggableListener;
 use PHPUnit\Framework\TestCase;
 use Sylius\Component\Channel\Model\ChannelInterface;
 use Symfony\Cmf\Bundle\RoutingBundle\Doctrine\Orm\ContentRepository;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Runs EntityRouteIndexer against a real Doctrine unit of work (SQLite in memory).
@@ -86,6 +89,36 @@ abstract class RouteIndexerTestCase extends TestCase
         );
 
         $this->entityManager->getEventManager()->addEventListener(self::listenedEvents(), $indexer);
+
+        return $indexer;
+    }
+
+    /**
+     * Registers the indexer and Gedmo's sluggable listener in the order Symfony gives them for onFlush: the priority
+     * of the indexer's onFlush tag in config/services.yaml against the one of stof_doctrine_extensions (none, so 0).
+     */
+    protected function registerIndexerAndSluggableListenerInServiceOrder(): EntityRouteIndexer
+    {
+        $sluggable = new SluggableListener();
+        $sluggable->setAnnotationReader(new AttributeReader());
+
+        /** @var array{services: array<string, array{tags: array<int, array{event?: string, priority?: int}>}>} $services */
+        $services = Yaml::parseFile(dirname(__DIR__, 5) . '/config/services.yaml', Yaml::PARSE_CUSTOM_TAGS);
+        $indexerPriority = 0;
+        foreach ($services['services']['sylius.happy_cms.plugin.listener.entity_route_indexer']['tags'] as $tag) {
+            if ('onFlush' === ($tag['event'] ?? null)) {
+                $indexerPriority = $tag['priority'] ?? 0;
+            }
+        }
+
+        // highest priority first; same priority: registration order (the plugin's services come first)
+        if ($indexerPriority < 0) {
+            $this->entityManager->getEventManager()->addEventSubscriber($sluggable);
+
+            return $this->registerIndexer();
+        }
+        $indexer = $this->registerIndexer();
+        $this->entityManager->getEventManager()->addEventSubscriber($sluggable);
 
         return $indexer;
     }

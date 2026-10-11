@@ -191,4 +191,16 @@ final class EntityRouteIndexerTest extends RouteIndexerTestCase
 
         self::assertSame(['/portail/porte-bois', '/portes-d-entree'], array_values($this->storedPrefixes()));
     }
+
+    public function testAnEntityCreatedWithoutSlugGetsARouteWithTheSlugGeneratedInTheSameFlush(): void
+    {
+        $this->registerIndexerAndSluggableListenerInServiceOrder();
+
+        $page = new IndexedPage(null, name: 'About us');
+        $this->entityManager->persist($page);
+        $this->entityManager->flush();
+
+        self::assertSame('about-us', $page->getTranslation()->getSlug());
+        self::assertSame(['/en_US/about-us'], array_values($this->storedPrefixes()));
+    }
 }

@@ -29,9 +29,10 @@ services:
       - !tagged_iterator sylius_happy_cms.route_parent_path_resolver
       - '%sylius_happy_cms.routing.rewrite_child_routes%'
     tags:
+      # after the onFlush listeners that compute the fields of the path (Gedmo sluggable: 0, translatable: -10)
       -   name: 'doctrine.event_listener'
           event: 'onFlush'
-          priority: 500
+          priority: -100
           connection: 'default'
       -   name: 'doctrine.event_listener'
           event: 'postPersist'

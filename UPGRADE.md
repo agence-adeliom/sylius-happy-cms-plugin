@@ -37,9 +37,14 @@ service, update its tags:
 
 ```yaml
 tags:
-    - { name: 'doctrine.event_listener', event: 'onFlush', priority: 500, connection: 'default' }
+    - { name: 'doctrine.event_listener', event: 'onFlush', priority: -100, connection: 'default' }
     - { name: 'doctrine.event_listener', event: 'postPersist', priority: 500, connection: 'default' }
 ```
+
+The `onFlush` priority (-100) places the indexer after the listeners that fill the fields of the path, such as
+Gedmo's sluggable listener (0) and translatable listener (-10): an entity created without a slug gets a route with
+its generated slug (it got a route `/` or `/<locale>/` before). Keep your own `onFlush` listeners that change a slug
+or a parent above -100.
 
 `postUpdate()` is kept as a no-op. New public methods: `onFlush()`, `index()` and `rewriteStaticPrefix()`.
 
