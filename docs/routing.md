@@ -62,6 +62,24 @@ When you save a routable entity (Page, BlogPost, etc.), the plugin automatically
 Routes are computed by `EntityRouteIndexer` during the flush that saves the entity (Doctrine `onFlush`), and written
 by that same flush: no second flush, one transaction.
 
+#### Disabling the rewriting of child routes
+
+Step 3 assumes that a path identifies a single parent. It does not when two contents of different types share a
+slug at the same level: a page `/pergolas` and a category (or taxon, or routable entity of another class) `pergolas`
+whose children are placed under it by a [parent path resolver](#parent-path-resolvers) (`/pergolas/bioclimatic`).
+Renaming the page to `/pergolas-and-verandas` would also move `/pergolas/bioclimatic`, a child of the category,
+and the children of both contents would be mixed. In that case, disable the rewriting and recompute the routes of the
+children yourself when a parent changes (`index()` or `rewriteStaticPrefix()`, see
+[parent of another type changed](#parent-of-another-type-changed)):
+
+```yaml
+sylius_happy_cms:
+    routing:
+        rewrite_child_routes: false # default: true
+```
+
+Only the automatic rewriting is disabled: an explicit `rewriteStaticPrefix()` call still moves the routes.
+
 ### URL Structure
 
 URLs follow this pattern:

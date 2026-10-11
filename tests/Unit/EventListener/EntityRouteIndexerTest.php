@@ -155,6 +155,31 @@ final class EntityRouteIndexerTest extends RouteIndexerTestCase
         self::assertSame(['/portail/', '/portes-d-entree/', '/portail/porte-bois/'], array_values($this->storedPrefixes()));
     }
 
+    public function testTheRewritingOfTheRoutesBelowARenamedPathCanBeDisabled(): void
+    {
+        // a page "porte" and a category "porte" (another type, same slug): "/porte/porte-bois" is a child of the
+        // category, not of the page; renaming the page must not move it
+        $this->registerIndexer(['{{other_entity_path}}{{current_entity_path}}', false, [new CategoryPathResolver()], false]);
+        $door = $this->savePage('porte');
+        $this->savePage('porte-bois', category: 'porte');
+
+        $door->getTranslation()->setSlug('portail');
+        $this->entityManager->flush();
+
+        self::assertSame(['/portail', '/porte/porte-bois'], array_values($this->storedPrefixes()));
+    }
+
+    public function testTheRoutesBelowAPathCanStillBeMovedExplicitlyWhenTheRewritingIsDisabled(): void
+    {
+        $indexer = $this->registerIndexer(['{{other_entity_path}}{{current_entity_path}}', false, [new CategoryPathResolver()], false]);
+        $this->savePage('porte-bois', category: 'porte');
+
+        $indexer->rewriteStaticPrefix('/porte', '/portail');
+        $this->entityManager->flush();
+
+        self::assertSame(['/portail/porte-bois'], array_values($this->storedPrefixes()));
+    }
+
     public function testTheRoutesBelowAPathOfAnotherTypeCanBeMoved(): void
     {
         $indexer = $this->registerIndexer(['{{other_entity_path}}{{current_entity_path}}', false, [new CategoryPathResolver()]]);

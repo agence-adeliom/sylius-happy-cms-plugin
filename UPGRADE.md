@@ -46,5 +46,9 @@ tags:
 Renaming a path now moves only the routes below it at a `/` boundary (`/door` no longer rewrites `/doors`), and
 only the leading part of their path is replaced.
 
+New option `sylius_happy_cms.routing.rewrite_child_routes` (default `true`, current behaviour): `false` disables
+the automatic move of the routes below a renamed path, for projects where two contents of different types can have
+the same slug (their children share the prefix). The indexer takes it as an eighth optional constructor argument.
+
 New command `happycms:routes:index` (`--class`, `--batch-size`, `--dry-run`) to index existing entities.
 

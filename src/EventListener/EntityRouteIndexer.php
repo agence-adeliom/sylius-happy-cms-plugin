@@ -70,6 +70,7 @@ class EntityRouteIndexer
         protected string $urlPattern = self::DEFAULT_URL_PATTERN,
         protected bool $trailingSlash = false,
         protected iterable $parentPathResolvers = [],
+        protected bool $rewriteChildRoutes = true,
     ) {
     }
 
@@ -153,6 +154,12 @@ class EntityRouteIndexer
         $routesChanges = [];
 
         $this->computeRoutes($routesChanges, $entity, self::ROUTE_ONLINE, $objectManager);
+
+        // "sylius_happy_cms.routing.rewrite_child_routes: false": a stored path below the previous one may belong to
+        // a content of another type with the same slug (its children would be moved with this entity)
+        if (!$this->rewriteChildRoutes) {
+            return;
+        }
 
         foreach ($routesChanges as $previousStaticPrefix => $staticPrefix) {
             $this->rewriteOtherStaticPrefix($staticPrefix, $previousStaticPrefix, $entity->getRoutes());
@@ -369,6 +376,7 @@ class EntityRouteIndexer
     /**
      * Public entry point to move the routes below a path that is not a CMS route, e.g. the slug of a parent of
      * another type has changed (see RouteParentPathResolverInterface). Flush the entity manager afterwards.
+     * Explicit call: not affected by "sylius_happy_cms.routing.rewrite_child_routes".
      */
     public function rewriteStaticPrefix(string $previousStaticPrefix, string $staticPrefix): void
     {
