@@ -15,6 +15,10 @@ sylius_happy_cms:
     # Optional: custom system prompt for AI content generation (learn more in docs/AI_CONTENT_GENERATION.md)
     ai_generate_content_prompt: null  
 
+    # Optional (default true): map the PageContentBlock model of the relational page builder.
+    # Set to false if your page has no "contentBlocks" association (see "Doctrine mapping" below).
+    map_page_content_block: true
+
   seo:
     title:
       suffix: ACME
@@ -155,3 +159,43 @@ services:
       - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addAdminMenuItems }
 
 ```
+
+## Doctrine mapping
+
+The plugin models (`Page`, `PageTranslation`, `Menu`, `Media`…) are Doctrine mapped superclasses that your
+entities extend; their associations target interfaces (`PageInterface`, `RouteInterface`…) resolved with
+`doctrine.orm.resolve_target_entities`. Doctrine reads them as parent classes of your entities, as long as their
+namespace is mapped (DoctrineBundle auto mapping of the plugin, or an explicit mapping of its `src/Entity`
+directories).
+
+### Pages without the relational page builder
+
+`PageContentBlock` owns the `contentOwner` association whose inverse side is `contentBlocks` on your page entity
+(`OneToMany`, `mappedBy: 'contentOwner'`, see `make:happy-cms:install`). If your page does not declare
+`contentBlocks` (you do not use the relational page builder), `doctrine:schema:validate` reports:
+
+```
+The association Adeliom\SyliusHappyCMSPlugin\Entity\Page\PageContentBlock#contentOwner refers to the inverse side
+field App\Entity\Page#contentBlocks which does not exist.
+```
+
+Leave the model out of the Doctrine mapping:
+
+```yaml
+sylius_happy_cms:
+  page_builder:
+    map_page_content_block: false
+```
+
+The other page models stay mapped. Do not use the page builder (`sylius_happy_cms_admin_page_builder` routes,
+`MigrateContentToBlocksCommand`) with this setting.
+
+### Inheritance below your entities
+
+Your entity may be the root of a single table or joined inheritance (`App\Entity\Pages\LandingPage extends
+App\Entity\Page extends Adeliom\SyliusHappyCMSPlugin\Entity\Page\Page`). Nothing to configure: the plugin
+models are Sylius resources, whose to-many associations Sylius `ORMMappedSuperClassSubscriber` removes from the
+mapped superclass, and the plugin listener
+`Adeliom\SyliusHappyCMSPlugin\EventListener\Doctrine\MappedSuperclassAssociationDeclaringClassListener` gives them
+back their declaring class, so that the subclasses do not declare `routes` / `children` a second time
+(`Property "routes" in "App\Entity\Pages\LandingPage" was already declared, but it must be declared only once`).
