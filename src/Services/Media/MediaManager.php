@@ -18,6 +18,7 @@ use Embed\Embed;
 use Illuminate\Support\Str;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
+use League\Flysystem\StorageAttributes;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
@@ -109,12 +110,68 @@ class MediaManager
         return $this->getHelper()->getMedia($media);
     }
 
+    /**
+     * Tells whether a media folder exists, according to `sylius_happy_cms.media.directory_check`:
+     * - "public_dir" (default): public/{base_url}/{path} on the local disk. Only valid with a relative
+     *   base_url and a storage located in the public directory;
+     * - "storage": the Flysystem storage (any adapter, any base_url);
+     * - "database": a chain of folder rows matching the slugs of the path (object storages without directories).
+     *
+     * @throws FilesystemException
+     */
     public function directoryExists(string $path): bool
+    {
+        $path = trim($this->helper->clearDblSlash($path), '/');
+
+        return match ($this->getDirectoryCheck()) {
+            'storage' => '' === $path || $this->filesystem->directoryExists($path),
+            'database' => '' === $path || null !== $this->findFolderBySlugs($path),
+            default => $this->publicDirectoryExists($path),
+        };
+    }
+
+    protected function getDirectoryCheck(): string
+    {
+        $check = $this->getMediaParameter('directory_check');
+
+        return is_string($check) ? $check : 'public_dir';
+    }
+
+    /**
+     * A `sylius_happy_cms.media.*` option, null when the parameter is not defined.
+     */
+    protected function getMediaParameter(string $name): mixed
+    {
+        $parameter = 'sylius_happy_cms.media.' . $name;
+
+        return $this->parameters->has($parameter) ? $this->parameters->get($parameter) : null;
+    }
+
+    private function publicDirectoryExists(string $path): bool
     {
         /** @var string $projectDir */
         $projectDir = $this->parameters->get('kernel.project_dir');
 
         return is_dir($projectDir . \DIRECTORY_SEPARATOR . 'public' . $this->helper->getBaseUrl() . \DIRECTORY_SEPARATOR . $path);
+    }
+
+    private function findFolderBySlugs(string $path): ?FolderInterface
+    {
+        $folderRepository = $this->getHelper()->getFolderRepository();
+        if (null === $folderRepository) {
+            return null;
+        }
+
+        $parent = null;
+        foreach (array_values(array_filter(explode('/', $path), static fn (string $slug): bool => '' !== $slug)) as $slug) {
+            $folder = $folderRepository->findOneBy(['parent' => $parent, 'slug' => $slug]);
+            if (!$folder instanceof FolderInterface) {
+                return null;
+            }
+            $parent = $folder;
+        }
+
+        return $parent;
     }
 
     /**
@@ -202,18 +259,33 @@ class MediaManager
     }
 
     /**
-     * @throws AlreadyExist
+     * Creates a media, writes its file to the storage and saves it.
+     *
+     * @param string|File          $source a local file path, a File / UploadedFile, a data URI (data:image/png;base64,...),
+     *                                     an image URL or an oEmbed URL (YouTube, Vimeo...)
+     * @param string|null          $path   the folder path ("products/doors"), missing folders are created;
+     *                                     null for the root folder. Ignored when $folder is given
+     * @param string|null          $name   the media name (the slug of the file is built from it); defaults to the file name
+     * @param FolderInterface|null $folder the folder, instead of $path
+     * @param array<string, mixed> $metas  metas added to the detected ones (dimensions...), e.g. ['alt' => '...', 'title' => '...']
+     *
+     * @throws AlreadyExist         a media with this name already exists in the folder
      * @throws FolderAlreadyExist
      * @throws ContainerExceptionInterface
-     * @throws ExtNotAllowed
+     * @throws ExtNotAllowed        file type not allowed
      * @throws FilesystemException
      * @throws FolderNotExist
-     * @throws NoFile
+     * @throws NoFile               unreadable source
      * @throws NotFoundExceptionInterface
-     * @throws ProviderNotFound
+     * @throws ProviderNotFound     URL without image nor oEmbed provider
      */
-    public function createMedia(string|File $source, ?string $path = null, ?string $name = null): MediaInterface
-    {
+    public function createMedia(
+        string|File $source,
+        ?string $path = null,
+        ?string $name = null,
+        ?FolderInterface $folder = null,
+        array $metas = [],
+    ): MediaInterface {
         $class = $this->getHelper()->getMediaClassName();
         /** @var MediaInterface $entity */
         $entity = new $class();
@@ -222,9 +294,11 @@ class MediaManager
             $entity->setName($this->helper->cleanName($name));
         }
 
-        $folder = $this->folderByPath($path);
-        if (false === $folder && is_string($path)) {
-            $folder = $this->createFolder(basename($path), dirname($path));
+        if (null === $folder) {
+            $folder = $this->folderByPath($path);
+            if (false === $folder && is_string($path)) {
+                $folder = $this->createFolder(basename($path), dirname($path));
+            }
         }
 
         $entity->setFolder($folder ?: null);
@@ -239,6 +313,10 @@ class MediaManager
             }
         } else {
             $entity = $this->createFromFile($entity, $source);
+        }
+
+        if ([] !== $metas) {
+            $entity->setMetas(array_replace($entity->getMetas(), $metas));
         }
 
         $this->save($entity);
@@ -281,9 +359,44 @@ class MediaManager
     {
         $source = $this->helper->clearDblSlash($oldPath);
         $destination = $this->helper->clearDblSlash($newPath);
-        if ($this->getFilesystem()->fileExists($source) || $this->directoryExists($source)) {
+        if ($this->getFilesystem()->fileExists($source)) {
             $this->getFilesystem()->move($source, $destination);
+
+            return;
         }
+
+        if ($this->directoryExists($source)) {
+            $this->moveDirectory($source, $destination);
+        }
+    }
+
+    /**
+     * Moves a folder entry by entry: Flysystem moves files only (most adapters cannot rename a directory).
+     *
+     * @throws FilesystemException
+     */
+    protected function moveDirectory(string $source, string $destination): void
+    {
+        $source = trim($source, '/');
+        $destination = trim($destination, '/');
+        if ('' === $source || $source === $destination) {
+            return;
+        }
+
+        $filesystem = $this->getFilesystem();
+        $filesystem->createDirectory($destination);
+        /** @var list<StorageAttributes> $entries */
+        $entries = $filesystem->listContents($source, true)->toArray();
+        foreach ($entries as $entry) {
+            $target = $destination . substr(trim($entry->path(), '/'), strlen($source));
+            if ($entry->isDir()) {
+                $filesystem->createDirectory($target);
+            } else {
+                $filesystem->move($entry->path(), $target);
+            }
+        }
+
+        $filesystem->deleteDirectory($source);
     }
 
     private function createFromOembed(MediaInterface $entity, string $source): MediaInterface
@@ -354,7 +467,9 @@ class MediaManager
             throw new NoFile($this->translator->trans('error.no_file', [], 'SyliusHappyCMSPlugin'));
         }
 
-        $entity->setName($this->helper->cleanName(''));
+        if (empty($entity->getName())) {
+            $entity->setName($this->helper->cleanName(''));
+        }
         $filename = strtolower((new AsciiSlugger())->slug(strtolower((string) $entity->getName()))->toString() . '.' . MediaHelper::mime2ext($infos['mime']));
         $entity->setSlug($filename);
 
@@ -432,6 +547,9 @@ class MediaManager
 
         $file_type = image_type_to_mime_type($type);
         $ext_only = MediaHelper::mime2ext($file_type) ?: pathinfo($original, \PATHINFO_EXTENSION);
+        if (true === $this->getMediaParameter('keep_original_extension') && '' !== pathinfo($original, \PATHINFO_EXTENSION)) {
+            $ext_only = pathinfo($original, \PATHINFO_EXTENSION);
+        }
 
         $final_name_slug = strtolower((new AsciiSlugger())->slug(strtolower((string) $name))->toString() . sprintf('.%s', $ext_only));
         $entity->setSlug($final_name_slug);
@@ -521,11 +639,15 @@ class MediaManager
             $name = $entity->getName() ?: pathinfo($orig_name, \PATHINFO_FILENAME);
             $ext_only = pathinfo($orig_name, \PATHINFO_EXTENSION);
 
-            // SECURITY: Use real MIME type from file content, NOT client-provided header
-            $realMimeType = $this->fileValidator->getRealMimeType($source);
-            $entity->setMime($realMimeType);
+            // SECURITY: the allowed types were checked on the real MIME type (file content) above. The MIME type
+            // stored on the media is the real one, or the client one with mime_type_source: client.
+            $mimeType = $this->fileValidator->getRealMimeType($source);
+            if ('client' === $this->getMediaParameter('mime_type_source') && '' !== $source->getClientMimeType()) {
+                $mimeType = $source->getClientMimeType();
+            }
+            $entity->setMime($mimeType);
 
-            if ($ext = MediaHelper::mime2ext($realMimeType)) {
+            if ($ext = MediaHelper::mime2ext($mimeType)) {
                 $ext_only = $ext;
             }
 
@@ -548,6 +670,11 @@ class MediaManager
             if (empty($entity->getName())) {
                 $entity->setName($source->getFilename());
             }
+        }
+
+        $originalExtension = pathinfo($orig_name, \PATHINFO_EXTENSION);
+        if (true === $this->getMediaParameter('keep_original_extension') && '' !== $originalExtension) {
+            $ext_only = $originalExtension;
         }
 
         $final_name_slug = strtolower((new AsciiSlugger())->slug(strtolower((string) $name))->toString() . sprintf('.%s', $ext_only));

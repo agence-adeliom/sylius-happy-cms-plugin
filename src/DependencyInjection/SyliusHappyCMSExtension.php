@@ -9,6 +9,7 @@ use Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock\SharedBlockTypeInterface;
 use Adeliom\SyliusHappyCMSPlugin\Services\Seo\Sitemap\SitemapDumperInterface;
 use Sylius\Bundle\CoreBundle\DependencyInjection\PrependDoctrineMigrationsTrait;
 use Sylius\Bundle\ResourceBundle\DependencyInjection\Extension\AbstractResourceExtension;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -152,23 +153,42 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
     {
         $this->prependDoctrineMigrations($container);
 
-        $configs = $container->getExtensionConfig('media');
-        $configuration = $this->getConfiguration($configs, $container);
-        /** @var array<string, array<string, mixed>> $config */
-        $config = $this->processConfiguration($configuration, $configs);
-        $config = $config['media'];
-
-        $container->prependExtensionConfig('media', $config);
-        $mediaGlobals = [];
-        foreach ($config as $k => $v) {
-            $mediaGlobals[$k] = $v;
-        }
+        $mediaGlobals = $this->getMediaConfiguration($container);
         $twigConfig = [
             'paths' => [__DIR__ . '/../../templates/media' => 'media'],
             'globals' => ['sylius_happy_cms' => ['media' => $mediaGlobals]],
         ];
 
         $container->prependExtensionConfig('twig', $twigConfig);
+    }
+
+    /**
+     * The `sylius_happy_cms.media` configuration of the application (with the defaults), for the Twig global
+     * `sylius_happy_cms.media` read by the media manager templates. Parameters (`%front_url%`) are resolved
+     * later, with the Twig configuration.
+     *
+     * @return array<string, mixed>
+     */
+    private function getMediaConfiguration(ContainerBuilder $container): array
+    {
+        $configs = [];
+        foreach ($container->getExtensionConfig($this->getAlias()) as $config) {
+            if (isset($config['media']) && is_array($config['media'])) {
+                $configs[] = ['media' => $config['media']];
+            }
+        }
+
+        try {
+            /** @var array{media: array<string, mixed>} $processed */
+            $processed = $this->processConfiguration(new Configuration(), $configs);
+        } catch (InvalidConfigurationException) {
+            // A value only valid once resolved (environment variable in a constrained node): the defaults are
+            // exposed, the services still use the resolved configuration.
+            /** @var array{media: array<string, mixed>} $processed */
+            $processed = $this->processConfiguration(new Configuration(), []);
+        }
+
+        return $processed['media'];
     }
 
     protected function getMigrationsNamespace(): string

@@ -41,6 +41,7 @@ use Adeliom\SyliusHappyCMSPlugin\Repository\Page\PageRepository;
 use Adeliom\SyliusHappyCMSPlugin\Repository\Page\PageRepositoryInterface;
 use Adeliom\SyliusHappyCMSPlugin\Repository\SharedBlock\SharedBlockRepository;
 use Adeliom\SyliusHappyCMSPlugin\Repository\SharedBlock\SharedBlockRepositoryInterface;
+use Adeliom\SyliusHappyCMSPlugin\Services\Media\FileValidator;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -310,6 +311,11 @@ class Configuration implements ConfigurationInterface
             ->scalarNode('base_url')
             ->defaultValue('/')
             ->end()
+            ->enumNode('directory_check')
+            ->values(['public_dir', 'storage', 'database'])
+            ->defaultValue('public_dir')
+            ->info('How the media manager tells whether a folder exists: "public_dir" looks for public/{base_url}/{path} on the local disk (only valid with a relative base_url and a storage in the public directory), "storage" asks the Flysystem storage, "database" looks for the folder rows.')
+            ->end()
             ->scalarNode('media_entity')
             ->defaultValue(Media::class)
             ->validate()
@@ -372,6 +378,25 @@ class Configuration implements ConfigurationInterface
                                'py',
                            ])
             ->scalarPrototype()->end()
+            ->end()
+            ->arrayNode('allowed_mime_types')
+            ->info('MIME types accepted for uploaded files, detected from their content. Replaces the default list (FileValidator::DEFAULT_ALLOWED_MIME_TYPES). Dangerous extensions (php, exe...) stay refused whatever the lists.')
+            ->scalarPrototype()->end()
+            ->defaultValue(FileValidator::DEFAULT_ALLOWED_MIME_TYPES)
+            ->end()
+            ->arrayNode('allowed_extensions')
+            ->info('Extensions accepted for uploaded files. Replaces the default list (FileValidator::DEFAULT_ALLOWED_EXTENSIONS).')
+            ->scalarPrototype()->end()
+            ->defaultValue(FileValidator::DEFAULT_ALLOWED_EXTENSIONS)
+            ->end()
+            ->enumNode('mime_type_source')
+            ->values(['content', 'client'])
+            ->defaultValue('content')
+            ->info('MIME type stored on an uploaded media, from which its extension (and slug) is derived: "content" (detected from the file content) or "client" (sent by the browser, as EasyMedia did). The allowed types are always checked on the content.')
+            ->end()
+            ->booleanNode('keep_original_extension')
+            ->defaultFalse()
+            ->info('Keep the extension of the original file name in the slug of a new media, instead of the one derived from its MIME type ("photo.jpg" stays "photo.jpg" instead of "photo.jpeg").')
             ->end()
             ->arrayNode('extended_mimes')
             ->addDefaultsIfNotSet()

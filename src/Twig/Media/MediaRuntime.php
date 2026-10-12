@@ -37,9 +37,9 @@ class MediaRuntime implements RuntimeExtensionInterface
     }
 
     /**
-     * @return array<string, mixed>|string|null
+     * A meta as stored (string, number, array such as "dimensions" or "code"), or all the metas without key.
      */
-    public function mediaMeta(int|string|MediaInterface $media, ?string $key = null, string|null $default = null): array|string|null
+    public function mediaMeta(int|string|MediaInterface $media, ?string $key = null, mixed $default = null): mixed
     {
         $media = $this->getMedia($media);
         if (!$media instanceof MediaInterface) {
@@ -47,7 +47,7 @@ class MediaRuntime implements RuntimeExtensionInterface
         }
 
         if ($key) {
-            return $media->getMeta($key, $default);
+            return $media->getMetas()[$key] ?? $default;
         }
 
         return $media->getMetas();
@@ -220,9 +220,15 @@ class MediaRuntime implements RuntimeExtensionInterface
         $params = [
             'title' => $media->getMeta('title', $media->getName()),
         ];
-        $code = $media->getMeta('code');
-        if ('reference' === $format && is_string($code)) {
+        // "code" is stored as an array (html, width, height, ratio) by MediaManager, as a string by older imports.
+        $code = $media->getMetas()['code'] ?? null;
+        if ('reference' === $format && is_array($code)) {
+            /** @var array<string, mixed> $codeParams */
+            $codeParams = $code;
+            $params += $codeParams;
+        } elseif ('reference' === $format && is_string($code)) {
             $params['code'] = $code;
+            $params['html'] = $code;
         }
 
         return array_merge($params, ['attributes' => $options]);

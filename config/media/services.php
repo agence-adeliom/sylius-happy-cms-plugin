@@ -31,7 +31,9 @@ return static function (ContainerConfigurator $container): void {
     $services->alias(MediaController::class, 'happy.cms.media.controller')->public();
 
     $services->set('happy.cms.media.file_validator', FileValidator::class)
-        ->public();
+        ->public()
+        ->arg('$allowedMimeTypes', '%sylius_happy_cms.media.allowed_mime_types%')
+        ->arg('$allowedExtensions', '%sylius_happy_cms.media.allowed_extensions%');
     $services->alias(FileValidator::class, 'happy.cms.media.file_validator')->public();
 
     $services->set('happy.cms.media.upload_rate_limiter', UploadRateLimiter::class)

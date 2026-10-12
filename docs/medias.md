@@ -189,8 +189,9 @@ yield MediaField::new('property', "label")
 # Get media metadatas
 {{ object.media|media_meta }}
 
-# Get single media metadata
+# Get single media metadata, as stored (string, number or array such as "dimensions")
 {{ object.media|media_meta('key') }}
+{{ (object.media|media_meta('dimensions')).width }}
 
 # Get complete media informations
 {{ object.media|media_infos }}
@@ -230,9 +231,11 @@ $folder = $manager->folderByPath($path);
 # Create a folder
 $folder = $manager->createFolder($folderName, $path = null)
 
-# Create a media
-# $source can be a UploadedFile, File, Image URL, Oembed URL, Base64 URI
-$folder = $manager->createMedia($source, $path = null, $name = null)
+# Create a media (see "Create a media from your code" below)
+$media = $manager->createMedia($source, $path = null, $name = null, $folder = null, $metas = [])
+
+# Find the media of a storage path ("products/doors/front-door.jpg"), or null
+$media = $manager->getHelper()->getMediaByPath($path);
 
 # Save a folder or media
 $manager->save($entity, $flush = true);
@@ -240,6 +243,45 @@ $manager->save($entity, $flush = true);
 # Delete a folder or media
 $manager->delete($entity, $flush = true);
 ```
+
+#### Create a media from your code
+
+`MediaManager::createMedia()` writes the file to the media storage and saves the media (it flushes).
+
+| Argument  | Type                       | Description                                                                                                                       |
+|-----------|----------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| `$source` | `string\|File`             | a local file path, a `File` / `UploadedFile`, a data URI (`data:image/png;base64,...`), an image URL or an oEmbed URL (YouTube...) |
+| `$path`   | `?string`                  | folder path (`products/doors`); missing folders are created; `null` = root folder. Ignored when `$folder` is given                 |
+| `$name`   | `?string`                  | media name, the file slug is built from it (defaults to the file name, or a random name for a data URI)                           |
+| `$folder` | `?FolderInterface`         | the folder entity, instead of `$path`                                                                                             |
+| `$metas`  | `array<string, mixed>`     | metas added to the detected ones (`dimensions`, oEmbed data...), e.g. `['alt' => '...', 'title' => '...']`                        |
+
+It throws `AlreadyExist` (a media with this name exists in the folder), `ExtNotAllowed` (file type not allowed),
+`NoFile` (unreadable source) or `ProviderNotFound` (URL without image nor oEmbed provider), all in
+`Adeliom\SyliusHappyCMSPlugin\Exceptions\Media`.
+
+```php
+use Adeliom\SyliusHappyCMSPlugin\Exceptions\Media\AlreadyExist;
+
+// A local file in a folder path, with its alternative text
+$media = $manager->createMedia('/tmp/import/front-door.jpg', 'products/doors', metas: ['alt' => 'Front door']);
+
+// In a folder entity, with a name
+$media = $manager->createMedia($uploadedFile, name: 'Front door', folder: $folder);
+
+// From a data URI (the name is kept)
+$media = $manager->createMedia('data:image/png;base64,iVBORw0...', 'drawings', 'Signature');
+
+try {
+    $manager->createMedia($file, 'products/doors');
+} catch (AlreadyExist) {
+    // same name in the same folder
+}
+```
+
+The media entity may keep its own repository (a `ServiceEntityRepository` of your application, or the default
+Doctrine one): the manager only calls Doctrine methods (`find`, `findBy`, `findOneBy`, `createQueryBuilder`).
+`MediaRepositoryInterface` / `MediaRepository` remain available but are not required.
 
 ### Use the Doctrine type (optional)
 
@@ -281,6 +323,26 @@ sylius_happy_cms:
         base_url: '/media/download'
         media_entity: App\Entity\HappyCMS\Media\Media
         folder_entity: App\Entity\HappyCMS\Media\Folder
+
+        # how the manager tells whether a folder exists:
+        # - public_dir (default): public/{base_url}/{path} on the local disk; only valid with a relative base_url
+        #   and a storage located in the public directory
+        # - storage: asks the Flysystem storage (any adapter, absolute base_url such as a CDN)
+        # - database: looks for the folder rows (object storages without directories)
+        directory_check: public_dir
+
+        # file types accepted for uploads; each list replaces its default
+        # (FileValidator::DEFAULT_ALLOWED_MIME_TYPES / DEFAULT_ALLOWED_EXTENSIONS).
+        # Dangerous extensions (php, exe, sh...) stay refused whatever the lists.
+        allowed_mime_types: [image/jpeg, image/png, image/avif, ...]   # detected from the file content
+        allowed_extensions: [jpg, jpeg, png, avif, ...]
+
+        # MIME type stored on an uploaded media, from which the extension of its slug is derived:
+        # content (default, detected from the file) or client (sent by the browser, as EasyMedia did)
+        mime_type_source: content
+
+        # keep the extension of the original file name in the slug ("photo.jpg" instead of "photo.jpeg")
+        keep_original_extension: false
 
         # ignore any file starts with "."
         ignore_files:         '/^\..*/'
@@ -338,6 +400,24 @@ sylius_happy_cms:
         pagination_amount:    50
 
 ```
+
+#### Existing media library (CDN base URL, EasyMedia)
+
+When the public URL of the media is absolute (`base_url: 'https://cdn.example.com/media'`) or the storage is not
+in the public directory, set `directory_check: storage` (or `database`): with the default check, folders are never
+found, `createMedia($source, 'a/b')` creates the folders again and moving a folder does not move its files.
+
+To keep the slugs EasyMedia gave to new files, set `mime_type_source: client` (or `keep_original_extension: true`
+to keep the extension of the uploaded file as is), and add the types your library holds to `allowed_mime_types` /
+`allowed_extensions`.
+
+The Twig global `sylius_happy_cms.media` (read by the media manager templates) holds this configuration.
+
+#### Global search
+
+`GET media.global_search?search=door` returns the media of every folder whose name contains the term (one query,
+files matching `ignore_files` left out), in the format of the folder listing plus `dir_path`. Without `search`,
+every media is listed.
 
 ### Events
 
