@@ -6,6 +6,7 @@ services:
             - "@happy_cms_seo.breadcrumb"
             - '%sylius_happy_cms.seo.title%'
             - '%sylius_happy_cms.seo.breadcrumbs%'
+            - '%sylius_happy_cms.seo.templates%'
         tags:
             - twig.extension
     

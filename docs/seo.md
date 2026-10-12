@@ -91,13 +91,39 @@ Look full support here : templates/front/seo/block-metas.html.twig
 ```
 
 ```html
-{{- seo_breadcrumb(seo) -}}
-# generates:
+{{- seo_breadcrumb() -}}
+# generates (nothing when no item was added):
 <nav id="happy_cms_seo-breadcrumbs" aria-label="breadcrumb">
-    <ol itemscope itemtype="http://schema.org/BreadcrumbList"
+    <ol itemscope itemtype="https://schema.org/BreadcrumbList"
         <li itemprop="itemListElement" class="breadcrumb-item"><a href="/">Home</a></li>
 # Look here : templates/front/seo/block-breadcrumb.html.twig
 ```
+
+The breadcrumb items are added from your controllers with the `Adeliom\SyliusHappyCMSPlugin\Services\Seo\BreadcrumbCollection`
+service (`addSimpleItem($name, $url)` or `addRouteItem($name, ['route' => …, 'params' => […]])`).
+
+### Your own SEO class
+
+`seo_metas()` and `seo_title()` accept any `Adeliom\SyliusHappyCMSPlugin\Entity\Seo\SeoInterface`, not only the
+plugin `Seo` embeddable: a project with its own SEO embeddable (other columns, extra fields) implements the
+interface and keeps the plugin functions. `seo_title()` also accepts a string or `null`.
+
+### Templates
+
+`seo_metas()` and `seo_breadcrumb()` render configurable templates. They receive the SEO object (metas) or the
+breadcrumb items (breadcrumb) as `data`; the `sylius_happy_cms.seo.render_meta` and `sylius_happy_cms.seo.breadcrumb`
+events still run before rendering.
+
+```yaml
+sylius_happy_cms:
+    seo:
+        templates:
+            metas: 'seo/metas.html.twig'            # default: '@SyliusHappyCMSPlugin/front/seo/block-metas.html.twig'
+            breadcrumb: 'seo/breadcrumb.html.twig'  # default: '@SyliusHappyCMSPlugin/front/seo/block-breadcrumb.html.twig'
+```
+
+Overriding the bundle templates (`templates/bundles/SyliusHappyCMSPlugin/front/seo/…`) still works when the options
+keep their default values.
 
 ## Sitemap.xml
 
