@@ -7,6 +7,7 @@ namespace Adeliom\SyliusHappyCMSPlugin\EventListener;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
 use Adeliom\SyliusHappyCMSPlugin\Event\Route\CalculateRouteStaticPrefixEvent;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
+use Adeliom\SyliusHappyCMSPlugin\Services\Cmf\RouteParentPathResolverInterface;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\PostPersistEventArgs;
@@ -14,6 +15,7 @@ use Doctrine\ORM\Event\PostUpdateEventArgs;
 use Doctrine\Persistence\ObjectManager;
 use Sylius\Resource\Model\TranslationInterface;
 use Symfony\Cmf\Bundle\RoutingBundle\Doctrine\Orm\ContentRepository;
+use Symfony\Cmf\Bundle\RoutingBundle\Model\Route as RouteModel;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -26,13 +28,25 @@ class EntityRouteIndexer
 
     public const OPTION_PREVIEW = 'preview_behavior';
 
+    /**
+     * Placeholders: {{locale}}, {{other_entity_path}} (path of a parent of another type, see
+     * CalculateRouteStaticPrefixEvent) and {{current_entity_path}} (CmsRoutableInterface::getRouteStaticPrefix()).
+     */
+    public const DEFAULT_URL_PATTERN = '/{{locale}}{{other_entity_path}}{{current_entity_path}}';
+
     public array $entitiesToManage = [];
 
+    /**
+     * @param iterable<RouteParentPathResolverInterface> $parentPathResolvers
+     */
     public function __construct(
         protected ContentRepository $contentRepository,
         protected ParameterBag $parameterBag,
         protected EventDispatcherInterface $dispatcher,
         protected EntityManagerInterface $manager,
+        protected string $urlPattern = self::DEFAULT_URL_PATTERN,
+        protected bool $trailingSlash = false,
+        protected iterable $parentPathResolvers = [],
     ) {
     }
 
@@ -72,7 +86,7 @@ class EntityRouteIndexer
         }
     }
 
-    private function manageRoutes(CmsRoutableInterface $entity, ObjectManager $objectManager): void
+    protected function manageRoutes(CmsRoutableInterface $entity, ObjectManager $objectManager): void
     {
         /** @var array<string, string> $routesChanges */
         $routesChanges = [];
@@ -103,7 +117,7 @@ class EntityRouteIndexer
     /**
      * @param array<string, string> $routesChanges
      */
-    private function computeRoutes(
+    protected function computeRoutes(
         array &$routesChanges,
         CmsRoutableInterface &$entity,
         string $routeNamePrefix,
@@ -146,40 +160,25 @@ class EntityRouteIndexer
             // slug "blog-slug" is a PageInterface entity slug
             // slug "slug-page is the PageInterface parent entity slug of "blog-slug"
 
-            $urlPattern = '/{{locale}}{{other_entity_path}}{{current_entity_path}}';
-
-            // Get locale
-            $locale = $translation->getLocale();
-
-            // Get specific parent slug (for other entities)
-            $event = $this->dispatcher->dispatch(
-                new CalculateRouteStaticPrefixEvent($entity, $translation),
-            );
-            $otherEntityPath = $event->getRouteStaticPrefix();
-
-            // Get current entity path
-            $currentEntityPath = $entity->getRouteStaticPrefix($translation);
+            // Get specific parent slug (for other entities): resolvers first, then listeners
+            $event = new CalculateRouteStaticPrefixEvent($entity, $translation);
+            $event->setRouteStaticPrefix($this->resolveParentPath($entity, $translation));
+            $event = $this->dispatcher->dispatch($event);
 
             // Set all complete path for the current entity route
-            $route->setStaticPrefix(
-                str_replace(
-                    [
-                                '{{locale}}',
-                                '{{other_entity_path}}',
-                                '{{current_entity_path}}',
-                            ],
-                    [
-                                (string) $locale,
-                                $otherEntityPath,
-                                $currentEntityPath,
-                            ],
-                    $urlPattern,
-                ),
-            );
+            $route->setStaticPrefix($this->buildStaticPrefix(
+                (string) $translation->getLocale(),
+                $event->getRouteStaticPrefix(),
+                $entity->getRouteStaticPrefix($translation),
+            ));
 
             $route->setVariablePattern(
                 $entity->getVariablePattern($translation),
             );
+
+            if ($this->trailingSlash) {
+                $this->addTrailingSlash($route);
+            }
 
             $route->setLastModification(new \DateTime());
             $route->setDefault(RouteObjectInterface::CONTENT_ID, $this->contentRepository->getContentId($entity));
@@ -193,6 +192,46 @@ class EntityRouteIndexer
         }
     }
 
+    protected function resolveParentPath(CmsRoutableInterface $entity, TranslationInterface $translation): string
+    {
+        foreach ($this->parentPathResolvers as $resolver) {
+            if ($resolver->supports($entity, $translation)) {
+                return $resolver->resolveParentPath($entity, $translation);
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * Fills the URL pattern, then collapses repeated slashes: a placeholder may be empty (no parent, homepage).
+     */
+    protected function buildStaticPrefix(string $locale, string $otherEntityPath, string $currentEntityPath): string
+    {
+        $path = str_replace(
+            ['{{locale}}', '{{other_entity_path}}', '{{current_entity_path}}'],
+            [$locale, $otherEntityPath, $currentEntityPath],
+            $this->urlPattern,
+        );
+
+        return '/' . ltrim((string) preg_replace('#/{2,}#', '/', $path), '/');
+    }
+
+    /**
+     * Ends the route path with "/": the static prefix when there is no variable part, the variable pattern otherwise.
+     */
+    protected function addTrailingSlash(RouteInterface $route): void
+    {
+        $variablePattern = $route instanceof RouteModel ? $route->getVariablePattern() : '';
+        if ('' === $variablePattern) {
+            $route->setStaticPrefix(rtrim($route->getStaticPrefix(), '/') . '/');
+
+            return;
+        }
+
+        $route->setVariablePattern(rtrim($variablePattern, '/') . '/');
+    }
+
     /**
      * If an uri is modified, ex: /mapage-1 => /ma-page-1, we need to update all other routes starting with the
      * same prefix.
@@ -201,7 +240,7 @@ class EntityRouteIndexer
      *
      * @param Collection<int, RouteInterface> $excludedRoutes
      */
-    private function rewriteOtherStaticPrefix(
+    protected function rewriteOtherStaticPrefix(
         string $staticPrefix,
         string $previousStaticPrefix,
         Collection $excludedRoutes,

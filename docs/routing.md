@@ -115,6 +115,73 @@ public function getRouteStaticPrefix(TranslationInterface $translation): string
 }
 ```
 
+### URL pattern (locale prefix)
+
+The route path is built from a pattern, `/{{locale}}{{other_entity_path}}{{current_entity_path}}` by default:
+
+- `{{locale}}`: the translation locale (`en_US`);
+- `{{other_entity_path}}`: path of a parent of another type (see [parent path resolvers](#parent-path-resolvers));
+- `{{current_entity_path}}` (required): `getRouteStaticPrefix()` of the entity (its slug under its parents).
+
+Repeated slashes are collapsed, so an empty placeholder leaves no `//` and the homepage is `/` without locale.
+
+```yaml
+sylius_happy_cms:
+    routing:
+        # URLs without locale prefix (one locale per host, or a single locale)
+        url_pattern: '{{other_entity_path}}{{current_entity_path}}'
+```
+
+Without `{{locale}}`, two translations with the same slug get the same path: keep the locale in the pattern for a
+multilingual site served on a single host.
+
+### Trailing slash
+
+```yaml
+sylius_happy_cms:
+    routing:
+        trailing_slash: true # default: false
+```
+
+Routes then end with `/` (`/about/team/`; the variable pattern gets the slash when the route has one), and a `GET`/
+`HEAD` request for the same path without the slash, which ends in a 404, is redirected (301, query string kept) when
+the CMS router matches the path with the slash (`TrailingSlashRedirectListener`) and the content of that route is
+online (`CmsRoutableInterface::isOnline()`, the check `RouteRenderService` makes before rendering). The route of an
+unpublished content, or of a content outside of its publication dates, stays in the database and answers 404: the
+path without the slash answers 404 as well, instead of a 301 to a 404 that would disclose the URL of the unpublished
+content and be cached as permanent by browsers and search engines. The content is the one the dynamic router adds to
+the match (`ContentRepositoryEnhancer`), or, when no enhancer adds it, the one loaded from the `_content_id` of the
+route (`cmf_routing.orm_content_repository`). A route without a `CmsRoutableInterface` content (e.g. a redirect
+route) is redirected as soon as it matches.
+
+Existing routes are not rewritten when the option changes: re-save the entities, or re-index them.
+
+### Parent path resolvers
+
+When the URL of an entity depends on a parent of another type (a taxon, a non-routable category, a page of another
+class), implement `Adeliom\SyliusHappyCMSPlugin\Services\Cmf\RouteParentPathResolverInterface`. The service is
+autoconfigured (tag `sylius_happy_cms.route_parent_path_resolver`); the first resolver supporting the entity
+(tag priority order) fills `{{other_entity_path}}`.
+
+```php
+final class GuidePathResolver implements RouteParentPathResolverInterface
+{
+    public function supports(CmsRoutableInterface $entity, TranslationInterface $translation): bool
+    {
+        return $entity instanceof Guide && null !== $entity->getTaxon();
+    }
+
+    public function resolveParentPath(CmsRoutableInterface $entity, TranslationInterface $translation): string
+    {
+        // e.g. "/doors/wooden"
+        return '/' . $entity->getTaxon()->getTranslation($translation->getLocale())->getSlug();
+    }
+}
+```
+
+`CalculateRouteStaticPrefixEvent` listeners run afterwards and receive the resolved path
+(`$event->getRouteStaticPrefix()`).
+
 ### Custom Controller
 
 Forward routing to a custom controller:
