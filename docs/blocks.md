@@ -579,6 +579,49 @@ Full example to render blocks and assets in your page template, checking for bot
     {{ happy_cms_shared_block_assets() }}
 ```
 
+### Blocks stored as JSON (flexible content field)
+
+When the blocks are stored as an array in a JSON column (`FlexibleContentField`), each entry holds the block fields
+plus `block_type`, `position` and `block_published`. Render them in order with `happy_cms_block_render()`:
+
+```twig
+{% for block in resource.content %}
+    {{ happy_cms_block_render(block, preview|default(false), {extra_variable: 'value'}) }}
+{% endfor %}
+{{ happy_cms_block_assets() }}
+```
+
+The block template receives `block` (the raw entry), `blockType`, `preview` and `settings` (the entry without
+`block_type` and `position`, with an `attr_id` of `block-1`, `block-2`… in rendering order when the entry has none:
+use it as the anchor of the block), plus the third argument.
+
+Three options change how these blocks are rendered (all disabled by default):
+
+```yaml
+sylius_happy_cms:
+  block_render:
+    # The block templates also receive the variables of the calling template (resource, page, loop...).
+    # Block variables (block, blockType, preview, settings) and the third argument take precedence.
+    inherit_context: true
+
+    # Render the entries that have no "block_published" key, e.g. content imported or migrated from another
+    # system. An explicit "0", "", false or null still hides the block.
+    missing_published_means_published: true
+
+    # A block that fails to render is logged (error level, with its type, position and exception) and skipped;
+    # the rest of the page is rendered. Usually enabled in production only:
+    swallow_render_errors: false
+
+when@prod:
+  sylius_happy_cms:
+    block_render:
+      swallow_render_errors: true
+```
+
+`swallow_render_errors` accepts an environment variable (`'%env(bool:HAPPY_CMS_SWALLOW_BLOCK_ERRORS)%'`), handy to
+make broken blocks visible on a staging environment that runs in `prod`. Blocks whose `block_type` is not a registered
+block are skipped silently, whatever the option.
+
 ### Rendering assets
 
 Those functions will render all the necessary CSS and JS assets for the blocks used on the page, including both flex and shared blocks.

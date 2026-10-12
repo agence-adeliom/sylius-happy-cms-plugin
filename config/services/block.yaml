@@ -39,13 +39,14 @@ services:
   Adeliom\SyliusHappyCMSPlugin\Factory\Block\Helper:
     public: true
     arguments:
-      - '@twig'
-      - '@event_dispatcher'
-      - '@sylius.happy_cms.block_collection'
-      - '@adeliom.sylius.asset.renderer'
-#      - '@form.factory'
-#      - '@doctrine.orm.entity_manager'
-#      - '@request_stack'
+      $twig: '@twig'
+      $eventDispatcher: '@event_dispatcher'
+      $collection: '@sylius.happy_cms.block_collection'
+      $assetRenderer: '@adeliom.sylius.asset.renderer'
+      $logger: '@?logger'
+      $inheritContext: '%sylius_happy_cms.block_render.inherit_context%'
+      $missingPublishedMeansPublished: '%sylius_happy_cms.block_render.missing_published_means_published%'
+      $swallowRenderErrors: '%sylius_happy_cms.block_render.swallow_render_errors%'
     tags:
       - { name: twig.runtime }
 
