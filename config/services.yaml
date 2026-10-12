@@ -27,13 +27,15 @@ services:
       - '%sylius_happy_cms.routing.url_pattern%'
       - '%sylius_happy_cms.routing.trailing_slash%'
       - !tagged_iterator sylius_happy_cms.route_parent_path_resolver
+      - '%sylius_happy_cms.routing.rewrite_child_routes%'
     tags:
+      # after the onFlush listeners that compute the fields of the path (Gedmo sluggable: 0, translatable: -10)
       -   name: 'doctrine.event_listener'
-          event: 'postPersist'
-          priority: 500
+          event: 'onFlush'
+          priority: -100
           connection: 'default'
       -   name: 'doctrine.event_listener'
-          event: 'postUpdate'
+          event: 'postPersist'
           priority: 500
           connection: 'default'
 
@@ -169,6 +171,13 @@ services:
     class: Adeliom\SyliusHappyCMSPlugin\Command\InvalidCacheCommand
     arguments:
       - '@sylius.happy_cms.plugin.services.render'
+    tags:
+      - { name: 'console.command' }
+
+  Adeliom\SyliusHappyCMSPlugin\Command\IndexRoutesCommand:
+    arguments:
+      - '@doctrine.orm.entity_manager'
+      - '@sylius.happy_cms.plugin.listener.entity_route_indexer'
     tags:
       - { name: 'console.command' }
 

@@ -54,6 +54,21 @@ final class RoutingConfigurationTest extends TestCase
         self::assertSame(RouteParentPathResolverInterface::TAG, $resolvers->getTag());
     }
 
+    public function testTheRoutesBelowARenamedPathAreRewrittenByDefault(): void
+    {
+        $container = $this->load([]);
+
+        self::assertTrue($container->getParameter('sylius_happy_cms.routing.rewrite_child_routes'));
+        self::assertSame('%sylius_happy_cms.routing.rewrite_child_routes%', $container->getDefinition(self::INDEXER)->getArgument(7));
+    }
+
+    public function testTheRewritingOfTheRoutesBelowARenamedPathCanBeDisabled(): void
+    {
+        $container = $this->load(['routing' => ['rewrite_child_routes' => false]]);
+
+        self::assertFalse($container->getParameter('sylius_happy_cms.routing.rewrite_child_routes'));
+    }
+
     public function testTheUrlPatternCanBeChanged(): void
     {
         $container = $this->load(['routing' => ['url_pattern' => '{{other_entity_path}}{{current_entity_path}}']]);

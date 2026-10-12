@@ -12,16 +12,20 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\Mapping\Driver\SimplifiedXmlDriver;
+use Doctrine\ORM\Mapping\Driver\XmlDriver;
 use Doctrine\ORM\ORMSetup;
 use Doctrine\ORM\Tools\ResolveTargetEntityListener;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
+use Gedmo\Mapping\Driver\AttributeReader;
+use Gedmo\Sluggable\SluggableListener;
 use PHPUnit\Framework\TestCase;
 use Sylius\Component\Channel\Model\ChannelInterface;
 use Symfony\Cmf\Bundle\RoutingBundle\Doctrine\Orm\ContentRepository;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Runs EntityRouteIndexer against a real Doctrine unit of work (SQLite in memory).
@@ -49,7 +53,7 @@ abstract class RouteIndexerTestCase extends TestCase
         $driver->addDriver($attributes, __NAMESPACE__);
         $driver->addDriver($attributes, 'Adeliom\SyliusHappyCMSPlugin\Entity\Cmf');
         $driver->addDriver(new SimplifiedXmlDriver([$vendor . '/symfony-cmf/routing-bundle/src/Resources/config/doctrine-model' => 'Symfony\Cmf\Bundle\RoutingBundle\Model']), 'Symfony\Cmf\Bundle\RoutingBundle\Model');
-        $driver->addDriver(new SimplifiedXmlDriver([$vendor . '/symfony-cmf/routing-bundle/src/Resources/config/doctrine-base' => 'Symfony\Component\Routing']), 'Symfony\Component\Routing');
+        $driver->addDriver(new XmlDriver($vendor . '/symfony-cmf/routing-bundle/src/Resources/config/doctrine-base', '.orm.xml'), 'Symfony\Component\Routing');
         $config->setMetadataDriverImpl($driver);
 
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true], $config);
@@ -90,11 +94,56 @@ abstract class RouteIndexerTestCase extends TestCase
     }
 
     /**
+     * Registers the indexer and Gedmo's sluggable listener in the order Symfony gives them for onFlush: the priority
+     * of the indexer's onFlush tag in config/services.yaml against the one of stof_doctrine_extensions (none, so 0).
+     */
+    protected function registerIndexerAndSluggableListenerInServiceOrder(): EntityRouteIndexer
+    {
+        $sluggable = new SluggableListener();
+        $sluggable->setAnnotationReader(new AttributeReader());
+
+        /** @var array{services: array<string, array{tags: array<int, array{event?: string, priority?: int}>}>} $services */
+        $services = Yaml::parseFile(dirname(__DIR__, 5) . '/config/services.yaml', Yaml::PARSE_CUSTOM_TAGS);
+        $indexerPriority = 0;
+        foreach ($services['services']['sylius.happy_cms.plugin.listener.entity_route_indexer']['tags'] as $tag) {
+            if ('onFlush' === ($tag['event'] ?? null)) {
+                $indexerPriority = $tag['priority'] ?? 0;
+            }
+        }
+
+        // highest priority first; same priority: registration order (the plugin's services come first)
+        if ($indexerPriority < 0) {
+            $this->entityManager->getEventManager()->addEventSubscriber($sluggable);
+
+            return $this->registerIndexer();
+        }
+        $indexer = $this->registerIndexer();
+        $this->entityManager->getEventManager()->addEventSubscriber($sluggable);
+
+        return $indexer;
+    }
+
+    /**
      * @return string[]
      */
     protected static function listenedEvents(): array
     {
-        return [Events::postPersist, Events::postUpdate];
+        return [Events::onFlush, Events::postPersist];
+    }
+
+    protected function countFlushes(): object
+    {
+        $counter = new class() {
+            public int $count = 0;
+
+            public function postFlush(): void
+            {
+                ++$this->count;
+            }
+        };
+        $this->entityManager->getEventManager()->addEventListener([Events::postFlush], $counter);
+
+        return $counter;
     }
 
     protected function savePage(string $slug, ?string $category = null, string $locale = 'en_US', bool $homepage = false): IndexedPage

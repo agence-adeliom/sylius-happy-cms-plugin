@@ -28,3 +28,34 @@ fills `{{other_entity_path}}` before `CalculateRouteStaticPrefixEvent` is dispat
 - the constructor takes three new optional arguments (`$urlPattern`, `$trailingSlash`, `$parentPathResolvers`);
   a service definition overriding the indexer with the four original arguments keeps the current behaviour;
 - repeated slashes in a computed path are collapsed (`/en_US//about` → `/en_US/about`).
+
+### CMS routes computed within the flush, `happycms:routes:index`
+
+`EntityRouteIndexer` now listens to `onFlush` and `postPersist` (it used to listen to `postPersist` and `postUpdate`
+and flush the entity manager from them). If you redefined the `sylius.happy_cms.plugin.listener.entity_route_indexer`
+service, update its tags:
+
+```yaml
+tags:
+    - { name: 'doctrine.event_listener', event: 'onFlush', priority: -100, connection: 'default' }
+    - { name: 'doctrine.event_listener', event: 'postPersist', priority: 500, connection: 'default' }
+```
+
+The `onFlush` priority (-100) places the indexer after the listeners that fill the fields of the path, such as
+Gedmo's sluggable listener (0) and translatable listener (-10): an entity created without a slug gets a route with
+its generated slug (it got a route `/` or `/<locale>/` before). Keep your own `onFlush` listeners that change a slug
+or a parent above -100.
+
+`postUpdate()` is kept as a no-op. New public methods: `onFlush()`, `index()` and `rewriteStaticPrefix()`.
+
+Renaming a path now moves only the routes below it at a `/` boundary (`/door` no longer rewrites `/doors`), and
+only the leading part of their path is replaced.
+
+New option `sylius_happy_cms.routing.rewrite_child_routes` (default `true`, current behaviour): `false` disables
+the automatic move of the routes below a renamed path, for projects where two contents of different types can have
+the same slug (their children share the prefix). The indexer takes it as an eighth optional constructor argument.
+
+New command `happycms:routes:index` (`--class`, `--batch-size`, `--dry-run`, `--save-entities`) to index existing
+entities. It writes the route tables only and does not save the entities (no `updated_at` change, no update
+listener); `--save-entities` saves them as well.
+
