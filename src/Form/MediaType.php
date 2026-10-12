@@ -42,6 +42,9 @@ class MediaType extends AbstractType implements AdminFormTypeInterface
             'rename' => true,
             'metas' => true,
             'delete' => true,
+            // false: the model value is the media id (happy_cms_media_type columns, JSON block content).
+            // true: the model value is the MediaInterface (happy_cms_media_reference_type columns).
+            'hydrate' => false,
         ]);
 
         $resolver->setAllowedTypes('restrictions_path', ['null', 'string']);
@@ -56,6 +59,7 @@ class MediaType extends AbstractType implements AdminFormTypeInterface
         $resolver->setAllowedTypes('rename', 'bool');
         $resolver->setAllowedTypes('metas', 'bool');
         $resolver->setAllowedTypes('delete', 'bool');
+        $resolver->setAllowedTypes('hydrate', 'bool');
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -67,10 +71,8 @@ class MediaType extends AbstractType implements AdminFormTypeInterface
                     return null;
                 }
 
-                $class = $this->manager->getHelper()->getMediaClassName();
-                if (!($media instanceof $class)) {
-                    $media = $this->manager->getMedia($media);
-                }
+                // Also loads a lazy reference: a reference to a deleted media gives null, like an unknown id.
+                $media = $this->manager->getMedia($media);
 
                 if (!$media instanceof MediaInterface) {
                     return null;
@@ -78,7 +80,7 @@ class MediaType extends AbstractType implements AdminFormTypeInterface
 
                 return $media->getId();
             },
-            function ($mediaId) {
+            function ($mediaId) use ($options) {
                 /** @var int|string|null $mediaId */
                 if (!$mediaId) {
                     return null;
@@ -90,7 +92,8 @@ class MediaType extends AbstractType implements AdminFormTypeInterface
                     throw new TransformationFailedException(sprintf('An media with id "%s" does not exist!', $mediaId));
                 }
 
-                return $mediaId;
+                // hydrate: the field is mapped on a happy_cms_media_reference_type column (or a MediaInterface property).
+                return $options['hydrate'] ? $media : $mediaId;
             },
         ));
     }
