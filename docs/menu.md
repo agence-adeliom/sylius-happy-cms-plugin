@@ -107,6 +107,27 @@ Main Menu
 └── Contact
 ```
 
+### Root Item
+
+Every new menu gets a root item, the parent of its first-level items, stored in `Menu#rootItem`
+(`MenuCreationListener`, Doctrine `prePersist`). It is published, at position 0, and named after the
+`sylius_happy_cms.menu_item.admin.data.menu_item_root` translation in each available locale. A menu persisted with
+its `rootItem` already set keeps it.
+
+```yaml
+# config/packages/sylius_happy_cms.yaml
+sylius_happy_cms:
+    menu:
+        root_item:
+            # false: the project creates the root item itself (the listener is not registered)
+            auto_create: true
+            # translated in each locale (messages domain); a text that is not a translation key is used as is
+            label: 'sylius_happy_cms.menu_item.admin.data.menu_item_root'
+```
+
+Deleting a menu deletes its items. Deleting the root item alone leaves the menu without root (`root_item_id` set to
+`NULL` by the database).
+
 ## Rendering Menus in Templates
 
 ### Basic Usage
@@ -438,7 +459,7 @@ $translation->getLocale();           // Get language code
 4. **Performance** - Use ESI for frequently used menus on high-traffic sites
 5. **Hierarchies** - Keep menu depth reasonable (3-4 levels max) for better UX
 6. **Translations** - Ensure all menu items have translations for all active locales
-7. **Root items** - The plugin automatically manages root items, don't create them manually
+7. **Root items** - The plugin creates the root item of a new menu, don't create it manually (or disable `menu.root_item.auto_create`)
 
 ## Troubleshooting
 
