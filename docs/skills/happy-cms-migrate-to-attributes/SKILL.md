@@ -1,11 +1,11 @@
 ---
 name: happy-cms-migrate-to-attributes
-description: Migrate HappyCMS admin resources (page, shared_block, menu, config, route, redirect_route, menu_item) from legacy YAML declaration (config/routes.yaml `type: sylius.resource` + config/packages/sylius_resource.yaml) to the `#[AsAdmin]` attribute on Admin classes. Use when upgrading easy-crud to 2.1+ and see deprecations about "Declaring the easy-crud resource ... through legacy YAML" for HappyCMS resources.
+description: Migrate HappyCMS admin resources (page, shared_block, menu, config, route, redirect_route, menu_item) from legacy YAML declaration (config/routes.yaml `type: sylius.resource` + config/packages/sylius_resource.yaml) to the `#[AsAdmin]` attribute on Admin classes. Use when upgrading easy-crud to 2.3.2+ and see deprecations about "Declaring the easy-crud resource ... through legacy YAML" for HappyCMS resources.
 ---
 
 # Migrate HappyCMS resources to `#[AsAdmin]` attributes
 
-Since easy-crud 2.1, HappyCMS admin resources are declared with **one attribute** instead of two legacy YAML blocks:
+Since easy-crud 2.3.2 (`#[AsAdmin]`), HappyCMS admin resources are declared with **one attribute** instead of two legacy YAML blocks:
 
 - **`#[Adeliom\SyliusEasyCrudPlugin\Metadata\AsAdmin]` on the Admin class** — the easy-crud layer with admin UI/routing metadata.
 
@@ -24,7 +24,7 @@ This skill performs that migration safely, one resource at a time.
 
 ## Prerequisites
 
-1. `agence-adeliom/sylius-easy-crud-plugin` is `>= 2.1`.
+1. `agence-adeliom/sylius-easy-crud-plugin` is `>= 2.3.2` (the release that ships `#[AsAdmin]`).
 2. Enable discovery **once for the project** — single path list in the app:
 
    ```yaml
@@ -89,7 +89,7 @@ Map the route block (`config/routes.yaml`) to the attribute using this table. **
 |-----------|----------|---------|-------|
 | `alias` | `alias:` | `'sylius_happy_cms.<resource>'` | Always set (from the table). |
 | `section` | `section:` | `'admin'` | Omit unless you override. |
-| `prefix` (import level) | `prefix:` | `'admin'` | Omit unless you override. |
+| `prefix` / `host` (import level) | on the import of the attribute routes | — | `@SyliusEasyCrudPlugin/config/routes.yaml` imports them under `/%sylius_admin.path_name%`; a project that imports `config/routes/admin.yaml` itself imports `Adeliom\SyliusEasyCrudPlugin\Routing\EasyCrudAttributesRoutesLoader` (`type: service`) with its own `prefix` / `host`. `#[AsAdmin(prefix:)]` only adds a per-resource prefix (none by default). |
 | `redirect` | `redirect:` | `'update'` | Omit unless you override. |
 | `grid` (= `Admin::getName()`) | `grid:` | auto-derived from alias | **Usually omitted** — easy-crud will derive it as `sylius_happy_cms_<resource>_admin`. Check if the YAML `grid:` equals this; if yes, omit it. |
 | `form.type` (the Admin) | (implicit, don't set) | — | The Admin class is discovered by path scan; no argument needed. |
@@ -101,6 +101,9 @@ Map the route block (`config/routes.yaml`) to the attribute using this table. **
 | `vars.*.header` (per action) | `header:` or per-action in `vars:` | auto-derived i18n keys | Omit — easy-crud auto-derives them. |
 | `classes.controller` (if not default) | `controller:` | `SyliusCrudResourceController` | Set only for `page` (`Adeliom\SyliusHappyCMSPlugin\Controller\Page\PageResourceController`). |
 | any custom `vars` (action-specific overrides) | `vars:` (free-form) | `[]` | Only if YAML has custom keys beyond standard headers/redirects. |
+| `vars` that must stay exactly as written | `defaultVars: false` + `vars:` | `true` | No derived default is added. |
+| `classes.repository` (resource block) | `repository:` | the entity's `repositoryClass` | |
+| other keys of the resource block (`classes.factory`, `translation.classes.*`) | `resource:` (free-form, deep-merged) | `[]` | |
 
 **Golden rule**: If the YAML already uses auto-derivable i18n keys and templates, **omit them from the attribute** — easy-crud will regenerate them.
 
