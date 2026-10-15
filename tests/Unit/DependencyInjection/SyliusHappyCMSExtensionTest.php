@@ -18,11 +18,33 @@ final class SyliusHappyCMSExtensionTest extends TestCase
 
         self::assertTrue($container->hasDefinition(SyliusHappyCMSExtension::NOT_FOUND_LISTENER));
         self::assertTrue($container->getDefinition(SeoExtension::class)->hasTag('twig.extension'));
+        self::assertTrue($container->getDefinition(SyliusHappyCMSExtension::REDIRECTION_MANAGER)->getArgument('$redirect'));
+        self::assertTrue($container->getDefinition(SyliusHappyCMSExtension::REDIRECTION_MANAGER)->getArgument('$recordNotFound'));
     }
 
-    public function testTheNotFoundListenerCanBeDisabled(): void
+    public function testTheRecordingOfNotFoundUrlsCanBeDisabledAlone(): void
     {
-        $container = $this->load(['redirect_route' => ['enable_not_found_listener' => false]]);
+        $container = $this->load(['redirect_route' => ['enable_not_found_recording' => false]]);
+
+        self::assertTrue($container->hasDefinition(SyliusHappyCMSExtension::NOT_FOUND_LISTENER));
+        $manager = $container->getDefinition(SyliusHappyCMSExtension::REDIRECTION_MANAGER);
+        self::assertTrue($manager->getArgument('$redirect'));
+        self::assertFalse($manager->getArgument('$recordNotFound'));
+    }
+
+    public function testTheRedirectionCanBeDisabledAlone(): void
+    {
+        $container = $this->load(['redirect_route' => ['enable_redirection' => false]]);
+
+        self::assertTrue($container->hasDefinition(SyliusHappyCMSExtension::NOT_FOUND_LISTENER));
+        $manager = $container->getDefinition(SyliusHappyCMSExtension::REDIRECTION_MANAGER);
+        self::assertFalse($manager->getArgument('$redirect'));
+        self::assertTrue($manager->getArgument('$recordNotFound'));
+    }
+
+    public function testTheNotFoundListenerIsRemovedWhenBothFeaturesAreDisabled(): void
+    {
+        $container = $this->load(['redirect_route' => ['enable_redirection' => false, 'enable_not_found_recording' => false]]);
 
         self::assertFalse($container->hasDefinition(SyliusHappyCMSExtension::NOT_FOUND_LISTENER));
     }

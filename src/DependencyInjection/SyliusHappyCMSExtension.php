@@ -23,6 +23,8 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
 
     public const NOT_FOUND_LISTENER = 'sylius.happy_cms.exception_listener';
 
+    public const REDIRECTION_MANAGER = 'sylius.happy_cms.plugin.listener.redirection_manager';
+
     /** @psalm-suppress UnusedVariable */
     public function load(array $configs, ContainerBuilder $container): void
     {
@@ -68,9 +70,19 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
             $container->getDefinition(SeoExtension::class)->clearTag('twig.extension');
         }
 
-        if (false === ($config['redirect_route']['enable_not_found_listener'] ?? true)) {
+        $redirection = (bool) ($config['redirect_route']['enable_redirection'] ?? true);
+        $recording = (bool) ($config['redirect_route']['enable_not_found_recording'] ?? true);
+
+        if (!$redirection && !$recording) {
+            // Nothing left to do on a 404: do not even register the listener.
             $container->removeDefinition(self::NOT_FOUND_LISTENER);
+
+            return;
         }
+
+        $container->getDefinition(self::REDIRECTION_MANAGER)
+            ->setArgument('$redirect', $redirection)
+            ->setArgument('$recordNotFound', $recording);
     }
 
     /**
