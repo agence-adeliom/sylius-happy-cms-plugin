@@ -126,6 +126,23 @@ sylius_easy_crud:
   resource: "@SyliusEasyCrudPlugin/config/routes.yaml"
 ```
 
+The admin routes (`config/routes.yaml`) are served under the Sylius admin path
+(`/%sylius_admin.path_name%`, `/admin` by default). If your admin uses another prefix or its own host, import the
+prefix-less files instead of `config/routes.yaml` and set your own `prefix` / `host`:
+
+```yaml
+sylius_happy_cms_admin:
+  resource: "@SyliusHappyCMSPlugin/config/routes/admin.yaml"
+  host: '%admin_host%'
+
+sylius_happy_cms_media_admin:
+  resource: "@SyliusHappyCMSPlugin/config/routes/media_admin.php"
+  host: '%admin_host%'
+
+sylius_happy_cms_media_public:
+  resource: "@SyliusHappyCMSPlugin/config/routes/media_public.php"
+```
+
 ### 5. Configure your firewall to protect preview routes
 
 All admin users with ROLE_ALLOWED_TO_SWITCH AND ROLE_HAPPY_CMS_CONTENT_BUILDER will be able to preview CMS routable entities.
