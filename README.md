@@ -121,21 +121,10 @@ In `config/routes.yaml`:
 ```yaml
 sylius_happy_cms:
   resource: "@SyliusHappyCMSPlugin/config/routes.yaml"
-
-# Media manager (admin)
-sylius_happy_cms_media:
-  resource: "@SyliusHappyCMSPlugin/config/media/routes.php"
-
-# Public media download route (`/media/download/{path}`), used by `media.base_url: '/media/download'`
-sylius_happy_cms_media_public:
-  resource: "@SyliusHappyCMSPlugin/config/media/public_routes.php"
   
 sylius_easy_crud:
   resource: "@SyliusEasyCrudPlugin/config/routes.yaml"
 ```
-
-The media routes are imported explicitly: skip `config/media/routes.php` if you do not use the plugin media manager,
-and `config/media/public_routes.php` if your media files are served another way (public directory, CDN…).
 
 ### 5. Configure your firewall to protect preview routes
 
