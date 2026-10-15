@@ -32,10 +32,10 @@ final class MediaRoutesTest extends KernelTestCase
     }
 
     /**
-     * The media routes are only registered through an explicit import of
-     * `@SyliusHappyCMSPlugin/config/media/routes.php` and `public_routes.php` (done by the test application).
+     * The media routes are registered by the plugin `config/routes.yaml`
+     * (`config/routes/media_admin.php` and `media_public.php`), not by a route loader.
      */
-    public function testMediaRoutesAreRegisteredByTheExplicitImport(): void
+    public function testMediaRoutesAreRegisteredByThePluginRoutesFile(): void
     {
         self::bootKernel();
 

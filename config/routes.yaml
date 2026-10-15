@@ -1,3 +1,10 @@
+# Media manager routes (admin, `media.*`) and public download route (`media.file_download`, /media/download/{path}).
+sylius_happy_cms_media_admin:
+  resource: routes/media_admin.php
+
+sylius_happy_cms_media_public:
+  resource: routes/media_public.php
+
 sylius_happy_cms_admin_shared_block_select:
   controller: Adeliom\SyliusHappyCMSPlugin\Controller\SharedBlock\SharedBlockController::select
   path: /admin/shared-blocks/select

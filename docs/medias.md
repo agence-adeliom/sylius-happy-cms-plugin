@@ -99,18 +99,9 @@ class Folder extends BaseFolder
 
 ## Routes
 
-The media manager routes are not loaded automatically. Import them in your `config/routes.yaml`:
-
-```yaml
-# Media manager (admin): media.index, media.browse, media.upload…
-sylius_happy_cms_media:
-  resource: "@SyliusHappyCMSPlugin/config/media/routes.php"
-
-# Public download route media.file_download (/media/download/{path}),
-# needed when `sylius_happy_cms.media.base_url` is '/media/download'
-sylius_happy_cms_media_public:
-  resource: "@SyliusHappyCMSPlugin/config/media/public_routes.php"
-```
+The media routes (admin media manager `media.*`, and the public download route `media.file_download`
+on `/media/download/{path}`) are defined in `config/routes/media_admin.php` and `config/routes/media_public.php`.
+They are imported by the plugin `config/routes.yaml`, which your project already imports: nothing to add.
 
 ## Documentation
 
