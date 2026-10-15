@@ -28,6 +28,9 @@ CRUD routes it writes in `config/routes.yaml`. Routes generated before keep work
 `make:happy-cms:generate-cms-model` prints the route configuration built by the easy-crud plugin
 (`CrudMakerService::generateRoute()`), which follows the same rule from the easy-crud version that ships it.
 
+The plugin now requires `agence-adeliom/sylius-easy-crud-plugin` `^2.3.1`: since that version easy-crud serves its own admin routes
+(`/oembed/`, `/autocomplete/`) under the same `/%sylius_admin.path_name%` prefix, so a custom admin path covers all of them.
+
 ### `MediaLoader` removed, media routes imported by `config/routes.yaml`
 
 The `Adeliom\SyliusHappyCMSPlugin\Routing\MediaLoader` route loader has been removed. No action is required:
