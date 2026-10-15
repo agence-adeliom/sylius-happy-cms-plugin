@@ -2,7 +2,7 @@
 
 ## Unreleased (2.3.x)
 
-### New options: disable the 404 listener and the SEO Twig extension
+### New options: control the 404 redirections and the SEO Twig extension
 
 Both default to `true` (current behaviour):
 
@@ -12,11 +12,22 @@ sylius_happy_cms:
         # seo_metas(), seo_title(), seo_breadcrumb() and the happy_cms_seo global
         enable_twig_extension: true
     redirect_route:
-        # redirect 404s to the matching redirect route, record unknown URLs as new redirect routes
-        enable_not_found_listener: true
+        # on a 404, redirect to the matching redirect route when it has a target
+        enable_redirection: true
+        # on a 404, record the unknown URL as a new redirect route (one row per URL and host)
+        enable_not_found_recording: true
 ```
 
-If you removed `sylius.happy_cms.exception_listener` or the `twig.extension` tag of
+The two features of the 404 listener can be turned off independently:
+
+| `enable_redirection` | `enable_not_found_recording` | Result |
+|---|---|---|
+| `true` | `true` | Current behaviour: redirections are served, unknown URLs are recorded. |
+| `true` | `false` | Redirections configured in the admin are served, the `redirect_route` table no longer grows with crawler and typo URLs. |
+| `false` | `true` | Unknown URLs are recorded, but nothing is redirected (collect the URLs first, enable the redirections later). |
+| `false` | `false` | The listener `sylius.happy_cms.exception_listener` is not registered. |
+
+If you removed `sylius.happy_cms.exception_listener` (both options to `false`) or the `twig.extension` tag of
 `Adeliom\SyliusHappyCMSPlugin\Twig\Seo\SeoExtension` in a compiler pass, you can use these options instead.
 With `enable_twig_extension: false`, the `SeoExtension` service stays defined (for its constants and for
 your own services) but its functions are no longer available in Twig: override the plugin templates

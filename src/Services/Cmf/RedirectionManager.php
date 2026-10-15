@@ -18,6 +18,8 @@ class RedirectionManager implements RedirectionManagerInterface
     public function __construct(
         protected EntityManagerInterface $manager,
         protected ParameterBag $parameterBag,
+        protected bool $redirect = true,
+        protected bool $recordNotFound = true,
     ) {
     }
 
@@ -55,12 +57,20 @@ class RedirectionManager implements RedirectionManagerInterface
         // A redirect route is already persisted?
         $redirectRoute = $redirectRouteRepository->findByHostAndPath($host, $uri);
         if (null === $redirectRoute) {
+            if (!$this->recordNotFound) {
+                return $response;
+            }
+
             // If not, we can create a new one
             $redirectRoute = $redirectRouteRepository->createNew();
             $redirectRoute->setStaticPrefix($uri);
             $redirectRoute->setHost($host);
             $this->manager->persist($redirectRoute);
             $this->manager->flush();
+        }
+
+        if (!$this->redirect) {
+            return $response;
         }
 
         if (null !== $redirectRoute->getUri() && $redirectRoute->getUri() !== '') {
