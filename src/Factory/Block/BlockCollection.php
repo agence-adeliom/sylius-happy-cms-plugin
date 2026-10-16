@@ -38,7 +38,7 @@ class BlockCollection
     }
 
     /**
-     * @return array<BlockTypeInterface>
+     * @return array<string, BlockTypeInterface>
      */
     public function getBlocks(): array
     {
@@ -46,9 +46,9 @@ class BlockCollection
     }
 
     /**
-     * @param BlockTypeInterface[] $blockTypes
+     * @param array<class-string|string>|null $blockTypes block classes (keys of getBlocks())
      *
-     * @return BlockTypeInterface[]
+     * @return array<string, BlockTypeInterface>
      */
     public function getAllowedBlocks(?array $blockTypes, ?ResourceInterface $resource): array
     {
