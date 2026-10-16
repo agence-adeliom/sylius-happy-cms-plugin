@@ -9,12 +9,12 @@ use Adeliom\SyliusHappyCMSPlugin\Entity\Config\ConfigTranslationInterface;
 use Adeliom\SyliusHappyCMSPlugin\Enum\Config\ConfigTypeEnum;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Form\DataMapperInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 class ConfigTranslatableDataMapper implements DataMapperInterface
 {
     public function __construct(
-        private PropertyAccessor $propertyAccessor,
+        private PropertyAccessorInterface $propertyAccessor,
     ) {
     }
 
