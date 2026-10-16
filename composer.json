@@ -70,6 +70,7 @@
         "robertfausk/behat-panther-extension": "^1.1 || ^2.0",
         "sylius-labs/coding-standard": "^4.4",
         "sylius-labs/suite-tags-extension": "~0.2",
+        "sylius/sylius-mate-extension": "^0.9",
         "sylius/test-application": "^2.3.0@alpha",
         "symfony/ai-bundle": "^0.3.2",
         "symfony/ai-chat": "^0.3.0",
@@ -84,6 +85,9 @@
         "symfony/web-profiler-bundle": "^7.4 || ^8.0",
         "symfony/webpack-encore-bundle": "^2.2"
     },
+    "suggest": {
+        "sylius/sylius-mate-extension": "Exposes the CMS routes and blocks to the Symfony AI Mate tools (happy_cms_match_url, happy_cms_list_blocks, happy_cms_content_blocks)"
+    },
     "config": {
         "sort-packages": true,
         "allow-plugins": {
@@ -91,12 +95,22 @@
             "php-http/discovery": false,
             "phpstan/extension-installer": true,
             "symfony/flex": true,
-            "symfony/runtime": true
+            "symfony/runtime": true,
+            "symfony/ai-mate-composer-plugin": false
         }
     },
     "extra": {
         "branch-alias": {
             "dev-2.4.x": "2.4-dev"
+        },
+        "ai-mate": {
+            "scan-dirs": [
+                "src/Mate/Tool"
+            ],
+            "includes": [
+                "config/mate/config.php"
+            ],
+            "instructions": "config/mate/INSTRUCTIONS.md"
         },
         "symfony": {
             "require": "^7.4 || ^8.0"
