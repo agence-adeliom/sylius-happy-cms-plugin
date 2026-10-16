@@ -96,7 +96,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-2.3.x": "2.3-dev"
+            "dev-2.4.x": "2.4-dev"
         },
         "symfony": {
             "require": "^7.4 || ^8.0"
