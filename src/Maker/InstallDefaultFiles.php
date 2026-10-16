@@ -108,6 +108,10 @@ final class InstallDefaultFiles extends AbstractMaker
 
     /**
      * Build the AsAdmin attribute source code for a given resource scope.
+     *
+     * Each option is PHP source (a quoted string, a `::class` constant or an array literal).
+     *
+     * @param array{controller?: string, templates?: string, except?: string, only?: string, breadcrumbTemplate?: string} $options
      */
     private function buildAsAdminAttribute(string $aliasScope, array $options = []): string
     {

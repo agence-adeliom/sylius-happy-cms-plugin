@@ -360,6 +360,7 @@ final class MakeHappyCMS extends AbstractMaker
                 variables: $adminVariables,
             );
 
+            $taxonomyAdminDetails = null;
             if ($hasTaxonomy && $taxonomyClassNameDetail) {
                 $taxonomyVariables = [
                     'classNameDetail' => $taxonomyClassNameDetail,
@@ -437,7 +438,7 @@ final class MakeHappyCMS extends AbstractMaker
                     $io,
                 );
 
-                if ($hasTaxonomy && $taxonomyClassNameDetail && isset($taxonomyAdminDetails)) {
+                if ($hasTaxonomy && $taxonomyClassNameDetail && null !== $taxonomyAdminDetails) {
                     $this->declareViaAttributes(
                         $resourceConfigGenerator,
                         $taxonomyClassNameDetail,
