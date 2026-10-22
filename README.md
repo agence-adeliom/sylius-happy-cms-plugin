@@ -111,8 +111,12 @@ In `config/packages/_sylius.yaml`:
 ```yaml
 imports:
   - { resource: "@SyliusEasyCrudPlugin/config/config.yaml" }
-  - { resource: "@SyliusHappyCMSPlugin/config/config.yaml" }
+  - { resource: "@SyliusHappyCMSPlugin/config/config.php" }
 ```
+
+The plugin ships its configuration and routes as PHP files. The `.yaml` files of the plugin
+(`config/config.yaml`, `config/routes.yaml`, `config/routes/admin.yaml`, ...) are deprecated and removed in 3.0:
+they only import the `.php` files. Your own project files can stay in YAML and import the `.php` files, as below.
 
 ### 4. Import Routes
 
@@ -120,19 +124,19 @@ In `config/routes.yaml`:
 
 ```yaml
 sylius_happy_cms:
-  resource: "@SyliusHappyCMSPlugin/config/routes.yaml"
+  resource: "@SyliusHappyCMSPlugin/config/routes.php"
   
 sylius_easy_crud:
   resource: "@SyliusEasyCrudPlugin/config/routes.yaml"
 ```
 
-The admin routes (`config/routes.yaml`) are served under the Sylius admin path
+The admin routes (`config/routes.php`) are served under the Sylius admin path
 (`/%sylius_admin.path_name%`, `/admin` by default). If your admin uses another prefix or its own host, import the
-prefix-less files instead of `config/routes.yaml` and set your own `prefix` / `host`:
+prefix-less files instead of `config/routes.php` and set your own `prefix` / `host`:
 
 ```yaml
 sylius_happy_cms_admin:
-  resource: "@SyliusHappyCMSPlugin/config/routes/admin.yaml"
+  resource: "@SyliusHappyCMSPlugin/config/routes/admin.php"
   host: '%admin_host%'
 
 sylius_happy_cms_media_admin:
