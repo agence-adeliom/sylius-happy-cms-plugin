@@ -22,7 +22,7 @@ use Doctrine\DBAL\Types\Type;
  *   entity. The media is resolved at render time through the happy_cms_media() Twig helper,
  *   hence the MediaInterface|int|null property types.
  *
- * The type is registered as happy_cms_media_type in config/packages/doctrine.yaml.
+ * The type is registered as happy_cms_media_type in config/packages/doctrine.php.
  */
 class MediaType extends Type
 {

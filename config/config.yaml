@@ -1,13 +1,4 @@
+# Deprecated since 2.3, removed in 3.0: import `@SyliusHappyCMSPlugin/config/config.php` instead.
+# This file only imports it.
 imports:
-  - { resource: "./packages/cmf_routing.yaml" }
-  - { resource: "./packages/doctrine.yaml" }
-  - { resource: "./packages/sylius_ui.yaml" }
-  - { resource: "./packages/sylius_happy_cms.yaml" }
-  - { resource: "./packages/flysystem.yaml" }
-  - { resource: "./packages/tinymce.yaml" }
-
-#sylius_happy_cms:
-#  media:
-#    storage_name: uploads.storage
-#    base_url: '/media/download'
-
+  - { resource: "config.php" }

@@ -7,8 +7,9 @@ namespace Tests\Adeliom\SyliusHappyCMSPlugin\Unit\DependencyInjection;
 use Adeliom\SyliusHappyCMSPlugin\DependencyInjection\SyliusHappyCMSExtension;
 use Adeliom\SyliusHappyCMSPlugin\Twig\Seo\SeoExtension;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
 final class SyliusHappyCMSExtensionTest extends TestCase
 {
@@ -62,13 +63,15 @@ final class SyliusHappyCMSExtensionTest extends TestCase
      */
     private function load(array $projectConfig): ContainerBuilder
     {
-        $pluginConfig = Yaml::parseFile(__DIR__ . '/../../../config/packages/sylius_happy_cms.yaml');
-        self::assertIsArray($pluginConfig);
+        $plugin = new ContainerBuilder();
+        $plugin->registerExtension(new SyliusHappyCMSExtension());
+        (new PhpFileLoader($plugin, new FileLocator(__DIR__ . '/../../../config/packages')))->load('sylius_happy_cms.php');
+        $pluginConfig = $plugin->getExtensionConfig('sylius_happy_cms')[0];
 
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
 
-        (new SyliusHappyCMSExtension())->load([$pluginConfig['sylius_happy_cms'], $projectConfig], $container);
+        (new SyliusHappyCMSExtension())->load([$pluginConfig, $projectConfig], $container);
 
         return $container;
     }

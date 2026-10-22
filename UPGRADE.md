@@ -2,6 +2,32 @@
 
 ## Unreleased (2.3.x)
 
+### PHP configuration files, YAML ones deprecated
+
+The configuration and route files of the plugin now exist as PHP files. The YAML files keep working (each one only
+imports its PHP equivalent, so both load exactly the same configuration and routes) but are deprecated and will be
+removed in 3.0 (#97). Import the `.php` files instead; your own project files can stay in YAML:
+
+| Deprecated | Replacement |
+|---|---|
+| `@SyliusHappyCMSPlugin/config/config.yaml` | `@SyliusHappyCMSPlugin/config/config.php` |
+| `@SyliusHappyCMSPlugin/config/packages/*.yaml` | `@SyliusHappyCMSPlugin/config/packages/*.php` |
+| `@SyliusHappyCMSPlugin/config/routes.yaml` | `@SyliusHappyCMSPlugin/config/routes.php` |
+| `@SyliusHappyCMSPlugin/config/routes/admin.yaml` | `@SyliusHappyCMSPlugin/config/routes/admin.php` |
+| `@SyliusHappyCMSPlugin/config/routes/shop.yaml` | `@SyliusHappyCMSPlugin/config/routes/shop.php` |
+
+```diff
+ imports:
+-  - { resource: "@SyliusHappyCMSPlugin/config/config.yaml" }
++  - { resource: "@SyliusHappyCMSPlugin/config/config.php" }
+```
+
+```diff
+ sylius_happy_cms:
+-  resource: "@SyliusHappyCMSPlugin/config/routes.yaml"
++  resource: "@SyliusHappyCMSPlugin/config/routes.php"
+```
+
 ### SEO Twig functions typed on `SeoInterface`
 
 `seo_metas()` and `seo_title()` now accept any `Adeliom\SyliusHappyCMSPlugin\Entity\Seo\SeoInterface` (they used to

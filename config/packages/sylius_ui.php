@@ -1,0 +1,315 @@
+<?php
+
+declare(strict_types=1);
+
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+
+return static function (ContainerConfigurator $container): void {
+    $container->extension('sylius_twig_hooks', [
+        'hooks' => [
+            'sylius_shop.base#metatags' => [
+                'happy_seo_metas' => [
+                    'template' => '@SyliusHappyCMSPlugin/front/template_block/seo_metas.html.twig',
+                ],
+            ],
+            'sylius.cms.shared_block.choose' => [
+                'content' => [
+                    'template' => '@SyliusHappyCMSPlugin/shared_block/select.html.twig',
+                ],
+            ],
+            'sylius.cms.shared_block.create.content' => [
+                'content' => [
+                    'template' => '@SyliusAdmin/Crud/Create/_content.html.twig',
+                ],
+            ],
+            'sylius_admin.happy_cms.medias' => [
+                'sidebar' => [
+                    'template' => '@SyliusAdmin/shared/crud/common/sidebar.html.twig',
+                    'priority' => 200,
+                ],
+                'navbar' => [
+                    'template' => '@SyliusAdmin/shared/crud/common/navbar.html.twig',
+                    'priority' => 100,
+                ],
+                'manager' => [
+                    'template' => '@SyliusHappyCMSPlugin/media/manager.html.twig',
+                    'priority' => 0,
+                ],
+            ],
+            'sylius_admin.happy_cms.shared_block.select' => [
+                'sidebar' => [
+                    'template' => '@SyliusAdmin/shared/crud/common/sidebar.html.twig',
+                    'priority' => 200,
+                ],
+                'navbar' => [
+                    'template' => '@SyliusAdmin/shared/crud/common/navbar.html.twig',
+                    'priority' => 100,
+                ],
+                'select_blocks' => [
+                    'template' => '@SyliusHappyCMSPlugin/shared_block/crud/select/blocks.html.twig',
+                    'priority' => 0,
+                ],
+            ],
+            'sylius_admin.page.index.content' => [
+                'flashes' => [
+                    'template' => '@SyliusAdmin/shared/crud/common/content/flashes.html.twig',
+                    'priority' => 300,
+                ],
+                'header' => [
+                    'template' => '@SyliusAdmin/shared/crud/common/content/header.html.twig',
+                    'priority' => 200,
+                ],
+                'grid' => [
+                    'enabled' => false,
+                ],
+                'sections' => [
+                    'template' => '@SyliusHappyCMSPlugin/page/crud/tree/sections.html.twig',
+                    'priority' => 100,
+                ],
+                'footer' => [
+                    'template' => '@SyliusAdmin/shared/crud/common/content/footer.html.twig',
+                    'priority' => -100,
+                ],
+            ],
+            'sylius_admin.page.index.content.sections#left' => [
+                'tree' => [
+                    'component' => 'happycms-page-tree-tree',
+                    'props' => [
+                        'template' => '@SyliusHappyCMSPlugin/page/crud/tree/components/tree.html.twig',
+                    ],
+                    'priority' => 0,
+                ],
+            ],
+            'sylius_admin.page.index.content.sections.tree' => [
+                'actions' => [
+                    'template' => '@SyliusHappyCMSPlugin/page/crud/tree/actions.html.twig',
+                    'priority' => 0,
+                ],
+            ],
+            'sylius_admin.page.index.content.sections.tree.actions' => [
+                'edit' => [
+                    'template' => '@SyliusHappyCMSPlugin/page/crud/tree/actions/edit.html.twig',
+                    'priority' => 100,
+                ],
+                'dropdown' => [
+                    'template' => '@SyliusHappyCMSPlugin/page/crud/tree/actions/dropdown.html.twig',
+                    'priority' => 0,
+                ],
+            ],
+            'sylius_admin.page.index.content.sections.tree.actions.dropdown' => [
+                'create_child' => [
+                    'template' => '@SyliusHappyCMSPlugin/page/crud/tree/actions/dropdown/create_child.html.twig',
+                    'priority' => 400,
+                ],
+                'move_top' => [
+                    'template' => '@SyliusHappyCMSPlugin/page/crud/tree/actions/dropdown/move_top.html.twig',
+                    'priority' => 4,
+                ],
+                'move_up' => [
+                    'template' => '@SyliusHappyCMSPlugin/page/crud/tree/actions/dropdown/move_up.html.twig',
+                    'priority' => 3,
+                ],
+                'move_down' => [
+                    'template' => '@SyliusHappyCMSPlugin/page/crud/tree/actions/dropdown/move_down.html.twig',
+                    'priority' => 2,
+                ],
+                'move_bottom' => [
+                    'template' => '@SyliusHappyCMSPlugin/page/crud/tree/actions/dropdown/move_bottom.html.twig',
+                    'priority' => 1,
+                ],
+                'manage_content' => [
+                    'template' => '@SyliusHappyCMSPlugin/page/crud/tree/actions/dropdown/manage_content.html.twig',
+                    'priority' => 0,
+                ],
+                'delete' => [
+                    'component' => 'happycms-page-tree-delete',
+                    'props' => [
+                        'template' => '@SyliusHappyCMSPlugin/page/crud/tree/components/delete.html.twig',
+                    ],
+                    'priority' => 0,
+                ],
+            ],
+            'sylius_admin.page.update.content.header.title_block.actions' => [
+                'show' => [
+                    'enabled' => false,
+                ],
+            ],
+            'easy_crud.menu_item.create.content' => [
+                'flashes' => [
+                    'template' => '@SyliusAdmin/shared/crud/common/content/flashes.html.twig',
+                    'priority' => 300,
+                ],
+                'header' => [
+                    'template' => '@SyliusAdmin/shared/crud/common/content/header.html.twig',
+                    'priority' => 200,
+                ],
+                'sections' => [
+                    'template' => '@SyliusHappyCMSPlugin/menu_item/crud/tree/sections.html.twig',
+                    'priority' => 100,
+                ],
+                'footer' => [
+                    'template' => '@SyliusAdmin/shared/crud/common/content/footer.html.twig',
+                    'priority' => -100,
+                ],
+                'form' => [
+                    'enabled' => false,
+                ],
+            ],
+            'easy_crud.menu_item.create.content.sections#right' => [
+                'form' => [
+                    'template' => '@SyliusEasyCrudPlugin/shared/crud/common/content/form.html.twig',
+                    'priority' => 0,
+                ],
+            ],
+            'easy_crud.menu_item.create.content.sections#left' => [
+                'tree' => [
+                    'component' => 'happycms-menu-item-tree-tree',
+                    'props' => [
+                        'template' => '@SyliusHappyCMSPlugin/menu_item/crud/tree/components/tree.html.twig',
+                    ],
+                    'priority' => 0,
+                ],
+            ],
+            'easy_crud.menu_item.create.content.sections.tree' => [
+                'actions' => [
+                    'template' => '@SyliusHappyCMSPlugin/menu_item/crud/tree/actions.html.twig',
+                    'priority' => 0,
+                ],
+            ],
+            'easy_crud.menu_item.create.content.sections.tree.actions' => [
+                'edit' => [
+                    'template' => '@SyliusHappyCMSPlugin/menu_item/crud/tree/actions/edit.html.twig',
+                    'priority' => 100,
+                ],
+                'dropdown' => [
+                    'template' => '@SyliusHappyCMSPlugin/menu_item/crud/tree/actions/dropdown.html.twig',
+                    'priority' => 0,
+                ],
+            ],
+            'easy_crud.menu_item.create.content.sections.tree.actions.dropdown' => [
+                'create_child' => [
+                    'template' => '@SyliusHappyCMSPlugin/menu_item/crud/tree/actions/dropdown/create_child.html.twig',
+                    'priority' => 400,
+                ],
+                'delete' => [
+                    'component' => 'happycms-menu-item-tree-delete',
+                    'props' => [
+                        'template' => '@SyliusHappyCMSPlugin/menu_item/crud/tree/components/delete.html.twig',
+                    ],
+                    'priority' => 300,
+                ],
+                'move_up' => [
+                    'template' => '@SyliusHappyCMSPlugin/menu_item/crud/tree/actions/dropdown/move_up.html.twig',
+                    'priority' => 100,
+                ],
+                'move_top' => [
+                    'template' => '@SyliusHappyCMSPlugin/menu_item/crud/tree/actions/dropdown/move_top.html.twig',
+                    'priority' => 101,
+                ],
+                'move_down' => [
+                    'template' => '@SyliusHappyCMSPlugin/menu_item/crud/tree/actions/dropdown/move_down.html.twig',
+                    'priority' => 1,
+                ],
+                'move_bottom' => [
+                    'template' => '@SyliusHappyCMSPlugin/menu_item/crud/tree/actions/dropdown/move_bottom.html.twig',
+                    'priority' => 0,
+                ],
+            ],
+            'easy_crud.menu_item.update.content' => [
+                'flashes' => [
+                    'template' => '@SyliusAdmin/shared/crud/common/content/flashes.html.twig',
+                    'priority' => 300,
+                ],
+                'header' => [
+                    'template' => '@SyliusAdmin/shared/crud/common/content/header.html.twig',
+                    'priority' => 200,
+                ],
+                'sections' => [
+                    'template' => '@SyliusHappyCMSPlugin/menu_item/crud/tree/sections.html.twig',
+                    'priority' => 100,
+                ],
+                'footer' => [
+                    'template' => '@SyliusAdmin/shared/crud/common/content/footer.html.twig',
+                    'priority' => -100,
+                ],
+                'form' => [
+                    'enabled' => false,
+                ],
+            ],
+            'easy_crud.menu_item.update.content.sections#right' => [
+                'form' => [
+                    'template' => '@SyliusEasyCrudPlugin/shared/crud/common/content/form.html.twig',
+                    'priority' => 0,
+                ],
+            ],
+            'easy_crud.menu_item.update.content.sections#left' => [
+                'tree' => [
+                    'component' => 'happycms-menu-item-tree-tree',
+                    'props' => [
+                        'template' => '@SyliusHappyCMSPlugin/menu_item/crud/tree/components/tree.html.twig',
+                    ],
+                    'priority' => 0,
+                ],
+            ],
+            'easy_crud.menu_item.update.content.sections.tree' => [
+                'actions' => [
+                    'template' => '@SyliusHappyCMSPlugin/menu_item/crud/tree/actions.html.twig',
+                    'priority' => 0,
+                ],
+            ],
+            'easy_crud.menu_item.update.content.sections.tree.actions' => [
+                'edit' => [
+                    'template' => '@SyliusHappyCMSPlugin/menu_item/crud/tree/actions/edit.html.twig',
+                    'priority' => 100,
+                ],
+                'dropdown' => [
+                    'template' => '@SyliusHappyCMSPlugin/menu_item/crud/tree/actions/dropdown.html.twig',
+                    'priority' => 0,
+                ],
+            ],
+            'easy_crud.menu_item.update.content.sections.tree.actions.dropdown' => [
+                'create_child' => [
+                    'template' => '@SyliusHappyCMSPlugin/menu_item/crud/tree/actions/dropdown/create_child.html.twig',
+                    'priority' => 400,
+                ],
+                'delete' => [
+                    'component' => 'happycms-menu-item-tree-delete',
+                    'props' => [
+                        'template' => '@SyliusHappyCMSPlugin/menu_item/crud/tree/components/delete.html.twig',
+                    ],
+                    'priority' => 300,
+                ],
+                'move_up' => [
+                    'template' => '@SyliusHappyCMSPlugin/menu_item/crud/tree/actions/dropdown/move_up.html.twig',
+                    'priority' => 100,
+                ],
+                'move_top' => [
+                    'template' => '@SyliusHappyCMSPlugin/menu_item/crud/tree/actions/dropdown/move_top.html.twig',
+                    'priority' => 101,
+                ],
+                'move_down' => [
+                    'template' => '@SyliusHappyCMSPlugin/menu_item/crud/tree/actions/dropdown/move_down.html.twig',
+                    'priority' => 1,
+                ],
+                'move_bottom' => [
+                    'template' => '@SyliusHappyCMSPlugin/menu_item/crud/tree/actions/dropdown/move_bottom.html.twig',
+                    'priority' => 0,
+                ],
+            ],
+            'sylius_admin.happy_cms.page_builder' => [
+                'sidebar' => [
+                    'template' => '@SyliusAdmin/shared/crud/common/sidebar.html.twig',
+                    'priority' => 200,
+                ],
+                'navbar' => [
+                    'template' => '@SyliusAdmin/shared/crud/common/navbar.html.twig',
+                    'priority' => 100,
+                ],
+                'content' => [
+                    'template' => '@SyliusHappyCMSPlugin/admin/page_builder/content.html.twig',
+                    'priority' => 0,
+                ],
+            ],
+        ],
+    ]);
+};
