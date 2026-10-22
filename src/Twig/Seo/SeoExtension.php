@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Twig\Seo;
 
-use Adeliom\SyliusHappyCMSPlugin\Entity\Seo\Seo;
+use Adeliom\SyliusHappyCMSPlugin\Entity\Seo\SeoInterface;
 use Adeliom\SyliusHappyCMSPlugin\Services\Seo\BreadcrumbCollection;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -36,12 +36,17 @@ class SeoExtension extends AbstractExtension implements GlobalsInterface
      */
     public const MAX_DESCRITION_LENGTH = 155;
 
+    public const DEFAULT_METAS_TEMPLATE = '@SyliusHappyCMSPlugin/front/seo/block-metas.html.twig';
+
+    public const DEFAULT_BREADCRUMB_TEMPLATE = '@SyliusHappyCMSPlugin/front/seo/block-breadcrumb.html.twig';
+
     /**
      * @param array{
      *      separator: string,
      *     suffix: string
      *  } $titleConfig
      * @param array<string, mixed> $breadcrumbConfig
+     * @param array{metas?: string, breadcrumb?: string} $templates
      */
     public function __construct(
         protected Environment $twig,
@@ -49,15 +54,16 @@ class SeoExtension extends AbstractExtension implements GlobalsInterface
         protected BreadcrumbCollection $breadcrumb,
         protected array $titleConfig,
         protected array $breadcrumbConfig,
+        protected array $templates = [],
     ) {
     }
 
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('seo_metas', \Closure::fromCallable(fn (?Seo $seo) => $this->renderSeoMetas($seo))),
+            new TwigFunction('seo_metas', $this->renderSeoMetas(...)),
             new TwigFunction('seo_title', $this->renderSeoTitle(...)),
-            new TwigFunction('seo_breadcrumb', \Closure::fromCallable(fn () => $this->renderBreadcrumb())),
+            new TwigFunction('seo_breadcrumb', $this->renderBreadcrumb(...)),
         ];
     }
 
@@ -79,18 +85,18 @@ class SeoExtension extends AbstractExtension implements GlobalsInterface
          */
         $result = $this->eventDispatcher->dispatch($event, 'sylius_happy_cms.seo.breadcrumb');
 
-        return new Markup($this->twig->render('@SyliusHappyCMSPlugin/front/seo/block-breadcrumb.html.twig', ['data' => $result->getArgument('items')]), 'UTF-8');
+        return new Markup($this->twig->render($this->getTemplate('breadcrumb'), ['data' => $result->getArgument('items')]), 'UTF-8');
     }
 
-    public function renderSeoTitle(string|Seo $seo): string
+    public function renderSeoTitle(string|SeoInterface|null $seo): string
     {
         $title = '';
         if (is_string($seo)) {
             $title = $seo;
         }
 
-        if ($seo instanceof Seo) {
-            $title = $seo->title;
+        if ($seo instanceof SeoInterface) {
+            $title = $seo->getTitle() ?? '';
         }
 
         if (!empty($this->titleConfig['suffix'])) {
@@ -107,10 +113,10 @@ class SeoExtension extends AbstractExtension implements GlobalsInterface
             return $result->getArgument('title');
         }
 
-        return $title ?? '';
+        return $title;
     }
 
-    public function renderSeoMetas(?Seo $seo): ?Markup
+    public function renderSeoMetas(?SeoInterface $seo): ?Markup
     {
         if (null === $seo) {
             return null;
@@ -122,6 +128,19 @@ class SeoExtension extends AbstractExtension implements GlobalsInterface
          */
         $result = $this->eventDispatcher->dispatch($event, 'sylius_happy_cms.seo.render_meta');
 
-        return new Markup($this->twig->render('@SyliusHappyCMSPlugin/front/seo/block-metas.html.twig', ['data' => ($result->getArgument('datas') ?: $seo)]), 'UTF-8');
+        return new Markup($this->twig->render($this->getTemplate('metas'), ['data' => ($result->getArgument('datas') ?: $seo)]), 'UTF-8');
+    }
+
+    /**
+     * @param 'metas'|'breadcrumb' $name
+     */
+    protected function getTemplate(string $name): string
+    {
+        $template = $this->templates[$name] ?? null;
+        if (is_string($template) && '' !== $template) {
+            return $template;
+        }
+
+        return 'metas' === $name ? self::DEFAULT_METAS_TEMPLATE : self::DEFAULT_BREADCRUMB_TEMPLATE;
     }
 }
