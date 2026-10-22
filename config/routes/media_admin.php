@@ -6,82 +6,83 @@ use Adeliom\SyliusHappyCMSPlugin\Controller\Media\MediaController;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
 /*
- * Media manager routes, without any path prefix.
+ * Media manager routes, without any path prefix, on the path of the
+ * `sylius_happy_cms.media.admin_path` option (`happy-cms-media/medias` by default).
  *
  * The plugin `config/routes.yaml` imports this file under the Sylius admin path
  * (`/%sylius_admin.path_name%`). Import this file directly when your admin is
  * served from another prefix or from its own host.
  */
 return static function (RoutingConfigurator $routes): void {
-    $routes->add('media.index', '/happy-cms-media/medias/')
+    $routes->add('media.index', '/%sylius_happy_cms.media.admin_path%/')
         ->controller(MediaController::class . '::index')
         ->methods(['GET']);
 
-    $routes->add('media.browse', '/happy-cms-media/medias/browse')
+    $routes->add('media.browse', '/%sylius_happy_cms.media.admin_path%/browse')
         ->controller(MediaController::class . '::browse')
         ->methods(['GET']);
 
-    $routes->add('media.upload', '/happy-cms-media/medias/upload')
+    $routes->add('media.upload', '/%sylius_happy_cms.media.admin_path%/upload')
         ->controller(MediaController::class . '::upload')
         ->methods(['POST']);
 
-    $routes->add('media.uploadCropped', '/happy-cms-media/medias/upload-cropped')
+    $routes->add('media.uploadCropped', '/%sylius_happy_cms.media.admin_path%/upload-cropped')
         ->controller(MediaController::class . '::uploadEditedImage')
         ->methods(['POST']);
 
-    $routes->add('media.uploadLink', '/happy-cms-media/medias/upload-link')
+    $routes->add('media.uploadLink', '/%sylius_happy_cms.media.admin_path%/upload-link')
         ->controller(MediaController::class . '::uploadLink')
         ->methods(['POST']);
 
-    $routes->add('media.get_files', '/happy-cms-media/medias/get-files')
+    $routes->add('media.get_files', '/%sylius_happy_cms.media.admin_path%/get-files')
         ->controller(MediaController::class . '::getFiles')
         ->methods(['POST']);
 
-    $routes->add('media.get_file_info', '/happy-cms-media/medias/get-file-info')
+    $routes->add('media.get_file_info', '/%sylius_happy_cms.media.admin_path%/get-file-info')
         ->controller(MediaController::class . '::getItemInfos')
         ->methods(['POST']);
 
-    $routes->add('media.new_folder', '/happy-cms-media/medias/create-new-folder')
+    $routes->add('media.new_folder', '/%sylius_happy_cms.media.admin_path%/create-new-folder')
         ->controller(MediaController::class . '::createNewFolder')
         ->methods(['POST']);
 
-    $routes->add('media.delete_file', '/happy-cms-media/medias/delete-file')
+    $routes->add('media.delete_file', '/%sylius_happy_cms.media.admin_path%/delete-file')
         ->controller(MediaController::class . '::deleteItem')
         ->methods(['POST']);
 
-    $routes->add('media.move_file', '/happy-cms-media/medias/move-file')
+    $routes->add('media.move_file', '/%sylius_happy_cms.media.admin_path%/move-file')
         ->controller(MediaController::class . '::moveItem')
         ->methods(['POST']);
 
-    $routes->add('media.rename_file', '/happy-cms-media/medias/rename-file')
+    $routes->add('media.rename_file', '/%sylius_happy_cms.media.admin_path%/rename-file')
         ->controller(MediaController::class . '::renameItem')
         ->methods(['POST']);
 
-    $routes->add('media.edit_metas_file', '/happy-cms-media/medias/edit-metas-file')
+    $routes->add('media.edit_metas_file', '/%sylius_happy_cms.media.admin_path%/edit-metas-file')
         ->controller(MediaController::class . '::editMetasItem')
         ->methods(['POST']);
 
-    $routes->add('media.generate_alt_file', '/happy-cms-media/medias/generate-alt-file')
+    $routes->add('media.generate_alt_file', '/%sylius_happy_cms.media.admin_path%/generate-alt-file')
         ->controller(MediaController::class . '::generateAltItem')
         ->methods(['POST']);
 
-    $routes->add('media.generate_alt_group', '/happy-cms-media/medias/generate-alt-group')
+    $routes->add('media.generate_alt_group', '/%sylius_happy_cms.media.admin_path%/generate-alt-group')
         ->controller(MediaController::class . '::generateAltGroup')
         ->methods(['POST']);
 
-    $routes->add('media.generate_all_alt', '/happy-cms-media/medias/generate-all-alt')
+    $routes->add('media.generate_all_alt', '/%sylius_happy_cms.media.admin_path%/generate-all-alt')
         ->controller(MediaController::class . '::generateAllAlt')
         ->methods(['POST']);
 
-    $routes->add('media.global_search', '/happy-cms-media/medias/global-search')
+    $routes->add('media.global_search', '/%sylius_happy_cms.media.admin_path%/global-search')
         ->controller(MediaController::class . '::globalSearch')
         ->methods(['GET']);
 
-    $routes->add('media.folder_download', '/happy-cms-media/medias/folder-download')
+    $routes->add('media.folder_download', '/%sylius_happy_cms.media.admin_path%/folder-download')
         ->controller(MediaController::class . '::downloadFolder')
         ->methods(['POST']);
 
-    $routes->add('media.files_download', '/happy-cms-media/medias/files-download')
+    $routes->add('media.files_download', '/%sylius_happy_cms.media.admin_path%/files-download')
         ->controller(MediaController::class . '::downloadFiles')
         ->methods(['POST']);
 };
