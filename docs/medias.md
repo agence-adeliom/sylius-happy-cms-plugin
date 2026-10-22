@@ -97,6 +97,23 @@ class Folder extends BaseFolder
 }
 ```
 
+## Routes
+
+The media routes (admin media manager `media.*`, and the public download route `media.file_download`
+on `/media/download/{path}`) are defined in `config/routes/media_admin.php` and `config/routes/media_public.php`.
+They are imported by the plugin `config/routes.yaml`, which your project already imports: nothing to add.
+The media manager is served under the Sylius admin path (`/%sylius_admin.path_name%/happy-cms-media/medias/…`);
+its path below the prefix is the `media.admin_path` option (`happy-cms-media/medias` by default):
+
+```yaml
+sylius_happy_cms:
+    media:
+        admin_path: medias   # media manager on /admin/medias/…
+```
+
+To choose the prefix or the host yourself, import `@SyliusHappyCMSPlugin/config/routes/media_admin.php` (and
+`media_public.php`) instead of `config/routes.yaml`.
+
 ## Documentation
 
 ### Integrate with FOS CKEditor
@@ -281,6 +298,9 @@ sylius_happy_cms:
         base_url: '/media/download'
         media_entity: App\Entity\HappyCMS\Media\Media
         folder_entity: App\Entity\HappyCMS\Media\Folder
+
+        # path of the media manager routes (media.*), below the prefix of their import
+        admin_path: 'happy-cms-media/medias'
 
         # ignore any file starts with "."
         ignore_files:         '/^\..*/'

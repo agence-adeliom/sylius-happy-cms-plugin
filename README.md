@@ -126,6 +126,23 @@ sylius_easy_crud:
   resource: "@SyliusEasyCrudPlugin/config/routes.yaml"
 ```
 
+The admin routes (`config/routes.yaml`) are served under the Sylius admin path
+(`/%sylius_admin.path_name%`, `/admin` by default). If your admin uses another prefix or its own host, import the
+prefix-less files instead of `config/routes.yaml` and set your own `prefix` / `host`:
+
+```yaml
+sylius_happy_cms_admin:
+  resource: "@SyliusHappyCMSPlugin/config/routes/admin.yaml"
+  host: '%admin_host%'
+
+sylius_happy_cms_media_admin:
+  resource: "@SyliusHappyCMSPlugin/config/routes/media_admin.php"
+  host: '%admin_host%'
+
+sylius_happy_cms_media_public:
+  resource: "@SyliusHappyCMSPlugin/config/routes/media_public.php"
+```
+
 ### 5. Configure your firewall to protect preview routes
 
 All admin users with ROLE_ALLOWED_TO_SWITCH AND ROLE_HAPPY_CMS_CONTENT_BUILDER will be able to preview CMS routable entities.
@@ -249,6 +266,21 @@ Import the AI development guides for efficient development:
 Create or update `.cursorrules`, `AGENTS.md`, or your AI configuration file with similar content pointing to the guides in `vendor/agence-adeliom/sylius-happy-cms-plugin/docs/agents/`.
 
 Add "See @CLAUDE.md"
+
+#### Symfony AI Mate tools
+
+With [Symfony AI Mate](https://symfony.com/doc/current/ai/components/mate.html) and `sylius/sylius-mate-extension` installed
+(`composer require --dev sylius/sylius-mate-extension`, then `vendor/bin/mate discover`), the plugin exposes read-only
+debugging tools to your AI assistant, next to the `easy_crud_*` tools of the easy-crud plugin:
+
+| Tool | Answers |
+|---|---|
+| `happy_cms_match_url` | Which route serves a URL (CMS or Symfony), the content behind a CMS route and its publication state; on a 404, the CMS candidates and the trailing slash variant |
+| `happy_cms_list_blocks` | The registered flex and shared blocks (stored `block_type`, template, assets), or those allowed in the flexible content fields of a resource |
+| `happy_cms_content_blocks` | The blocks stored by an entity (JSON flexible content and page builder), each one rendered on its own with its error; or the block types stored by every entity of a resource |
+
+They boot the application kernel in `dev` and, except `happy_cms_list_blocks`, read the database. See
+[`config/mate/INSTRUCTIONS.md`](./config/mate/INSTRUCTIONS.md).
 
 ---
 

@@ -146,7 +146,7 @@ abstract class AbstractMenuItemAdmin extends AbstractAdmin implements MenuItemAd
          *     factory: class-string,
          *  }
          * }|null> $syliusResources */
-        $syliusResources = $this->crudAdminFactory->parameterBag->get('sylius.resources');
+        $syliusResources = $this->parameterBag->get('sylius.resources');
         if ($menuId && is_array($syliusResources['sylius_happy_cms.menu']) && is_array($syliusResources['sylius_happy_cms.menu']['classes'])) {
             yield Field::new('menu', 'sylius_happy_cms.menu_item.admin.field.menu')
                 ->onlyOnForms()
@@ -204,7 +204,7 @@ abstract class AbstractMenuItemAdmin extends AbstractAdmin implements MenuItemAd
     private function getMenuId(): ?int
     {
         $resource = $this->getResource();
-        $request = $this->crudAdminFactory->requestStack->getCurrentRequest();
+        $request = $this->requestStack->getCurrentRequest();
 
         if (!$request) {
             return null;
