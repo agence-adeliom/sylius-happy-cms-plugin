@@ -97,6 +97,12 @@ class Folder extends BaseFolder
 }
 ```
 
+## Routes
+
+The media routes (admin media manager `media.*`, and the public download route `media.file_download`
+on `/media/download/{path}`) are defined in `config/routes/media_admin.php` and `config/routes/media_public.php`.
+They are imported by the plugin `config/routes.yaml`, which your project already imports: nothing to add.
+
 ## Documentation
 
 ### Integrate with FOS CKEditor
