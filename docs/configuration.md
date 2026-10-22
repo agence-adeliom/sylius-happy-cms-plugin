@@ -18,6 +18,10 @@ sylius_happy_cms:
   seo:
     title:
       suffix: ACME
+    # Optional (default: true): register the seo_metas(), seo_title() and seo_breadcrumb()
+    # Twig functions and the happy_cms_seo global. Set to false if your project defines its own
+    # functions with these names; the plugin front templates that call them must then be overridden.
+    enable_twig_extension: true
 
   config:
     config_model: App\Entity\HappyCMS\Config\Config
@@ -55,6 +59,13 @@ sylius_happy_cms:
     redirect_route_model: App\Entity\HappyCMS\Cmf\RedirectRoute
     redirect_route_repository: App\Repository\HappyCMS\Cmf\RedirectRouteRepository
     redirect_route_admin:  App\Admin\HappyCMS\Cmf\RedirectRouteAdmin
+    # Optional (default: true): on each 404, redirect to the matching redirect route when it has a
+    # target. Set to false if your project handles redirections itself.
+    enable_redirection: true
+    # Optional (default: true): on each 404, record the unknown URL as a new redirect route
+    # (one row per URL and host) to configure from the admin. Set to false to keep the table free of
+    # crawler and typo URLs. With both options set to false the 404 listener is not registered.
+    enable_not_found_recording: true
 ```
 
 2. Into `config/packages/sylius_resources.yaml` add :
