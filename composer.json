@@ -34,7 +34,7 @@
         "ext-exif": "*",
         "ext-intl": "*",
         "ext-json": "*",
-        "agence-adeliom/sylius-easy-crud-plugin": "^2.4",
+        "agence-adeliom/sylius-easy-crud-plugin": "^2.3.2",
         "emileperron/tinymce-bundle": "^3.0",
         "illuminate/support": "^v11.33.2",
         "james-heinrich/getid3": "^1.9",
@@ -101,7 +101,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-2.4.x": "2.4-dev"
+            "dev-2.3.x": "2.3-dev"
         },
         "ai-mate": {
             "scan-dirs": [

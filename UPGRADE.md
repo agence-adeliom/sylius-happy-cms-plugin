@@ -1,11 +1,11 @@
 # Upgrade
 
-## 2.4.0
+## 2.3.1
 
-### `agence-adeliom/sylius-easy-crud-plugin` ^2.4 is required
+### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required
 
-easy-crud 2.4 removes `CrudAdminFactory`, which the happy-cms Admins used. happy-cms now requires
-`agence-adeliom/sylius-easy-crud-plugin: ^2.4`, and easy-crud 2.4 declares a Composer `conflict` with happy-cms < 2.4:
+easy-crud 2.3.2 removes `CrudAdminFactory`, which the happy-cms Admins used. happy-cms now requires
+`agence-adeliom/sylius-easy-crud-plugin: ^2.3.2`, and easy-crud 2.3.2 declares a Composer `conflict` with happy-cms < 2.3.1:
 the two plugins must be updated together.
 
 ```bash
@@ -27,7 +27,7 @@ composer update agence-adeliom/sylius-easy-crud-plugin agence-adeliom/sylius-hap
 - **A controller extending `SyliusCrudResourceController` calls `resetBuild()`**: remove the call, the method no
   longer exists.
 
-See the [easy-crud 2.4 upgrade notes](https://github.com/agence-adeliom/sylius-easy-crud-plugin/blob/2.4.x/UPGRADE.md)
+See the [easy-crud 2.3.2 upgrade notes](https://github.com/agence-adeliom/sylius-easy-crud-plugin/blob/2.3.x/UPGRADE.md)
 for the full list of changes (removed services, `CrudViewBuilder`, resource context).
 
 `ConfigTranslatableDataMapper` and `ContentTranslatableDataMapper` now type their property accessor argument with
