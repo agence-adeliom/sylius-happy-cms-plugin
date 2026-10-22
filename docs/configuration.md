@@ -37,6 +37,7 @@ sylius_happy_cms:
   media:
     storage_name: uploads.storage
     base_url: '/media/download'
+    admin_path: 'happy-cms-media/medias' # media manager path, below the admin prefix
     media_entity: App\Entity\HappyCMS\Media\Media
     folder_entity: App\Entity\HappyCMS\Media\Folder
 

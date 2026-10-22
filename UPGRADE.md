@@ -55,6 +55,20 @@ project routes.
 - The route files moved from `config/media/routes.php` and `config/media/public_routes.php` to
   `config/routes/media_admin.php` and `config/routes/media_public.php`. Only matters if you imported them directly.
 
+### New option: path of the media manager
+
+`sylius_happy_cms.media.admin_path` sets the path of the media manager routes (`media.*`) below the prefix of their
+import. The default, `happy-cms-media/medias`, keeps the current URLs: nothing to do.
+
+```yaml
+sylius_happy_cms:
+    media:
+        admin_path: medias   # media manager on /admin/medias/…
+```
+
+Leading and trailing `/` are removed (`/medias` and `medias` are the same). The routes are generated with `path()`, so templates and the media
+manager JavaScript follow it.
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required
