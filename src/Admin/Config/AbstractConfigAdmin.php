@@ -30,7 +30,7 @@ abstract class AbstractConfigAdmin extends AbstractAdmin implements ConfigAdminI
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         parent::buildForm($builder, $options);
-        $builder->setDataMapper(new ConfigTranslatableDataMapper($this->crudAdminFactory->getPropertyAccessor()));
+        $builder->setDataMapper(new ConfigTranslatableDataMapper($this->propertyAccessor));
     }
 
     public function configureFields(string $pageName, ?string $context = null): iterable

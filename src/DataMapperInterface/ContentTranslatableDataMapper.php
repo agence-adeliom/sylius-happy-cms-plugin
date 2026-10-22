@@ -8,7 +8,7 @@ use Sylius\Component\Locale\Provider\LocaleProviderInterface;
 use Sylius\Resource\Model\TranslatableInterface;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Form;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 class ContentTranslatableDataMapper implements DataMapperInterface
 {
@@ -17,7 +17,7 @@ class ContentTranslatableDataMapper implements DataMapperInterface
     public function __construct(
         private string $class,
         protected LocaleProviderInterface $localeProvider,
-        protected PropertyAccessor $propertyAccessor,
+        protected PropertyAccessorInterface $propertyAccessor,
         ?string $context = null,
     ) {
         // get the current locale based on context, or fallback on default locale
