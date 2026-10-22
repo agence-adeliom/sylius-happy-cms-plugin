@@ -5,24 +5,26 @@ declare(strict_types=1);
 namespace Tests\Adeliom\SyliusHappyCMSPlugin\Unit\DependencyInjection\Compiler;
 
 use Adeliom\SyliusHappyCMSPlugin\DependencyInjection\Compiler\DynamicRouterRouteClassGuardPass;
-use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\Route;
+use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\Route as BaseRoute;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
+use Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Cmf\Route;
 
 final class DynamicRouterRouteClassGuardPassTest extends TestCase
 {
-    public function testTheDynamicRouterIsLeftOutWhenTheRouteClassDoesNotExist(): void
+    public function testTheDynamicRouterIsLeftOutWhileTheRouteModelIsNotConfigured(): void
     {
-        $container = $this->createContainer('App\Entity\HappyCMS\Cmf\MissingRoute');
+        $container = $this->createContainer(BaseRoute::class);
 
         (new DynamicRouterRouteClassGuardPass())->process($container);
 
         self::assertSame(['router.default'], $this->chainedRouters($container));
     }
 
-    public function testTheDynamicRouterIsKeptWhenTheRouteClassExists(): void
+    public function testTheDynamicRouterIsKeptWithTheRouteEntity(): void
     {
         $container = $this->createContainer(Route::class);
 
@@ -34,11 +36,21 @@ final class DynamicRouterRouteClassGuardPassTest extends TestCase
     public function testTheRouteClassParameterIsResolved(): void
     {
         $container = $this->createContainer('%app.route_class%');
-        $container->setParameter('app.route_class', Route::class);
+        $container->setParameter('app.route_class', BaseRoute::class);
 
         (new DynamicRouterRouteClassGuardPass())->process($container);
 
-        self::assertSame(['router.default', 'cmf_routing.dynamic_router'], $this->chainedRouters($container));
+        self::assertSame(['router.default'], $this->chainedRouters($container));
+    }
+
+    public function testAMissingRouteClassFailsTheContainerBuild(): void
+    {
+        $container = $this->createContainer('App\Entity\HappyCMS\Cmf\MissingRoute');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The CMF route class "App\Entity\HappyCMS\Cmf\MissingRoute"');
+
+        (new DynamicRouterRouteClassGuardPass())->process($container);
     }
 
     public function testNothingHappensWithoutTheChainRouter(): void
