@@ -32,7 +32,7 @@ final class MediaRoutesTest extends KernelTestCase
     }
 
     /**
-     * The media routes are registered by the plugin `config/routes.yaml`
+     * The media routes are registered by the plugin `config/routes.php`
      * (`config/routes/media_admin.php` and `media_public.php`), not by a route loader.
      */
     public function testMediaRoutesAreRegisteredByThePluginRoutesFile(): void

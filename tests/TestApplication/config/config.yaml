@@ -1,6 +1,6 @@
 imports:
     - { resource: "@SyliusEasyCrudPlugin/config/config.yaml" }
-    - { resource: "@SyliusHappyCMSPlugin/config/config.yaml" }
+    - { resource: "@SyliusHappyCMSPlugin/config/config.php" }
     - { resource: "packages/sylius_happy_cms.yaml" }
     - { resource: "packages/sylius_resource.yaml" }
     - { resource: "packages/cmf_routing.yaml" }

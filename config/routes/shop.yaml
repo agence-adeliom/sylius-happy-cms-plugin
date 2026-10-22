@@ -1,1 +1,4 @@
-# Define your own shop routes here
+# Deprecated since 2.3, removed in 3.0: import `@SyliusHappyCMSPlugin/config/routes/shop.php` instead.
+# This file only imports it.
+sylius_happy_cms_shop:
+  resource: "shop.php"

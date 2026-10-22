@@ -1,19 +1,4 @@
-parameters:
-  cmf_routing.dynamic.persistence.orm.route_class: 'App\Entity\HappyCMS\Cmf\Route'
-
-cmf_routing:
-    chain:
-        routers_by_id:
-            router.default:             100
-            cmf_routing.dynamic_router: 50
-    dynamic:
-        persistence:
-            orm:
-                enabled: true
-        locales:
-            - en_US
-        match_implicit_locale: false
-        controllers_by_class:
-            Symfony\Cmf\Component\Routing\RedirectRouteInterface: cmf_routing.redirect_controller:redirectAction
-            Symfony\Cmf\Component\Routing\RouteReferrersInterface: sylius.happy_cms.plugin.controller.render::renderAction
-            Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface: sylius.happy_cms.plugin.controller.render::renderAction
+# Deprecated since 2.3, removed in 3.0: import `@SyliusHappyCMSPlugin/config/packages/cmf_routing.php` instead.
+# This file only imports it.
+imports:
+  - { resource: "cmf_routing.php" }

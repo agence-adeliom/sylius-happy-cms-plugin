@@ -11,7 +11,7 @@ use Symfony\Component\Routing\RouterInterface;
 final class AdminRoutesTest extends KernelTestCase
 {
     /**
-     * The admin and media manager routes imported through `@SyliusHappyCMSPlugin/config/routes.yaml`
+     * The admin and media manager routes imported through `@SyliusHappyCMSPlugin/config/routes.php`
      * follow the Sylius admin path instead of a hard-coded `/admin`.
      *
      * @param array<string, string> $parameters
