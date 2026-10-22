@@ -55,7 +55,7 @@ sylius_happy_cms_page_admin:
          # needed to keep context in URL after updating flex content
                         id: $id
     type: sylius.resource
-    prefix: admin
+    prefix: '/%sylius_admin.path_name%'
 
 sylius_happy_cms_config_admin:
     resource: |
@@ -103,7 +103,7 @@ sylius_happy_cms_config_admin:
          # needed to keep context in URL after updating flex content
                         id: $id
     type: sylius.resource
-    prefix: admin
+    prefix: '/%sylius_admin.path_name%'
 
 sylius_happy_cms_menu_admin:
     resource: |
@@ -151,7 +151,7 @@ sylius_happy_cms_menu_admin:
          # needed to keep context in URL after updating flex content
                         id: $id
     type: sylius.resource
-    prefix: admin
+    prefix: '/%sylius_admin.path_name%'
 
 sylius_happy_cms_menu_item_admin:
     resource: |
@@ -203,7 +203,7 @@ sylius_happy_cms_menu_item_admin:
          # needed to keep context in URL after updating flex content
                         id: $id
     type: sylius.resource
-    prefix: admin
+    prefix: '/%sylius_admin.path_name%'
 
 sylius_happy_cms_shared_block_admin:
     resource: |
@@ -251,7 +251,7 @@ sylius_happy_cms_shared_block_admin:
          # needed to keep context in URL after updating flex content
                         id: $id
     type: sylius.resource
-    prefix: admin
+    prefix: '/%sylius_admin.path_name%'
 
 sylius_happy_cms_route_admin:
     resource: |
@@ -300,7 +300,7 @@ sylius_happy_cms_route_admin:
          # needed to keep context in URL after updating flex content
                         id: $id
     type: sylius.resource
-    prefix: admin
+    prefix: '/%sylius_admin.path_name%'
 
 sylius_happy_cms_redirect_route_admin:
     resource: |
@@ -348,4 +348,4 @@ sylius_happy_cms_redirect_route_admin:
          # needed to keep context in URL after updating flex content
                         id: $id
     type: sylius.resource
-    prefix: admin
+    prefix: '/%sylius_admin.path_name%'
