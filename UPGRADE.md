@@ -397,6 +397,12 @@ contained `//`.
 
 In 2.4 the option is removed and collapsing the repeated slashes is the only behaviour.
 
+### The CMF dynamic router is skipped while its route class does not exist
+
+When the class of `cmf_routing.dynamic.persistence.orm.route_class` (`App\Entity\HappyCMS\Cmf\Route` by
+default) does not exist, the dynamic router is no longer added to the chain router. Unknown URLs now
+answer 404 instead of a 500 (`MappingException`). Nothing changes once the class exists.
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required
