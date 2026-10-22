@@ -157,9 +157,6 @@ sylius_resource:
 3. Into `config/services.yaml` add :
 
 ```yaml
-parameters:
-  cmf_routing.dynamic.persistence.orm.route_class: 'App\Entity\HappyCMS\Cmf\Route'
-  
 services:
   adeliom.sylius.cms.plugin.listener.admin.menu_builder:
     class: Adeliom\SyliusHappyCMSPlugin\Menu\AdminMenuListener

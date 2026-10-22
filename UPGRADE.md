@@ -135,11 +135,16 @@ sylius_happy_cms:
 Leading and trailing `/` are removed (`/medias` and `medias` are the same). The routes are generated with `path()`, so templates and the media
 manager JavaScript follow it.
 
-### The CMF dynamic router is skipped while its route class does not exist
+### The CMF route class comes from `sylius_happy_cms.route.route_model`
 
-When the class of `cmf_routing.dynamic.persistence.orm.route_class` (`App\Entity\HappyCMS\Cmf\Route` by
-default) does not exist, the dynamic router is no longer added to the chain router. Unknown URLs now
-answer 404 instead of a 500 (`MappingException`). Nothing changes once the class exists.
+The plugin no longer sets the parameter `cmf_routing.dynamic.persistence.orm.route_class` to
+`App\Entity\HappyCMS\Cmf\Route`: the CMF dynamic router now uses `sylius_happy_cms.route.route_model`.
+
+- You can remove `cmf_routing.dynamic.persistence.orm.route_class` from your `parameters` when it has the same value as
+  `route_model` (a project parameter still takes precedence).
+- Without `route_model` (before `make:happy-cms:install`), the dynamic router is left out of the chain router: unknown
+  URLs answer 404 instead of a 500 (`MappingException`).
+- A route class that does not exist now fails the container build instead of answering 500 on every unknown URL.
 
 ## 2.3.1
 
