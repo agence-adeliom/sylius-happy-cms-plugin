@@ -537,7 +537,7 @@ final class InstallDefaultFiles extends AbstractMaker
                         . "                context: \$context\n # needed to keep context in URL after updating flex content\n"
                         . "                id: \$id\n",
                     'type' => 'sylius.resource',
-                    'prefix' => 'admin',
+                    'prefix' => '/%sylius_admin.path_name%',
                 ],
             ];
 
