@@ -15,7 +15,6 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 final class SyliusHappyCMSExtension extends AbstractResourceExtension implements PrependExtensionInterface
 {
@@ -52,8 +51,8 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
             ->addTag('sylius_happy_cms.seo.sitemap_dumpable')
         ;
 
-        $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../../config'));
-        $loader->load('services.yaml');
+        $loader = new PhpFileLoader($container, new FileLocator(__DIR__ . '/../../config'));
+        $loader->load('services.php');
 
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__ . '/../../config/media'));
         $loader->load('services.php');
