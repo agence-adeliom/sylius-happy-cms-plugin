@@ -86,9 +86,6 @@ sylius_twig_hooks:
       move_bottom:
         template: '@SyliusHappyCMSPlugin/page/crud/tree/actions/dropdown/move_bottom.html.twig'
         priority: 1
-      manage_content:
-        template: '@SyliusHappyCMSPlugin/page/crud/tree/actions/dropdown/manage_content.html.twig'
-        priority: 0
       delete:
         component: 'happycms-page-tree-delete'
         props:
