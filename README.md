@@ -147,6 +147,11 @@ sylius_happy_cms_media_public:
 
 All admin users with ROLE_ALLOWED_TO_SWITCH AND ROLE_HAPPY_CMS_CONTENT_BUILDER will be able to preview CMS routable entities.
 
+> **Required for the page builder.** Preview URLs (`?happy_cms_preview=1`) are rendered on the shop side. Without this firewall,
+> the admin session is not loaded there and the preview fails with `Access Denied to preview content document`.
+> The `admin_happy_cms_content_builder` firewall must be declared **before** the `shop` firewall (the first matching firewall wins),
+> and the `role_hierarchy` entry below is mandatory.
+
 In config/packages/security.yaml
 
 ```yaml 

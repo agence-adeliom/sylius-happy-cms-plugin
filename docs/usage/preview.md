@@ -28,6 +28,16 @@ The legacy system uses a separate preview route with `-preview` suffix.
 https://yoursite.com/my-page-preview
 ```
 
+## Troubleshooting: "Access Denied to preview content document"
+
+The preview is rendered on the shop side, so the admin session must be available there. Check that:
+
+- the `admin_happy_cms_content_builder` firewall is declared in `security.yaml` **before** the `shop` firewall (see the README, step 5);
+- `role_hierarchy` contains `ROLE_ADMINISTRATION_ACCESS: [ ROLE_HAPPY_CMS_CONTENT_BUILDER ]`;
+- you are logged in to the admin with a user having that role, in the same browser as the page builder.
+
+In this repository's test application, run `make configure-preview-mode` (or `composer run configure-preview-mode`) then clear the cache.
+
 ## Access Control
 
 The roles allowed to access a resource preview can be defined using the `ContentPreview` attribute.

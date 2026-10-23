@@ -13,6 +13,7 @@ install:
 	yarn install || true
 	#yarn run || true
 	@make init
+	@make configure-preview-mode
 	@make install-database
 	@make frontend-clear
 	echo "Setup completed! You can now access the application at http://localhost"

@@ -141,7 +141,11 @@
             "cd vendor/sylius/test-application && yarn install && yarn build",
             "vendor/bin/console assets:install"
         ],
+        "configure-preview-mode": [
+            "cp config/packages/tpl/_security.yaml vendor/sylius/test-application/config/packages/security.yaml"
+        ],
         "test-app-init": [
+            "@configure-preview-mode",
             "@database-reset",
             "@frontend-clear"
         ]

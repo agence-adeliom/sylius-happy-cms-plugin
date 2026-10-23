@@ -8,7 +8,7 @@ See [MIGRATION_CONTENT_BLOCKS.md](./MIGRATION_CONTENT_BLOCKS.md) for details.
 
 ## Url pattern for preview routes has changed
 
-Instead of managing 2 routes (online and preview), now only online route is used. To get preview mode, just add ?preview=1 in your url.
+Instead of managing 2 routes (online and preview), now only online route is used. To get preview mode, just add ?happy_cms_preview=1 in your url.
 A DocumentVoter and specific firewall will check if current user is granted to access to preview mode.
 
 Globally all user with ROLE_HAPPY_CMS_CONTENT_BUILDER will be able to manage content and access to preview mode.
