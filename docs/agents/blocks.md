@@ -205,7 +205,8 @@ class NewsletterBlock extends AbstractSharedBlockType
 
 > **Attribute alternative**: when `sylius_easy_crud.attributes.enabled` is true, declare the static metadata with
 > `#[AsBlock(name:, template:, icon: '', position: 100, tab: null)]` on a class extending `AbstractBlock`
-> (`#[AsSharedBlock(name:, template:, icon: '', position: 100, description: null)]` on an `AbstractSharedBlockType`)
+> (`#[AsSharedBlock(name:, template:, icon: '', position: 100, description: null)]` on an `AbstractSharedBlockType`;
+> `#[AsSharedBlock(block: ContentBlock::class)]` takes the metadata and the form of a content block, no method needed)
 > instead of the methods below. An overridden method wins over the attribute: keep a method for dynamic values
 > (e.g. an icon built with `$this->getPackages()`). See `docs/blocks.md`.
 

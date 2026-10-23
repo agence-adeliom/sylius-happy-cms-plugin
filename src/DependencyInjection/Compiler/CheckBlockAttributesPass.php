@@ -11,6 +11,7 @@ use Adeliom\SyliusHappyCMSPlugin\Factory\Block\AbstractBlock;
 use Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock\AbstractSharedBlockType;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Checks the #[AsBlock] / #[AsSharedBlock] declarations at container build time, rather than when the page builder
@@ -18,7 +19,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  *   - the attributes are only allowed when "sylius_easy_crud.attributes.enabled" is true (the project's "attribute
  *     mode", shared with #[AsAdmin]); a project left on the legacy declarations keeps overriding the methods;
  *   - an attribute is only read by AbstractBlock / AbstractSharedBlockType: on any other class it would be ignored;
- *   - a block without attribute must override getName(), getIcon() and getFrontEndTemplatePath().
+ *   - a block without attribute must override getName(), getIcon() and getFrontEndTemplatePath();
+ *   - #[AsSharedBlock] needs a name and a template, unless it takes them from a content block with $block: that
+ *     block must be a registered content block, injected into the shared block (setSharedBlockSource()).
  */
 final class CheckBlockAttributesPass implements CompilerPassInterface
 {
@@ -57,6 +60,15 @@ final class CheckBlockAttributesPass implements CompilerPassInterface
             }
         }
 
+        /** @var array<class-string, string> $contentBlocks service id by class */
+        $contentBlocks = [];
+        foreach ($container->findTaggedServiceIds('sylius.happy_cms.block') as $id => $tags) {
+            $class = $this->serviceClass($container, $id);
+            if (null !== $class && is_subclass_of($class, AbstractBlock::class)) {
+                $contentBlocks[$class] = $id;
+            }
+        }
+
         foreach (self::ATTRIBUTES as $attributeClass => $config) {
             foreach ($container->findTaggedServiceIds($config['tag']) as $id => $tags) {
                 $class = $this->serviceClass($container, $id);
@@ -77,9 +89,52 @@ final class CheckBlockAttributesPass implements CompilerPassInterface
 
                 if (!$hasAttribute) {
                     $this->assertMetadataMethodsOverridden($class, $config['base'], $attributeClass);
+                } elseif (AsSharedBlock::class === $attributeClass) {
+                    $this->configureSharedBlock($container, $id, $class, $contentBlocks);
                 }
             }
         }
+    }
+
+    /**
+     * @param class-string                $class
+     * @param array<class-string, string> $contentBlocks
+     */
+    private function configureSharedBlock(ContainerBuilder $container, string $id, string $class, array $contentBlocks): void
+    {
+        $attribute = BlockAttributeResolver::find($class, AsSharedBlock::class);
+        if (null === $attribute) {
+            return;
+        }
+
+        if (null === $attribute->block) {
+            $missing = array_filter(
+                ['name' => 'getName', 'template' => 'getFrontEndTemplatePath'],
+                static fn (string $method, string $argument): bool => null === $attribute->{$argument} &&
+                    AbstractSharedBlockType::class === (new \ReflectionMethod($class, $method))->getDeclaringClass()->getName(),
+                \ARRAY_FILTER_USE_BOTH,
+            );
+            if ([] !== $missing) {
+                throw new \LogicException(sprintf(
+                    'The shared block "%s" has no %s: set it in #[AsSharedBlock], or take it from a content block with ' .
+                    '#[AsSharedBlock(block: YourContentBlock::class)].',
+                    $class,
+                    implode(' nor ', array_keys($missing)),
+                ));
+            }
+
+            return;
+        }
+
+        $sourceId = $contentBlocks[$attribute->block] ?? throw new \LogicException(sprintf(
+            'The shared block "%s" takes its metadata and its form from "%s" (#[AsSharedBlock(block:)]), which is not a ' .
+            'registered content block: it must be a service extending "%s" (autoconfigured, or tagged "sylius.happy_cms.block").',
+            $class,
+            $attribute->block,
+            AbstractBlock::class,
+        ));
+
+        $container->findDefinition($id)->addMethodCall('setSharedBlockSource', [new Reference($sourceId)]);
     }
 
     /**

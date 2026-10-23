@@ -7,13 +7,17 @@ namespace Tests\Adeliom\SyliusHappyCMSPlugin\Unit\DependencyInjection;
 use Adeliom\SyliusHappyCMSPlugin\DependencyInjection\Compiler\CheckBlockAttributesPass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\DependencyInjection\Fixtures\AttributeOnPlainFormType;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\Factory\Block\Fixtures\AttributeBlock;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\Factory\Block\Fixtures\ChildOfAttributeBlock;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\Factory\Block\Fixtures\LegacyBlock;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\Factory\Block\Fixtures\NoMetadataBlock;
+use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\Factory\Block\Fixtures\TitleContentBlock;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\Factory\SharedBlock\Fixtures\AttributeSharedBlock;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\Factory\SharedBlock\Fixtures\NoMetadataSharedBlock;
+use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\Factory\SharedBlock\Fixtures\SharedFromContentBlock;
+use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\Factory\SharedBlock\Fixtures\SharedWithoutName;
 
 final class CheckBlockAttributesPassTest extends TestCase
 {
@@ -105,6 +109,42 @@ final class CheckBlockAttributesPassTest extends TestCase
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(sprintf('The block "%s" has no metadata: set #[AsSharedBlock] on the class', NoMetadataSharedBlock::class));
+
+        (new CheckBlockAttributesPass())->process($container);
+    }
+
+    public function testTheContentBlockIsInjectedIntoTheSharedBlockTakingItsMetadata(): void
+    {
+        $container = $this->container(true);
+        $container->register('app.title_block', TitleContentBlock::class)->addTag('sylius.happy_cms.block');
+        $this->registerSharedBlock($container, SharedFromContentBlock::class, attribute: true);
+
+        (new CheckBlockAttributesPass())->process($container);
+
+        self::assertEquals(
+            [['setSharedBlockSource', [new Reference('app.title_block')]]],
+            $container->getDefinition(SharedFromContentBlock::class)->getMethodCalls(),
+        );
+    }
+
+    public function testASharedBlockTakingAnUnregisteredContentBlockIsRejected(): void
+    {
+        $container = $this->container(true);
+        $this->registerSharedBlock($container, SharedFromContentBlock::class, attribute: true);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(sprintf('The shared block "%s" takes its metadata and its form from "%s" (#[AsSharedBlock(block:)]), which is not a registered content block', SharedFromContentBlock::class, TitleContentBlock::class));
+
+        (new CheckBlockAttributesPass())->process($container);
+    }
+
+    public function testASharedBlockAttributeWithoutNameNorContentBlockIsRejected(): void
+    {
+        $container = $this->container(true);
+        $this->registerSharedBlock($container, SharedWithoutName::class, attribute: true);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(sprintf('The shared block "%s" has no name: set it in #[AsSharedBlock], or take it from a content block', SharedWithoutName::class));
 
         (new CheckBlockAttributesPass())->process($container);
     }

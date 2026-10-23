@@ -256,6 +256,21 @@ class TestimonialBlock extends AbstractBlock
 `#[AsSharedBlock]` takes `name`, `template`, `icon`, `position` and `description` (feeds `getDescription()`,
 `''` by default).
 
+A shared block can take the metadata **and the form** of a content block with `block`: the values left out of the
+attribute come from that block (its methods, so a block with computed metadata works too), `buildBlock()` delegates to
+it, and the values set in the attribute win:
+
+```php
+#[AsSharedBlock(block: TestimonialBlock::class, description: 'Testimonial shared between pages')]
+class SharedTestimonialBlock extends AbstractSharedBlockType
+{
+}
+```
+
+The content block must be a registered block service (extending `AbstractBlock`): the container injects it into the
+shared block (`setSharedBlockSource()`), and fails to compile otherwise. Without `block`, `name` and `template` are
+required (in the attribute or as methods).
+
 - **The method wins**: keep overriding a method when the value is not static (an icon built with
   `$this->getPackages()`, metadata delegated to another block…), the attribute serves the others.
 - **Inheritance**: a block extending a concrete block inherits its attribute.

@@ -28,6 +28,9 @@ compiles):
 A `getDescription()` declared in a class extending `AbstractSharedBlockType` must be compatible with
 `public function getDescription(): string`.
 
+`#[AsSharedBlock(block: ContentBlock::class)]` makes a shared block take the metadata and the form (`buildBlock()`)
+of a content block, injected by the container through `AbstractSharedBlockType::setSharedBlockSource()`.
+
 The attributes require `sylius_easy_crud.attributes.enabled: true`. The makers generate them only in that case.
 
 ### SEO Twig functions typed on `SeoInterface`

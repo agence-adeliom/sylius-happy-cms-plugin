@@ -7,6 +7,7 @@ namespace Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock;
 use Adeliom\SyliusHappyCMSPlugin\Attribute\AsSharedBlock;
 use Adeliom\SyliusHappyCMSPlugin\Attribute\BlockAttributeResolver;
 use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableInterface;
+use Adeliom\SyliusHappyCMSPlugin\Factory\Block\AbstractBlock;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -18,11 +19,23 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Base of the shared blocks. The metadata methods (getName(), getIcon(), getFrontEndTemplatePath(), getPosition(),
  * getDescription()) read #[AsSharedBlock] by default; a block overrides them when its metadata is not static.
+ * With #[AsSharedBlock(block:)], the values left out of the attribute and the form (buildBlock()) come from that
+ * content block, injected by CheckBlockAttributesPass.
  */
 abstract class AbstractSharedBlockType extends AbstractType implements SharedBlockTypeInterface
 {
+    private ?AbstractBlock $sharedBlockSource = null;
+
     public function __construct(protected EntityManagerInterface $manager)
     {
+    }
+
+    /**
+     * @internal called by the container for #[AsSharedBlock(block:)] (see CheckBlockAttributesPass)
+     */
+    public function setSharedBlockSource(AbstractBlock $block): void
+    {
+        $this->sharedBlockSource = $block;
     }
 
     public function getManager(): EntityManagerInterface
@@ -46,6 +59,7 @@ abstract class AbstractSharedBlockType extends AbstractType implements SharedBlo
      */
     public function buildBlock(FormBuilderInterface $builder, array $options): void
     {
+        $this->sourceBlock()?->buildBlock($builder, $options);
     }
 
     public function buildView(FormView $view, FormInterface $form, array $options): void
@@ -118,7 +132,9 @@ abstract class AbstractSharedBlockType extends AbstractType implements SharedBlo
 
     public function getName(): string
     {
-        return BlockAttributeResolver::get(static::class, AsSharedBlock::class, __FUNCTION__)->name;
+        return BlockAttributeResolver::get(static::class, AsSharedBlock::class, __FUNCTION__)->name
+            ?? $this->sourceBlock()?->getName()
+            ?? throw $this->missingMetadata(__FUNCTION__);
     }
 
     /**
@@ -126,12 +142,16 @@ abstract class AbstractSharedBlockType extends AbstractType implements SharedBlo
      */
     public function getIcon(): string|array
     {
-        return BlockAttributeResolver::get(static::class, AsSharedBlock::class, __FUNCTION__)->icon;
+        return BlockAttributeResolver::get(static::class, AsSharedBlock::class, __FUNCTION__)->icon
+            ?? $this->sourceBlock()?->getIcon()
+            ?? '';
     }
 
     public function getFrontEndTemplatePath(): string
     {
-        return BlockAttributeResolver::get(static::class, AsSharedBlock::class, __FUNCTION__)->template;
+        return BlockAttributeResolver::get(static::class, AsSharedBlock::class, __FUNCTION__)->template
+            ?? $this->sourceBlock()?->getFrontEndTemplatePath()
+            ?? throw $this->missingMetadata(__FUNCTION__);
     }
 
     /**
@@ -144,11 +164,41 @@ abstract class AbstractSharedBlockType extends AbstractType implements SharedBlo
 
     public function getPosition(): int
     {
-        return BlockAttributeResolver::find(static::class, AsSharedBlock::class)->position ?? 100;
+        return BlockAttributeResolver::find(static::class, AsSharedBlock::class)->position
+            ?? $this->sourceBlock()?->getPosition()
+            ?? 100;
     }
 
     public function supports(?ContentEditableInterface $resource = null): bool
     {
         return true;
+    }
+
+    /**
+     * The content block of #[AsSharedBlock(block:)], null without it.
+     */
+    private function sourceBlock(): ?AbstractBlock
+    {
+        $source = BlockAttributeResolver::find(static::class, AsSharedBlock::class)->block ?? null;
+        if (null === $source) {
+            return null;
+        }
+
+        return $this->sharedBlockSource ?? throw new \LogicException(sprintf(
+            'The shared block "%s" takes the metadata and the form of "%s" (#[AsSharedBlock(block:)]) but this block ' .
+            'was not injected: get the shared block from the container, or call setSharedBlockSource().',
+            static::class,
+            $source,
+        ));
+    }
+
+    private function missingMetadata(string $method): \LogicException
+    {
+        return new \LogicException(sprintf(
+            'The shared block "%s" has no metadata for %s(): set it in #[AsSharedBlock], set #[AsSharedBlock(block:)] ' .
+            'or override %2$s().',
+            static::class,
+            $method,
+        ));
     }
 }
