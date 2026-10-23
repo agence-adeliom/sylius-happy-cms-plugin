@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\DependencyInjection;
 
+use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\Route as BaseRoute;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockTypeInterface;
 use Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock\SharedBlockTypeInterface;
 use Adeliom\SyliusHappyCMSPlugin\Services\Seo\Sitemap\SitemapDumperInterface;
@@ -200,6 +201,30 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
         ];
 
         $container->prependExtensionConfig('twig', $twigConfig);
+
+        $this->prependCmfRouteClass($container);
+    }
+
+    /**
+     * Gives `route.route_model` to the CMF dynamic router, so the route class is configured once.
+     *
+     * Before `make:happy-cms:install` there is no `route_model`: the base `Route` mapped superclass of the plugin is
+     * given instead (rather than the CMF default entity, whose Doctrine mapping would then be registered), and
+     * `DynamicRouterRouteClassGuardPass` leaves the dynamic router out of the chain router.
+     */
+    private function prependCmfRouteClass(ContainerBuilder $container): void
+    {
+        $routeClass = BaseRoute::class;
+        foreach ($container->getExtensionConfig($this->getAlias()) as $config) {
+            $route = $config['route'] ?? null;
+            if (is_array($route) && is_string($route['route_model'] ?? null) && '' !== $route['route_model']) {
+                $routeClass = $route['route_model'];
+            }
+        }
+
+        $container->prependExtensionConfig('cmf_routing', [
+            'dynamic' => ['persistence' => ['orm' => ['route_class' => $routeClass]]],
+        ]);
     }
 
     protected function getMigrationsNamespace(): string

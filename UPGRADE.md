@@ -135,6 +135,17 @@ sylius_happy_cms:
 Leading and trailing `/` are removed (`/medias` and `medias` are the same). The routes are generated with `path()`, so templates and the media
 manager JavaScript follow it.
 
+### The CMF route class comes from `sylius_happy_cms.route.route_model`
+
+The plugin no longer sets the parameter `cmf_routing.dynamic.persistence.orm.route_class` to
+`App\Entity\HappyCMS\Cmf\Route`: the CMF dynamic router now uses `sylius_happy_cms.route.route_model`.
+
+- You can remove `cmf_routing.dynamic.persistence.orm.route_class` from your `parameters` when it has the same value as
+  `route_model` (a project parameter still takes precedence).
+- Without `route_model` (before `make:happy-cms:install`), the dynamic router is left out of the chain router: unknown
+  URLs answer 404 instead of a 500 (`MappingException`).
+- A route class that does not exist now fails the container build instead of answering 500 on every unknown URL.
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required
