@@ -61,8 +61,8 @@ abstract class AbstractPageAdmin extends AbstractAdmin implements PageAdminInter
         if ($resource) {
             $contentAction = Action::new(
                 'content',
-                'sylius_happy_cms.page.admin.action.manage_content',
-                'bi:card-heading',
+                'sylius_happy_cms.page.admin.action.page_builder',
+                'tabler:layout-grid-add',
             )->linkToRoute('sylius_happy_cms_admin_page_builder', [
                 'resource' => $this->getResourceAlias(),
                 'id' => $resource->getId(),
@@ -72,8 +72,8 @@ abstract class AbstractPageAdmin extends AbstractAdmin implements PageAdminInter
         } else {
             $contentAction = Action::new(
                 'content',
-                'sylius_happy_cms.page.admin.action.manage_content',
-                'bi:card-heading',
+                'sylius_happy_cms.page.admin.action.page_builder',
+                'tabler:layout-grid-add',
             )->linkToRoute('sylius_happy_cms_admin_page_builder', [
                 'resource' => $this->getResourceAlias() ?? 'sylius_happy_cms.page',
             ]);

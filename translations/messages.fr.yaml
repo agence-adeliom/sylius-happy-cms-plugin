@@ -20,7 +20,7 @@ sylius_happy_cms:
   page:
     admin:
       action:
-        manage_content: Gérer le contenu
+        page_builder: Page builder
         index: Retour à la liste
         clear_cache: Vider le cache HTTP
       crud:
