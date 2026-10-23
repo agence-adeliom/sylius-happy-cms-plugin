@@ -68,6 +68,16 @@ export default class extends Controller {
       togglerPrototyp.classList.add('infinite-tree-leaf');
     }
 
-    return itemPrototyp.outerHTML.replaceAll('__PAGE_ID__', id).replaceAll('__PAGE_NAME__', name);
+    // Placeholders are also injected into attributes (title, test attribute), so quotes must be escaped too.
+    const escapeHtml = (value) => String(value)
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;');
+
+    return itemPrototyp.outerHTML
+      .replaceAll('__PAGE_ID__', escapeHtml(id))
+      .replaceAll('__PAGE_NAME__', escapeHtml(name));
   }
 }
