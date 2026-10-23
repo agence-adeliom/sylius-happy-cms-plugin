@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock;
 
+use Adeliom\SyliusHappyCMSPlugin\Attribute\AsSharedBlock;
+use Adeliom\SyliusHappyCMSPlugin\Attribute\BlockAttributeResolver;
 use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
@@ -13,6 +15,10 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Base of the shared blocks. The metadata methods (getName(), getIcon(), getFrontEndTemplatePath(), getPosition(),
+ * getDescription()) read #[AsSharedBlock] by default; a block overrides them when its metadata is not static.
+ */
 abstract class AbstractSharedBlockType extends AbstractType implements SharedBlockTypeInterface
 {
     public function __construct(protected EntityManagerInterface $manager)
@@ -110,9 +116,35 @@ abstract class AbstractSharedBlockType extends AbstractType implements SharedBlo
         return [];
     }
 
+    public function getName(): string
+    {
+        return BlockAttributeResolver::get(static::class, AsSharedBlock::class, __FUNCTION__)->name;
+    }
+
+    /**
+     * @return string|mixed[]
+     */
+    public function getIcon(): string|array
+    {
+        return BlockAttributeResolver::get(static::class, AsSharedBlock::class, __FUNCTION__)->icon;
+    }
+
+    public function getFrontEndTemplatePath(): string
+    {
+        return BlockAttributeResolver::get(static::class, AsSharedBlock::class, __FUNCTION__)->template;
+    }
+
+    /**
+     * Not part of SharedBlockTypeInterface: shown in the shared block type picker (shared_block/crud/select/blocks.html.twig).
+     */
+    public function getDescription(): string
+    {
+        return BlockAttributeResolver::find(static::class, AsSharedBlock::class)->description ?? '';
+    }
+
     public function getPosition(): int
     {
-        return 100;
+        return BlockAttributeResolver::find(static::class, AsSharedBlock::class)->position ?? 100;
     }
 
     public function supports(?ContentEditableInterface $resource = null): bool
