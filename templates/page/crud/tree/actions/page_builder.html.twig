@@ -1,0 +1,6 @@
+{# The route requires a numeric id, so the placeholder is appended to the URL generated with id 0. #}
+{% set builder_url = path('sylius_happy_cms_admin_page_builder', {resource: 'sylius_happy_cms.page', id: 0})|slice(0, -1) ~ '__PAGE_ID__' %}
+
+<a href="{{ builder_url }}" class="btn btn-icon btn-sm w-4" data-bs-toggle="tooltip" data-bs-title="{{ 'sylius_happy_cms.page.admin.action.manage_content'|trans }}" {{ sylius_test_html_attribute('page-builder') }}>
+    {{ ux_icon('bi:card-heading') }}
+</a>
