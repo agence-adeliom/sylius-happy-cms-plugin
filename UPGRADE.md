@@ -78,6 +78,34 @@ Related changes, without effect when the option is not set:
   `bool $inheritContext = false`. The service keeps its four positional arguments and gets `$inheritContext` by
   name. A project that redefines the service keeps the legacy behaviour.
 
+### Block metadata declared with `#[AsBlock]` / `#[AsSharedBlock]`
+
+`AbstractBlock` and `AbstractSharedBlockType` now implement `getName()`, `getIcon()` and `getFrontEndTemplatePath()`
+(and `AbstractSharedBlockType` a new `getDescription()`): they read the new `#[AsBlock]` / `#[AsSharedBlock]`
+attributes, see [docs/blocks.md](docs/blocks.md#declaring-the-metadata-with-asblock--assharedblock). Blocks overriding
+these methods are unchanged.
+
+**BC break**: PHP forbids redeclaring a concrete parent method as `abstract`. If one of your intermediate classes does
+it, remove the declaration (a block with neither the attribute nor the methods is then reported when the container
+compiles):
+
+```diff
+ abstract class MyBaseBlock extends AbstractBlock
+ {
+-    abstract public function getName(): string;
+ }
+
+ abstract class MyBaseSharedBlock extends AbstractSharedBlockType
+ {
+-    abstract public function getDescription(): string;
+ }
+```
+
+A `getDescription()` declared in a class extending `AbstractSharedBlockType` must be compatible with
+`public function getDescription(): string`.
+
+The attributes require `sylius_easy_crud.attributes.enabled: true`. The makers generate them only in that case.
+
 ### SEO Twig functions typed on `SeoInterface`
 
 `seo_metas()` and `seo_title()` now accept any `Adeliom\SyliusHappyCMSPlugin\Entity\Seo\SeoInterface` (they used to

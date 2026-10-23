@@ -13,9 +13,15 @@ use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 final class MakeBlock extends AbstractMaker
 {
+    public function __construct(
+        private readonly ?ParameterBagInterface $parameterBag = null,
+    ) {
+    }
+
     public static function getCommandName(): string
     {
         return 'make:happy-cms:block';
@@ -51,6 +57,7 @@ final class MakeBlock extends AbstractMaker
             __DIR__ . '/../../Resources/skeleton/block/Block.tpl.php',
             [
                 'template_name' => $templateName,
+                'use_attribute' => $this->attributesEnabled(),
             ],
         );
 
@@ -68,6 +75,17 @@ final class MakeBlock extends AbstractMaker
 
         $this->writeSuccessMessage($io);
         $io->text('Next: Open your new block type and add some fields!');
+    }
+
+    /**
+     * The attribute is generated only in the "attribute mode" of the project ("sylius_easy_crud.attributes.enabled",
+     * shared with #[AsAdmin]): a project left on the legacy declarations gets the metadata methods.
+     */
+    private function attributesEnabled(): bool
+    {
+        return null !== $this->parameterBag &&
+            $this->parameterBag->has('sylius_easy_crud.attributes.enabled') &&
+            true === $this->parameterBag->get('sylius_easy_crud.attributes.enabled');
     }
 
     public function configureDependencies(DependencyBuilder $dependencies): void

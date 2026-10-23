@@ -6,15 +6,22 @@ echo "<?php\n"; ?>
 
 namespace <?php echo $namespace; ?>;
 
+<?php if ($use_attribute ?? false) { ?>
+use Adeliom\SyliusHappyCMSPlugin\Attribute\AsSharedBlock;
+<?php } ?>
 use Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock\AbstractSharedBlockType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+<?php if ($use_attribute ?? false) { ?>
+#[AsSharedBlock(name: '<?php echo $class_name; ?>', template: '<?php echo $template_name; ?>')]
+<?php } ?>
 class <?php echo $class_name; ?> extends AbstractSharedBlockType<?php echo "\n"; ?>
 {
     public function buildBlock(FormBuilderInterface $builder, array $options): void
     {
         // Implement with your fields
     }
+<?php if (!($use_attribute ?? false)) { ?>
 
     public function getName(): string
     {
@@ -35,18 +42,6 @@ class <?php echo $class_name; ?> extends AbstractSharedBlockType<?php echo "\n";
     {
         return '';
     }
-
-    public static function getDefaultSettings(): array
-    {
-        return [];
-    }
-
-    public static function configureAdminAssets(): array
-    {
-        return [
-            'js' => [],
-            'css' => []
-        ];
-    }
+<?php } ?>
 }
 <?php } ?>
