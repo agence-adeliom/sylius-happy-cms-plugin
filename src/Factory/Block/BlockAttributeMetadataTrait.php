@@ -12,7 +12,7 @@ use Adeliom\SyliusHappyCMSPlugin\Attribute\BlockAttributeResolver;
  * getFrontEndTemplatePath(), getPosition() and getTab(). A block overriding one of these methods keeps its method.
  *
  * Opt-in in 2.x, to keep AbstractBlock unchanged: use it in the block, or once in the project's base block class.
- * In 3.0, AbstractBlock reads the attribute itself and this trait goes away.
+ * Temporary: in 3.0, AbstractBlock reads the attribute itself and this trait is removed.
  *
  * ```php
  * #[AsBlock(name: 'My Block', template: '@App/blocks/my.html.twig', icon: 'ti ti-star')]
@@ -25,6 +25,8 @@ use Adeliom\SyliusHappyCMSPlugin\Attribute\BlockAttributeResolver;
  * ```
  *
  * @phpstan-require-extends AbstractBlock
+ *
+ * @deprecated since 2.3.3, to be removed in 3.0, where AbstractBlock reads #[AsBlock] itself: only remove "use BlockAttributeMetadataTrait;" when upgrading.
  */
 trait BlockAttributeMetadataTrait
 {

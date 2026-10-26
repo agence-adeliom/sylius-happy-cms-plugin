@@ -14,7 +14,9 @@ of a content block, injected by the container.
 The attributes require `sylius_easy_crud.attributes.enabled: true`. The makers generate them (with the trait) only in
 that case.
 
-In 3.0, `AbstractBlock` / `AbstractSharedBlockType` will read the attributes themselves and the traits will be removed.
+The traits are deprecated from the start: they only keep `AbstractBlock` / `AbstractSharedBlockType` unchanged in 2.x.
+In 3.0, the abstract classes read the attributes themselves and the traits are removed: delete the
+`use BlockAttributeMetadataTrait;` / `use SharedBlockAttributeMetadataTrait;` lines when upgrading.
 
 ### SEO Twig functions typed on `SeoInterface`
 
