@@ -18,9 +18,11 @@ use Symfony\Component\Form\FormBuilderInterface;
  * content block, injected by the container (setSharedBlockSource(), see CheckBlockAttributesPass).
  *
  * Opt-in in 2.x, to keep AbstractSharedBlockType unchanged: use it in the block, or once in the project's base shared
- * block class. In 3.0, AbstractSharedBlockType reads the attribute itself and this trait goes away.
+ * block class. Temporary: in 3.0, AbstractSharedBlockType reads the attribute itself and this trait is removed.
  *
  * @phpstan-require-extends AbstractSharedBlockType
+ *
+ * @deprecated since 2.3.3, to be removed in 3.0, where AbstractSharedBlockType reads #[AsSharedBlock] itself: only remove "use SharedBlockAttributeMetadataTrait;" when upgrading.
  */
 trait SharedBlockAttributeMetadataTrait
 {
