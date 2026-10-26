@@ -2,36 +2,19 @@
 
 ## Unreleased (2.3.x)
 
-### Block metadata declared with `#[AsBlock]` / `#[AsSharedBlock]`
+### New: block metadata declared with `#[AsBlock]` / `#[AsSharedBlock]`
 
-`AbstractBlock` and `AbstractSharedBlockType` now implement `getName()`, `getIcon()` and `getFrontEndTemplatePath()`
-(and `AbstractSharedBlockType` a new `getDescription()`): they read the new `#[AsBlock]` / `#[AsSharedBlock]`
-attributes, see [docs/blocks.md](docs/blocks.md#declaring-the-metadata-with-asblock--assharedblock). Blocks overriding
-these methods are unchanged.
-
-**BC break**: PHP forbids redeclaring a concrete parent method as `abstract`. If one of your intermediate classes does
-it, remove the declaration (a block with neither the attribute nor the methods is then reported when the container
-compiles):
-
-```diff
- abstract class MyBaseBlock extends AbstractBlock
- {
--    abstract public function getName(): string;
- }
-
- abstract class MyBaseSharedBlock extends AbstractSharedBlockType
- {
--    abstract public function getDescription(): string;
- }
-```
-
-A `getDescription()` declared in a class extending `AbstractSharedBlockType` must be compatible with
-`public function getDescription(): string`.
-
+Optional, nothing changes for existing blocks: `AbstractBlock` and `AbstractSharedBlockType` are unchanged. A block
+can declare its metadata with the new `#[AsBlock]` / `#[AsSharedBlock]` attributes instead of the metadata methods,
+read by `BlockAttributeMetadataTrait` / `SharedBlockAttributeMetadataTrait` (to use in the block or in your base block
+class), see [docs/blocks.md](docs/blocks.md#declaring-the-metadata-with-asblock--assharedblock).
 `#[AsSharedBlock(block: ContentBlock::class)]` makes a shared block take the metadata and the form (`buildBlock()`)
-of a content block, injected by the container through `AbstractSharedBlockType::setSharedBlockSource()`.
+of a content block, injected by the container.
 
-The attributes require `sylius_easy_crud.attributes.enabled: true`. The makers generate them only in that case.
+The attributes require `sylius_easy_crud.attributes.enabled: true`. The makers generate them (with the trait) only in
+that case.
+
+In 3.0, `AbstractBlock` / `AbstractSharedBlockType` will read the attributes themselves and the traits will be removed.
 
 ### SEO Twig functions typed on `SeoInterface`
 

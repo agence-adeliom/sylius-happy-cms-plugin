@@ -10,6 +10,9 @@ namespace <?php echo $namespace; ?>;
 use Adeliom\SyliusHappyCMSPlugin\Attribute\AsSharedBlock;
 <?php } ?>
 use Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock\AbstractSharedBlockType;
+<?php if ($use_attribute ?? false) { ?>
+use Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock\SharedBlockAttributeMetadataTrait;
+<?php } ?>
 use Symfony\Component\Form\FormBuilderInterface;
 
 <?php if ($use_attribute ?? false) { ?>
@@ -17,6 +20,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 <?php } ?>
 class <?php echo $class_name; ?> extends AbstractSharedBlockType<?php echo "\n"; ?>
 {
+<?php if ($use_attribute ?? false) { ?>
+    use SharedBlockAttributeMetadataTrait;
+
+<?php } ?>
     public function buildBlock(FormBuilderInterface $builder, array $options): void
     {
         // Implement with your fields
