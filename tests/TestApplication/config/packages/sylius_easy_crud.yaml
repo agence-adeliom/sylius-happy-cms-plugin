@@ -1,0 +1,5 @@
+# "Attribute mode" of the test application: #[AsBlock] / #[AsSharedBlock] (demo blocks under src/Block and
+# src/SharedBlock) are only allowed when it is enabled.
+sylius_easy_crud:
+    attributes:
+        enabled: true

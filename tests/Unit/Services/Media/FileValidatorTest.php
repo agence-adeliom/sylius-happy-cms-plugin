@@ -88,7 +88,7 @@ class FileValidatorTest extends TestCase
                 'malware.php.jpg',
                 'image/jpeg',
                 null,
-                true
+                true,
             );
 
             $this->validator->validate($file);
@@ -125,7 +125,7 @@ class FileValidatorTest extends TestCase
                 'test.jpg',
                 'image/jpeg',
                 null,
-                true
+                true,
             );
 
             // Should not throw exception
@@ -152,7 +152,7 @@ class FileValidatorTest extends TestCase
                 'test.jpg',
                 'image/jpeg',
                 null,
-                true
+                true,
             );
 
             $realMimeType = $this->validator->getRealMimeType($file);
@@ -183,7 +183,7 @@ class FileValidatorTest extends TestCase
                 'fake_image.jpg',
                 'image/jpeg', // Fake MIME type
                 null,
-                true
+                true,
             );
 
             $this->expectException(\InvalidArgumentException::class);
@@ -208,7 +208,7 @@ class FileValidatorTest extends TestCase
                 'document.pdf',
                 'application/pdf',
                 null,
-                true
+                true,
             );
 
             // Should not throw exception
@@ -281,7 +281,7 @@ class FileValidatorTest extends TestCase
             $filename,
             $mimeType,
             null,
-            true // test mode
+            true, // test mode
         );
     }
 

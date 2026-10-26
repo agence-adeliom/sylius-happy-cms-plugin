@@ -226,9 +226,73 @@ class NewsletterBlock extends AbstractSharedBlockType
 
 ## Block Structure
 
+### Declaring the metadata with `#[AsBlock]` / `#[AsSharedBlock]`
+
+Instead of overriding the metadata methods, a block can carry its metadata in a PHP attribute, read by
+`BlockAttributeMetadataTrait` / `SharedBlockAttributeMetadataTrait`:
+
+```php
+use Adeliom\SyliusHappyCMSPlugin\Attribute\AsBlock;
+use Adeliom\SyliusHappyCMSPlugin\Factory\Block\AbstractBlock;
+use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockAttributeMetadataTrait;
+
+#[AsBlock(name: 'Testimonial', template: '@App/front/blocks/testimonial.html.twig', icon: 'ti ti-quote', position: 10, tab: 'sylius_happy_cms.blocks.tabs.text_blocks')]
+class TestimonialBlock extends AbstractBlock
+{
+    use BlockAttributeMetadataTrait;
+
+    public function buildBlock(FormBuilderInterface $builder, array $options): void
+    {
+        // fields
+    }
+}
+```
+
+| `#[AsBlock]` | Method | Default |
+|---|---|---|
+| `name` | `getName()` | required |
+| `template` | `getFrontEndTemplatePath()` | required |
+| `icon` | `getIcon()` | `''` |
+| `position` | `getPosition()` | `100` |
+| `tab` | `getTab()` | `sylius_happy_cms.editor.blocks` (translated) |
+
+`#[AsSharedBlock]` takes `name`, `template`, `icon`, `position` and `description` (feeds `getDescription()`,
+`''` by default).
+
+A shared block can take the metadata **and the form** of a content block with `block`: the values left out of the
+attribute come from that block (its methods, so a block with computed metadata works too), `buildBlock()` delegates to
+it, and the values set in the attribute win:
+
+```php
+#[AsSharedBlock(block: TestimonialBlock::class, description: 'Testimonial shared between pages')]
+class SharedTestimonialBlock extends AbstractSharedBlockType
+{
+    use SharedBlockAttributeMetadataTrait;
+}
+```
+
+The content block must be a registered block service (extending `AbstractBlock`): the container injects it into the
+shared block (`setSharedBlockSource()`), and fails to compile otherwise. Without `block`, `name` and `template` are
+required (in the attribute or as methods).
+
+- **The trait**: in 2.x, `AbstractBlock` / `AbstractSharedBlockType` are unchanged, the attribute is read by the trait
+  (`BlockAttributeMetadataTrait` for content blocks, `SharedBlockAttributeMetadataTrait` for shared blocks). Use it in
+  each block, or once in your own base block class. The traits are a temporary 2.x solution, deprecated from the start
+  (Symfony reports it when a class using them is loaded): in 3.0 the abstract classes read the attribute themselves,
+  the traits are removed and upgrading only means deleting the `use` lines.
+- **The method wins**: keep overriding a method when the value is not static (an icon built with
+  `$this->getPackages()`, metadata delegated to another block…), the attribute serves the others.
+- **Inheritance**: a block extending a concrete block inherits its attribute.
+- **Attribute mode**: the attributes require `sylius_easy_crud.attributes.enabled: true` (the switch of
+  `#[AsAdmin]`). Otherwise the container compilation fails, and `make:happy-cms:block` /
+  `make:happy-cms:block:shared` generate the methods instead of the attribute.
+- The container compilation also fails for an attribute on a class not extending `AbstractBlock` /
+  `AbstractSharedBlockType` or not using the trait, and for a block using the trait with neither attribute nor
+  metadata methods.
+
 ### Required Methods
 
-All blocks must implement these methods from `BlockTypeInterface`:
+All blocks must implement these methods from `BlockTypeInterface` (or declare them with `#[AsBlock]`, see above):
 
 #### `getName(): string`
 Returns the display name shown in the page builder block selection menu.

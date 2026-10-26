@@ -2,6 +2,22 @@
 
 ## Unreleased (2.3.x)
 
+### New: block metadata declared with `#[AsBlock]` / `#[AsSharedBlock]`
+
+Optional, nothing changes for existing blocks: `AbstractBlock` and `AbstractSharedBlockType` are unchanged. A block
+can declare its metadata with the new `#[AsBlock]` / `#[AsSharedBlock]` attributes instead of the metadata methods,
+read by `BlockAttributeMetadataTrait` / `SharedBlockAttributeMetadataTrait` (to use in the block or in your base block
+class), see [docs/blocks.md](docs/blocks.md#declaring-the-metadata-with-asblock--assharedblock).
+`#[AsSharedBlock(block: ContentBlock::class)]` makes a shared block take the metadata and the form (`buildBlock()`)
+of a content block, injected by the container.
+
+The attributes require `sylius_easy_crud.attributes.enabled: true`. The makers generate them (with the trait) only in
+that case.
+
+The traits are deprecated from the start: they only keep `AbstractBlock` / `AbstractSharedBlockType` unchanged in 2.x.
+In 3.0, the abstract classes read the attributes themselves and the traits are removed: delete the
+`use BlockAttributeMetadataTrait;` / `use SharedBlockAttributeMetadataTrait;` lines when upgrading.
+
 ### SEO Twig functions typed on `SeoInterface`
 
 `seo_metas()` and `seo_title()` now accept any `Adeliom\SyliusHappyCMSPlugin\Entity\Seo\SeoInterface` (they used to
