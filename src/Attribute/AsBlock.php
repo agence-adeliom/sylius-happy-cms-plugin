@@ -7,8 +7,9 @@ namespace Adeliom\SyliusHappyCMSPlugin\Attribute;
 /**
  * Declares the metadata of a content block on its class, instead of overriding the metadata methods.
  *
- * Read by AbstractBlock, which serves each value as the default of the matching method: getName(), getIcon(),
- * getFrontEndTemplatePath(), getPosition() and getTab(). A block can still override any of these methods (dynamic
+ * Read by BlockAttributeMetadataTrait (to use in the block or its base class; in 3.0, by AbstractBlock), which serves
+ * each value as the default of the matching method: getName(), getIcon(), getFrontEndTemplatePath(), getPosition()
+ * and getTab(). A block can still override any of these methods (dynamic
  * icon, metadata delegated to another block…): the method wins over the attribute.
  *
  * Requires "sylius_easy_crud.attributes.enabled: true", like #[AsAdmin]: the container compilation fails otherwise
@@ -18,6 +19,8 @@ namespace Adeliom\SyliusHappyCMSPlugin\Attribute;
  * #[AsBlock(name: 'My Block', template: '@App/blocks/my.html.twig', icon: 'ti ti-star', position: 10)]
  * class MyBlockType extends AbstractBlock
  * {
+ *     use BlockAttributeMetadataTrait;
+ *
  *     public function buildBlock(FormBuilderInterface $builder, array $options): void { … }
  * }
  * ```

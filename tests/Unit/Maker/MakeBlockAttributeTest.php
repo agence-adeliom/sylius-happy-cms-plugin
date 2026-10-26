@@ -25,24 +25,25 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 final class MakeBlockAttributeTest extends TestCase
 {
     /**
-     * @return iterable<string, array{class-string<AbstractMaker>, string, string}>
+     * @return iterable<string, array{class-string<AbstractMaker>, string, string, string}>
      */
     public static function makers(): iterable
     {
-        yield 'content block' => [MakeBlock::class, 'AsBlock', 'AbstractBlock'];
-        yield 'shared block' => [MakeSharedBlock::class, 'AsSharedBlock', 'AbstractSharedBlockType'];
+        yield 'content block' => [MakeBlock::class, 'AsBlock', 'AbstractBlock', 'BlockAttributeMetadataTrait'];
+        yield 'shared block' => [MakeSharedBlock::class, 'AsSharedBlock', 'AbstractSharedBlockType', 'SharedBlockAttributeMetadataTrait'];
     }
 
     /**
      * @param class-string<MakeBlock|MakeSharedBlock> $makerClass
      */
     #[DataProvider('makers')]
-    public function testTheAttributeIsGeneratedInAttributeMode(string $makerClass, string $attribute, string $parent): void
+    public function testTheAttributeIsGeneratedInAttributeMode(string $makerClass, string $attribute, string $parent, string $trait): void
     {
         $code = $this->generate(new $makerClass(new ParameterBag(['sylius_easy_crud.attributes.enabled' => true])));
 
         self::assertStringContainsString(sprintf("#[%s(name: 'HeroType', template: '", $attribute), $code);
         self::assertStringContainsString('class HeroType extends ' . $parent, $code);
+        self::assertStringContainsString('    use ' . $trait . ';', $code);
         self::assertStringNotContainsString('function getName()', $code);
         $this->assertValidPhp($code);
     }
@@ -51,7 +52,7 @@ final class MakeBlockAttributeTest extends TestCase
      * @param class-string<MakeBlock|MakeSharedBlock> $makerClass
      */
     #[DataProvider('makers')]
-    public function testTheMethodsAreGeneratedWhenTheAttributeModeIsDisabled(string $makerClass, string $attribute, string $parent): void
+    public function testTheMethodsAreGeneratedWhenTheAttributeModeIsDisabled(string $makerClass, string $attribute, string $parent, string $trait): void
     {
         foreach ([
             new $makerClass(new ParameterBag(['sylius_easy_crud.attributes.enabled' => false])),
@@ -61,6 +62,7 @@ final class MakeBlockAttributeTest extends TestCase
             $code = $this->generate($maker);
 
             self::assertStringNotContainsString('#[' . $attribute, $code);
+            self::assertStringNotContainsString($trait, $code);
             self::assertStringContainsString('class HeroType extends ' . $parent, $code);
             self::assertStringContainsString('function getName()', $code);
             self::assertStringContainsString('function getFrontEndTemplatePath()', $code);

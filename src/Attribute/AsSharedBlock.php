@@ -9,8 +9,9 @@ use Adeliom\SyliusHappyCMSPlugin\Factory\Block\AbstractBlock;
 /**
  * Declares the metadata of a shared block on its class, instead of overriding the metadata methods.
  *
- * Read by AbstractSharedBlockType, which serves each value as the default of the matching method: getName(),
- * getIcon(), getFrontEndTemplatePath(), getPosition() and getDescription(). A block can still override any of these
+ * Read by SharedBlockAttributeMetadataTrait (to use in the block or its base class; in 3.0, by
+ * AbstractSharedBlockType), which serves each value as the default of the matching method: getName(), getIcon(),
+ * getFrontEndTemplatePath(), getPosition() and getDescription(). A block can still override any of these
  * methods: the method wins over the attribute.
  *
  * With $block, the shared block takes the metadata and the form (buildBlock()) of a content block: the values left
@@ -20,6 +21,7 @@ use Adeliom\SyliusHappyCMSPlugin\Factory\Block\AbstractBlock;
  * #[AsSharedBlock(block: TextMediaType::class, description: 'Text and media, shared between pages')]
  * class SharedTextMediaType extends AbstractSharedBlockType
  * {
+ *     use SharedBlockAttributeMetadataTrait;
  * }
  * ```
  *

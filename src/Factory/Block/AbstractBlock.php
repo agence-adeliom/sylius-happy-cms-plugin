@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\Factory\Block;
 
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
-use Adeliom\SyliusHappyCMSPlugin\Attribute\AsBlock;
-use Adeliom\SyliusHappyCMSPlugin\Attribute\BlockAttributeResolver;
 use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Asset\Packages;
@@ -20,10 +18,6 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Base of the content blocks. The metadata methods (getName(), getIcon(), getFrontEndTemplatePath(), getPosition(),
- * getTab()) read #[AsBlock] by default; a block overrides them when its metadata is not static.
- */
 abstract class AbstractBlock extends AbstractType implements BlockTypeInterface
 {
     protected ?FormBuilderInterface $tempBuilder = null;
@@ -181,33 +175,14 @@ abstract class AbstractBlock extends AbstractType implements BlockTypeInterface
         return [];
     }
 
-    public function getName(): string
-    {
-        return BlockAttributeResolver::get(static::class, AsBlock::class, __FUNCTION__)->name;
-    }
-
-    /**
-     * @return string|mixed[]
-     */
-    public function getIcon(): string|array
-    {
-        return BlockAttributeResolver::get(static::class, AsBlock::class, __FUNCTION__)->icon;
-    }
-
-    public function getFrontEndTemplatePath(): string
-    {
-        return BlockAttributeResolver::get(static::class, AsBlock::class, __FUNCTION__)->template;
-    }
-
     public function getTab(): string
     {
-        return BlockAttributeResolver::find(static::class, AsBlock::class)->tab
-            ?? $this->translator->trans('sylius_happy_cms.editor.blocks');
+        return $this->translator->trans('sylius_happy_cms.editor.blocks');
     }
 
     public function getPosition(): int
     {
-        return BlockAttributeResolver::find(static::class, AsBlock::class)->position ?? 100;
+        return 100;
     }
 
     public function supports(?ContentEditableInterface $resource = null): bool

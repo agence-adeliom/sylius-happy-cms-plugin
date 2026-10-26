@@ -10,6 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\DependencyInjection\Fixtures\AttributeOnPlainFormType;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\Factory\Block\Fixtures\AttributeBlock;
+use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\Factory\Block\Fixtures\AttributeWithoutTraitBlock;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\Factory\Block\Fixtures\ChildOfAttributeBlock;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\Factory\Block\Fixtures\LegacyBlock;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\Factory\Block\Fixtures\NoMetadataBlock;
@@ -87,6 +88,17 @@ final class CheckBlockAttributesPassTest extends TestCase
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(sprintf('The class "%s" carries #[AsBlock] but does not extend', AttributeOnPlainFormType::class));
+
+        (new CheckBlockAttributesPass())->process($container);
+    }
+
+    public function testAnAttributeOnABlockNotUsingTheTraitIsRejected(): void
+    {
+        $container = $this->container(true);
+        $this->registerBlock($container, AttributeWithoutTraitBlock::class, attribute: true);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(sprintf('The block "%s" carries #[AsBlock] but does not use "Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockAttributeMetadataTrait", which reads the attribute: add "use BlockAttributeMetadataTrait;" to the class or to its base class.', AttributeWithoutTraitBlock::class));
 
         (new CheckBlockAttributesPass())->process($container);
     }

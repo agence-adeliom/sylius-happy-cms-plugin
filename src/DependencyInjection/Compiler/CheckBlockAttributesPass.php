@@ -8,7 +8,9 @@ use Adeliom\SyliusHappyCMSPlugin\Attribute\AsBlock;
 use Adeliom\SyliusHappyCMSPlugin\Attribute\AsSharedBlock;
 use Adeliom\SyliusHappyCMSPlugin\Attribute\BlockAttributeResolver;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\AbstractBlock;
+use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockAttributeMetadataTrait;
 use Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock\AbstractSharedBlockType;
+use Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock\SharedBlockAttributeMetadataTrait;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -18,8 +20,9 @@ use Symfony\Component\DependencyInjection\Reference;
  * first renders a block:
  *   - the attributes are only allowed when "sylius_easy_crud.attributes.enabled" is true (the project's "attribute
  *     mode", shared with #[AsAdmin]); a project left on the legacy declarations keeps overriding the methods;
- *   - an attribute is only read by AbstractBlock / AbstractSharedBlockType: on any other class it would be ignored;
- *   - a block without attribute must override getName(), getIcon() and getFrontEndTemplatePath();
+ *   - an attribute is only read by BlockAttributeMetadataTrait / SharedBlockAttributeMetadataTrait, on a class
+ *     extending AbstractBlock / AbstractSharedBlockType (opt-in in 2.x, see the traits): elsewhere it would be ignored;
+ *   - a block using the trait without attribute must override getName(), getIcon() and getFrontEndTemplatePath();
  *   - #[AsSharedBlock] needs a name and a template, unless it takes them from a content block with $block: that
  *     block must be a registered content block, injected into the shared block (setSharedBlockSource()).
  */
@@ -30,10 +33,10 @@ final class CheckBlockAttributesPass implements CompilerPassInterface
 
     private const METADATA_METHODS = ['getName', 'getIcon', 'getFrontEndTemplatePath'];
 
-    /** @var array<class-string, array{tag: string, base: class-string}> */
+    /** @var array<class-string, array{tag: string, base: class-string, trait: class-string}> */
     private const ATTRIBUTES = [
-        AsBlock::class => ['tag' => 'sylius.happy_cms.block', 'base' => AbstractBlock::class],
-        AsSharedBlock::class => ['tag' => 'sylius.happy_cms.shared_block', 'base' => AbstractSharedBlockType::class],
+        AsBlock::class => ['tag' => 'sylius.happy_cms.block', 'base' => AbstractBlock::class, 'trait' => BlockAttributeMetadataTrait::class],
+        AsSharedBlock::class => ['tag' => 'sylius.happy_cms.shared_block', 'base' => AbstractSharedBlockType::class, 'trait' => SharedBlockAttributeMetadataTrait::class],
     ];
 
     public function process(ContainerBuilder $container): void
@@ -48,15 +51,21 @@ final class CheckBlockAttributesPass implements CompilerPassInterface
             }
 
             foreach (self::ATTRIBUTES as $attributeClass => $config) {
-                if (null !== BlockAttributeResolver::find($class, $attributeClass) && !is_subclass_of($class, $config['base'])) {
+                if (null === BlockAttributeResolver::find($class, $attributeClass)) {
+                    continue;
+                }
+
+                if (!is_subclass_of($class, $config['base'])) {
                     throw new \LogicException(sprintf(
-                        'The class "%s" carries #[%s] but does not extend "%s": the attribute is only read by this class. ' .
+                        'The class "%s" carries #[%s] but does not extend "%s": the attribute is only read on this class. ' .
                         'Extend it, or remove the attribute and implement the metadata methods.',
                         $class,
                         self::shortName($attributeClass),
                         $config['base'],
                     ));
                 }
+
+                self::assertUsesTrait($class, $attributeClass, $config['trait']);
             }
         }
 
@@ -87,10 +96,13 @@ final class CheckBlockAttributesPass implements CompilerPassInterface
                     ));
                 }
 
-                if (!$hasAttribute) {
-                    $this->assertMetadataMethodsOverridden($class, $config['base'], $attributeClass);
-                } elseif (AsSharedBlock::class === $attributeClass) {
-                    $this->configureSharedBlock($container, $id, $class, $contentBlocks);
+                if ($hasAttribute) {
+                    self::assertUsesTrait($class, $attributeClass, $config['trait']);
+                    if (AsSharedBlock::class === $attributeClass) {
+                        $this->configureSharedBlock($container, $id, $class, $contentBlocks);
+                    }
+                } elseif (self::usesTrait($class, $config['trait'])) {
+                    $this->assertMetadataMethodsOverridden($class, $config['trait'], $attributeClass);
                 }
             }
         }
@@ -111,7 +123,7 @@ final class CheckBlockAttributesPass implements CompilerPassInterface
             $missing = array_filter(
                 ['name' => 'getName', 'template' => 'getFrontEndTemplatePath'],
                 static fn (string $method, string $argument): bool => null === $attribute->{$argument} &&
-                    AbstractSharedBlockType::class === (new \ReflectionMethod($class, $method))->getDeclaringClass()->getName(),
+                    self::comesFromTrait($class, $method, SharedBlockAttributeMetadataTrait::class),
                 \ARRAY_FILTER_USE_BOTH,
             );
             if ([] !== $missing) {
@@ -139,14 +151,14 @@ final class CheckBlockAttributesPass implements CompilerPassInterface
 
     /**
      * @param class-string $class
-     * @param class-string $base
+     * @param class-string $trait
      * @param class-string $attributeClass
      */
-    private function assertMetadataMethodsOverridden(string $class, string $base, string $attributeClass): void
+    private function assertMetadataMethodsOverridden(string $class, string $trait, string $attributeClass): void
     {
         $missing = array_filter(
             self::METADATA_METHODS,
-            static fn (string $method): bool => $base === (new \ReflectionMethod($class, $method))->getDeclaringClass()->getName(),
+            static fn (string $method): bool => self::comesFromTrait($class, $method, $trait),
         );
 
         if ([] !== $missing) {
@@ -180,6 +192,58 @@ final class CheckBlockAttributesPass implements CompilerPassInterface
         }
 
         return $reflection->getName();
+    }
+
+    /**
+     * @param class-string $class
+     * @param class-string $attributeClass
+     * @param class-string $trait
+     */
+    private static function assertUsesTrait(string $class, string $attributeClass, string $trait): void
+    {
+        if (!self::usesTrait($class, $trait)) {
+            throw new \LogicException(sprintf(
+                'The block "%s" carries #[%s] but does not use "%s", which reads the attribute: add ' .
+                '"use %s;" to the class or to its base class.',
+                $class,
+                self::shortName($attributeClass),
+                $trait,
+                self::shortName($trait),
+            ));
+        }
+    }
+
+    /**
+     * Whether the class, one of its parents or one of their traits uses the trait.
+     *
+     * @param class-string $class
+     * @param class-string $trait
+     */
+    private static function usesTrait(string $class, string $trait): bool
+    {
+        for ($reflection = new \ReflectionClass($class); false !== $reflection; $reflection = $reflection->getParentClass()) {
+            $traits = $reflection->getTraitNames();
+            while ([] !== $traits) {
+                $name = array_shift($traits);
+                if ($trait === $name) {
+                    return true;
+                }
+                $traits = [...$traits, ...(new \ReflectionClass($name))->getTraitNames()];
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Whether the implementation of the method is the one of the trait (not overridden by the class or a parent).
+     *
+     * @param class-string $class
+     * @param class-string $trait
+     */
+    private static function comesFromTrait(string $class, string $method, string $trait): bool
+    {
+        return (new \ReflectionMethod($class, $method))->getFileName() === (new \ReflectionClass($trait))->getFileName();
     }
 
     /**
