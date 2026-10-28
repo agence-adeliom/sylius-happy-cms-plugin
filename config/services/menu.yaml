@@ -27,6 +27,10 @@ services:
                 entity: Adeliom\SyliusHappyCMSPlugin\Entity\Menu\Menu
                 lazy: true
 
+    # Tagged `doctrine.event_listener` (loadClassMetadata) by the extension when
+    # `sylius_happy_cms.menu.root_item_on_delete_set_null` is true.
+    Adeliom\SyliusHappyCMSPlugin\EventListener\Menu\MenuRootItemOnDeleteListener: ~
+
     Adeliom\SyliusHappyCMSPlugin\Twig\Menu\MenuExtension:
         public: true
         autowire: true

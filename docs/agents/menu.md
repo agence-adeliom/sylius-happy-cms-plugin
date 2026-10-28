@@ -643,6 +643,9 @@ Add icon field to MenuItemTranslation or use class attribute:
 - `sylius_..._menu_item` - Menu items with nested set
 - `sylius_..._menu_item_translation` - Translations
 
+**Key columns** (Menu):
+- `root_item_id` - Root item reference, `ON DELETE CASCADE` by default; `ON DELETE SET NULL` with `sylius_happy_cms.menu.root_item_on_delete_set_null: true` (needed to delete a menu with its items under doctrine/orm 3, migration to generate)
+
 **Key columns** (MenuItem):
 - `lft`, `rgt`, `lvl`, `root` - Nested set structure (Gedmo)
 - `parent_id` - Parent item reference

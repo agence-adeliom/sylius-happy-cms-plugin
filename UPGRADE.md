@@ -135,6 +135,39 @@ sylius_happy_cms:
 Leading and trailing `/` are removed (`/medias` and `medias` are the same). The routes are generated with `path()`, so templates and the media
 manager JavaScript follow it.
 
+### New option: menu root item key `ON DELETE SET NULL` (deprecation)
+
+`Menu#rootItem` is mapped `ON DELETE CASCADE` while every item (the root item included) references its menu
+(`MenuItem#menu`). Under doctrine/orm 3, removing a menu with its items (`cascade: all` on `Menu#items`, as the admin
+does) fails with a `CycleDetectedException`: the unit of work cannot order the two deletions. In the database, deleting
+the root item alone also deletes the menu row.
+
+`sylius_happy_cms.menu.root_item_on_delete_set_null: true` maps the `root_item_id` key `ON DELETE SET NULL`: the items
+are deleted first, then the menu, and deleting the root item alone keeps the menu, without root.
+
+```yaml
+sylius_happy_cms:
+    menu:
+        root_item_on_delete_set_null: true
+```
+
+The option changes the schema: generate the migration of your project (`doctrine:migrations:diff`). On MySQL it looks
+like:
+
+```sql
+ALTER TABLE <menu_table> DROP FOREIGN KEY <fk_root_item>;
+ALTER TABLE <menu_table> ADD CONSTRAINT <fk_root_item> FOREIGN KEY (root_item_id) REFERENCES <menu_item_table> (id) ON DELETE SET NULL;
+```
+
+If your database already has `ON DELETE SET NULL` on this key (a migration written by hand), set the option to `true`,
+otherwise `doctrine:schema:validate` reports a difference.
+
+Not setting the option, or setting it to `false`, keeps the `CASCADE` mapping (no schema change) and triggers a
+deprecation. With `CASCADE`, a menu can still be deleted under doctrine/orm 3 by unsetting its root item in a first
+flush (`$menu->setRootItem(null)`).
+
+In 3.0 the option is removed and `ON DELETE SET NULL` is the only mapping of the `root_item_id` key.
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required

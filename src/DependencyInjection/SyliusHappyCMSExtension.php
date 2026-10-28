@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\DependencyInjection;
 
+use Adeliom\SyliusHappyCMSPlugin\EventListener\Menu\MenuRootItemOnDeleteListener;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockTypeInterface;
 use Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock\SharedBlockTypeInterface;
 use Adeliom\SyliusHappyCMSPlugin\Services\Seo\Sitemap\SitemapDumperInterface;
@@ -59,6 +60,46 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
         $loader->load('services.php');
 
         $this->disableOptionalServices($config, $container);
+        $this->configureMenuServices($config['menu'], $container);
+    }
+
+    /**
+     * @param array<string, mixed> $config
+     */
+    private function configureMenuServices(array $config, ContainerBuilder $container): void
+    {
+        $rootItemOnDeleteSetNull = $config['root_item_on_delete_set_null'] ?? null;
+        if (true === $rootItemOnDeleteSetNull) {
+            $container->getDefinition(MenuRootItemOnDeleteListener::class)
+                ->addTag('doctrine.event_listener', ['event' => 'loadClassMetadata']);
+        }
+        $this->deprecateLegacyFlag(
+            'menu.root_item_on_delete_set_null',
+            $rootItemOnDeleteSetNull,
+            'ON DELETE SET NULL on the root_item_id key of the menus',
+        );
+    }
+
+    /**
+     * Compatibility flag: not set (`null`) or `false` keeps the current behaviour, deprecated; `true` opts in.
+     */
+    private function deprecateLegacyFlag(string $path, mixed $value, string $newBehaviour): void
+    {
+        if (true === $value) {
+            return;
+        }
+
+        trigger_deprecation(
+            'agence-adeliom/sylius-happy-cms-plugin',
+            '2.3.3',
+            sprintf(
+                null === $value
+                    ? 'Not setting the "sylius_happy_cms.%s" option is deprecated. It will be removed in 3.0, where %s is the only behaviour. Set it to true to opt in now (see UPGRADE.md).'
+                    : 'Setting the "sylius_happy_cms.%s" option to false is deprecated. It will be removed in 3.0, where %s is the only behaviour. Set it to true to opt in now (see UPGRADE.md).',
+                $path,
+                $newBehaviour,
+            ),
+        );
     }
 
     /**
