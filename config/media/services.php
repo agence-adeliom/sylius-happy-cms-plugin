@@ -75,6 +75,7 @@ return static function (ContainerConfigurator $container): void {
     $services->set('happy.cms.media.twig.happy.cms.media_extension', MediaExtension::class)
         ->public()
         ->arg('$manager', service('happy.cms.media.manager'))
+        ->arg('$rawMetaValues', '%sylius_happy_cms.media.raw_meta_values%')
         ->tag('twig.extension');
 
     $services->set('happy.cms.media.twig.happy.cms.media_runtime', MediaRuntime::class)

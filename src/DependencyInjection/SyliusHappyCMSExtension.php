@@ -177,6 +177,17 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
         if (is_string($storageName) || $storageName instanceof Alias) {
             $container->setAlias('happy.cms.media.storage', $storageName);
         }
+
+        // Resolved to a boolean for the MediaExtension argument.
+        $container->setParameter('sylius_happy_cms.media.raw_meta_values', true === $config['raw_meta_values']);
+        if (true !== $config['raw_meta_values']) {
+            trigger_deprecation(
+                'agence-adeliom/sylius-happy-cms-plugin',
+                '2.3.3',
+                (null === $config['raw_meta_values'] ? 'Not setting the "%s" option is deprecated.' : 'Setting the "%s" option to false is deprecated.') . ' It will be removed in 3.0, where the media_meta Twig filter returning the metas as stored is the only behaviour. Set it to true to opt in now (see UPGRADE.md).',
+                'sylius_happy_cms.media.raw_meta_values',
+            );
+        }
     }
 
     public function prepend(ContainerBuilder $container): void
