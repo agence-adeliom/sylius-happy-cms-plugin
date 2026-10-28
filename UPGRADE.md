@@ -135,6 +135,18 @@ sylius_happy_cms:
 Leading and trailing `/` are removed (`/medias` and `medias` are the same). The routes are generated with `path()`, so templates and the media
 manager JavaScript follow it.
 
+### Inheritance below an entity extending a plugin model
+
+`Adeliom\SyliusHappyCMSPlugin\EventListener\Doctrine\MappedSuperclassAssociationDeclaringClassListener` (Doctrine
+`loadClassMetadata` listener, priority -100) is registered by the plugin. It sets the declaring class of the
+associations that Sylius `ORMMappedSuperClassSubscriber` removes from the plugin mapped superclasses (`routes`,
+`children`, `items`…), which lets a single table or joined inheritance subclass of your entity load (it failed with
+`Property "routes" … was already declared`). Nothing to configure, no schema change: only the entities mapped with an
+inheritance are changed, and only their associations without a declaring class whose property belongs to a plugin
+class. An entity without inheritance (e.g. `App\Entity\Page extends Adeliom\SyliusHappyCMSPlugin\Entity\Page\Page`
+and nothing below it) keeps exactly the same metadata. If your project has its own listener for this, you can remove
+it.
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required
