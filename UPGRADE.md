@@ -135,6 +135,21 @@ sylius_happy_cms:
 Leading and trailing `/` are removed (`/medias` and `medias` are the same). The routes are generated with `path()`, so templates and the media
 manager JavaScript follow it.
 
+### New options: menu root item creation and label
+
+```yaml
+sylius_happy_cms:
+    menu:
+        root_item:
+            auto_create: true   # false: MenuCreationListener is not registered (the project creates the root item)
+            label: 'sylius_happy_cms.menu_item.admin.data.menu_item_root'   # translated per locale; plain text kept as is
+```
+
+The defaults keep the current behaviour. `auto_create: false` removes the `doctrine.orm.entity_listener` tag of the
+listener (an entity listener on the mapped superclass is inherited by the project's entity, so it could only be turned
+off by redefining the service). `MenuCreationListener` takes the label as a new optional sixth constructor argument; a
+service definition overriding the listener without it keeps the current label.
+
 ### New option: assign the root item created with a menu (deprecation)
 
 `MenuCreationListener` creates the root item of every new menu but never assigned it to `Menu#rootItem`: the

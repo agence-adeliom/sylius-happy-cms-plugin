@@ -22,6 +22,8 @@ services:
             - '@parameter_bag'
             - false # assign the root item: `sylius_happy_cms.menu.root_item.assign`, set by the extension
             - '@doctrine'
+            - '%sylius_happy_cms.menu.root_item.label%'
+        # Tag removed when `sylius_happy_cms.menu.root_item.auto_create` is false.
         tags:
             - # these are the options required to define the entity listener
                 name: 'doctrine.orm.entity_listener'
