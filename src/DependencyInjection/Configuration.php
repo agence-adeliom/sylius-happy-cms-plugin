@@ -132,6 +132,10 @@ class Configuration implements ConfigurationInterface
             ->defaultFalse()
             ->info('Pass the Twig context of the calling template (page, resource, loop variables...) to the block templates, overridden by the block variables.')
             ->end()
+            ->booleanNode('missing_published_means_published')
+            ->defaultFalse()
+            ->info('Render a block that has no "block_published" key (content written outside the block form, imported or migrated). An explicit falsy value still hides the block.')
+            ->end()
             ->end()
             ->end()
 
