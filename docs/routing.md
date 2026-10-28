@@ -332,6 +332,22 @@ php bin/console make:happy-cms:generate-cms-model
 ```
 [Learn mode about this command usage here](./docs/commands/generate-cms-model.md)
 
+### Index existing entities
+
+Routes are only computed when an entity is saved. To create or update the routes of entities already in the
+database (data migration, import, change of the `routing` options):
+
+```bash
+php bin/console happycms:routes:index --dry-run -v   # list the computed routes, save nothing
+php bin/console happycms:routes:index                # every mapped routable entity
+php bin/console happycms:routes:index --class='App\Entity\HappyCMS\Page\Page' --batch-size=200
+```
+
+Only the route tables are written (the routes and the join rows between the entities and their new routes): the
+entities are not saved, so their update listeners (`updated_at`, hence the sitemap `lastmod`, search index, cache
+invalidation, audit) do not run for the whole site. `--save-entities` saves the entities as well, for projects whose
+listeners derive data from the routes (e.g. a search index storing the URL).
+
 ## Breadcrumb Navigation
 
 Automatically generated from entity hierarchy:

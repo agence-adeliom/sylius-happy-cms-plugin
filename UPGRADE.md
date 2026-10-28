@@ -267,6 +267,14 @@ types can have the same slug (their children share the prefix). The project then
 (`index()` or an explicit `rewriteStaticPrefix()`, still available). `EntityRouteIndexer` takes a new optional
 constructor argument, `$rewriteChildRoutes` (default `true`).
 
+### New command: `happycms:routes:index`
+
+`happycms:routes:index` (`--class` repeatable, default every mapped routable root entity; `--batch-size`, default
+100; `--dry-run`, with `-v` to list the computed routes; `--save-entities`) creates or updates the routes of the
+routable entities already in the database. It writes the route tables only and does not save the entities (no
+`updated_at` change, no update listener); `--save-entities` saves them as well. It works with and without
+`sylius_happy_cms.routing.index_on_flush`.
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required
