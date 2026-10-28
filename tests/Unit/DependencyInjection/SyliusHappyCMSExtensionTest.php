@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Adeliom\SyliusHappyCMSPlugin\Unit\DependencyInjection;
 
+use Adeliom\SyliusHappyCMSPlugin\DependencyInjection\Compiler\PageContentBlockMappingPass;
 use Adeliom\SyliusHappyCMSPlugin\DependencyInjection\SyliusHappyCMSExtension;
 use Adeliom\SyliusHappyCMSPlugin\Twig\Seo\SeoExtension;
 use PHPUnit\Framework\TestCase;
@@ -55,6 +56,20 @@ final class SyliusHappyCMSExtensionTest extends TestCase
 
         self::assertTrue($container->hasDefinition(SeoExtension::class), 'The service stays available to other services.');
         self::assertFalse($container->getDefinition(SeoExtension::class)->hasTag('twig.extension'));
+    }
+
+    public function testThePageContentBlockModelIsMappedByDefault(): void
+    {
+        $container = $this->load([]);
+
+        self::assertTrue($container->getParameter(PageContentBlockMappingPass::PARAMETER));
+    }
+
+    public function testThePageContentBlockModelCanBeLeftOutOfTheMapping(): void
+    {
+        $container = $this->load(['page_builder' => ['map_page_content_block' => false]]);
+
+        self::assertFalse($container->getParameter(PageContentBlockMappingPass::PARAMETER));
     }
 
     /**

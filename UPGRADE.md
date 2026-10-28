@@ -135,6 +135,22 @@ sylius_happy_cms:
 Leading and trailing `/` are removed (`/medias` and `medias` are the same). The routes are generated with `path()`, so templates and the media
 manager JavaScript follow it.
 
+### New option: leave the `PageContentBlock` model out of the Doctrine mapping
+
+Defaults to `true` (current behaviour, nothing to do):
+
+```yaml
+sylius_happy_cms:
+    page_builder:
+        map_page_content_block: true
+```
+
+If your page entity has no `contentBlocks` association (no relational page builder), set it to `false`:
+`doctrine:schema:validate` no longer reports the `PageContentBlock#contentOwner` association. No schema change (the
+model is a mapped superclass, it has no table). If you pointed a Doctrine mapping of the plugin `Entity/Page`
+namespace to a directory without plugin classes, or disabled the plugin auto mapping, to avoid that error, you can map
+the plugin directory again. See [Doctrine mapping](docs/configuration.md#doctrine-mapping).
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required
