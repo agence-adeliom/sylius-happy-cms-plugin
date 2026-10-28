@@ -7,7 +7,6 @@ namespace Adeliom\SyliusHappyCMSPlugin\Controller\Media\Module;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Media\FolderInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Media\MediaInterface;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityRepository;
 use League\Flysystem\FilesystemException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -95,7 +94,7 @@ trait GetContent
         $data = $this->readRequestData($request);
         $mediaId = $data['item'] ?? null;
         if (null !== $mediaId) {
-            $mediaRepository = $this->helper->getMediaRepository();
+            $mediaRepository = $this->helper->getEntityRepository();
             if ($mediaRepository) {
                 /** @var MediaInterface|null $media */
                 $media = $mediaRepository->findOneBy(['id' => $mediaId]);
@@ -221,14 +220,10 @@ trait GetContent
             throw new \RuntimeException('Folder Repository not found');
         }
 
-        $mediaRepository = $this->helper->getMediaRepository();
+        $mediaRepository = $this->helper->getEntityRepository();
 
         if (!$mediaRepository) {
             throw new \RuntimeException('Media Repository not found');
-        }
-
-        if (!$mediaRepository instanceof EntityRepository) {
-            return [];
         }
 
         $folderQuery = $folderRepository->createQueryBuilder('f');

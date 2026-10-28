@@ -97,6 +97,12 @@ class Folder extends BaseFolder
 }
 ```
 
+The media entity may keep its own repository (a `ServiceEntityRepository` of your application, or the default
+Doctrine one): the manager only calls Doctrine methods (`find`, `findBy`, `findOneBy`, `createQueryBuilder`) on
+`MediaHelper::getEntityRepository()`. `MediaRepositoryInterface` / `MediaRepository` remain available but are not
+required. `MediaHelper::getMediaRepository()` is deprecated: it returns `null` unless the repository implements
+`MediaRepositoryInterface`.
+
 ## Routes
 
 The media routes (admin media manager `media.*`, and the public download route `media.file_download`
