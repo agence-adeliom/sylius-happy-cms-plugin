@@ -114,6 +114,9 @@ sylius_happy_cms:
 To choose the prefix or the host yourself, import `@SyliusHappyCMSPlugin/config/routes/media_admin.php` (and
 `media_public.php`) instead of `config/routes.yaml`.
 
+The read routes `media.get_files` and `media.get_file_info` answer a `GET` with their parameters in the query string
+(`/get-files?folder=12&search=logo`, `/get-file-info?item=42`) as well as a `POST` with a JSON body.
+
 ## Documentation
 
 ### Integrate with FOS CKEditor

@@ -36,11 +36,11 @@ return static function (RoutingConfigurator $routes): void {
 
     $routes->add('media.get_files', '/%sylius_happy_cms.media.admin_path%/get-files')
         ->controller(MediaController::class . '::getFiles')
-        ->methods(['POST']);
+        ->methods(['GET', 'POST']);
 
     $routes->add('media.get_file_info', '/%sylius_happy_cms.media.admin_path%/get-file-info')
         ->controller(MediaController::class . '::getItemInfos')
-        ->methods(['POST']);
+        ->methods(['GET', 'POST']);
 
     $routes->add('media.new_folder', '/%sylius_happy_cms.media.admin_path%/create-new-folder')
         ->controller(MediaController::class . '::createNewFolder')
