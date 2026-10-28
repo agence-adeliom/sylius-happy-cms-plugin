@@ -251,6 +251,10 @@ $folder = $manager->getFolder($id);
 # Get folder by path
 $folder = $manager->folderByPath($path);
 
+# Get the media of a storage path ("products/doors/front-door.jpg") or null (used by the public download route:
+# the folders are resolved by their slugs, the media table is not scanned)
+$media = $manager->getHelper()->getMediaByPath($path);
+
 # Create a folder
 $folder = $manager->createFolder($folderName, $path = null)
 
