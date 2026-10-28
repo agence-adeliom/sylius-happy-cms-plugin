@@ -39,13 +39,12 @@ services:
   Adeliom\SyliusHappyCMSPlugin\Factory\Block\Helper:
     public: true
     arguments:
-      - '@twig'
-      - '@event_dispatcher'
-      - '@sylius.happy_cms.block_collection'
-      - '@adeliom.sylius.asset.renderer'
-#      - '@form.factory'
-#      - '@doctrine.orm.entity_manager'
-#      - '@request_stack'
+      # positional arguments kept (index 0 to 3) for the projects that replace them in a compiler pass
+      0: '@twig'
+      1: '@event_dispatcher'
+      2: '@sylius.happy_cms.block_collection'
+      3: '@adeliom.sylius.asset.renderer'
+      $inheritContext: '%sylius_happy_cms.block_render.inherit_context%'
     tags:
       - { name: twig.runtime }
 
