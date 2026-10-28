@@ -84,7 +84,7 @@ abstract class AbstractContentCommand extends Command
             }
             $folder = $manager->folderByPath($folderPath);
 
-            $repo = $manager->getHelper()->getMediaRepository();
+            $repo = $manager->getHelper()->getEntityRepository();
             if ($repo) {
                 return $repo->findOneBy([
                     'folder' => $folder,

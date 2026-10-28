@@ -53,13 +53,40 @@ class MediaHelper
         return $mediaClass;
     }
 
+    /**
+     * @deprecated since 2.3.3, use getEntityRepository() instead: this method returns null unless the repository
+     *             of the media entity implements MediaRepositoryInterface
+     */
     public function getMediaRepository(): ?MediaRepositoryInterface
     {
+        trigger_deprecation('agence-adeliom/sylius-happy-cms-plugin', '2.3.3', 'The "%s()" method is deprecated, use "%s::getEntityRepository()" instead. It will be removed in 3.0.', __METHOD__, self::class);
+
         $class = $this->getMediaClassName();
         if (class_exists($class) && in_array(MediaInterface::class, class_implements($class))) {
             $repo = $this->em->getRepository($class);
 
             return $repo instanceof MediaRepositoryInterface ? $repo : null;
+        }
+
+        return null;
+    }
+
+    /**
+     * The Doctrine repository of the media entity, whatever its class: the plugin MediaRepository, a
+     * repository implementing MediaRepositoryInterface, or any EntityRepository / ServiceEntityRepository
+     * of the application. The media manager only calls the Doctrine methods (find, findBy, findOneBy,
+     * createQueryBuilder).
+     *
+     * @return EntityRepository<MediaInterface>|null null when the configured class is not a media entity
+     */
+    public function getEntityRepository(): ?EntityRepository
+    {
+        $class = $this->getMediaClassName();
+        if (class_exists($class) && in_array(MediaInterface::class, class_implements($class))) {
+            /** @var EntityRepository<MediaInterface> $repository */
+            $repository = $this->em->getRepository($class);
+
+            return $repository;
         }
 
         return null;
@@ -117,7 +144,7 @@ class MediaHelper
         }
 
         try {
-            if (null !== ($mediaRepository = $this->getMediaRepository())) {
+            if (null !== ($mediaRepository = $this->getEntityRepository())) {
                 if (is_numeric($media) || is_string($media)) {
                     /**
                      * @var ?MediaInterface $media
@@ -459,7 +486,7 @@ class MediaHelper
             return null;
         }
 
-        $mediaRepository = $this->getMediaRepository();
+        $mediaRepository = $this->getEntityRepository();
         if (!$mediaRepository) {
             return null;
         }

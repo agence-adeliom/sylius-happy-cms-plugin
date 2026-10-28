@@ -291,6 +291,25 @@ Templates of the application reading `sylius_happy_cms.media.*` get the configur
 
 In 3.0 the option is removed and the global holding the application configuration is the only behaviour.
 
+### Media lookups work with any repository of the media entity, `MediaHelper::getMediaRepository()` deprecated
+
+The media manager looked the media up through `MediaHelper::getMediaRepository()`, which returns `null` unless the
+repository of the media entity implements `MediaRepositoryInterface`. An application keeping its own repository (a
+`ServiceEntityRepository`, or the default Doctrine one) silently lost every lookup: `getMedia()` and the Twig
+functions returned `null`, the duplicate name check was skipped and the manager listing returned nothing. The plugin
+now uses the new `MediaHelper::getEntityRepository(): ?EntityRepository`, the Doctrine repository of the media
+entity whatever its class (bug fix, no option).
+
+`getMediaRepository()` keeps its signature and behaviour, and is deprecated: call `getEntityRepository()` instead.
+
+```diff
+-$repository = $mediaManager->getHelper()->getMediaRepository();
++$repository = $mediaManager->getHelper()->getEntityRepository();
+```
+
+A `MediaHelper` subclass overriding `getMediaRepository()` to change the lookups must override
+`getEntityRepository()` instead. In 3.0 `getMediaRepository()` is removed.
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required

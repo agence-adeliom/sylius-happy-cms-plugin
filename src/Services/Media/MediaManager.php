@@ -358,7 +358,7 @@ class MediaManager
         $filename = strtolower((new AsciiSlugger())->slug(strtolower((string) $entity->getName()))->toString() . '.' . MediaHelper::mime2ext($infos['mime']));
         $entity->setSlug($filename);
 
-        $mediaRepository = $this->getHelper()->getMediaRepository();
+        $mediaRepository = $this->getHelper()->getEntityRepository();
 
         if ($mediaRepository && !empty($mediaRepository->findBy([
             'folder' => $entity->getFolder(),
@@ -450,7 +450,7 @@ class MediaManager
             throw new ExtNotAllowed($this->translator->trans('not_allowed_file_ext', [], 'SyliusHappyCMSPlugin'));
         }
 
-        $mediaRepository = $this->getHelper()->getMediaRepository();
+        $mediaRepository = $this->getHelper()->getEntityRepository();
 
         if ($mediaRepository && !empty($mediaRepository->findBy([
             'folder' => $entity->getFolder(),
@@ -571,7 +571,7 @@ class MediaManager
             throw new ExtNotAllowed($this->translator->trans('not_allowed_file_ext', [], 'SyliusHappyCMSPlugin'));
         }
 
-        $mediaRepository = $this->getHelper()->getMediaRepository();
+        $mediaRepository = $this->getHelper()->getEntityRepository();
 
         if ($mediaRepository && !empty($mediaRepository->findBy(['folder' => $entity->getFolder(), 'name' => $entity->getName()]))) {
             throw new AlreadyExist($this->translator->trans('error.already_exists', [], 'SyliusHappyCMSPlugin'));
