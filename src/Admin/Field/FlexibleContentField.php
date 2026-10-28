@@ -121,6 +121,9 @@ class FlexibleContentField implements FieldInterface
     }
 
     /**
+     * Block types allowed in the field. For a resource that does not implement ContentEditableInterface, this list
+     * alone decides (BlockTypeInterface::supports() is only asked for content-editable resources).
+     *
      * @param array<int, class-string> $blocks
      */
     public function allowedBlocks(array $blocks): self
