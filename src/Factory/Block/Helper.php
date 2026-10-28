@@ -36,9 +36,8 @@ class Helper
         private EventDispatcherInterface $eventDispatcher,
         private readonly BlockCollection $collection,
         private readonly AssetRenderer $assetRenderer,
-        //private readonly FormFactoryInterface $formFactory,
-        //private readonly EntityManagerInterface $entityManager,
-        //private readonly RequestStack $requestStack
+        /** Merge the Twig context of the calling template into the block template context */
+        private readonly bool $inheritContext = false,
     ) {
     }
 
@@ -85,6 +84,30 @@ class Helper
     }
 
     /**
+     * Renders a flex block stored as an array (`block_type`, `position`, `block_published` and the block fields).
+     *
+     * Returns null when the block is not published (unless in preview) or when its type is unknown.
+     *
+     * @param array<string, mixed> $data
+     * @param array<string, mixed> $extra variables added to the block template context
+     *
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     */
+    public function renderBlock(array $data, bool $preview = false, array $extra = []): ?Markup
+    {
+        return $this->doRenderBlock([], $data, $preview, $extra);
+    }
+
+    /**
+     * Same as renderBlock(), called by the `happy_cms_block_render()` Twig function with the context of the calling
+     * template. When `inherit_context` is enabled, the block template receives that context (`page`, `resource`,
+     * loop variables…), overridden by the block variables (`block`, `preview`, `blockType`, `settings`), themselves
+     * overridden by `$extra`. When it is disabled, renderBlock() is called, so an override of renderBlock() keeps
+     * being used by the Twig function.
+     *
+     * @param array<string, mixed> $context
      * @param array<string, mixed> $data
      * @param array<string, mixed> $extra
      *
@@ -92,7 +115,21 @@ class Helper
      * @throws RuntimeError
      * @throws SyntaxError
      */
-    public function renderBlock(array $data, bool $preview = false, array $extra = []): ?Markup
+    public function renderBlockInContext(array $context, array $data, bool $preview = false, array $extra = []): ?Markup
+    {
+        if (!$this->inheritContext) {
+            return $this->renderBlock($data, $preview, $extra);
+        }
+
+        return $this->doRenderBlock($context, $data, $preview, $extra);
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     * @param array<string, mixed> $data
+     * @param array<string, mixed> $extra
+     */
+    private function doRenderBlock(array $context, array $data, bool $preview, array $extra): ?Markup
     {
         $blockPublished = $data['block_published'] ?? null;
 
@@ -149,11 +186,15 @@ class Helper
             $this->stopTracing($stats['id'], $stats);
         }
 
-        return new Markup($this->twig->render($block->getFrontEndTemplatePath(), array_merge([
-                                                                                                 'block' => $data,
-                                                                                                 'preview' => $preview,
-                                                                                                 'blockType' => $blockType,
-                                                                                                 'settings' => $blockData,
-                                                                                             ], $extra)), 'UTF-8');
+        return new Markup($this->twig->render($block->getFrontEndTemplatePath(), array_merge(
+            $context,
+            [
+                'block' => $data,
+                'preview' => $preview,
+                'blockType' => $blockType,
+                'settings' => $blockData,
+            ],
+            $extra,
+        )), 'UTF-8');
     }
 }

@@ -124,6 +124,17 @@ class Configuration implements ConfigurationInterface
             ->end()
             ->end()
 
+            ->arrayNode('block_render')
+            ->info('Rendering of flex blocks stored as arrays (JSON content) by happy_cms_block_render().')
+            ->addDefaultsIfNotSet()
+            ->children()
+            ->booleanNode('inherit_context')
+            ->defaultFalse()
+            ->info('Pass the Twig context of the calling template (page, resource, loop variables...) to the block templates, overridden by the block variables.')
+            ->end()
+            ->end()
+            ->end()
+
             ->arrayNode('seo')
             ->addDefaultsIfNotSet()
             ->children()
