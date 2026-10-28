@@ -319,16 +319,24 @@ association remains an option.
 - **Id of a deleted media** (no foreign key, so it can happen): the reference is still returned, since checking it
   would need the query the type avoids. Reading one of its fields throws `Doctrine\ORM\EntityNotFoundException`.
   `MediaManager::getMedia()` / `MediaHelper::getMedia()`, and therefore the `happy_cms_media*`, `resolve_media`,
-  `media_meta`, `media_infos` and `file_is_type` Twig helpers, resolve it to `null`, like an unknown id.
+  `media_meta`, `media_infos` and `file_is_type` Twig helpers and the media form field, resolve it to `null`, like an
+  unknown id.
   Prefer these helpers over direct property access (`entity.image.name`) where orphans may exist, or clean them up:
   `UPDATE article SET image = NULL WHERE image NOT IN (SELECT id FROM media)`.
 - The reference factory is installed when the bundle boots (`SyliusHappyCMSPlugin::boot()`); outside of a booted
   kernel, call `MediaReferenceType::setReferenceFactory()`.
 - Unchanged references are not rewritten on flush.
 
-Form: the media form field submits the media id. On a `happy_cms_media_reference_type` column, type the property
-`MediaInterface|int|null` if it is edited through that field (the id is converted on write, and read back as a
-reference on the next load).
+Form: map the field with the `hydrate` option so that the submitted value is the media, not its id
+(otherwise a `?MediaInterface` property would receive an int):
+
+```php
+yield MediaField::new('image', 'Image')->setFormTypeOption('hydrate', true);
+// or
+$builder->add('image', MediaType::class, ['hydrate' => true]);
+```
+
+Keep the default (`hydrate: false`) for `happy_cms_media_type` columns and for media stored in JSON (blocks).
 
 Switching every `happy_cms_media_type` column of a project (including `Seo::$cover`, typed `MediaInterface|int|null`)
 to lazy references is possible by mapping the type name to the other class in the project configuration:
