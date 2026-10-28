@@ -309,6 +309,17 @@ sylius_happy_cms:
         # path of the media manager routes (media.*), below the prefix of their import
         admin_path: 'happy-cms-media/medias'
 
+        # how the manager tells whether a folder exists (folderByPath(), createMedia($source, 'a/b'), move()):
+        # - public_dir (default): public/{base_url}/{path} on the local disk; only valid with a relative base_url
+        #   and a storage located in the public directory
+        # - storage: asks the Flysystem storage (any adapter, absolute base_url such as a CDN)
+        # - database: looks for the folder rows (object storages without directories)
+        # With an absolute base_url or a storage outside the public directory, set storage or database: with
+        # public_dir the folders are never found, createMedia($source, 'a/b') creates them again on each call and
+        # moving a folder does not move its files. With storage and database, a folder is moved entry by entry on
+        # the storage (Flysystem moves files only).
+        directory_check: public_dir
+
         # ignore any file starts with "."
         ignore_files:         '/^\..*/'
         
