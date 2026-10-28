@@ -173,6 +173,15 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
             $container->setParameter('sylius_happy_cms.media.' . $key, $value);
         }
 
+        if (true !== $config['keep_data_uri_name']) {
+            trigger_deprecation(
+                'agence-adeliom/sylius-happy-cms-plugin',
+                '2.3.3',
+                (null === $config['keep_data_uri_name'] ? 'Not setting the "%s" option is deprecated.' : 'Setting the "%s" option to false is deprecated.') . ' It will be removed in 3.0, where MediaManager::createMedia() keeping the name given for a data URI source is the only behaviour. Set it to true to opt in now (see UPGRADE.md).',
+                'sylius_happy_cms.media.keep_data_uri_name',
+            );
+        }
+
         $storageName = $container->getParameter('sylius_happy_cms.media.storage_name');
         if (is_string($storageName) || $storageName instanceof Alias) {
             $container->setAlias('happy.cms.media.storage', $storageName);

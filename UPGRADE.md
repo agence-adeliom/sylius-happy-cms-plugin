@@ -135,6 +135,32 @@ sylius_happy_cms:
 Leading and trailing `/` are removed (`/medias` and `medias` are the same). The routes are generated with `path()`, so templates and the media
 manager JavaScript follow it.
 
+### New `MediaManager::createMediaFromSource()`, flag: name of a data URI source
+
+`MediaManager::createMediaFromSource(string|File $source, FolderInterface|string|null $folder = null, ?string $name = null, array $metas = [])`
+creates a media in a folder entity or a folder path, with metas (alternative text...) merged into the detected ones
+before the save, and keeps the name given for a data URI source. `createMedia($source, $path, $name)` is unchanged
+(same signature, so subclasses overriding it keep working).
+
+```diff
+-$media = $mediaManager->createMedia($file, $folder->getPath());
+-$media->setMetas(array_merge($media->getMetas(), ['alt' => 'Front door']));
+-$mediaManager->save($media);
++$media = $mediaManager->createMediaFromSource($file, $folder, metas: ['alt' => 'Front door']);
+```
+
+`createMedia()` ignores the `$name` of a data URI source (a random name is used), including for the media manager
+upload of an edited image. To keep it:
+
+```yaml
+sylius_happy_cms:
+    media:
+        keep_data_uri_name: true
+```
+
+Not setting the option, or setting it to `false`, keeps the random name and triggers a deprecation. In 3.0 the option
+is removed and `createMedia()` keeping the name of a data URI is the only behaviour.
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required

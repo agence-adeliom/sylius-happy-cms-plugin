@@ -254,9 +254,10 @@ $folder = $manager->folderByPath($path);
 # Create a folder
 $folder = $manager->createFolder($folderName, $path = null)
 
-# Create a media
+# Create a media (see "Create a media from your code" below)
 # $source can be a UploadedFile, File, Image URL, Oembed URL, Base64 URI
-$folder = $manager->createMedia($source, $path = null, $name = null)
+$media = $manager->createMediaFromSource($source, $folder = null, $name = null, $metas = [])
+$media = $manager->createMedia($source, $path = null, $name = null)
 
 # Save a folder or media
 $manager->save($entity, $flush = true);
@@ -264,6 +265,43 @@ $manager->save($entity, $flush = true);
 # Delete a folder or media
 $manager->delete($entity, $flush = true);
 ```
+
+#### Create a media from your code
+
+`MediaManager::createMediaFromSource()` writes the file to the media storage and saves the media (it flushes).
+
+| Argument  | Type                          | Description                                                                                                                         |
+|-----------|-------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| `$source` | `string\|File`                | a local file path, a `File` / `UploadedFile`, a data URI (`data:image/png;base64,...`), an image URL or an oEmbed URL (YouTube...)   |
+| `$folder` | `FolderInterface\|string\|null` | the folder entity, or its path (`products/doors`, missing folders are created); `null` = root folder                               |
+| `$name`   | `?string`                     | media name, the file slug is built from it (defaults to the file name, or a random name for a data URI)                             |
+| `$metas`  | `array<string, mixed>`        | metas added to the detected ones (`dimensions`, oEmbed data...) before the save, e.g. `['alt' => '...', 'title' => '...']`          |
+
+It throws `AlreadyExist` (a media with this name exists in the folder), `ExtNotAllowed` (file type not allowed),
+`NoFile` (unreadable source) or `ProviderNotFound` (URL without image nor oEmbed provider), all in
+`Adeliom\SyliusHappyCMSPlugin\Exceptions\Media`.
+
+```php
+use Adeliom\SyliusHappyCMSPlugin\Exceptions\Media\AlreadyExist;
+
+// A local file in a folder path, with its alternative text
+$media = $manager->createMediaFromSource('/tmp/import/front-door.jpg', 'products/doors', metas: ['alt' => 'Front door']);
+
+// In a folder entity, with a name
+$media = $manager->createMediaFromSource($uploadedFile, $folder, 'Front door');
+
+// From a data URI (the name is kept)
+$media = $manager->createMediaFromSource('data:image/png;base64,iVBORw0...', 'drawings', 'Signature');
+
+try {
+    $manager->createMediaFromSource($file, 'products/doors');
+} catch (AlreadyExist) {
+    // same name in the same folder
+}
+```
+
+`createMedia($source, $path, $name)` stays available (folder path only, no metas). It ignores the name of a data URI
+source (random name) unless `media.keep_data_uri_name` is `true` (see the configuration below).
 
 ### Use the Doctrine type (optional)
 
@@ -355,6 +393,10 @@ sylius_happy_cms:
                 - application/x-tar
                 - application/zip
         
+        # createMedia() (and the media manager upload of an edited image) keeps the name given for a data URI
+        # source; not set or false (deprecated): a random name. true is the only behaviour in 3.0
+        keep_data_uri_name: true
+
         # display file last modification time as
         last_modified_format: Y-m-d
         
