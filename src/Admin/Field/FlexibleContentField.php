@@ -129,4 +129,15 @@ class FlexibleContentField implements FieldInterface
 
         return $this;
     }
+
+    /**
+     * Render the complete form of each block type in its prototype, so that a new block can be filled before the
+     * first save (by default, a new block only holds its technical fields and is filled after saving).
+     */
+    public function completePrototypes(bool $complete = true): self
+    {
+        $this->setFormTypeOption('complete_prototypes', $complete);
+
+        return $this;
+    }
 }

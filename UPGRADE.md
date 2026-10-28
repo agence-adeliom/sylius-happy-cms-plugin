@@ -135,6 +135,16 @@ sylius_happy_cms:
 Leading and trailing `/` are removed (`/medias` and `medias` are the same). The routes are generated with `path()`, so templates and the media
 manager JavaScript follow it.
 
+### New option: complete prototypes in the flexible content field
+
+`FlexibleContentField::completePrototypes()` (form option `complete_prototypes` of `BlockCollectionType`, default
+`false`) renders all the fields of a block in its prototype, so a new block can be filled before the first save. The
+default prototypes are unchanged (technical fields and a "please save" notice).
+
+Fixed without option: the flexible content form theme no longer fails ("Impossible to access an attribute "name" on a
+null variable") on a stored block whose type is not in the allowed list of the field; the block is rendered under its
+class name.
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required

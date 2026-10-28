@@ -34,6 +34,7 @@ class BlockCollectionType extends CollectionType implements AdminFormTypeInterfa
      *     required: bool,
      *     allow_extra_fields?: bool,
      *     blocks: FormTypeInterface[],
+     *     complete_prototypes: bool,
      * } $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -64,9 +65,12 @@ class BlockCollectionType extends CollectionType implements AdminFormTypeInterfa
                 }
 
                 $form = $builder->create($name, $block::class, $prototypeOptions);
-                foreach ($form as $child) {
-                    if (!in_array($child->getName(), ['block_type', 'block_published', 'position'])) {
-                        $form->remove($child->getName());
+                if (!$options['complete_prototypes']) {
+                    // minimal prototype: the block is filled after the first save
+                    foreach ($form as $child) {
+                        if (!in_array($child->getName(), ['block_type', 'block_published', 'position'])) {
+                            $form->remove($child->getName());
+                        }
                     }
                 }
                 $prototypes[$type] = $form->getForm();
@@ -101,6 +105,7 @@ class BlockCollectionType extends CollectionType implements AdminFormTypeInterfa
      *     required: bool,
      *     allow_extra_fields?: bool,
      *     blocks: FormTypeInterface[],
+     *     complete_prototypes: bool,
      * } $options
      */
     public function buildView(FormView $view, FormInterface $form, array $options): void
@@ -110,6 +115,7 @@ class BlockCollectionType extends CollectionType implements AdminFormTypeInterfa
             'allow_add' => $options['allow_add'],
             'allow_delete' => $options['allow_delete'],
             'blocks' => $options['blocks'],
+            'complete_prototypes' => $options['complete_prototypes'],
         ]);
         if ($form->getConfig()->hasAttribute('prototypes')) {
             $prototypes = $form->getConfig()->getAttribute('prototypes');
@@ -149,6 +155,9 @@ class BlockCollectionType extends CollectionType implements AdminFormTypeInterfa
             'delete_empty' => true,
             'by_reference' => false,
             'blocks' => [],
+            // true: the prototype of a block holds all its fields, so a new block can be filled before saving
+            // false: only block_type, block_published and position; the block is filled after the first save
+            'complete_prototypes' => false,
             'invalid_message' => static fn (
                 Options $options,
                 $previousValue,
@@ -161,6 +170,7 @@ class BlockCollectionType extends CollectionType implements AdminFormTypeInterfa
         $resolver->setAllowedTypes('delete_empty', ['bool', 'callable']);
         $resolver->setAllowedTypes('blocks', 'array');
         $resolver->setAllowedTypes('allow_drag', 'bool');
+        $resolver->setAllowedTypes('complete_prototypes', 'bool');
     }
 
     /**
