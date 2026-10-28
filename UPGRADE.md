@@ -183,6 +183,15 @@ routes: re-save the routable entities afterwards.
 
 `EntityRouteIndexer` takes a new optional constructor argument, `$trailingSlash` (default `false`).
 
+### New extension point: parent path resolvers of the CMS routes
+
+`Adeliom\SyliusHappyCMSPlugin\Services\Cmf\RouteParentPathResolverInterface` (autoconfigured, tag
+`sylius_happy_cms.route_parent_path_resolver`): the first resolver supporting an entity fills `{{other_entity_path}}`
+before `CalculateRouteStaticPrefixEvent` is dispatched; the listeners of the event receive that value and can still
+change it. Without resolver, the routes are unchanged.
+
+`EntityRouteIndexer` takes a new optional constructor argument, `$parentPathResolvers` (default `[]`).
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required
