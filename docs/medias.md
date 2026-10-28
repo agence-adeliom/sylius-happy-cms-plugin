@@ -222,6 +222,10 @@ yield MediaField::new('property', "label")
 
 # Get mimetype icon (font-awesome)
 {{ mime_icon("text/plain") }}
+
+# CSRF token of the media manager routes, for an admin page that calls them (upload, rename…) without being the
+# media manager page: send it in the `X-CSRF-Token` header (or as `_csrf_token`)
+{{ happy_cms_media_csrf_token() }}
 ```
 
 #### You can override media render with twig
