@@ -80,6 +80,7 @@ class EntityRouteIndexer
         protected iterable $parentPathResolvers = [],
         protected bool $indexOnFlush = false,
         protected bool $childRoutesPrefixBoundary = false,
+        protected bool $rewriteChildRoutes = true,
     ) {
     }
 
@@ -209,6 +210,12 @@ class EntityRouteIndexer
                 $this->manager->persist($route);
             }
             $this->manager->flush();
+        }
+
+        // "sylius_happy_cms.routing.rewrite_child_routes: false": a stored path below the previous one may belong to
+        // a content of another type with the same slug (its children would be moved with this entity)
+        if (!$this->rewriteChildRoutes) {
+            return;
         }
 
         foreach ($routesChanges as $previousStaticPrefix => $staticPrefix) {
@@ -451,7 +458,7 @@ class EntityRouteIndexer
     /**
      * Public entry point to move the routes below a path that is not a CMS route, e.g. the slug of a parent of
      * another type has changed (see RouteParentPathResolverInterface). Call it outside of a flush, then flush the
-     * entity manager.
+     * entity manager. Explicit call: not affected by "sylius_happy_cms.routing.rewrite_child_routes".
      */
     public function rewriteStaticPrefix(string $previousStaticPrefix, string $staticPrefix): void
     {

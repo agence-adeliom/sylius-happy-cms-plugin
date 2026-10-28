@@ -646,6 +646,10 @@ class Configuration implements ConfigurationInterface
             ->defaultNull()
             ->info('true: when the path of an entity changes, rewrite only the stored routes below it at a "/" boundary ("/door" moves "/door/wooden", not "/doors"), replacing the leading prefix only. Not set or false: every route starting with the previous path is rewritten (deprecated). In 3.0 the option is removed and the "/" boundary is the only behaviour.')
             ->end()
+            ->booleanNode('rewrite_child_routes')
+            ->defaultTrue()
+            ->info('When the path of an entity changes, move the stored routes below its previous path ("/door/…" when "/door" becomes "/gate"). Disable it when a path does not identify a single parent: two contents of different types with the same slug, whose children share the same prefix.')
+            ->end()
             ->end()
             ->end()
 

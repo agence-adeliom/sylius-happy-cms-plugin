@@ -335,4 +335,34 @@ final class EntityRouteIndexerTest extends RouteIndexerTestCase
             $event->setRouteStaticPrefix(null === $category ? '' : '/' . $category);
         });
     }
+
+    #[DataProvider('indexOnFlushModes')]
+    public function testTheRewritingOfTheRoutesBelowARenamedPathCanBeDisabled(bool $indexOnFlush): void
+    {
+        // a page "porte" and a category "porte" (another type, same slug): "/porte/porte-bois" is a child of the
+        // category, not of the page; renaming the page must not move it
+        $this->registerIndexer(['urlPattern' => '{{other_entity_path}}{{current_entity_path}}', 'parentPathResolvers' => [new CategoryPathResolver()], 'indexOnFlush' => $indexOnFlush, 'rewriteChildRoutes' => false]);
+        $id = $this->savePage('porte')->getId();
+        $this->savePage('porte-bois', category: 'porte');
+        $this->restartProcess();
+
+        $door = $this->entityManager->find(IndexedPage::class, $id);
+        self::assertInstanceOf(IndexedPage::class, $door);
+        $door->getTranslation()->setSlug('portail');
+        $this->entityManager->flush();
+
+        self::assertSame(['/portail', '/porte/porte-bois'], array_values($this->storedPrefixes()));
+    }
+
+    #[DataProvider('indexOnFlushModes')]
+    public function testTheRoutesBelowAPathCanStillBeMovedExplicitlyWhenTheRewritingIsDisabled(bool $indexOnFlush): void
+    {
+        $indexer = $this->registerIndexer(['urlPattern' => '{{other_entity_path}}{{current_entity_path}}', 'parentPathResolvers' => [new CategoryPathResolver()], 'indexOnFlush' => $indexOnFlush, 'childRoutesPrefixBoundary' => true, 'rewriteChildRoutes' => false]);
+        $this->savePage('porte-bois', category: 'porte');
+
+        $indexer->rewriteStaticPrefix('/porte', '/portail');
+        $this->entityManager->flush();
+
+        self::assertSame(['/portail/porte-bois'], array_values($this->storedPrefixes()));
+    }
 }
