@@ -117,6 +117,10 @@ To choose the prefix or the host yourself, import `@SyliusHappyCMSPlugin/config/
 The read routes `media.get_files` and `media.get_file_info` answer a `GET` with their parameters in the query string
 (`/get-files?folder=12&search=logo`, `/get-file-info?item=42`) as well as a `POST` with a JSON body.
 
+`media.global_search` (`/global-search?search=door`) returns the media of every folder whose name contains the term
+(one query, the term is not a `LIKE` pattern, files matching `ignore_files` left out), in the format of the folder
+listing plus `dir_path`. Without `search`, every media is listed (as the EasyMedia global search did).
+
 ## Documentation
 
 ### Integrate with FOS CKEditor
