@@ -76,6 +76,7 @@ trait GetContent
         return new JsonResponse([
             'files' => [
                 'path' => $path,
+                'breadcrumb' => $this->getBreadcrumb($folder),
                 'items' => $items,
             ],
         ]);
@@ -296,5 +297,21 @@ trait GetContent
         });
 
         return $list->toArray();
+    }
+
+    /**
+     * Folders from the root to the given folder, empty at the root.
+     *
+     * @return list<array{id: int|null, name: string|null}>
+     */
+    protected function getBreadcrumb(?FolderInterface $folder): array
+    {
+        $breadcrumb = [];
+        while ($folder instanceof FolderInterface) {
+            array_unshift($breadcrumb, ['id' => $folder->getId(), 'name' => $folder->getName()]);
+            $folder = $folder->getParent();
+        }
+
+        return $breadcrumb;
     }
 }
