@@ -127,6 +127,31 @@ final class RoutingConfigurationTest extends TestCase
         self::assertSame([], self::deprecationsOf('index_on_flush', $deprecations));
     }
 
+    public function testChildRoutesAreRewrittenWithoutBoundaryAndDeprecatedByDefault(): void
+    {
+        [$container, $deprecations] = $this->loadCollectingDeprecations([]);
+
+        self::assertFalse($container->getParameter('sylius_happy_cms.routing.child_routes_prefix_boundary'));
+        self::assertSame('%sylius_happy_cms.routing.child_routes_prefix_boundary%', $container->getDefinition(self::INDEXER)->getArgument(9));
+        self::assertContains('Since agence-adeliom/sylius-happy-cms-plugin 2.3.3: Not setting the "sylius_happy_cms.routing.child_routes_prefix_boundary" option is deprecated. It will be removed in 3.0, where rewriting only the routes below a renamed path, at a "/" boundary, is the only behaviour. Set it to true to opt in now (see UPGRADE.md).', $deprecations);
+    }
+
+    public function testDisablingThePrefixBoundaryExplicitlyIsDeprecated(): void
+    {
+        [$container, $deprecations] = $this->loadCollectingDeprecations(['routing' => ['child_routes_prefix_boundary' => false]]);
+
+        self::assertFalse($container->getParameter('sylius_happy_cms.routing.child_routes_prefix_boundary'));
+        self::assertContains('Since agence-adeliom/sylius-happy-cms-plugin 2.3.3: Setting the "sylius_happy_cms.routing.child_routes_prefix_boundary" option to false is deprecated. It will be removed in 3.0, where rewriting only the routes below a renamed path, at a "/" boundary, is the only behaviour. Set it to true to opt in now (see UPGRADE.md).', $deprecations);
+    }
+
+    public function testThePrefixBoundaryIsNotDeprecated(): void
+    {
+        [$container, $deprecations] = $this->loadCollectingDeprecations(['routing' => ['child_routes_prefix_boundary' => true]]);
+
+        self::assertTrue($container->getParameter('sylius_happy_cms.routing.child_routes_prefix_boundary'));
+        self::assertSame([], self::deprecationsOf('child_routes_prefix_boundary', $deprecations));
+    }
+
     /**
      * @param array<string, mixed> $projectConfig
      *
