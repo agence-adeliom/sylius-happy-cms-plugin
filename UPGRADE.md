@@ -469,6 +469,21 @@ parent of another type whose slug changed (call it outside of a Doctrine flush, 
 The protected `rewriteOtherStaticPrefix()` is replaced by `recomputeRoutesBelowStaticPrefix()`: a project overriding
 it must override the new method.
 
+### New option: how the media manager checks that a folder exists
+
+```yaml
+sylius_happy_cms:
+    media:
+        # public_dir (default, current behaviour), storage or database
+        directory_check: storage
+```
+
+`MediaManager::directoryExists()` tests `public/{base_url}/{path}` on the local disk (`public_dir`). With an absolute
+`base_url` (CDN, front domain) or a storage outside the public directory it is always false: `folderByPath()` returns
+`false`, `createMedia($source, 'a/b')` creates the folders again on every call and `move()` does not move folders.
+`storage` asks the Flysystem storage, `database` looks for the folder rows (object storages without directories);
+with both, a folder is moved entry by entry on the storage. `public_dir` is unchanged (same check, same one-call move).
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required
