@@ -20,6 +20,8 @@ services:
             - '@sylius.provider.locale'
             - '@translator'
             - '@parameter_bag'
+            - false # assign the root item: `sylius_happy_cms.menu.root_item.assign`, set by the extension
+            - '@doctrine'
         tags:
             - # these are the options required to define the entity listener
                 name: 'doctrine.orm.entity_listener'

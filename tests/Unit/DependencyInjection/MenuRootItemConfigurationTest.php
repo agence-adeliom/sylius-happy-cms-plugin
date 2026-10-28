@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Tests\Adeliom\SyliusHappyCMSPlugin\Unit\DependencyInjection;
 
 use Adeliom\SyliusHappyCMSPlugin\DependencyInjection\SyliusHappyCMSExtension;
+use Adeliom\SyliusHappyCMSPlugin\EventListener\Menu\MenuCreationListener;
 use Adeliom\SyliusHappyCMSPlugin\EventListener\Menu\MenuRootItemOnDeleteListener;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Yaml\Yaml;
 
 final class MenuRootItemConfigurationTest extends TestCase
@@ -32,10 +34,10 @@ final class MenuRootItemConfigurationTest extends TestCase
         $container = $this->load(['menu' => ['root_item_on_delete_set_null' => false]]);
 
         self::assertFalse($container->getDefinition(MenuRootItemOnDeleteListener::class)->hasTag('doctrine.event_listener'));
-        self::assertCount(1, $this->menuDeprecations());
+        self::assertCount(1, $this->deprecationsOf('menu.root_item_on_delete_set_null'));
         self::assertStringStartsWith(
             'Since agence-adeliom/sylius-happy-cms-plugin 2.3.3: Setting the "sylius_happy_cms.menu.root_item_on_delete_set_null" option to false is deprecated.',
-            $this->menuDeprecations()[0],
+            $this->deprecationsOf('menu.root_item_on_delete_set_null')[0],
         );
     }
 
@@ -48,17 +50,50 @@ final class MenuRootItemConfigurationTest extends TestCase
             [['event' => 'loadClassMetadata']],
             $container->getDefinition(MenuRootItemOnDeleteListener::class)->getTag('doctrine.event_listener'),
         );
-        self::assertSame([], $this->menuDeprecations());
+        self::assertSame([], $this->deprecationsOf('menu.root_item_on_delete_set_null'));
+    }
+
+    public function testTheRootItemIsNotAssignedWithADeprecationByDefault(): void
+    {
+        $container = $this->load([]);
+
+        self::assertNull($container->getParameter('sylius_happy_cms.menu.root_item.assign'));
+        $listener = $container->getDefinition(MenuCreationListener::class);
+        self::assertFalse($listener->getArgument(3));
+        self::assertEquals(new Reference('doctrine'), $listener->getArgument(4));
+        self::assertTrue($listener->hasTag('doctrine.orm.entity_listener'));
+        self::assertSame(
+            ['Since agence-adeliom/sylius-happy-cms-plugin 2.3.3: Not setting the "sylius_happy_cms.menu.root_item.assign" option is deprecated. It will be removed in 3.0, where assigning the root item created with a menu to Menu#rootItem is the only behaviour. Set it to true to opt in now (see UPGRADE.md).'],
+            $this->deprecationsOf('menu.root_item.assign'),
+        );
+    }
+
+    public function testSettingTheRootItemAssignOptionToFalseIsDeprecated(): void
+    {
+        $container = $this->load(['menu' => ['root_item' => ['assign' => false]]]);
+
+        self::assertFalse($container->getDefinition(MenuCreationListener::class)->getArgument(3));
+        self::assertCount(1, $this->deprecationsOf('menu.root_item.assign'));
+        self::assertStringContainsString('option to false is deprecated', $this->deprecationsOf('menu.root_item.assign')[0]);
+    }
+
+    public function testTheRootItemIsAssignedWhenOptedIn(): void
+    {
+        $container = $this->load(['menu' => ['root_item' => ['assign' => true]]]);
+
+        self::assertTrue($container->getParameter('sylius_happy_cms.menu.root_item.assign'));
+        self::assertTrue($container->getDefinition(MenuCreationListener::class)->getArgument(3));
+        self::assertSame([], $this->deprecationsOf('menu.root_item.assign'));
     }
 
     /**
      * @return list<string>
      */
-    private function menuDeprecations(): array
+    private function deprecationsOf(string $path): array
     {
         return array_values(array_filter(
             $this->deprecations,
-            static fn (string $message): bool => str_contains($message, '"sylius_happy_cms.menu.root_item_on_delete_set_null"'),
+            static fn (string $message): bool => str_contains($message, '"sylius_happy_cms.' . $path . '"'),
         ));
     }
 
