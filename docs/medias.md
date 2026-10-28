@@ -305,6 +305,10 @@ sylius_happy_cms:
         base_url: '/media/download'
         media_entity: App\Entity\HappyCMS\Media\Media
         folder_entity: App\Entity\HappyCMS\Media\Folder
+        # the sylius_happy_cms.media Twig global (read by the media manager templates: base_url, hide_files_ext,
+        # extended_mimes, enable_generating_alts, locales...) holds this configuration; not set or false (deprecated),
+        # it holds the plugin defaults whatever you configure. true is the only behaviour in 3.0.
+        twig_global_from_config: true
 
         # path of the media manager routes (media.*), below the prefix of their import
         admin_path: 'happy-cms-media/medias'

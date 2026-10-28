@@ -135,6 +135,25 @@ sylius_happy_cms:
 Leading and trailing `/` are removed (`/medias` and `medias` are the same). The routes are generated with `path()`, so templates and the media
 manager JavaScript follow it.
 
+### Flag: `sylius_happy_cms.media` Twig global built from the application configuration
+
+```yaml
+sylius_happy_cms:
+    media:
+        twig_global_from_config: true
+```
+
+The Twig global `sylius_happy_cms.media`, read by the media manager templates (`base_url`, `hide_files_ext`,
+`extended_mimes`, `enable_broadcasting`, `enable_generating_alts`, `locales`...), is built in `prepend()` from the
+configuration of a `media` extension that does not exist: it always holds the plugin defaults (`base_url: '/'`,
+`storage_name: 'default.storage'`...), whatever the application configures. With `true`, it holds the
+`sylius_happy_cms.media` configuration of the application (parameters such as `%front_url%` are resolved with the
+Twig configuration; on a value only valid once resolved, e.g. an environment variable in a constrained node, the
+defaults are exposed). Not setting the option, or setting it to `false`, keeps the defaults and triggers a deprecation.
+Templates of the application reading `sylius_happy_cms.media.*` get the configured values once opted in.
+
+In 3.0 the option is removed and the global holding the application configuration is the only behaviour.
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required

@@ -10,6 +10,7 @@ use Adeliom\SyliusHappyCMSPlugin\Services\Seo\Sitemap\SitemapDumperInterface;
 use Adeliom\SyliusHappyCMSPlugin\Twig\Seo\SeoExtension;
 use Sylius\Bundle\CoreBundle\DependencyInjection\PrependDoctrineMigrationsTrait;
 use Sylius\Bundle\ResourceBundle\DependencyInjection\Extension\AbstractResourceExtension;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -183,16 +184,29 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
     {
         $this->prependDoctrineMigrations($container);
 
-        $configs = $container->getExtensionConfig('media');
-        $configuration = $this->getConfiguration($configs, $container);
-        /** @var array<string, array<string, mixed>> $config */
-        $config = $this->processConfiguration($configuration, $configs);
-        $config = $config['media'];
+        $twigGlobalFromConfig = $this->getMediaTwigGlobalFromConfig($container);
+        if (true === $twigGlobalFromConfig) {
+            $mediaGlobals = $this->getMediaConfiguration($container);
+        } else {
+            trigger_deprecation(
+                'agence-adeliom/sylius-happy-cms-plugin',
+                '2.3.3',
+                (null === $twigGlobalFromConfig ? 'Not setting the "%s" option is deprecated.' : 'Setting the "%s" option to false is deprecated.') . ' It will be removed in 3.0, where the "sylius_happy_cms.media" Twig global holding the media configuration of the application is the only behaviour. Set it to true to opt in now (see UPGRADE.md).',
+                'sylius_happy_cms.media.twig_global_from_config',
+            );
 
-        $container->prependExtensionConfig('media', $config);
-        $mediaGlobals = [];
-        foreach ($config as $k => $v) {
-            $mediaGlobals[$k] = $v;
+            // Legacy: the configuration of the unknown "media" extension, i.e. the plugin defaults.
+            $configs = $container->getExtensionConfig('media');
+            $configuration = $this->getConfiguration($configs, $container);
+            /** @var array<string, array<string, mixed>> $config */
+            $config = $this->processConfiguration($configuration, $configs);
+            $config = $config['media'];
+
+            $container->prependExtensionConfig('media', $config);
+            $mediaGlobals = [];
+            foreach ($config as $k => $v) {
+                $mediaGlobals[$k] = $v;
+            }
         }
         $twigConfig = [
             'paths' => [__DIR__ . '/../../templates/media' => 'media'],
@@ -200,6 +214,61 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
         ];
 
         $container->prependExtensionConfig('twig', $twigConfig);
+    }
+
+    /**
+     * The value of `sylius_happy_cms.media.twig_global_from_config` set by the application (the last one wins), null
+     * when not set. Read before the configuration is processed, since the Twig global is prepended.
+     */
+    private function getMediaTwigGlobalFromConfig(ContainerBuilder $container): ?bool
+    {
+        $value = null;
+        foreach ($container->getExtensionConfig($this->getAlias()) as $config) {
+            if (isset($config['media']) && is_array($config['media']) && array_key_exists('twig_global_from_config', $config['media'])) {
+                $value = $config['media']['twig_global_from_config'];
+            }
+        }
+
+        if (is_string($value)) {
+            try {
+                $value = $container->getParameterBag()->resolveValue($value);
+            } catch (\Throwable) {
+                $value = null;
+            }
+        }
+
+        return null === $value ? null : filter_var($value, \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE);
+    }
+
+    /**
+     * The `sylius_happy_cms.media` configuration of the application (with the defaults), for the Twig global
+     * `sylius_happy_cms.media` read by the media manager templates. Parameters (`%front_url%`) are resolved
+     * later, with the Twig configuration.
+     *
+     * @return array<string, mixed>
+     */
+    private function getMediaConfiguration(ContainerBuilder $container): array
+    {
+        $configs = [];
+        foreach ($container->getExtensionConfig($this->getAlias()) as $config) {
+            if (isset($config['media']) && is_array($config['media'])) {
+                // Already read by getMediaTwigGlobalFromConfig(), possibly as a parameter.
+                unset($config['media']['twig_global_from_config']);
+                $configs[] = ['media' => $config['media']];
+            }
+        }
+
+        try {
+            /** @var array{media: array<string, mixed>} $processed */
+            $processed = $this->processConfiguration(new Configuration(), $configs);
+        } catch (InvalidConfigurationException) {
+            // A value only valid once resolved (environment variable in a constrained node): the defaults are
+            // exposed, the services still use the resolved configuration.
+            /** @var array{media: array<string, mixed>} $processed */
+            $processed = $this->processConfiguration(new Configuration(), []);
+        }
+
+        return $processed['media'];
     }
 
     protected function getMigrationsNamespace(): string
