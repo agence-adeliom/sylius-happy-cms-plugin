@@ -33,6 +33,7 @@ class MediaExtension extends AbstractExtension
             new TwigFunction('happy_cms_media', [MediaRuntime::class, 'media'], ['is_safe' => ['html']]),
             new TwigFunction('happy_cms_media_path', [MediaRuntime::class, 'path']),
             new TwigFunction('happy_cms_media_download_url', [MediaRuntime::class, 'downloadUrl']),
+            new TwigFunction('happy_cms_media_csrf_token', [MediaCsrfRuntime::class, 'csrfToken']),
         ];
     }
 }

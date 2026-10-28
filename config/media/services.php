@@ -12,6 +12,7 @@ use Adeliom\SyliusHappyCMSPlugin\Services\Media\MediaHelper;
 use Adeliom\SyliusHappyCMSPlugin\Services\Media\MediaManager;
 use Adeliom\SyliusHappyCMSPlugin\Services\Media\UploadRateLimiter;
 use Adeliom\SyliusHappyCMSPlugin\Services\Media\UrlValidator;
+use Adeliom\SyliusHappyCMSPlugin\Twig\Media\MediaCsrfRuntime;
 use Adeliom\SyliusHappyCMSPlugin\Twig\Media\MediaExtension;
 use Adeliom\SyliusHappyCMSPlugin\Twig\Media\MediaRuntime;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -81,6 +82,9 @@ return static function (ContainerConfigurator $container): void {
         ->arg('$manager', service('happy.cms.media.manager'))
         ->arg('$twig', service('twig'))
         ->arg('$filterManager', service('liip_imagine.filter.manager'))
+        ->tag('twig.runtime');
+
+    $services->set('happy.cms.media.twig.happy.cms.media_csrf_runtime', MediaCsrfRuntime::class)
         ->tag('twig.runtime');
 
     $services->set('happy.cms.media.imagine.data.loader', MediaDataLoader::class)
