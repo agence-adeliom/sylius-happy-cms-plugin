@@ -23,4 +23,16 @@ final class MediaAdminRoutesFileTest extends TestCase
             self::assertStringStartsWith('/%sylius_happy_cms.media.admin_path%/', $route->getPath(), $name);
         }
     }
+
+    /**
+     * The read actions answer a GET with a query string and a POST with a JSON body.
+     */
+    public function testTheReadRoutesAcceptGetAndPost(): void
+    {
+        $routes = (new PhpFileLoader(new FileLocator(\dirname(__DIR__, 3) . '/config/routes')))->load('media_admin.php');
+
+        foreach (['media.get_files', 'media.get_file_info'] as $name) {
+            self::assertSame(['GET', 'POST'], $routes->get($name)?->getMethods(), $name);
+        }
+    }
 }

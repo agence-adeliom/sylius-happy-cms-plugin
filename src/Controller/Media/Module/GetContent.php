@@ -41,11 +41,11 @@ trait GetContent
          *     search: string|null
          * } $data
          */
-        $data = json_decode($request->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        $data = $this->readRequestData($request);
         $folder = null;
         $path = '/';
         if (!empty($data['folder'])) {
-            $folder = $this->manager->getFolder($data['folder']);
+            $folder = $this->manager->getFolder((int) $data['folder']);
             if ($folder instanceof FolderInterface) {
                 $path = $folder->getPath();
             } else {
@@ -86,16 +86,14 @@ trait GetContent
      */
     public function getItemInfos(Request $request): JsonResponse
     {
-        $mediaId = null;
-        if (is_string($request->getContent())) {
-            /**
-             * @var array{
-             *     item: int
-             * } $data
-             */
-            $data = json_decode($request->getContent(), true, 512, \JSON_THROW_ON_ERROR);
-            $mediaId = $data['item'];
-
+        /**
+         * @var array{
+         *     item?: int|string
+         * } $data
+         */
+        $data = $this->readRequestData($request);
+        $mediaId = $data['item'] ?? null;
+        if (null !== $mediaId) {
             $mediaRepository = $this->helper->getMediaRepository();
             if ($mediaRepository) {
                 /** @var MediaInterface|null $media */
@@ -132,6 +130,27 @@ trait GetContent
         return new JsonResponse([
             'error' => $this->translator->trans('error.doesnt_exist', ['attr' => $mediaId], 'SyliusHappyCMSPlugin'),
         ]);
+    }
+
+    /**
+     * Parameters of a read action: the query string of a GET request, the JSON body of a POST request.
+     *
+     * @return array<string, mixed>
+     */
+    protected function readRequestData(Request $request): array
+    {
+        if ($request->isMethod(Request::METHOD_GET)) {
+            return $request->query->all();
+        }
+
+        $content = $request->getContent();
+        if ('' === $content) {
+            return [];
+        }
+
+        $data = json_decode($content, true, 512, \JSON_THROW_ON_ERROR);
+
+        return is_array($data) ? $data : [];
     }
 
     /**
