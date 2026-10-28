@@ -14,6 +14,7 @@ use Doctrine\ORM\Event\PostUpdateEventArgs;
 use Doctrine\Persistence\ObjectManager;
 use Sylius\Resource\Model\TranslationInterface;
 use Symfony\Cmf\Bundle\RoutingBundle\Doctrine\Orm\ContentRepository;
+use Symfony\Cmf\Bundle\RoutingBundle\Model\Route as RouteModel;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -41,6 +42,7 @@ class EntityRouteIndexer
         protected EntityManagerInterface $manager,
         protected string $urlPattern = self::DEFAULT_URL_PATTERN,
         protected bool $collapseSlashes = false,
+        protected bool $trailingSlash = false,
     ) {
     }
 
@@ -170,6 +172,10 @@ class EntityRouteIndexer
                 $entity->getVariablePattern($translation),
             );
 
+            if ($this->trailingSlash) {
+                $this->addTrailingSlash($route);
+            }
+
             $route->setLastModification(new \DateTime());
             $route->setDefault(RouteObjectInterface::CONTENT_ID, $this->contentRepository->getContentId($entity));
 
@@ -200,6 +206,21 @@ class EntityRouteIndexer
         }
 
         return '/' . ltrim((string) preg_replace('#/{2,}#', '/', $path), '/');
+    }
+
+    /**
+     * Ends the route path with "/": the static prefix when there is no variable part, the variable pattern otherwise.
+     */
+    protected function addTrailingSlash(RouteInterface $route): void
+    {
+        $variablePattern = $route instanceof RouteModel ? $route->getVariablePattern() : '';
+        if ('' === $variablePattern) {
+            $route->setStaticPrefix(rtrim($route->getStaticPrefix(), '/') . '/');
+
+            return;
+        }
+
+        $route->setVariablePattern(rtrim($variablePattern, '/') . '/');
     }
 
     /**

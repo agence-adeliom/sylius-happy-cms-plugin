@@ -167,6 +167,22 @@ contained `//`.
 
 In 3.0 the option is removed and collapsing the repeated slashes is the only behaviour.
 
+### New option: trailing slash on the CMS routes
+
+```yaml
+sylius_happy_cms:
+    routing:
+        trailing_slash: true # default: false, the current routes
+```
+
+With `true`, the CMS routes end with `/` and a `GET`/`HEAD` request for the same path without the final slash is
+redirected (301, query string kept) to the CMS route, only when its content is online
+(`CmsRoutableInterface::isOnline()`, content loaded from the `_content_id` of the route when the dynamic router has no
+content enhancer); otherwise it answers 404, like the route itself. Changing the option does not rewrite the stored
+routes: re-save the routable entities afterwards.
+
+`EntityRouteIndexer` takes a new optional constructor argument, `$trailingSlash` (default `false`).
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required

@@ -6,6 +6,7 @@ namespace Tests\Adeliom\SyliusHappyCMSPlugin\Unit\DependencyInjection;
 
 use Adeliom\SyliusHappyCMSPlugin\DependencyInjection\SyliusHappyCMSExtension;
 use Adeliom\SyliusHappyCMSPlugin\EventListener\EntityRouteIndexer;
+use Adeliom\SyliusHappyCMSPlugin\EventListener\TrailingSlashRedirectListener;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -21,6 +22,23 @@ final class RoutingConfigurationTest extends TestCase
 
         self::assertSame(EntityRouteIndexer::DEFAULT_URL_PATTERN, $container->getParameter('sylius_happy_cms.routing.url_pattern'));
         self::assertSame('%sylius_happy_cms.routing.url_pattern%', $container->getDefinition(self::INDEXER)->getArgument(4));
+    }
+
+    public function testTheRoutesHaveNoTrailingSlashByDefault(): void
+    {
+        $container = $this->load([]);
+
+        self::assertFalse($container->getParameter('sylius_happy_cms.routing.trailing_slash'));
+        self::assertSame('%sylius_happy_cms.routing.trailing_slash%', $container->getDefinition(self::INDEXER)->getArgument(6));
+        self::assertFalse($container->hasDefinition(TrailingSlashRedirectListener::class));
+    }
+
+    public function testTheTrailingSlashOptionRegistersTheRedirectListener(): void
+    {
+        $container = $this->load(['routing' => ['trailing_slash' => true]]);
+
+        self::assertTrue($container->getParameter('sylius_happy_cms.routing.trailing_slash'));
+        self::assertTrue($container->getDefinition(TrailingSlashRedirectListener::class)->hasTag('kernel.event_listener'));
     }
 
     public function testTheUrlPatternCanBeChanged(): void
