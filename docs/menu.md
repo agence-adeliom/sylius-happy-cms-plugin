@@ -107,6 +107,27 @@ Main Menu
 └── Contact
 ```
 
+### Root Item
+
+Every menu has a root item (`Menu#rootItem`), the parent of its first-level items.
+
+#### Deleting a menu
+
+```yaml
+# config/packages/sylius_happy_cms.yaml
+sylius_happy_cms:
+    menu:
+        # true: the root_item_id key is ON DELETE SET NULL (generate a migration); the only behaviour in 3.0
+        root_item_on_delete_set_null: true
+```
+
+With the option, deleting a menu deletes its items, and deleting the root item alone leaves the menu without root
+(`root_item_id` set to `NULL` by the database).
+
+Without it (deprecated), the key is `ON DELETE CASCADE`: under doctrine/orm 3 a menu removed with its items fails with
+a `CycleDetectedException` (unset its root item and flush first), and deleting the root item deletes the menu. See
+`UPGRADE.md`.
+
 ## Rendering Menus in Templates
 
 ### Basic Usage

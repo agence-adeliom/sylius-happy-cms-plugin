@@ -310,6 +310,10 @@ class Configuration implements ConfigurationInterface
             ->integerNode('ttl')->defaultValue(300)->end()
             ->end()
             ->end()
+            ->booleanNode('root_item_on_delete_set_null')
+            ->info('true: the root_item_id key of the menus is ON DELETE SET NULL instead of CASCADE, so that a menu can be deleted with its items under doctrine/orm 3 (generate a migration). The only behaviour in 3.0.')
+            ->defaultNull()
+            ->end()
             ->end()
             ->end()
 
