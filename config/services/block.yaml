@@ -51,6 +51,8 @@ services:
       3: '@adeliom.sylius.asset.renderer'
       $inheritContext: '%sylius_happy_cms.block_render.inherit_context%'
       $missingPublishedMeansPublished: '%sylius_happy_cms.block_render.missing_published_means_published%'
+      $swallowRenderErrors: '%sylius_happy_cms.block_render.swallow_render_errors%'
+      $logger: '@?logger'
     tags:
       - { name: twig.runtime }
 

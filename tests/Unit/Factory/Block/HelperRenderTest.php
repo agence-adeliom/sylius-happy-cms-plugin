@@ -9,13 +9,17 @@ use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockCollection;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\Helper;
 use Adeliom\SyliusHappyCMSPlugin\Twig\Block\BlockExtension;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LogLevel;
 use Symfony\Component\Asset\Packages;
+use Symfony\Component\ErrorHandler\BufferingLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\WebpackEncoreBundle\Asset\TagRenderer;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\Factory\Block\Fixtures\ContextBlock;
+use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\Factory\Block\Fixtures\FailingBlock;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\Factory\Block\Fixtures\OverriddenHelper;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\Factory\Block\Fixtures\TitleBlock;
 use Twig\Environment;
+use Twig\Error\RuntimeError;
 use Twig\Loader\ArrayLoader;
 use Twig\RuntimeLoader\FactoryRuntimeLoader;
 
@@ -25,9 +29,12 @@ use Twig\RuntimeLoader\FactoryRuntimeLoader;
  */
 final class HelperRenderTest extends TestCase
 {
+    private BufferingLogger $logger;
+
     protected function setUp(): void
     {
         $GLOBALS['blockLoopIndex'] = 0;
+        $this->logger = new BufferingLogger();
     }
 
     protected function tearDown(): void
@@ -165,6 +172,73 @@ final class HelperRenderTest extends TestCase
         self::assertSame('<h2 id="block-1">Hello</h2>', $this->renderPage('{{ happy_cms_block_render(block, true) }}', ['block' => $block]));
     }
 
+    public function testARenderErrorIsThrownByDefault(): void
+    {
+        $this->expectException(RuntimeError::class);
+
+        $this->renderPage(
+            'before {{ happy_cms_block_render(broken) }} after',
+            ['broken' => $this->block(FailingBlock::class)],
+        );
+    }
+
+    public function testARenderErrorIsLoggedAndTheBlockSkippedWhenRenderErrorsAreSwallowed(): void
+    {
+        $html = $this->renderPage(
+            'before {{ happy_cms_block_render(broken) }}{{ happy_cms_block_render(title) }} after',
+            [
+                'broken' => $this->block(FailingBlock::class, ['position' => 3]),
+                'title' => $this->block(TitleBlock::class, ['title' => 'Still here']),
+            ],
+            swallowRenderErrors: true,
+        );
+
+        self::assertSame('before <h2 id="block-2">Still here</h2> after', $html);
+
+        $logs = $this->logger->cleanLogs();
+        self::assertCount(1, $logs);
+        [$level, $message, $context] = $logs[0];
+        self::assertSame(LogLevel::ERROR, $level);
+        self::assertStringContainsString('has been skipped', $message);
+        self::assertSame(FailingBlock::class, $context['block_type']);
+        self::assertSame(3, $context['position']);
+        self::assertInstanceOf(\Throwable::class, $context['exception']);
+    }
+
+    public function testRenderErrorsAreSwallowedWithInheritContextToo(): void
+    {
+        $html = $this->renderPage(
+            '[{{ happy_cms_block_render(broken) }}]',
+            ['broken' => $this->block(FailingBlock::class)],
+            inheritContext: true,
+            swallowRenderErrors: true,
+        );
+
+        self::assertSame('[]', $html);
+        self::assertCount(1, $this->logger->cleanLogs());
+    }
+
+    public function testASwallowedErrorLeavesNoPartialOutput(): void
+    {
+        $html = $this->renderPage(
+            '[{{ happy_cms_block_render(broken) }}]',
+            ['broken' => $this->block(FailingBlock::class)],
+            swallowRenderErrors: true,
+            failingTemplate: '<section>partial {{ settings.missing.deep }}</section>',
+        );
+
+        self::assertSame('[]', $html);
+        self::assertCount(1, $this->logger->cleanLogs());
+    }
+
+    public function testRenderErrorsAreSwallowedWithoutLogger(): void
+    {
+        $twig = $this->twig(['blocks/failing.html.twig' => '{{ settings.missing.deep }}']);
+        $helper = new Helper(...$this->helperArguments($twig), swallowRenderErrors: true);
+
+        self::assertNull($helper->renderBlock($this->block(FailingBlock::class)));
+    }
+
     public function testBlocksGetSequentialAnchorIdsUnlessTheyHaveOne(): void
     {
         $html = $this->renderPage(
@@ -184,7 +258,8 @@ final class HelperRenderTest extends TestCase
         $block = $this->block(TitleBlock::class, ['title' => 'Hello']);
         $block['block_type'] = 'App\Block\RemovedBlock';
 
-        self::assertSame('', $this->renderPage('{{ happy_cms_block_render(block) }}', ['block' => $block]));
+        self::assertSame('', $this->renderPage('{{ happy_cms_block_render(block) }}', ['block' => $block], swallowRenderErrors: true));
+        self::assertSame([], $this->logger->cleanLogs());
     }
 
     /**
@@ -206,14 +281,17 @@ final class HelperRenderTest extends TestCase
         array $variables,
         bool $inheritContext = false,
         bool $missingPublishedMeansPublished = false,
+        bool $swallowRenderErrors = false,
         string $blockTemplate = '<h2 id="{{ settings.attr_id }}">{{ settings.title }}</h2>',
+        string $failingTemplate = '{{ settings.missing.deep }}',
     ): string {
         $twig = $this->twig([
             'page.html.twig' => $pageTemplate,
             'blocks/title.html.twig' => $blockTemplate,
+            'blocks/failing.html.twig' => $failingTemplate,
         ]);
 
-        $helper = $this->helper($twig, $inheritContext, $missingPublishedMeansPublished);
+        $helper = $this->helper($twig, $inheritContext, $missingPublishedMeansPublished, $swallowRenderErrors);
         $twig->addExtension(new BlockExtension());
         $twig->addRuntimeLoader(new FactoryRuntimeLoader([Helper::class => static fn () => $helper]));
 
@@ -231,12 +309,18 @@ final class HelperRenderTest extends TestCase
         ], $templates)), ['strict_variables' => true, 'autoescape' => false]);
     }
 
-    private function helper(Environment $twig, bool $inheritContext = false, bool $missingPublishedMeansPublished = false): Helper
-    {
+    private function helper(
+        Environment $twig,
+        bool $inheritContext = false,
+        bool $missingPublishedMeansPublished = false,
+        bool $swallowRenderErrors = false,
+    ): Helper {
         return new Helper(
             ...$this->helperArguments($twig),
             inheritContext: $inheritContext,
             missingPublishedMeansPublished: $missingPublishedMeansPublished,
+            swallowRenderErrors: $swallowRenderErrors,
+            logger: $this->logger,
         );
     }
 
@@ -248,7 +332,7 @@ final class HelperRenderTest extends TestCase
         return [
             $twig,
             new EventDispatcher(),
-            new BlockCollection([new TitleBlock(), new ContextBlock()]),
+            new BlockCollection([new TitleBlock(), new FailingBlock(), new ContextBlock()]),
             new AssetRenderer(new EventDispatcher(), $this->createStub(TagRenderer::class), new Packages()),
         ];
     }

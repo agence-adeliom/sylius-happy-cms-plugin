@@ -23,6 +23,22 @@ same change, then rebuild the assets:
 If one of your own screens relies on that default theme outside the Sylius admin, keep it set to `true` and
 override `.ts-dropdown` with the theme variables in your own stylesheet.
 
+### New option: skip the JSON blocks that fail to render
+
+```yaml
+sylius_happy_cms:
+    block_render:
+        swallow_render_errors: true # default: false
+```
+
+With the option enabled, an exception raised while rendering a block with `happy_cms_block_render()` or
+`Helper::renderBlock()` (block template, `happy_cms_block.render_block` listener) is logged at error level
+(`Failed to render the block "{block_type}" at position "{position}". The block has been skipped.`, with the block
+type, position and exception) and the block renders nothing instead of failing the page. Typically set in `when@prod`.
+Nothing changes when the option is not set. The `Helper` constructor gets two new optional last arguments,
+`bool $swallowRenderErrors = false` and `?LoggerInterface $logger = null`, passed by name by the service definition
+(`$logger: '@?logger'`).
+
 ### New option: render the JSON blocks that have no `block_published` key
 
 ```yaml
