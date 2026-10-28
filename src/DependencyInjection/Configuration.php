@@ -642,6 +642,10 @@ class Configuration implements ConfigurationInterface
             ->defaultNull()
             ->info('true: compute the routes within the flush that saves the entity (onFlush, after the slug listeners), without nested flush. Not set or false: the routes are computed in postPersist / postUpdate and written by a nested flush (deprecated). In 3.0 the option is removed and indexing within the flush is the only behaviour.')
             ->end()
+            ->booleanNode('child_routes_prefix_boundary')
+            ->defaultNull()
+            ->info('true: when the path of an entity changes, rewrite only the stored routes below it at a "/" boundary ("/door" moves "/door/wooden", not "/doors"), replacing the leading prefix only. Not set or false: every route starting with the previous path is rewritten (deprecated). In 3.0 the option is removed and the "/" boundary is the only behaviour.')
+            ->end()
             ->end()
             ->end()
 

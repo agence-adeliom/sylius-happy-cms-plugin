@@ -232,6 +232,28 @@ is not a CMS route, flush afterwards).
 In 3.0 the option is removed and computing the routes within the flush is the only behaviour; `postUpdate()` is
 removed.
 
+### Deprecated: not setting `sylius_happy_cms.routing.child_routes_prefix_boundary`
+
+```yaml
+sylius_happy_cms:
+    routing:
+        child_routes_prefix_boundary: true
+```
+
+When the path of an entity changes, the indexer moves the stored routes below its previous path. Not set or `false`
+(a deprecation is triggered), it keeps its current behaviour: it loads every route and rewrites the ones starting
+with the previous path, `str_replace()`-ing every occurrence of it (renaming `/porte` also rewrites
+`/portes-d-entree` into `/portails-d-entree`). With `true`, only the route with exactly the previous path and the
+routes below it at a `/` boundary are rewritten (`/porte/porte-bois` becomes `/portail/porte-bois`, `/portes-d-entree`
+is unchanged), only their leading prefix is replaced, `/` (homepage) is never used as a prefix, and the routes are
+selected by a query on the route class `cmf_routing.dynamic.persistence.orm.route_class` instead of `findAll()`.
+Already stored routes are not changed when you opt in; check (and fix) the routes rewritten by mistake before.
+
+`EntityRouteIndexer` takes a new optional constructor argument, `$childRoutesPrefixBoundary` (default `false`); it
+also applies to `rewriteStaticPrefix()`.
+
+In 3.0 the option is removed and the `/` boundary is the only behaviour.
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required

@@ -152,6 +152,11 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
             'index_on_flush',
             'computing the CMS routes within the flush that saves the entity',
         ));
+        $container->setParameter('sylius_happy_cms.routing.child_routes_prefix_boundary', $this->resolveRoutingFlag(
+            $config['child_routes_prefix_boundary'] ?? null,
+            'child_routes_prefix_boundary',
+            'rewriting only the routes below a renamed path, at a "/" boundary,',
+        ));
 
         if (true === $config['trailing_slash']) {
             $container->register(TrailingSlashRedirectListener::class, TrailingSlashRedirectListener::class)

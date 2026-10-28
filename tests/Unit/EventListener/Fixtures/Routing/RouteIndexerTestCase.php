@@ -36,6 +36,11 @@ abstract class RouteIndexerTestCase extends TestCase
 
     protected EventDispatcher $dispatcher;
 
+    private EntityRouteIndexer $indexer;
+
+    /** @var array<int|string, mixed> */
+    private array $indexerArguments = [];
+
     protected function setUp(): void
     {
         if (!\extension_loaded('pdo_sqlite')) {
@@ -89,8 +94,22 @@ abstract class RouteIndexerTestCase extends TestCase
         );
 
         $this->entityManager->getEventManager()->addEventListener(self::listenedEvents(true === ($extraArguments['indexOnFlush'] ?? false)), $indexer);
+        $this->indexer = $indexer;
+        $this->indexerArguments = $extraArguments;
 
         return $indexer;
+    }
+
+    /**
+     * Simulates a new process (request, command): empty identity map, new indexer with the same arguments. The legacy
+     * listener indexes each entity once per process (and compares the entities already indexed loosely).
+     */
+    protected function restartProcess(): EntityRouteIndexer
+    {
+        $this->entityManager->clear();
+        $this->entityManager->getEventManager()->removeEventListener(self::listenedEvents(true === ($this->indexerArguments['indexOnFlush'] ?? false)), $this->indexer);
+
+        return $this->registerIndexer($this->indexerArguments);
     }
 
     /**

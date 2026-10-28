@@ -55,7 +55,10 @@ When you save a routable entity (Page, BlogPost, etc.), the plugin automatically
 
 1. Creates or updates database routes for each language
 2. Calculates URLs based on parent hierarchy
-3. Updates child routes when parent URLs change
+3. Updates child routes when parent URLs change: with `routing.child_routes_prefix_boundary: true` (the only
+   behaviour in 3.0), the routes whose path is the previous path or starts with the previous path followed by `/`
+   (renaming `/door` moves `/door/wooden`, not `/doors`); without it (deprecated), every route starting with the
+   previous path
 4. Stores routes in the `..._route` database table
 
 With `routing.index_on_flush: true` (the only behaviour in 3.0), routes are computed by `EntityRouteIndexer` during

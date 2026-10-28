@@ -79,6 +79,7 @@ class EntityRouteIndexer
         protected bool $trailingSlash = false,
         protected iterable $parentPathResolvers = [],
         protected bool $indexOnFlush = false,
+        protected bool $childRoutesPrefixBoundary = false,
     ) {
     }
 
@@ -400,8 +401,10 @@ class EntityRouteIndexer
     /**
      * If an uri is modified, ex: /mapage-1 => /ma-page-1, we need to update all other routes starting with the
      * same prefix.
-     * This method will find all routes that start with the previous static prefix and update them to use the new
-     * TODO: replace findAll() with an optimized query to avoid loading all routes
+     * With "sylius_happy_cms.routing.child_routes_prefix_boundary": the route with exactly the previous prefix and the
+     * routes below it ("/mapage-1/…"), never a sibling sharing the first characters ("/mapage-12"); only the leading
+     * prefix is replaced. Without it (legacy): every route starting with the previous prefix, every occurrence of the
+     * prefix in their path is replaced.
      *
      * @param Collection<int, RouteInterface> $excludedRoutes
      */
@@ -410,6 +413,12 @@ class EntityRouteIndexer
         string $previousStaticPrefix,
         Collection $excludedRoutes,
     ): void {
+        if ($this->childRoutesPrefixBoundary) {
+            $this->rewriteRoutesBelowStaticPrefix($staticPrefix, $previousStaticPrefix, $excludedRoutes);
+
+            return;
+        }
+
         if ($previousStaticPrefix && $previousStaticPrefix !== $staticPrefix) {
             $allRoutes = $this->manager->getRepository(RouteInterface::class)->findAll();
 
@@ -447,5 +456,83 @@ class EntityRouteIndexer
     public function rewriteStaticPrefix(string $previousStaticPrefix, string $staticPrefix): void
     {
         $this->rewriteOtherStaticPrefix($staticPrefix, $previousStaticPrefix, new ArrayCollection());
+    }
+
+    /**
+     * Rewrites the stored routes whose static prefix is the previous one or starts with it followed by "/"; only the
+     * leading prefix is replaced.
+     *
+     * @param Collection<int, RouteInterface> $excludedRoutes
+     */
+    protected function rewriteRoutesBelowStaticPrefix(
+        string $staticPrefix,
+        string $previousStaticPrefix,
+        Collection $excludedRoutes,
+    ): void {
+        $previousBase = rtrim($previousStaticPrefix, '/');
+        // "" (new route) has no descendants; "/" is the prefix of every route
+        if ('' === $previousBase || $previousStaticPrefix === $staticPrefix) {
+            return;
+        }
+        $newBase = rtrim($staticPrefix, '/');
+
+        $routesToUpdate = $this->findRoutesUnderStaticPrefix($previousBase);
+        if ([] === $routesToUpdate) {
+            return;
+        }
+
+        if ($this->flushRoutes) {
+            $this->manager->getConnection()->beginTransaction();
+        }
+        foreach ($routesToUpdate as $routeToUpdate) {
+            // skip the routes of the entity, and routes already recomputed in memory during this flush
+            if ($excludedRoutes->contains($routeToUpdate) || !self::isUnderStaticPrefix($routeToUpdate->getStaticPrefix(), $previousBase)) {
+                continue;
+            }
+            // Update the static prefix of the route
+            $rewritten = $newBase . substr($routeToUpdate->getStaticPrefix(), strlen($previousBase));
+            $routeToUpdate->setStaticPrefix('' === $rewritten ? '/' : $rewritten);
+            $this->saveRoute($routeToUpdate);
+        }
+        if ($this->flushRoutes) {
+            $this->manager->flush();
+            $this->manager->getConnection()->commit();
+        }
+    }
+
+    /**
+     * @return RouteInterface[] the stored routes whose static prefix is $base or starts with "$base/"
+     */
+    protected function findRoutesUnderStaticPrefix(string $base): array
+    {
+        /** @var RouteInterface[] $routes */
+        $routes = $this->manager->createQueryBuilder()
+            ->select('route')
+            ->from($this->getRouteClass(), 'route')
+            ->where('route.staticPrefix = :base')
+            ->orWhere("route.staticPrefix LIKE :descendants ESCAPE '!'")
+            ->setParameter('base', $base)
+            ->setParameter('descendants', str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $base) . '/%')
+            ->getQuery()
+            ->getResult()
+        ;
+
+        return $routes;
+    }
+
+    protected static function isUnderStaticPrefix(string $staticPrefix, string $base): bool
+    {
+        return $staticPrefix === $base || str_starts_with($staticPrefix, $base . '/');
+    }
+
+    /**
+     * @return class-string<RouteInterface>
+     */
+    protected function getRouteClass(): string
+    {
+        /** @var class-string<RouteInterface> $routeClass */
+        $routeClass = $this->parameterBag->get('cmf_routing.dynamic.persistence.orm.route_class');
+
+        return $routeClass;
     }
 }

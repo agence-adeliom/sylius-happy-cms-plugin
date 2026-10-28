@@ -248,4 +248,91 @@ final class EntityRouteIndexerTest extends RouteIndexerTestCase
 
         self::assertSame(['/en_US/about-us'], array_values($this->storedPrefixes()), 'Legacy listener: postPersist runs after the slug is generated.');
     }
+
+    public function testRenamingAPrefixRewritesTheDescendantRoutesOnly(): void
+    {
+        $this->registerIndexer(['urlPattern' => '{{other_entity_path}}{{current_entity_path}}', 'parentPathResolvers' => [new CategoryPathResolver()], 'indexOnFlush' => true, 'childRoutesPrefixBoundary' => true]);
+        $door = $this->savePage('porte');
+        $this->savePage('portes-d-entree');
+        $this->savePage('porte-bois', category: 'porte');
+        $this->savePage('vitree', category: 'porte/porte');
+
+        $door->getTranslation()->setSlug('portail');
+        $this->entityManager->flush();
+
+        self::assertSame(['/portail', '/portes-d-entree', '/portail/porte-bois', '/portail/porte/vitree'], array_values($this->storedPrefixes()));
+    }
+
+    public function testRenamingAPrefixWithATrailingSlashRewritesTheDescendantRoutesOnly(): void
+    {
+        $this->registerIndexer(['urlPattern' => '{{other_entity_path}}{{current_entity_path}}', 'trailingSlash' => true, 'parentPathResolvers' => [new CategoryPathResolver()], 'indexOnFlush' => true, 'childRoutesPrefixBoundary' => true]);
+        $door = $this->savePage('porte');
+        $this->savePage('portes-d-entree');
+        $this->savePage('porte-bois', category: 'porte');
+
+        $door->getTranslation()->setSlug('portail');
+        $this->entityManager->flush();
+
+        self::assertSame(['/portail/', '/portes-d-entree/', '/portail/porte-bois/'], array_values($this->storedPrefixes()));
+    }
+
+    #[DataProvider('indexOnFlushModes')]
+    public function testWithThePrefixBoundaryTheRoutesBelowAPathOfAnotherTypeCanBeMoved(bool $indexOnFlush): void
+    {
+        $indexer = $this->registerIndexer(['urlPattern' => '{{other_entity_path}}{{current_entity_path}}', 'parentPathResolvers' => [new CategoryPathResolver()], 'indexOnFlush' => $indexOnFlush, 'childRoutesPrefixBoundary' => true]);
+        $this->savePage('porte-bois', category: 'porte');
+        $this->savePage('portes-d-entree');
+
+        $indexer->rewriteStaticPrefix('/porte', '/portail');
+        $this->entityManager->flush();
+
+        self::assertSame(['/portail/porte-bois', '/portes-d-entree'], array_values($this->storedPrefixes()));
+    }
+
+    #[DataProvider('indexOnFlushModes')]
+    public function testWithThePrefixBoundaryTheLegacyListenerRewritesTheDescendantRoutesOnly(bool $indexOnFlush): void
+    {
+        $this->registerIndexer(['indexOnFlush' => $indexOnFlush, 'childRoutesPrefixBoundary' => true]);
+        $this->listenCategoryPath();
+        $id = $this->savePage('porte')->getId();
+        $this->savePage('portes-d-entree');
+        $this->savePage('porte-bois', category: 'porte');
+        $this->restartProcess();
+
+        $door = $this->entityManager->find(IndexedPage::class, $id);
+        self::assertInstanceOf(IndexedPage::class, $door);
+        $door->getTranslation()->setSlug('portail');
+        $this->entityManager->flush();
+
+        self::assertSame(['/en_US/portail', '/en_US/portes-d-entree', '/en_US/portail/porte-bois'], array_values($this->storedPrefixes()));
+    }
+
+    #[DataProvider('indexOnFlushModes')]
+    public function testWithoutThePrefixBoundaryEveryRouteStartingWithTheRenamedPathIsRewritten(bool $indexOnFlush): void
+    {
+        $this->registerIndexer(['indexOnFlush' => $indexOnFlush]);
+        $this->listenCategoryPath();
+        $id = $this->savePage('porte')->getId();
+        $this->savePage('portes-d-entree');
+        $this->savePage('porte-bois', category: 'porte');
+        $this->restartProcess();
+
+        $door = $this->entityManager->find(IndexedPage::class, $id);
+        self::assertInstanceOf(IndexedPage::class, $door);
+        $door->getTranslation()->setSlug('portail');
+        $this->entityManager->flush();
+
+        self::assertSame(['/en_US/portail', '/en_US/portails-d-entree', '/en_US/portail/porte-bois'], array_values($this->storedPrefixes()), 'Legacy rewriting: a sibling sharing the first characters is rewritten too.');
+    }
+
+    /**
+     * Places a page under "/en_US/<category>" (CalculateRouteStaticPrefixEvent, available without the options).
+     */
+    private function listenCategoryPath(): void
+    {
+        $this->dispatcher->addListener(CalculateRouteStaticPrefixEvent::class, static function (CalculateRouteStaticPrefixEvent $event): void {
+            $category = $event->getEntity()->category;
+            $event->setRouteStaticPrefix(null === $category ? '' : '/' . $category);
+        });
+    }
 }
