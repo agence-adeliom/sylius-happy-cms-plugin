@@ -160,6 +160,20 @@ Related changes:
   is the same object as before (a Doctrine proxy, e.g. from a `ManyToOne` to the media, is now loaded at that call
   instead of on its first field access); for a deleted one, `null` instead of a proxy that throws on access.
 
+### New option of the media form type: `hydrate`
+
+`Adeliom\SyliusHappyCMSPlugin\Form\MediaType` has a new `hydrate` option (default `false`: the submitted value is
+still the media id). With `true`, the submitted value is the `MediaInterface`, for fields mapped on a
+`happy_cms_media_reference_type` column or a `?MediaInterface` property:
+
+```php
+yield MediaField::new('image', 'Image')->setFormTypeOption('hydrate', true);
+```
+
+The form type now also passes a `MediaInterface` model value through `MediaManager::getMedia()` (it used its id
+directly): the field shows the same id for an existing media, and is empty instead of showing a dangling id for a
+reference to a deleted media.
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required
