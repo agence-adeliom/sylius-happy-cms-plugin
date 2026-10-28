@@ -135,6 +135,25 @@ sylius_happy_cms:
 Leading and trailing `/` are removed (`/medias` and `medias` are the same). The routes are generated with `path()`, so templates and the media
 manager JavaScript follow it.
 
+### Flag: `media_meta` returns the metas as stored, oEmbed rendering fixed
+
+```yaml
+sylius_happy_cms:
+    media:
+        raw_meta_values: true
+```
+
+`media_meta(media, key)` calls `Media::getMeta()`, which only returns strings: `media|media_meta('dimensions')` or
+`media|media_meta('code')` are `null`. With `true`, the filter calls the new `MediaRuntime::mediaMetaValue()`, which
+returns the meta as stored (any type, `$default` of any type). `MediaRuntime::mediaMeta()` keeps its signature and
+behaviour. `media|media_meta` without key (every meta) is the same in both modes. Not setting the option, or setting
+it to `false`, triggers a deprecation. In 3.0 the option is removed and the filter returning the metas as stored is
+the only behaviour.
+
+Bug fix, no option: `happy_cms_media()` of an oEmbed media rendered an empty block (the `code` meta is an array that
+the template reads as `options.html` / `options.ratio`). The code array is now passed to the template (`html`,
+`width`, `height`, `ratio`), as EasyMedia did; a string `code` (older imports) is passed as `html` too.
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required

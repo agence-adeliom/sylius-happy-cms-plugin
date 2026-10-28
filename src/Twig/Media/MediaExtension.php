@@ -12,8 +12,15 @@ use Twig\TwigFunction;
 
 class MediaExtension extends AbstractExtension
 {
-    public function __construct(protected MediaManager $manager, protected FilterManager $filterManager)
-    {
+    /**
+     * @param bool $rawMetaValues `sylius_happy_cms.media.raw_meta_values`: the `media_meta` filter returns the metas
+     *                            as stored (MediaRuntime::mediaMetaValue()) instead of text only (MediaRuntime::mediaMeta())
+     */
+    public function __construct(
+        protected MediaManager $manager,
+        protected FilterManager $filterManager,
+        protected bool $rawMetaValues = false,
+    ) {
     }
 
     public function getFilters(): array
@@ -21,7 +28,7 @@ class MediaExtension extends AbstractExtension
         return [
             new TwigFilter('resolve_media', [MediaRuntime::class, 'resolveMedia']),
             new TwigFilter('media_infos', [MediaRuntime::class, 'mediaInfos']),
-            new TwigFilter('media_meta', [MediaRuntime::class, 'mediaMeta']),
+            new TwigFilter('media_meta', [MediaRuntime::class, $this->rawMetaValues ? 'mediaMetaValue' : 'mediaMeta']),
         ];
     }
 
