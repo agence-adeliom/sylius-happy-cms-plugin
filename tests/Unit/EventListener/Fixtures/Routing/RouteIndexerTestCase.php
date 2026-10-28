@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Adeliom\SyliusHappyCMSPlugin\Unit\EventListener\Fixtures\Routing;
 
+use Adeliom\SyliusHappyCMSPlugin\DependencyInjection\SyliusHappyCMSExtension;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
 use Adeliom\SyliusHappyCMSPlugin\EventListener\EntityRouteIndexer;
 use Doctrine\DBAL\DriverManager;
@@ -12,11 +13,14 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\Mapping\Driver\SimplifiedXmlDriver;
+use Doctrine\ORM\Mapping\Driver\XmlDriver;
 use Doctrine\ORM\ORMSetup;
 use Doctrine\ORM\Tools\ResolveTargetEntityListener;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
+use Gedmo\Mapping\Driver\AttributeReader;
+use Gedmo\Sluggable\SluggableListener;
 use PHPUnit\Framework\TestCase;
 use Sylius\Component\Channel\Model\ChannelInterface;
 use Symfony\Cmf\Bundle\RoutingBundle\Doctrine\Orm\ContentRepository;
@@ -49,7 +53,7 @@ abstract class RouteIndexerTestCase extends TestCase
         $driver->addDriver($attributes, __NAMESPACE__);
         $driver->addDriver($attributes, 'Adeliom\SyliusHappyCMSPlugin\Entity\Cmf');
         $driver->addDriver(new SimplifiedXmlDriver([$vendor . '/symfony-cmf/routing-bundle/src/Resources/config/doctrine-model' => 'Symfony\Cmf\Bundle\RoutingBundle\Model']), 'Symfony\Cmf\Bundle\RoutingBundle\Model');
-        $driver->addDriver(new SimplifiedXmlDriver([$vendor . '/symfony-cmf/routing-bundle/src/Resources/config/doctrine-base' => 'Symfony\Component\Routing']), 'Symfony\Component\Routing');
+        $driver->addDriver(new XmlDriver($vendor . '/symfony-cmf/routing-bundle/src/Resources/config/doctrine-base', '.orm.xml'), 'Symfony\Component\Routing');
         $config->setMetadataDriverImpl($driver);
 
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true], $config);
@@ -84,17 +88,56 @@ abstract class RouteIndexerTestCase extends TestCase
             ...$extraArguments,
         );
 
-        $this->entityManager->getEventManager()->addEventListener(self::listenedEvents(), $indexer);
+        $this->entityManager->getEventManager()->addEventListener(self::listenedEvents(true === ($extraArguments['indexOnFlush'] ?? false)), $indexer);
 
         return $indexer;
     }
 
     /**
+     * Registers the indexer ("index_on_flush") and Gedmo's sluggable listener in the order Symfony gives them for
+     * onFlush: the priority of the indexer's onFlush tag (set by SyliusHappyCMSExtension) against the one of
+     * stof_doctrine_extensions (none, so 0).
+     */
+    protected function registerIndexerAndSluggableListenerInServiceOrder(): EntityRouteIndexer
+    {
+        $sluggable = new SluggableListener();
+        $sluggable->setAnnotationReader(new AttributeReader());
+
+        // highest priority first; same priority: registration order (the plugin's services come first)
+        if (SyliusHappyCMSExtension::ROUTE_INDEXER_ON_FLUSH_PRIORITY < 0) {
+            $this->entityManager->getEventManager()->addEventSubscriber($sluggable);
+
+            return $this->registerIndexer(['indexOnFlush' => true]);
+        }
+        $indexer = $this->registerIndexer(['indexOnFlush' => true]);
+        $this->entityManager->getEventManager()->addEventSubscriber($sluggable);
+
+        return $indexer;
+    }
+
+    /**
+     * The events of the tags of the indexer service (see SyliusHappyCMSExtension).
+     *
      * @return string[]
      */
-    protected static function listenedEvents(): array
+    protected static function listenedEvents(bool $indexOnFlush): array
     {
-        return [Events::postPersist, Events::postUpdate];
+        return $indexOnFlush ? [Events::onFlush, Events::postPersist] : [Events::postPersist, Events::postUpdate];
+    }
+
+    protected function countFlushes(): object
+    {
+        $counter = new class() {
+            public int $count = 0;
+
+            public function postFlush(): void
+            {
+                ++$this->count;
+            }
+        };
+        $this->entityManager->getEventManager()->addEventListener([Events::postFlush], $counter);
+
+        return $counter;
     }
 
     protected function savePage(string $slug, ?string $category = null, string $locale = 'en_US', bool $homepage = false): IndexedPage
