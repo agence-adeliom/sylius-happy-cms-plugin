@@ -25,7 +25,7 @@ Main container for menu items.
 - name: string          // Display name for admin
 - status: bool          // Active/inactive
 - items: Collection     // Menu items
-- rootItem: MenuItem    // Root item (managed automatically)
+- rootItem: MenuItem    // Root item (created with the menu; assigned with `sylius_happy_cms.menu.root_item.assign: true`)
 ```
 
 ### MenuItem

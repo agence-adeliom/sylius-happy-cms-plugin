@@ -8,16 +8,30 @@ use Adeliom\SyliusEasyCrudPlugin\Enum\ThreeStateStatusEnum;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuItemInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuItemTranslationInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Sylius\Component\Locale\Provider\LocaleProviderInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Creates the root item of every new menu; with `$assignRootItem` (`sylius_happy_cms.menu.root_item.assign: true`),
+ * makes it the menu's root (`Menu#rootItem`) and leaves a menu persisted with its own root alone.
+ */
 class MenuCreationListener
 {
+    /**
+     * @param bool                 $assignRootItem  false (deprecated): the root item is created but `Menu#rootItem`
+     *                                              stays null, and a menu persisted with its own root gets a second
+     *                                              item without parent
+     * @param ManagerRegistry|null $managerRegistry to take the root item class from the Doctrine mapping of
+     *                                              `Menu#rootItem` when there is no `sylius_happy_cms.menu_item` resource
+     */
     public function __construct(
         protected LocaleProviderInterface $localeProvider,
         protected TranslatorInterface $translator,
         protected ParameterBagInterface $parameterBag,
+        protected bool $assignRootItem = false,
+        protected ?ManagerRegistry $managerRegistry = null,
     ) {
     }
 
@@ -25,27 +39,13 @@ class MenuCreationListener
     // the entity instance and the lifecycle event
     public function prePersist(MenuInterface $menu): void
     {
-        /** @var array<string, array{
-         *  classes: array{
-         *     model: class-string,
-         *     controller: class-string,
-         *     repository: class-string,
-         *     form: class-string,
-         *     factory: class-string,
-         *  }
-         * }|null> $resources */
-        $resources = $this->parameterBag->get('sylius.resources');
-        if (!is_array($resources) || !is_array($resources['sylius_happy_cms.menu_item'])) {
+        // The project created the root item itself.
+        if ($this->assignRootItem && null !== $menu->getRootItem()) {
             return;
         }
 
-        if (!is_array($resources['sylius_happy_cms.menu_item']['classes'])) {
-            return;
-        }
-
-        $modelClass = $resources['sylius_happy_cms.menu_item']['classes']['model'];
-
-        if (!is_string($modelClass) || !class_exists($modelClass)) {
+        $modelClass = $this->resolveRootItemClass($menu);
+        if (null === $modelClass) {
             return;
         }
 
@@ -56,19 +56,52 @@ class MenuCreationListener
         $rootItem->setPosition(0);
 
         $menu->addItem($rootItem);
+        if ($this->assignRootItem) {
+            $menu->setRootItem($rootItem);
+        }
+
+        if (!method_exists($modelClass, 'getTranslationClass')) {
+            return;
+        }
 
         foreach ($this->localeProvider->getAvailableLocalesCodes() as $locale) {
-            if (class_exists($modelClass) && method_exists($modelClass, 'getTranslationClass')) {
-                $menuItemTranslationClass = $modelClass::getTranslationClass();
-                $translation = new $menuItemTranslationClass();
-                if ($translation instanceof MenuItemTranslationInterface) {
-                    $translation->setLocale($locale);
-                    $translation->setName(
-                        $this->translator->trans('sylius_happy_cms.menu_item.admin.data.menu_item_root', locale: $locale),
-                    );
-                    $rootItem->addTranslation($translation);
-                }
+            $menuItemTranslationClass = $modelClass::getTranslationClass();
+            $translation = new $menuItemTranslationClass();
+            if ($translation instanceof MenuItemTranslationInterface) {
+                $translation->setLocale($locale);
+                $translation->setName(
+                    $this->translator->trans('sylius_happy_cms.menu_item.admin.data.menu_item_root', locale: $locale),
+                );
+                $rootItem->addTranslation($translation);
             }
         }
+    }
+
+    /**
+     * The model of the `sylius_happy_cms.menu_item` resource; without this resource (a project naming its menu item
+     * resource differently), the class Doctrine maps on `Menu#rootItem` (`resolve_target_entities` applied).
+     *
+     * @return class-string|null
+     */
+    protected function resolveRootItemClass(MenuInterface $menu): ?string
+    {
+        $resources = $this->parameterBag->has('sylius.resources') ? $this->parameterBag->get('sylius.resources') : null;
+        $resource = is_array($resources) ? ($resources['sylius_happy_cms.menu_item'] ?? null) : null;
+
+        if (null !== $resource) {
+            $classes = is_array($resource) ? ($resource['classes'] ?? null) : null;
+            $modelClass = is_array($classes) ? ($classes['model'] ?? null) : null;
+
+            return is_string($modelClass) && class_exists($modelClass) ? $modelClass : null;
+        }
+
+        $metadata = $this->managerRegistry?->getManagerForClass($menu::class)?->getClassMetadata($menu::class);
+        if (null === $metadata || !$metadata->hasAssociation('rootItem')) {
+            return null;
+        }
+
+        $modelClass = $metadata->getAssociationTargetClass('rootItem');
+
+        return null !== $modelClass && is_a($modelClass, MenuItemInterface::class, true) ? $modelClass : null;
     }
 }

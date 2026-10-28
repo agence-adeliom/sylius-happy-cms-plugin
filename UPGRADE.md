@@ -135,6 +135,43 @@ sylius_happy_cms:
 Leading and trailing `/` are removed (`/medias` and `medias` are the same). The routes are generated with `path()`, so templates and the media
 manager JavaScript follow it.
 
+### New option: assign the root item created with a menu (deprecation)
+
+`MenuCreationListener` creates the root item of every new menu but never assigned it to `Menu#rootItem`: the
+`root_item_id` column of the menus stays `NULL`, and a menu persisted with its own root item gets a second item
+without parent. `sylius_happy_cms.menu.root_item.assign: true` assigns it, and leaves a menu persisted with its
+`rootItem` already set alone.
+
+```yaml
+sylius_happy_cms:
+    menu:
+        root_item:
+            assign: true
+```
+
+Menus created before keep a `NULL` `root_item_id` (the `happy_cms_menu()` Twig function finds the root by query and is
+not affected). To fill it:
+
+```sql
+UPDATE <menu_table> m
+SET m.root_item_id = (SELECT MIN(i.id) FROM <menu_item_table> i WHERE i.menu_id = m.id AND i.parent_id IS NULL)
+WHERE m.root_item_id IS NULL;
+```
+
+Not setting the option, or setting it to `false`, keeps the current behaviour and triggers a deprecation.
+`MenuCreationListener` takes it as a new optional fourth constructor argument (`false` by default), so a service
+definition overriding the listener with the three original arguments keeps the current behaviour.
+
+In 3.0 the option is removed and the root item created with a menu is always its `rootItem`.
+
+### Menu root item class without the `sylius_happy_cms.menu_item` resource
+
+`MenuCreationListener` took the root item class from the Sylius resource named `sylius_happy_cms.menu_item` only: a
+project naming its menu item resource differently (e.g. with easy-crud `#[AsAdmin(alias: 'app.menu_link')]`) got an
+`Undefined array key` error (an exception in debug mode, no root item otherwise). The resource is still used first;
+without it, the class Doctrine maps on `Menu#rootItem` (`resolve_target_entities` applied) is used. The Doctrine
+registry is a new optional fifth constructor argument of the listener.
+
 ### New option: menu root item key `ON DELETE SET NULL` (deprecation)
 
 `Menu#rootItem` is mapped `ON DELETE CASCADE` while every item (the root item included) references its menu

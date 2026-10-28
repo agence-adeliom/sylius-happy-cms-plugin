@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\DependencyInjection;
 
+use Adeliom\SyliusHappyCMSPlugin\EventListener\Menu\MenuCreationListener;
 use Adeliom\SyliusHappyCMSPlugin\EventListener\Menu\MenuRootItemOnDeleteListener;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockTypeInterface;
 use Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock\SharedBlockTypeInterface;
@@ -68,6 +69,17 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
      */
     private function configureMenuServices(array $config, ContainerBuilder $container): void
     {
+        /** @var array<string, mixed> $rootItem */
+        $rootItem = $config['root_item'] ?? [];
+
+        $assignRootItem = $rootItem['assign'] ?? null;
+        $container->getDefinition(MenuCreationListener::class)->replaceArgument(3, true === $assignRootItem);
+        $this->deprecateLegacyFlag(
+            'menu.root_item.assign',
+            $assignRootItem,
+            'assigning the root item created with a menu to Menu#rootItem',
+        );
+
         $rootItemOnDeleteSetNull = $config['root_item_on_delete_set_null'] ?? null;
         if (true === $rootItemOnDeleteSetNull) {
             $container->getDefinition(MenuRootItemOnDeleteListener::class)
