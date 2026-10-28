@@ -19,6 +19,7 @@ sylius_happy_cms:
   block_render:
     inherit_context: false
     missing_published_means_published: false
+    swallow_render_errors: false
 
   seo:
     title:

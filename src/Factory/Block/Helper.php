@@ -7,6 +7,7 @@ namespace Adeliom\SyliusHappyCMSPlugin\Factory\Block;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
 use Adeliom\SyliusEasyCrudPlugin\Services\AssetRenderer;
 use Adeliom\SyliusHappyCMSPlugin\Event\Block\BlockRender;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
 use Twig\Error\LoaderError;
@@ -40,6 +41,9 @@ class Helper
         private readonly bool $inheritContext = false,
         /** Render a block whose data has no `block_published` key (data written outside the block form) */
         private readonly bool $missingPublishedMeansPublished = false,
+        /** Log a block that fails to render and skip it instead of failing the whole page */
+        private readonly bool $swallowRenderErrors = false,
+        private readonly ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -88,8 +92,9 @@ class Helper
     /**
      * Renders a flex block stored as an array (`block_type`, `position`, `block_published` and the block fields).
      *
-     * Returns null when the block is not published (unless in preview) or when its type is unknown. A block without
-     * `block_published` key is not published, unless `missing_published_means_published` is enabled.
+     * Returns null when the block is not published (unless in preview), when its type is unknown, or when it fails
+     * to render and `swallow_render_errors` is enabled. A block without `block_published` key is not published,
+     * unless `missing_published_means_published` is enabled.
      *
      * @param array<string, mixed> $data
      * @param array<string, mixed> $extra variables added to the block template context
@@ -150,6 +155,30 @@ class Helper
             return null;
         }
 
+        if (!$this->swallowRenderErrors) {
+            return $this->renderPublishedBlock($context, $data, $preview, $extra);
+        }
+
+        try {
+            return $this->renderPublishedBlock($context, $data, $preview, $extra);
+        } catch (\Throwable $exception) {
+            $this->logger?->error('Failed to render the block "{block_type}" at position "{position}". The block has been skipped.', [
+                'block_type' => $data['block_type'] ?? null,
+                'position' => $data['position'] ?? null,
+                'exception' => $exception,
+            ]);
+
+            return null;
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     * @param array<string, mixed> $data
+     * @param array<string, mixed> $extra
+     */
+    private function renderPublishedBlock(array $context, array $data, bool $preview, array $extra): ?Markup
+    {
         $blocks = $this->collection->getBlocks();
         /** @var string $blockType */
         $blockType = $data['block_type'] ?? '';
