@@ -44,6 +44,7 @@ sylius_happy_cms:
     admin_path: 'happy-cms-media/medias' # media manager path, below the admin prefix
     media_entity: App\Entity\HappyCMS\Media\Media
     folder_entity: App\Entity\HappyCMS\Media\Folder
+    long_slugs: true # media and folder slugs at 255 characters (see docs/medias.md#slug-length)
 
   shared_block:
     shared_block_model: App\Entity\HappyCMS\SharedBlock\SharedBlock

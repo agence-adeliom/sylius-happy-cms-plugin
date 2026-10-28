@@ -135,6 +135,34 @@ sylius_happy_cms:
 Leading and trailing `/` are removed (`/medias` and `medias` are the same). The routes are generated with `path()`, so templates and the media
 manager JavaScript follow it.
 
+### New option: 255-character media and folder slugs (`media.long_slugs`)
+
+`Media::$slug` and `Folder::$slug` (mapped superclasses) are `VARCHAR(100)`, while the `name` they are derived from is
+`VARCHAR(255)`: a file or folder name longer than 100 characters cannot be saved on MySQL in strict mode. The new
+option maps both slugs at 255 characters:
+
+```yaml
+sylius_happy_cms:
+    media:
+        long_slugs: true
+```
+
+Not setting the option (or setting it to `false`) keeps the 100-character mapping and triggers a deprecation.
+When you opt in, clear the cache and generate the migration of your own media and folder tables:
+
+```bash
+bin/console doctrine:migrations:diff
+# ALTER TABLE <media table> CHANGE slug slug VARCHAR(255) NOT NULL
+# ALTER TABLE <folder table> CHANGE slug slug VARCHAR(255) NOT NULL
+```
+
+Widening a `VARCHAR` keeps the data (MySQL may rebuild the table: plan it for large media tables). A slug length your
+entity already overrides (`#[ORM\AttributeOverride]`) to another value than 100 is kept. If your database is already
+at 255 (for instance because you ran the migration of a pre-release of this change), set the option to `true` so that
+the mapping matches it.
+
+In 3.0 the option is removed and 255-character slugs are the only behaviour.
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required
