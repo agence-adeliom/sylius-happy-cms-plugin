@@ -120,7 +120,7 @@ public function getRouteStaticPrefix(TranslationInterface $translation): string
 The route path is built from a pattern, `/{{locale}}{{other_entity_path}}{{current_entity_path}}` by default:
 
 - `{{locale}}`: the translation locale (`en_US`);
-- `{{other_entity_path}}`: path of a parent of another type (see `CalculateRouteStaticPrefixEvent`);
+- `{{other_entity_path}}`: path of a parent of another type (see [parent path resolvers](#parent-path-resolvers));
 - `{{current_entity_path}}` (required): `getRouteStaticPrefix()` of the entity (its slug under its parents).
 
 ```yaml
@@ -159,6 +159,32 @@ route (`cmf_routing.orm_content_repository`). A route without a `CmsRoutableInte
 route) is redirected as soon as it matches.
 
 Existing routes are not rewritten when the option changes: re-save the entities.
+
+### Parent path resolvers
+
+When the URL of an entity depends on a parent of another type (a taxon, a non-routable category, a page of another
+class), implement `Adeliom\SyliusHappyCMSPlugin\Services\Cmf\RouteParentPathResolverInterface`. The service is
+autoconfigured (tag `sylius_happy_cms.route_parent_path_resolver`); the first resolver supporting the entity
+(tag priority order) fills `{{other_entity_path}}`.
+
+```php
+final class GuidePathResolver implements RouteParentPathResolverInterface
+{
+    public function supports(CmsRoutableInterface $entity, TranslationInterface $translation): bool
+    {
+        return $entity instanceof Guide && null !== $entity->getTaxon();
+    }
+
+    public function resolveParentPath(CmsRoutableInterface $entity, TranslationInterface $translation): string
+    {
+        // e.g. "/doors/wooden"
+        return '/' . $entity->getTaxon()->getTranslation($translation->getLocale())->getSlug();
+    }
+}
+```
+
+`CalculateRouteStaticPrefixEvent` listeners run afterwards and receive the resolved path
+(`$event->getRouteStaticPrefix()`).
 
 ### Custom Controller
 
