@@ -135,6 +135,28 @@ sylius_happy_cms:
 Leading and trailing `/` are removed (`/medias` and `medias` are the same). The routes are generated with `path()`, so templates and the media
 manager JavaScript follow it.
 
+### New options: upload types, client MIME type, original extension
+
+Defaults keep the current behaviour:
+
+```yaml
+sylius_happy_cms:
+    media:
+        allowed_mime_types: [...]        # default: FileValidator::DEFAULT_ALLOWED_MIME_TYPES
+        allowed_extensions: [...]        # default: FileValidator::DEFAULT_ALLOWED_EXTENSIONS
+        mime_type_source: content        # or client
+        keep_original_extension: false
+```
+
+- `allowed_mime_types` / `allowed_extensions`: the upload whitelists of `FileValidator`, hard-coded until now (no
+  avif, ico, json...). A configured list replaces the default one. Dangerous extensions, magic bytes and double
+  extensions are still checked. `FileValidator` takes the lists as optional constructor arguments; its former
+  private constants are now public as `DEFAULT_ALLOWED_MIME_TYPES` / `DEFAULT_ALLOWED_EXTENSIONS`.
+- `mime_type_source`: the MIME type stored on an uploaded media, and so the extension of its slug, comes from the file
+  content (`content`: `prices.csv` detected as `text/plain` becomes `prices.txt`, `photo.jpg` becomes `photo.jpeg`).
+  `client` keeps the browser MIME type, as EasyMedia did. The allowed types are always checked on the content.
+- `keep_original_extension`: keep the extension of the uploaded file name (or of the image URL) in the slug.
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required
