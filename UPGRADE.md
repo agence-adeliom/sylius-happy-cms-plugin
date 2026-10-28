@@ -135,6 +135,12 @@ sylius_happy_cms:
 Leading and trailing `/` are removed (`/medias` and `medias` are the same). The routes are generated with `path()`, so templates and the media
 manager JavaScript follow it.
 
+### Media manager global search restored
+
+The `media.global_search` route pointed to `MediaController::globalSearch()`, whose body was commented out: every call
+failed. It now searches the media of every folder by name (`?search=`), whatever the repository of the media entity.
+Bug fix, no option.
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required
