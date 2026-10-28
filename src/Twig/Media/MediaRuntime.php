@@ -54,6 +54,25 @@ class MediaRuntime implements RuntimeExtensionInterface
     }
 
     /**
+     * A meta as stored (string, number, array such as "dimensions" or "code"), or all the metas without key.
+     * Behind the `media_meta` filter when `sylius_happy_cms.media.raw_meta_values` is true; mediaMeta() returns
+     * null for a meta that is not a string.
+     */
+    public function mediaMetaValue(int|string|MediaInterface $media, ?string $key = null, mixed $default = null): mixed
+    {
+        $media = $this->getMedia($media);
+        if (!$media instanceof MediaInterface) {
+            return null;
+        }
+
+        if ($key) {
+            return $media->getMetas()[$key] ?? $default;
+        }
+
+        return $media->getMetas();
+    }
+
+    /**
      * @return array<string, mixed>|null
      */
     public function mediaInfos(int|string|MediaInterface $media): ?array
@@ -220,9 +239,15 @@ class MediaRuntime implements RuntimeExtensionInterface
         $params = [
             'title' => $media->getMeta('title', $media->getName()),
         ];
-        $code = $media->getMeta('code');
-        if ('reference' === $format && is_string($code)) {
+        // "code" is stored as an array (html, width, height, ratio) by MediaManager, as a string by older imports.
+        $code = $media->getMetas()['code'] ?? null;
+        if ('reference' === $format && is_array($code)) {
+            /** @var array<string, mixed> $codeParams */
+            $codeParams = $code;
+            $params += $codeParams;
+        } elseif ('reference' === $format && is_string($code)) {
             $params['code'] = $code;
+            $params['html'] = $code;
         }
 
         return array_merge($params, ['attributes' => $options]);
