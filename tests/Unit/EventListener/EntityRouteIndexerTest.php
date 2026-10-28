@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Tests\Adeliom\SyliusHappyCMSPlugin\Unit\EventListener;
 
 use Adeliom\SyliusHappyCMSPlugin\Event\Route\CalculateRouteStaticPrefixEvent;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\EventListener\Fixtures\Routing\CategoryPathResolver;
+use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\EventListener\Fixtures\Routing\IndexedPage;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\EventListener\Fixtures\Routing\RouteIndexerTestCase;
 
 final class EntityRouteIndexerTest extends RouteIndexerTestCase
@@ -99,5 +101,123 @@ final class EntityRouteIndexerTest extends RouteIndexerTestCase
         $this->savePage('about', category: 'company');
 
         self::assertSame(['/shop/company/about'], array_values($this->storedPrefixes()));
+    }
+
+    public function testWithoutIndexOnFlushTheRoutesOfANewEntityAreWrittenByANestedFlush(): void
+    {
+        $this->registerIndexer();
+        $flushes = $this->countFlushes();
+
+        $about = $this->savePage('about');
+
+        self::assertSame(2, $flushes->count, 'Legacy listener: the routes are written by a flush inside postPersist.');
+        self::assertSame(['route_online_en_US_' . str_replace('\\', '_', IndexedPage::class) . '_' . $about->getId() => '/en_US/about'], $this->storedPrefixes());
+    }
+
+    public function testWithoutIndexOnFlushAnEntityIsIndexedOncePerProcess(): void
+    {
+        $this->registerIndexer();
+        $page = $this->savePage('about');
+
+        $page->getTranslation()->setSlug('about-us');
+        $this->entityManager->flush();
+
+        self::assertSame(['/en_US/about'], array_values($this->storedPrefixes()), 'Legacy listener: the route of an entity already indexed in the process is not recomputed.');
+    }
+
+    public function testNewEntitiesGetTheirRouteNameAndContentIdWithinASingleFlush(): void
+    {
+        $this->registerIndexer(['indexOnFlush' => true]);
+        $flushes = $this->countFlushes();
+
+        $about = new IndexedPage('about');
+        $contact = new IndexedPage('contact');
+        $this->entityManager->persist($about);
+        $this->entityManager->persist($contact);
+        $this->entityManager->flush();
+
+        self::assertSame(1, $flushes->count, 'The routes are written by the flush that saves the entities.');
+        $routeName = static fn (IndexedPage $page): string => 'route_online_en_US_' . str_replace('\\', '_', IndexedPage::class) . '_' . $page->getId();
+        self::assertSame([$routeName($about) => '/en_US/about', $routeName($contact) => '/en_US/contact'], $this->storedPrefixes());
+        $defaults = $this->entityManager->getConnection()->fetchOne('SELECT defaults FROM indexed_route WHERE name = ?', [$routeName($about)]);
+        self::assertSame(IndexedPage::class . ':' . $about->getId(), json_decode((string) $defaults, true)['_content_id']);
+
+        $unitOfWork = $this->entityManager->getUnitOfWork();
+        $unitOfWork->computeChangeSets();
+        foreach ([...$about->getRoutes(), ...$contact->getRoutes()] as $route) {
+            self::assertSame([], $unitOfWork->getEntityChangeSet($route), 'The completed name and content id are known as persisted.');
+        }
+    }
+
+    public function testChangingASlugUpdatesTheRouteOfAnEntityAlreadyIndexedInTheSameProcess(): void
+    {
+        $this->registerIndexer(['indexOnFlush' => true]);
+        $page = $this->savePage('about');
+
+        $page->getTranslation()->setSlug('about-us');
+        $this->entityManager->flush();
+
+        self::assertSame(['/en_US/about-us'], array_values($this->storedPrefixes()));
+    }
+
+    public function testChangingTheSlugOfAReloadedEntityUpdatesItsRoute(): void
+    {
+        $this->registerIndexer(['indexOnFlush' => true]);
+        $id = $this->savePage('about')->getId();
+        $this->entityManager->clear();
+
+        $page = $this->entityManager->find(IndexedPage::class, $id);
+        self::assertInstanceOf(IndexedPage::class, $page);
+        $page->getTranslation()->setSlug('about-us');
+        $this->entityManager->flush();
+
+        self::assertSame(['/en_US/about-us'], array_values($this->storedPrefixes()));
+        self::assertCount(1, $page->getRoutes());
+    }
+
+    /**
+     * @return iterable<string, array{bool}>
+     */
+    public static function indexOnFlushModes(): iterable
+    {
+        yield 'legacy listener' => [false];
+        yield 'index on flush' => [true];
+    }
+
+    #[DataProvider('indexOnFlushModes')]
+    public function testIndexComputesTheRoutesOfAnEntityOutsideOfAFlush(bool $indexOnFlush): void
+    {
+        $indexer = $this->registerIndexer(['indexOnFlush' => $indexOnFlush]);
+        $page = $this->savePage('about');
+        $this->entityManager->getConnection()->executeStatement('UPDATE indexed_route SET staticPrefix = ?', ['/stale']);
+        $this->entityManager->clear();
+        $page = $this->entityManager->find(IndexedPage::class, $page->getId());
+        self::assertInstanceOf(IndexedPage::class, $page);
+        $flushes = $this->countFlushes();
+
+        $indexer->index($page);
+
+        self::assertSame(0, $flushes->count, 'index() does not flush.');
+        self::assertSame(['/stale'], array_values($this->storedPrefixes()));
+
+        $this->entityManager->flush();
+
+        self::assertSame(['/en_US/about'], array_values($this->storedPrefixes()));
+    }
+
+    #[DataProvider('indexOnFlushModes')]
+    public function testRewriteStaticPrefixMovesTheRoutesBelowAPathOutsideOfAFlush(bool $indexOnFlush): void
+    {
+        $indexer = $this->registerIndexer(['urlPattern' => '{{other_entity_path}}{{current_entity_path}}', 'indexOnFlush' => $indexOnFlush, 'parentPathResolvers' => [new CategoryPathResolver()]]);
+        $this->savePage('wooden', category: 'doors');
+        $this->savePage('contact');
+        $flushes = $this->countFlushes();
+
+        $indexer->rewriteStaticPrefix('/doors', '/entry-doors');
+
+        self::assertSame(0, $flushes->count, 'rewriteStaticPrefix() does not flush.');
+        $this->entityManager->flush();
+
+        self::assertSame(['/entry-doors/wooden', '/contact'], array_values($this->storedPrefixes()));
     }
 }

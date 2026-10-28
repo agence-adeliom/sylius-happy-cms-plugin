@@ -638,6 +638,10 @@ class Configuration implements ConfigurationInterface
             ->defaultFalse()
             ->info('End the CMS routes with "/" and redirect (301) the same URL without the final slash to them.')
             ->end()
+            ->booleanNode('index_on_flush')
+            ->defaultNull()
+            ->info('true: compute the routes within the flush that saves the entity (onFlush, after the slug listeners), without nested flush. Not set or false: the routes are computed in postPersist / postUpdate and written by a nested flush (deprecated). In 3.0 the option is removed and indexing within the flush is the only behaviour.')
+            ->end()
             ->end()
             ->end()
 

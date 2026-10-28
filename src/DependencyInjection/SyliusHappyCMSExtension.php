@@ -29,6 +29,14 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
 
     public const REDIRECTION_MANAGER = 'sylius.happy_cms.plugin.listener.redirection_manager';
 
+    public const ROUTE_INDEXER = 'sylius.happy_cms.plugin.listener.entity_route_indexer';
+
+    /**
+     * Priority of the onFlush listener of the route indexer with "sylius_happy_cms.routing.index_on_flush": after
+     * Gedmo's sluggable (0) and translatable (-10) listeners.
+     */
+    public const ROUTE_INDEXER_ON_FLUSH_PRIORITY = -100;
+
     /** @psalm-suppress UnusedVariable */
     public function load(array $configs, ContainerBuilder $container): void
     {
@@ -68,6 +76,25 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
         $loader->load('services.php');
 
         $this->disableOptionalServices($config, $container);
+        $this->configureRouteIndexerListener($container);
+    }
+
+    /**
+     * "sylius_happy_cms.routing.index_on_flush: true": the indexer listens to onFlush (after the listeners that fill
+     * the fields of the path: Gedmo sluggable 0, translatable -10) and postPersist, instead of postPersist and
+     * postUpdate. A project redefining the service with the legacy tags keeps the legacy behaviour.
+     */
+    private function configureRouteIndexerListener(ContainerBuilder $container): void
+    {
+        if (true !== $container->getParameter('sylius_happy_cms.routing.index_on_flush') || !$container->hasDefinition(self::ROUTE_INDEXER)) {
+            return;
+        }
+
+        $container->getDefinition(self::ROUTE_INDEXER)
+            ->clearTag('doctrine.event_listener')
+            ->addTag('doctrine.event_listener', ['event' => 'onFlush', 'priority' => self::ROUTE_INDEXER_ON_FLUSH_PRIORITY, 'connection' => 'default'])
+            ->addTag('doctrine.event_listener', ['event' => 'postPersist', 'priority' => 500, 'connection' => 'default'])
+        ;
     }
 
     /**
@@ -119,6 +146,11 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
             $config['collapse_slashes'] ?? null,
             'collapse_slashes',
             'collapsing the repeated slashes of a computed route path',
+        ));
+        $container->setParameter('sylius_happy_cms.routing.index_on_flush', $this->resolveRoutingFlag(
+            $config['index_on_flush'] ?? null,
+            'index_on_flush',
+            'computing the CMS routes within the flush that saves the entity',
         ));
 
         if (true === $config['trailing_slash']) {
