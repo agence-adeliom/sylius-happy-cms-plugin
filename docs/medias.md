@@ -343,6 +343,20 @@ sylius_happy_cms:
             - php
             - jav
             - py
+
+        # file types accepted for uploads; each list replaces its default
+        # (FileValidator::DEFAULT_ALLOWED_MIME_TYPES / DEFAULT_ALLOWED_EXTENSIONS).
+        # Dangerous extensions (php, exe, sh...), magic bytes and double extensions stay checked whatever the lists.
+        allowed_mime_types: [image/jpeg, image/png, image/avif, ...]   # detected from the file content
+        allowed_extensions: [jpg, jpeg, png, avif, ...]
+
+        # MIME type stored on an uploaded media, from which the extension of its slug is derived:
+        # content (default, detected from the file: "prices.csv" becomes "prices.txt") or client (sent by the
+        # browser, as EasyMedia did). The allowed types are always checked on the content.
+        mime_type_source: content
+
+        # keep the extension of the original file name in the slug ("photo.jpg" instead of "photo.jpeg")
+        keep_original_extension: false
     
         extended_mimes:
             # any extra mime-types that doesnt have "image" in it
@@ -365,6 +379,13 @@ sylius_happy_cms:
         pagination_amount:    50
 
 ```
+
+#### Existing media library (EasyMedia)
+
+To keep the slugs EasyMedia gave to new files, set `mime_type_source: client` (or `keep_original_extension: true` to
+keep the extension of the uploaded file as is), and add the types your library holds (`SELECT DISTINCT mime FROM
+media`) to `allowed_mime_types` / `allowed_extensions`. In YAML, the default lists can be reused with
+`!php/const Adeliom\SyliusHappyCMSPlugin\Services\Media\FileValidator::DEFAULT_ALLOWED_MIME_TYPES`.
 
 ### Events
 
