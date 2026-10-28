@@ -426,6 +426,16 @@ parent of another type whose slug changed (call it outside of a Doctrine flush, 
 The protected `rewriteOtherStaticPrefix()` is replaced by `recomputeRoutesBelowStaticPrefix()`: a project overriding
 it must override the new method.
 
+### New command: `happycms:routes:index`
+
+`happycms:routes:index` (`--class` repeatable, default every mapped routable root entity; `--batch-size`, default
+100; `--dry-run`, with `-v` to list the computed routes; `--save-entities`) creates or updates the routes of the
+routable entities already in the database. It writes the route tables only and does not save the entities (no
+`updated_at` change, no update listener); `--save-entities` saves them as well.
+
+`EntityRouteIndexer` has a new public method, `index()`, which computes and persists the routes of an entity without
+flushing (the command uses it).
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required
