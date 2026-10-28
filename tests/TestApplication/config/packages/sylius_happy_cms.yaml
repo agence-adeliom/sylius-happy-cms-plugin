@@ -20,6 +20,7 @@ sylius_happy_cms:
     base_url: '/media/download'
     media_entity: Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Media\Media
     folder_entity: Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Media\Folder
+    twig_global_from_config: true
   
 
   menu:
