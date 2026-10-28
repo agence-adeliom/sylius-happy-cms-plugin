@@ -19,12 +19,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class MenuCreationListener
 {
+    public const DEFAULT_ROOT_ITEM_LABEL = 'sylius_happy_cms.menu_item.admin.data.menu_item_root';
+
     /**
      * @param bool                 $assignRootItem  false (deprecated): the root item is created but `Menu#rootItem`
      *                                              stays null, and a menu persisted with its own root gets a second
      *                                              item without parent
      * @param ManagerRegistry|null $managerRegistry to take the root item class from the Doctrine mapping of
      *                                              `Menu#rootItem` when there is no `sylius_happy_cms.menu_item` resource
+     * @param string               $rootItemLabel   translated in each available locale; a text that is not a
+     *                                              translation key is kept as is
      */
     public function __construct(
         protected LocaleProviderInterface $localeProvider,
@@ -32,6 +36,7 @@ class MenuCreationListener
         protected ParameterBagInterface $parameterBag,
         protected bool $assignRootItem = false,
         protected ?ManagerRegistry $managerRegistry = null,
+        protected string $rootItemLabel = self::DEFAULT_ROOT_ITEM_LABEL,
     ) {
     }
 
@@ -70,7 +75,7 @@ class MenuCreationListener
             if ($translation instanceof MenuItemTranslationInterface) {
                 $translation->setLocale($locale);
                 $translation->setName(
-                    $this->translator->trans('sylius_happy_cms.menu_item.admin.data.menu_item_root', locale: $locale),
+                    $this->translator->trans($this->rootItemLabel, locale: $locale),
                 );
                 $rootItem->addTranslation($translation);
             }

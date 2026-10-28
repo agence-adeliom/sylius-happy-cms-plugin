@@ -28,6 +28,9 @@ final class MenuCreationListenerTest extends MenuTestCase
 
     private bool $withManagerRegistry = true;
 
+    /** `sylius_happy_cms.menu.root_item.label` (null: the default label of the listener) */
+    private ?string $rootItemLabel = null;
+
     public function testANewMenuGetsItsRootItem(): void
     {
         $menu = $this->saveMenu('main');
@@ -51,6 +54,17 @@ final class MenuCreationListenerTest extends MenuTestCase
         self::assertNotNull($root);
         self::assertSame('Root item', $root->getTranslation('en_US')->getName());
         self::assertSame('Élément racine', $root->getTranslation('fr_FR')->getName());
+    }
+
+    public function testTheRootItemLabelCanBeChanged(): void
+    {
+        $this->rootItemLabel = 'Root';
+
+        $root = $this->saveMenu('main')->getRootItem();
+
+        self::assertNotNull($root);
+        self::assertSame('Root', $root->getTranslation('en_US')->getName());
+        self::assertSame('Root', $root->getTranslation('fr_FR')->getName());
     }
 
     public function testAMenuCreatedWithItsOwnRootItemKeepsIt(): void
@@ -179,6 +193,7 @@ final class MenuCreationListenerTest extends MenuTestCase
             new ParameterBag(['sylius.resources' => $this->resources]),
             $this->assignRootItem,
             $this->withManagerRegistry ? $this->managerRegistry() : null,
+            ...(null !== $this->rootItemLabel ? [$this->rootItemLabel] : []),
         );
 
         $this->entityManager->getConfiguration()->getEntityListenerResolver()->register($listener);

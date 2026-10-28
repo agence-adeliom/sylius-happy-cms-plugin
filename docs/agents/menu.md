@@ -633,7 +633,7 @@ Add icon field to MenuItemTranslation or use class attribute:
 4. **Depth limit**: Keep menu depth reasonable (3-4 levels max)
 5. **Cache**: Use ESI for frequently accessed menus
 6. **Translations**: Ensure all active locales have translations
-7. **Root items**: Don't create root items manually (managed automatically)
+7. **Root items**: Don't create root items manually (created with the menu; `sylius_happy_cms.menu.root_item.auto_create: false` when the project creates them, `label` to rename them)
 8. **Performance**: Use `getPublishedChildren()` instead of filtering all children
 
 ## Database Schema

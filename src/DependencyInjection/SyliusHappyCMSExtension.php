@@ -72,8 +72,13 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
         /** @var array<string, mixed> $rootItem */
         $rootItem = $config['root_item'] ?? [];
 
+        $creationListener = $container->getDefinition(MenuCreationListener::class);
+        if (false === ($rootItem['auto_create'] ?? true)) {
+            $creationListener->clearTag('doctrine.orm.entity_listener');
+        }
+
         $assignRootItem = $rootItem['assign'] ?? null;
-        $container->getDefinition(MenuCreationListener::class)->replaceArgument(3, true === $assignRootItem);
+        $creationListener->replaceArgument(3, true === $assignRootItem);
         $this->deprecateLegacyFlag(
             'menu.root_item.assign',
             $assignRootItem,

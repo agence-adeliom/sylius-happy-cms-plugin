@@ -114,7 +114,8 @@ Every menu has a root item (`Menu#rootItem`), the parent of its first-level item
 #### Creation
 
 `MenuCreationListener` (Doctrine `prePersist`) creates the root item of every new menu: published, at position 0,
-named after the `sylius_happy_cms.menu_item.admin.data.menu_item_root` translation in each available locale. Its
+named after the `label` option (by default the `sylius_happy_cms.menu_item.admin.data.menu_item_root` translation) in
+each available locale. Its
 class is the model of the `sylius_happy_cms.menu_item` resource, or, without this resource, the class Doctrine maps on
 `Menu#rootItem`.
 
@@ -126,6 +127,10 @@ sylius_happy_cms:
             # true: the root item becomes the menu's rootItem, and a menu persisted with its own rootItem keeps it
             # (no second root); the only behaviour in 3.0
             assign: true
+            # false: the project creates the root item itself (the listener is not registered)
+            auto_create: true
+            # translated in each locale (messages domain); a text that is not a translation key is used as is
+            label: 'sylius_happy_cms.menu_item.admin.data.menu_item_root'
 ```
 
 Without the option (deprecated), the root item is created but `Menu#rootItem` stays `null`. See `UPGRADE.md`.
@@ -478,7 +483,7 @@ $translation->getLocale();           // Get language code
 4. **Performance** - Use ESI for frequently used menus on high-traffic sites
 5. **Hierarchies** - Keep menu depth reasonable (3-4 levels max) for better UX
 6. **Translations** - Ensure all menu items have translations for all active locales
-7. **Root items** - The plugin creates the root item of a new menu, don't create it manually (with `menu.root_item.assign: true`, a menu persisted with its own `rootItem` keeps it)
+7. **Root items** - The plugin creates the root item of a new menu, don't create it manually, or disable `menu.root_item.auto_create` (with `menu.root_item.assign: true`, a menu persisted with its own `rootItem` keeps it)
 
 ## Troubleshooting
 

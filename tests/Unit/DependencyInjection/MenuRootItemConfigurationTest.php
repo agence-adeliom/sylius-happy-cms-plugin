@@ -8,6 +8,7 @@ use Adeliom\SyliusHappyCMSPlugin\DependencyInjection\SyliusHappyCMSExtension;
 use Adeliom\SyliusHappyCMSPlugin\EventListener\Menu\MenuCreationListener;
 use Adeliom\SyliusHappyCMSPlugin\EventListener\Menu\MenuRootItemOnDeleteListener;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Yaml\Yaml;
@@ -84,6 +85,43 @@ final class MenuRootItemConfigurationTest extends TestCase
         self::assertTrue($container->getParameter('sylius_happy_cms.menu.root_item.assign'));
         self::assertTrue($container->getDefinition(MenuCreationListener::class)->getArgument(3));
         self::assertSame([], $this->deprecationsOf('menu.root_item.assign'));
+    }
+
+    public function testTheRootItemIsCreatedWithTheTranslatedLabelByDefault(): void
+    {
+        $container = $this->load([]);
+
+        self::assertTrue($container->getParameter('sylius_happy_cms.menu.root_item.auto_create'));
+        self::assertSame(MenuCreationListener::DEFAULT_ROOT_ITEM_LABEL, $container->getParameter('sylius_happy_cms.menu.root_item.label'));
+
+        $listener = $container->getDefinition(MenuCreationListener::class);
+        self::assertTrue($listener->hasTag('doctrine.orm.entity_listener'));
+        self::assertSame('%sylius_happy_cms.menu.root_item.label%', $listener->getArgument(5));
+        self::assertSame([], $this->deprecationsOf('menu.root_item.auto_create'));
+        self::assertSame([], $this->deprecationsOf('menu.root_item.label'));
+    }
+
+    public function testTheRootItemLabelCanBeChanged(): void
+    {
+        $container = $this->load(['menu' => ['root_item' => ['label' => 'Root']]]);
+
+        self::assertSame('Root', $container->getParameter('sylius_happy_cms.menu.root_item.label'));
+    }
+
+    public function testTheCreationOfTheRootItemCanBeDisabled(): void
+    {
+        $container = $this->load(['menu' => ['root_item' => ['auto_create' => false]]]);
+
+        self::assertFalse($container->getParameter('sylius_happy_cms.menu.root_item.auto_create'));
+        self::assertFalse($container->getDefinition(MenuCreationListener::class)->hasTag('doctrine.orm.entity_listener'));
+    }
+
+    public function testTheRootItemLabelCannotBeEmpty(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches('/menu\.root_item\.label/');
+
+        $this->load(['menu' => ['root_item' => ['label' => '']]]);
     }
 
     /**
