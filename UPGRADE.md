@@ -192,6 +192,46 @@ change it. Without resolver, the routes are unchanged.
 
 `EntityRouteIndexer` takes a new optional constructor argument, `$parentPathResolvers` (default `[]`).
 
+### Deprecated: not setting `sylius_happy_cms.routing.index_on_flush`
+
+```yaml
+sylius_happy_cms:
+    routing:
+        index_on_flush: true
+```
+
+Not set or `false` (a deprecation is triggered), `EntityRouteIndexer` keeps its current behaviour: it listens to
+`postPersist` and `postUpdate` and writes the routes by flushing the entity manager from them (nested flush, one
+extra transaction per entity), and indexes each entity once per process (a later change of the slug of the same
+entity in a long-running process, a Messenger worker or a command, leaves its route stale).
+
+With `true`, the indexer listens to `onFlush` (priority -100) and `postPersist`: the routes of the entities inserted
+or updated by a flush are computed in `onFlush` and written by that same flush (one transaction, no nested flush),
+for every flush. The priority -100 places the indexer after the listeners that fill the fields of the path within the
+flush, such as Gedmo's sluggable listener (0) and translatable listener (-10): an entity created without a slug gets a
+route with its generated slug. Keep your own `onFlush` listeners that change a slug or a parent above -100. Route names
+and content ids are unchanged, no migration is needed.
+
+The tags are set by the extension from the option. If you redefine the
+`sylius.happy_cms.plugin.listener.entity_route_indexer` service, it keeps the legacy behaviour until you pass the
+option as its `$indexOnFlush` argument and replace its tags:
+
+```yaml
+arguments:
+    # ...
+    $indexOnFlush: true
+tags:
+    - { name: 'doctrine.event_listener', event: 'onFlush', priority: -100, connection: 'default' }
+    - { name: 'doctrine.event_listener', event: 'postPersist', priority: 500, connection: 'default' }
+```
+
+New public methods, in both modes: `onFlush()`, `index(CmsRoutableInterface)` (computes the routes of an entity
+outside of a flush, flush afterwards) and `rewriteStaticPrefix($previous, $new)` (moves the routes below a path that
+is not a CMS route, flush afterwards).
+
+In 3.0 the option is removed and computing the routes within the flush is the only behaviour; `postUpdate()` is
+removed.
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required
