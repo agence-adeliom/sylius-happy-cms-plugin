@@ -91,7 +91,13 @@ sylius_happy_cms:
     admin:
       action:
         index: Retour à la liste
+      channel_value_choice:
+        inherit: 'Hériter de la valeur par défaut'
+        yes: 'Oui'
+        no: 'Non'
       field:
+        channel_value: 'Valeur pour le channel %channel%'
+        channels: Channels
         key: Clé
         name: Nom
         description: Description
@@ -137,6 +143,7 @@ sylius_happy_cms:
   shared_block:
     admin:
       field:
+        channels: Channels
         name: Nom
         key: Clé
         type: Type
@@ -160,6 +167,7 @@ sylius_happy_cms:
   menu:
     admin:
       field:
+        channels: Channels
         name: Nom
         code: Code
         status: Actif
@@ -201,6 +209,8 @@ sylius_happy_cms:
       data:
         menu_item_root: "Élément racine"
   admin:
+    channels:
+      help: Laissez vide pour que ce contenu soit disponible sur tous les channels
     menu:
       cms: CMS
       pages: Pages

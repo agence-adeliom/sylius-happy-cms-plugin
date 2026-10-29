@@ -12,6 +12,7 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action\Action;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Actions;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\Field;
+use Adeliom\SyliusHappyCMSPlugin\Admin\Channel\ChannelsFieldTrait;
 use Adeliom\SyliusHappyCMSPlugin\Admin\Field\SharedBlockField;
 use Adeliom\SyliusHappyCMSPlugin\Entity\SharedBlock\SharedBlockInterface;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -20,6 +21,8 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 abstract class AbstractSharedBlockAdmin extends AbstractAdmin implements ServiceSubscriberInterface, AdminInterface
 {
+    use ChannelsFieldTrait;
+
     public static function getSubscribedServices(): array
     {
         return [];
@@ -55,6 +58,8 @@ abstract class AbstractSharedBlockAdmin extends AbstractAdmin implements Service
             ->setRequired(true);
 
         yield Field::new('status', 'sylius_happy_cms.shared_block.admin.field.status');
+
+        yield $this->createChannelsField('sylius_happy_cms.shared_block.admin.field.channels');
 
         if (null !== $blockType) {
             yield TabField::new('tabContent', 'sylius_happy_cms.shared_block.admin.tab.content');

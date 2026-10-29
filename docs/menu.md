@@ -16,6 +16,7 @@ The Sylius Happy CMS Plugin provides a flexible menu management system that allo
 - **Custom attributes** - CSS classes, target, position
 - **Template flexibility** - Custom templates per menu
 - **Nested Set** - Efficient hierarchical queries using Gedmo Tree
+- **Channels** - Optional attachment to one or several Sylius channels, empty meaning all channels (see [channels](./channels.md))
 
 ## Data Model
 

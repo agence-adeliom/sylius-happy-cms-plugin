@@ -13,4 +13,5 @@ use Sylius\Resource\Doctrine\Persistence\RepositoryInterface;
  */
 interface ConfigRepositoryInterface extends RepositoryInterface, TranslationRepositoryInterface
 {
+    public function getByKey(string $key): ?ConfigInterface;
 }

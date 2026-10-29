@@ -36,6 +36,10 @@ Learn about automatic route generation, URL hierarchy, and customization
 → **Use**: [Menu System Guide](./menu.md)
 Learn about creating hierarchical menus, templates, and rendering
 
+### I need to restrict menus, shared blocks or configs to some channels, or read a config per channel
+→ **Use**: [Channels Guide](../channels.md)
+Learn about the optional channel attachment (empty = all channels), per-channel config values and the `happy_cms_config` Twig function
+
 ## 📋 Standard Workflow Patterns
 
 ### Creating New Routable Entity

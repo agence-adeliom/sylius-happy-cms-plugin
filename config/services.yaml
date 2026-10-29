@@ -2,6 +2,7 @@ imports:
   - { resource: services/pages.yaml }
   - { resource: services/seo.yaml }
   - { resource: services/menu.yaml }
+  - { resource: services/config.yaml }
   - { resource: services/block.yaml }
   - { resource: services/maker.yaml }
   - { resource: services/ai.yaml }

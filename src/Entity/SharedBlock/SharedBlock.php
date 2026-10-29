@@ -8,16 +8,21 @@ use Adeliom\SyliusEasyCrudPlugin\Traits\EntityIdTrait;
 use Adeliom\SyliusEasyCrudPlugin\Traits\EntityNameTrait;
 use Adeliom\SyliusEasyCrudPlugin\Traits\EntityStatusTrait;
 use Adeliom\SyliusEasyCrudPlugin\Traits\EntityTimestampableTrait;
+use Adeliom\SyliusHappyCMSPlugin\Entity\Channel\ChannelAwareInterface;
+use Adeliom\SyliusHappyCMSPlugin\Entity\Channel\ChannelAwareTrait;
 use Adeliom\SyliusHappyCMSPlugin\Repository\SharedBlock\SharedBlockRepository;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Sylius\Component\Channel\Model\ChannelInterface;
 use Sylius\Resource\Model\TranslatableTrait;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\HasLifecycleCallbacks]
 #[ORM\MappedSuperclass(repositoryClass: SharedBlockRepository::class)]
-class SharedBlock implements SharedBlockInterface
+class SharedBlock implements SharedBlockInterface, ChannelAwareInterface
 {
+    use ChannelAwareTrait;
     use EntityIdTrait;
     use EntityNameTrait;
     use TranslatableTrait {
@@ -39,10 +44,20 @@ class SharedBlock implements SharedBlockInterface
     #[Assert\Type('string')]
     protected ?string $type = null;
 
+    /** @var Collection<int, ChannelInterface> */
+    #[ORM\ManyToMany(targetEntity: ChannelInterface::class)]
+    #[ORM\JoinTable(
+        name: 'sylius_happy_cms__shared_block_channels',
+        joinColumns: [new ORM\JoinColumn(name: 'shared_block_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
+        inverseJoinColumns: [new ORM\JoinColumn(name: 'channel_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
+    )]
+    protected Collection $channels;
+
     public function __construct()
     {
         $this->initializeTranslationsCollection();
         $this->timestampableConstruct();
+        $this->initializeChannels();
     }
 
     protected function createTranslation(): SharedBlockTranslationInterface

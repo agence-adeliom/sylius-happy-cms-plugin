@@ -1,0 +1,18 @@
+services:
+    Adeliom\SyliusHappyCMSPlugin\Services\Config\ConfigValueConverter: ~
+
+    Adeliom\SyliusHappyCMSPlugin\Services\Config\ConfigValueResolver:
+        public: true
+        arguments:
+            - '@sylius_happy_cms.repository.config'
+            - '@sylius.context.channel'
+            - '@sylius.context.locale'
+            - '@sylius.translation_locale_provider'
+            - '@Adeliom\SyliusHappyCMSPlugin\Services\Config\ConfigValueConverter'
+
+    Adeliom\SyliusHappyCMSPlugin\Twig\Config\ConfigExtension:
+        public: true
+        arguments:
+            - '@Adeliom\SyliusHappyCMSPlugin\Services\Config\ConfigValueResolver'
+        tags:
+            - { name: twig.extension }

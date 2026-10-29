@@ -7,17 +7,21 @@ namespace Adeliom\SyliusHappyCMSPlugin\Entity\Menu;
 use Adeliom\SyliusEasyCrudPlugin\Traits\EntityIdTrait;
 use Adeliom\SyliusEasyCrudPlugin\Traits\EntityStatusTrait;
 use Adeliom\SyliusEasyCrudPlugin\Traits\EntityTimestampableTrait;
+use Adeliom\SyliusHappyCMSPlugin\Entity\Channel\ChannelAwareInterface;
+use Adeliom\SyliusHappyCMSPlugin\Entity\Channel\ChannelAwareTrait;
 use Adeliom\SyliusHappyCMSPlugin\Repository\Menu\MenuRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Sylius\Component\Channel\Model\ChannelInterface;
 
 #[ORM\HasLifecycleCallbacks]
 #[ORM\MappedSuperclass(repositoryClass: MenuRepository::class)]
 #[ORM\UniqueConstraint(name: 'sylius_happy_cms__menu_code_unik', columns: ['code'])]
-class Menu implements MenuInterface
+class Menu implements MenuInterface, ChannelAwareInterface
 {
+    use ChannelAwareTrait;
     use EntityIdTrait;
     use EntityTimestampableTrait {
         EntityTimestampableTrait::__construct as private timestampableConstruct;
@@ -39,6 +43,15 @@ class Menu implements MenuInterface
     #[ORM\JoinColumn(name: 'root_item_id', nullable: true, onDelete: 'CASCADE')]
     protected ?MenuItemInterface $rootItem = null;
 
+    /** @var Collection<int, ChannelInterface> */
+    #[ORM\ManyToMany(targetEntity: ChannelInterface::class)]
+    #[ORM\JoinTable(
+        name: 'sylius_happy_cms__menu_channels',
+        joinColumns: [new ORM\JoinColumn(name: 'menu_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
+        inverseJoinColumns: [new ORM\JoinColumn(name: 'channel_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
+    )]
+    protected Collection $channels;
+
     /**
      * Constructor.
      */
@@ -46,6 +59,7 @@ class Menu implements MenuInterface
     {
         $this->timestampableConstruct();
         $this->items = new ArrayCollection();
+        $this->initializeChannels();
     }
 
     public function setName(?string $name): void
