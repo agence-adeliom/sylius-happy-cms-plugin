@@ -150,8 +150,11 @@ trait GetContent
         }
 
         $data = json_decode($content, true, 512, \JSON_THROW_ON_ERROR);
+        if (!is_array($data)) {
+            return [];
+        }
 
-        return is_array($data) ? $data : [];
+        return array_filter($data, is_string(...), \ARRAY_FILTER_USE_KEY);
     }
 
     /**
@@ -308,7 +311,8 @@ trait GetContent
     {
         $breadcrumb = [];
         while ($folder instanceof FolderInterface) {
-            array_unshift($breadcrumb, ['id' => $folder->getId(), 'name' => $folder->getName()]);
+            $id = $folder->getId();
+            array_unshift($breadcrumb, ['id' => is_int($id) ? $id : null, 'name' => $folder->getName()]);
             $folder = $folder->getParent();
         }
 
