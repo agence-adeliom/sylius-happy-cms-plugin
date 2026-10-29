@@ -13,11 +13,12 @@ use Symfony\Component\Yaml\Yaml;
 
 final class BlockRenderConfigurationTest extends TestCase
 {
-    public function testInheritContextIsDisabledByDefault(): void
+    public function testTheBlockRenderOptionsAreDisabledByDefault(): void
     {
         $container = $this->load([]);
 
         self::assertFalse($container->getParameter('sylius_happy_cms.block_render.inherit_context'));
+        self::assertFalse($container->getParameter('sylius_happy_cms.block_render.missing_published_means_published'));
     }
 
     public function testInheritContextReachesTheBlockHelper(): void
@@ -26,6 +27,17 @@ final class BlockRenderConfigurationTest extends TestCase
 
         self::assertTrue($container->getParameter('sylius_happy_cms.block_render.inherit_context'));
         self::assertSame('%sylius_happy_cms.block_render.inherit_context%', $container->getDefinition(Helper::class)->getArgument('$inheritContext'));
+    }
+
+    public function testMissingPublishedMeansPublishedReachesTheBlockHelper(): void
+    {
+        $container = $this->load(['block_render' => ['missing_published_means_published' => true]]);
+
+        self::assertTrue($container->getParameter('sylius_happy_cms.block_render.missing_published_means_published'));
+        self::assertSame(
+            '%sylius_happy_cms.block_render.missing_published_means_published%',
+            $container->getDefinition(Helper::class)->getArgument('$missingPublishedMeansPublished'),
+        );
     }
 
     public function testTheFirstBlockHelperArgumentsStayPositional(): void

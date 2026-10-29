@@ -633,12 +633,17 @@ sylius_happy_cms:
     # The block templates also receive the variables of the calling template (resource, page, loop...).
     # Block variables (block, blockType, preview, settings) and the third argument take precedence.
     inherit_context: true
+
+    # Render the entries that have no "block_published" key, e.g. content imported or migrated from another
+    # system. An explicit "0", "", false or null still hides the block.
+    missing_published_means_published: true
 ```
 
 With `inherit_context`, the Twig function calls `Helper::renderBlockInContext()` with the context of the calling
 template; without it, it calls `Helper::renderBlock()` as before (an override of `renderBlock()` in a project helper
 keeps being used). `Helper::renderBlock()` never receives a context: PHP callers pass the variables they need as the
-third argument. Blocks whose `block_type` is not a registered block are skipped silently.
+third argument. `missing_published_means_published` applies to both methods. Blocks whose `block_type` is not a
+registered block are skipped silently.
 
 ### Rendering assets
 

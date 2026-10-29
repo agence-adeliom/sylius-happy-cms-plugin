@@ -100,13 +100,62 @@ final class HelperRenderTest extends TestCase
         );
     }
 
-    public function testABlockWithoutPublishedKeyIsHidden(): void
+    public function testABlockWithoutPublishedKeyIsHiddenByDefault(): void
     {
         $block = $this->block(TitleBlock::class, ['title' => 'Hello']);
         unset($block['block_published']);
 
         self::assertSame('', $this->renderPage('{{ happy_cms_block_render(block) }}', ['block' => $block]));
         self::assertSame('', $this->renderPage('{{ happy_cms_block_render(block) }}', ['block' => $block], inheritContext: true));
+    }
+
+    public function testABlockWithoutPublishedKeyIsRenderedWhenMissingPublishedMeansPublished(): void
+    {
+        $block = $this->block(TitleBlock::class, ['title' => 'Hello']);
+        unset($block['block_published']);
+
+        self::assertSame(
+            '<h2 id="block-1">Hello</h2>',
+            $this->renderPage('{{ happy_cms_block_render(block) }}', ['block' => $block], missingPublishedMeansPublished: true),
+        );
+        self::assertSame(
+            '<h2 id="block-2">Hello</h2>',
+            $this->renderPage('{{ happy_cms_block_render(block) }}', ['block' => $block], inheritContext: true, missingPublishedMeansPublished: true),
+        );
+    }
+
+    /**
+     * @return iterable<string, array{mixed}>
+     */
+    public static function unpublishedValues(): iterable
+    {
+        yield 'string "0"' => ['0'];
+        yield 'empty string' => [''];
+        yield 'false' => [false];
+        yield 'null' => [null];
+    }
+
+    /**
+     * @dataProvider unpublishedValues
+     */
+    public function testAnUnpublishedBlockIsHiddenWhateverMissingPublishedMeansPublished(mixed $published): void
+    {
+        $block = $this->block(TitleBlock::class, ['title' => 'Hello', 'block_published' => $published]);
+
+        self::assertSame('', $this->renderPage('{{ happy_cms_block_render(block) }}', ['block' => $block]));
+        self::assertSame('', $this->renderPage('{{ happy_cms_block_render(block) }}', ['block' => $block], missingPublishedMeansPublished: true));
+    }
+
+    public function testTheMissingPublishedOptionAlsoAppliesToThePhpApi(): void
+    {
+        $block = $this->block(TitleBlock::class, ['title' => 'Hello']);
+        unset($block['block_published']);
+
+        self::assertNull($this->helper(new Environment(new ArrayLoader()))->renderBlock($block));
+        self::assertSame(
+            '<h2 id="block-1">Hello</h2>',
+            (string) $this->helper($this->twig([]), missingPublishedMeansPublished: true)->renderBlock($block),
+        );
     }
 
     public function testAnUnpublishedBlockIsRenderedInPreview(): void
@@ -156,6 +205,7 @@ final class HelperRenderTest extends TestCase
         string $pageTemplate,
         array $variables,
         bool $inheritContext = false,
+        bool $missingPublishedMeansPublished = false,
         string $blockTemplate = '<h2 id="{{ settings.attr_id }}">{{ settings.title }}</h2>',
     ): string {
         $twig = $this->twig([
@@ -163,7 +213,7 @@ final class HelperRenderTest extends TestCase
             'blocks/title.html.twig' => $blockTemplate,
         ]);
 
-        $helper = $this->helper($twig, $inheritContext);
+        $helper = $this->helper($twig, $inheritContext, $missingPublishedMeansPublished);
         $twig->addExtension(new BlockExtension());
         $twig->addRuntimeLoader(new FactoryRuntimeLoader([Helper::class => static fn () => $helper]));
 
@@ -181,9 +231,13 @@ final class HelperRenderTest extends TestCase
         ], $templates)), ['strict_variables' => true, 'autoescape' => false]);
     }
 
-    private function helper(Environment $twig, bool $inheritContext = false): Helper
+    private function helper(Environment $twig, bool $inheritContext = false, bool $missingPublishedMeansPublished = false): Helper
     {
-        return new Helper(...$this->helperArguments($twig), inheritContext: $inheritContext);
+        return new Helper(
+            ...$this->helperArguments($twig),
+            inheritContext: $inheritContext,
+            missingPublishedMeansPublished: $missingPublishedMeansPublished,
+        );
     }
 
     /**

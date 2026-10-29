@@ -2,6 +2,20 @@
 
 ## Unreleased (2.3.x)
 
+### New option: render the JSON blocks that have no `block_published` key
+
+```yaml
+sylius_happy_cms:
+    block_render:
+        missing_published_means_published: true # default: false
+```
+
+An entry of a JSON block list without a `block_published` key (content imported, migrated or written outside the
+block form) is skipped by `happy_cms_block_render()` and `Helper::renderBlock()`. With the option enabled, it is
+rendered; an explicit `"0"`, `""`, `false` or `null` still hides the block. Nothing changes when the option is not set.
+The `Helper` constructor gets a new optional last argument, `bool $missingPublishedMeansPublished = false`, passed by
+name by the service definition.
+
 ### New option: block templates receive the context of the calling template
 
 ```yaml
