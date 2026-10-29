@@ -312,6 +312,36 @@ public function supports(?ContentEditableInterface $resource = null): bool
 }
 ```
 
+## Flexible content field (blocks stored as JSON)
+
+`FlexibleContentField` edits a JSON column holding a list of blocks; each entry is
+`{"block_type": "<block class>", "block_published": "1", "position": 0, ...block fields}`.
+
+```php
+FlexibleContentField::new('content')
+    // block classes allowed in this field (all registered blocks when omitted)
+    ->allowedBlocks([TextBlockType::class, GalleryBlockType::class])
+;
+```
+
+### Saved value: `flexible_content.save_as_list`
+
+```yaml
+sylius_happy_cms:
+    flexible_content:
+        save_as_list: true
+```
+
+- `true`: on save, the entries are sorted by the positions written by the admin script, stored as a JSON **list**
+  (never as an object keyed by form names) and their `position` is renumbered `0`, `1`, `2`… (integers). Entries
+  without a numeric position go after the others, in submitted order; a submitted row without `block_type` is
+  ignored. This is the only behaviour in 3.0.
+- Not set or `false` (deprecated): legacy save. The entries keep the form names as keys (a JSON object such as
+  `{"3": …, "a1b2-c3d": …}` as soon as a block is moved, removed or added) and the positions posted by the admin
+  script; a block at position `0` is moved to the end (`999`).
+
+In both modes, a content stored as a JSON list (or as an object with numeric keys) can be edited.
+
 ## Assets Management
 
 ### Frontend Assets

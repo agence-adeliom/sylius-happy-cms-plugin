@@ -20,6 +20,15 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class BlockCollectionType extends CollectionType implements AdminFormTypeInterface
 {
     /**
+     * @param bool $saveAsList save the collection as a list in position order (option
+     *                         `sylius_happy_cms.flexible_content.save_as_list`, see ResizeFormListener)
+     */
+    public function __construct(
+        private readonly bool $saveAsList = false,
+    ) {
+    }
+
+    /**
      * @param array{
      *     allow_extra_fields: ?bool,
      *     allow_add: bool,
@@ -81,6 +90,8 @@ class BlockCollectionType extends CollectionType implements AdminFormTypeInterfa
             $options['allow_add'],
             $options['allow_delete'],
             $options['delete_empty'],
+            [],
+            $this->saveAsList,
         );
 
         $builder->addEventSubscriber($resizeListener);

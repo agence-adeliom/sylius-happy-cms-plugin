@@ -309,6 +309,11 @@ sylius_happy_cms:
         # path of the media manager routes (media.*), below the prefix of their import
         admin_path: 'happy-cms-media/medias'
 
+        # true: slugs of the media and folder entities mapped at 255 characters (like their name) instead of 100,
+        # so a file or folder name longer than 100 characters can be saved. Not set (or false): 100, deprecated.
+        # Generate the migration of your media and folder tables when you switch it on (see "Slug length" below).
+        long_slugs: true
+
         # ignore any file starts with "."
         ignore_files:         '/^\..*/'
         
@@ -365,6 +370,25 @@ sylius_happy_cms:
         pagination_amount:    50
 
 ```
+
+#### Slug length
+
+The slug of a media or folder is derived from its name (`VARCHAR(255)`), but the models map it at `VARCHAR(100)`:
+a file or folder name longer than 100 characters cannot be saved on MySQL in strict mode (data too long).
+
+`long_slugs: true` maps the `slug` column of the media and folder entities (the `Media` and `Folder` models and the
+project entities extending them) at 255 characters, through a Doctrine `loadClassMetadata` listener. An entity that
+already overrides the slug length (`#[ORM\AttributeOverride]`) to another value than 100 keeps its own length.
+The tables belong to your entities, so generate the migration in your project after switching it on:
+
+```bash
+bin/console cache:clear
+bin/console doctrine:migrations:diff
+# ALTER TABLE <media table> CHANGE slug slug VARCHAR(255) NOT NULL
+# ALTER TABLE <folder table> CHANGE slug slug VARCHAR(255) NOT NULL
+```
+
+Without the option, the mapping stays at 100 characters (deprecated: 255 is the only length in 3.0).
 
 ### Events
 

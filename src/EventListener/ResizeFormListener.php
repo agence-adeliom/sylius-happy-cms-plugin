@@ -13,6 +13,15 @@ use Symfony\Component\Form\FormInterface;
 /**
  * Adapted from Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener
  *
+ * Each entry of the collection is a block (`block_type`, `block_published`, `position` and the block fields) whose
+ * form type is its `block_type`. Entries are displayed in `position` order.
+ *
+ * With `$saveAsList` (option `sylius_happy_cms.flexible_content.save_as_list`), on submit the collection is sorted by
+ * the submitted positions (stable, numeric), re-indexed as a list (so that it is stored as a JSON array, not as an
+ * object keyed by the form names) and the positions are renumbered 0, 1, 2…; rows without block type are ignored.
+ * Without it (legacy, removed in 3.0), the entries keep the form names as keys and the submitted positions, and a
+ * falsy position is replaced by 999.
+ *
  * @phpstan-type BlockData array{block_type?: string|null, position: mixed}
  */
 class ResizeFormListener implements EventSubscriberInterface
@@ -28,6 +37,7 @@ class ResizeFormListener implements EventSubscriberInterface
         protected bool $allowDelete = false,
         private bool|\Closure $deleteEmpty = false,
         protected array $prototypeOptions = [],
+        protected bool $saveAsList = false,
     ) {
         $this->deleteEmpty = \is_bool($deleteEmpty) ? $deleteEmpty : $deleteEmpty(...);
         $this->prototypeOptions = empty($prototypeOptions) ? $options : $prototypeOptions;
@@ -49,7 +59,7 @@ class ResizeFormListener implements EventSubscriberInterface
     public function preSetData(FormEvent $event): void
     {
         $form = $event->getForm();
-        /** @var array<string, BlockData>|(\Traversable<string, BlockData>&\ArrayAccess<string, BlockData>) $data */
+        /** @var array<array-key, BlockData>|(\Traversable<array-key, BlockData>&\ArrayAccess<array-key, BlockData>) $data */
         $data = $event->getData() ?? [];
 
         if (!\is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
@@ -58,23 +68,33 @@ class ResizeFormListener implements EventSubscriberInterface
 
         // First remove all rows
         foreach ($form as $name => $child) {
-            $form->remove($name);
+            $form->remove((string) $name);
+        }
+
+        if (!$this->saveAsList) {
+            if (is_array($data)) {
+                uasort($data, static fn ($a, $b) => $a['position'] <=> $b['position']);
+            }
+
+            // Then add all rows again in the correct order
+            foreach ($data as $name => $value) {
+                if (!empty($value['block_type'])) {
+                    $this->addRow($form, (string) $name, $value['block_type']);
+                }
+            }
+
+            return;
         }
 
         if (is_array($data)) {
-            uasort($data, static fn ($a, $b) => $a['position'] <=> $b['position']);
+            $data = self::sortByPosition($data);
         }
 
         // Then add all rows again in the correct order
         foreach ($data as $name => $value) {
-            if (!empty($value['block_type'])) {
-                $form->add(
-                    $name,
-                    $value['block_type'],
-                    array_replace([
-                      'property_path' => '[' . $name . ']',
-                    ], $this->prototypeOptions),
-                );
+            $blockType = self::blockType($value);
+            if (null !== $blockType) {
+                $this->addRow($form, (string) $name, $blockType);
             }
         }
     }
@@ -92,19 +112,27 @@ class ResizeFormListener implements EventSubscriberInterface
         if ($this->allowDelete) {
             foreach ($form as $name => $child) {
                 if (!isset($data[$name])) {
-                    $form->remove($name);
+                    $form->remove((string) $name);
                 }
             }
         }
 
         // Add all additional rows
-        if ($this->allowAdd) {
+        if ($this->allowAdd && !$this->saveAsList) {
             foreach ($data as $name => $value) {
                 /** @var array{block_type: string|null} $value */
-                if (!$form->has($name)) {
-                    $form->add($name, $value['block_type'], array_replace([
-                      'property_path' => '[' . $name . ']',
-                  ], $this->prototypeOptions));
+                if (!$form->has((string) $name)) {
+                    $this->addRow($form, (string) $name, $value['block_type']);
+                }
+            }
+        }
+
+        // Add all additional rows (a row without block type cannot be built: it is dropped on submit)
+        if ($this->allowAdd && $this->saveAsList) {
+            foreach ($data as $name => $value) {
+                $blockType = self::blockType($value);
+                if (null !== $blockType && !$form->has((string) $name)) {
+                    $this->addRow($form, (string) $name, $blockType);
                 }
             }
         }
@@ -113,7 +141,7 @@ class ResizeFormListener implements EventSubscriberInterface
     public function onSubmit(FormEvent $event): void
     {
         $form = $event->getForm();
-        /** @var array<string, BlockData>|(\Traversable<string, BlockData>&\ArrayAccess<string, BlockData>) $data */
+        /** @var array<array-key, BlockData>|(\Traversable<array-key, BlockData>&\ArrayAccess<array-key, BlockData>) $data */
         $data = $event->getData() ?? [];
 
         // At this point, $data is an array or an array-like object that already contains the
@@ -140,7 +168,7 @@ class ResizeFormListener implements EventSubscriberInterface
                 // need to check allowAdd again
                 if ($isEmpty && ($isNew || $this->allowDelete)) {
                     unset($data[$name]);
-                    $form->remove($name);
+                    $form->remove((string) $name);
                 }
             }
         }
@@ -151,7 +179,7 @@ class ResizeFormListener implements EventSubscriberInterface
             $toDelete = [];
 
             foreach ($data as $name => $child) {
-                if (!$form->has($name)) {
+                if (!$form->has((string) $name)) {
                     $toDelete[] = $name;
                 }
             }
@@ -161,16 +189,72 @@ class ResizeFormListener implements EventSubscriberInterface
             }
         }
 
-        foreach ($data as $name => $value) {
-            if (!$value['position']) {
-                $data[$name]['position'] = 999;
+        if (!$this->saveAsList) {
+            foreach ($data as $name => $value) {
+                if (!$value['position']) {
+                    $data[$name]['position'] = 999;
+                }
             }
+
+            if (is_array($data)) {
+                uasort($data, static fn ($a, $b) => $a['position'] <=> $b['position']);
+            }
+
+            $event->setData($data);
+
+            return;
         }
 
         if (is_array($data)) {
-            uasort($data, static fn ($a, $b) => $a['position'] <=> $b['position']);
+            $data = array_values(self::sortByPosition($data));
+
+            foreach ($data as $index => $value) {
+                if (is_array($value)) {
+                    $data[$index]['position'] = $index;
+                }
+            }
         }
 
         $event->setData($data);
+    }
+
+    private function addRow(FormInterface $form, string $name, ?string $blockType): void
+    {
+        $form->add($name, $blockType, array_replace([
+            'property_path' => '[' . $name . ']',
+        ], $this->prototypeOptions));
+    }
+
+    private static function blockType(mixed $value): ?string
+    {
+        if (!is_array($value) || !isset($value['block_type']) || !is_string($value['block_type']) || '' === $value['block_type']) {
+            return null;
+        }
+
+        return $value['block_type'];
+    }
+
+    /**
+     * Stable sort by numeric `position` (string or int); entries without a numeric position keep their relative
+     * order, after the others. Keys are preserved.
+     *
+     * @template T
+     *
+     * @param array<array-key, T> $data
+     *
+     * @return array<array-key, T>
+     */
+    private static function sortByPosition(array $data): array
+    {
+        $order = 0;
+        $keys = [];
+        foreach ($data as $name => $value) {
+            $position = is_array($value) ? ($value['position'] ?? null) : null;
+            $keys[$name] = [is_numeric($position) ? 0 : 1, is_numeric($position) ? (float) $position : 0.0, $order++];
+        }
+
+        uksort($data, static fn (int|string $a, int|string $b): int => $keys[$a] <=> $keys[$b]);
+
+        return $data;
     }
 }

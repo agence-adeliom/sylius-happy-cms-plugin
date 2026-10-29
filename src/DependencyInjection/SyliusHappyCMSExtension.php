@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\DependencyInjection;
 
+use Adeliom\SyliusHappyCMSPlugin\EventListener\Media\LongSlugsListener;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockTypeInterface;
 use Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock\SharedBlockTypeInterface;
 use Adeliom\SyliusHappyCMSPlugin\Services\Seo\Sitemap\SitemapDumperInterface;
@@ -25,6 +26,8 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
 
     public const REDIRECTION_MANAGER = 'sylius.happy_cms.plugin.listener.redirection_manager';
 
+    public const LONG_SLUGS_LISTENER = 'happy.cms.media.event_listener.long_slugs';
+
     /** @psalm-suppress UnusedVariable */
     public function load(array $configs, ContainerBuilder $container): void
     {
@@ -38,6 +41,7 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
         $this->processConfigConfiguration($config['config'], $container);
         $this->processMenuConfiguration($config['menu'], $container);
         $this->processBlockConfiguration($config['shared_block'], $container);
+        $this->processFlexibleContentConfiguration($config['flexible_content'], $container);
         $this->processMediaConfiguration($config['media'], $container);
 
         $container->registerForAutoconfiguration(BlockTypeInterface::class)
@@ -166,6 +170,26 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
     /**
      * @param array<string, mixed> $config
      */
+    private function processFlexibleContentConfiguration(array $config, ContainerBuilder $container): void
+    {
+        $saveAsList = $config['save_as_list'] ?? null;
+
+        if (true !== $saveAsList) {
+            trigger_deprecation(
+                'agence-adeliom/sylius-happy-cms-plugin',
+                '2.3.3',
+                '%s the "sylius_happy_cms.flexible_content.save_as_list" option %s deprecated. It will be removed in 3.0, where flexible contents are always saved as a JSON list in display order. Set it to true to opt in now (see UPGRADE.md).',
+                null === $saveAsList ? 'Not setting' : 'Setting',
+                null === $saveAsList ? 'is' : 'to false is',
+            );
+        }
+
+        $container->setParameter('sylius_happy_cms.flexible_content.save_as_list', true === $saveAsList);
+    }
+
+    /**
+     * @param array<string, mixed> $config
+     */
     private function processMediaConfiguration(array $config, ContainerBuilder $container): void
     {
         foreach ($config as $key => $value) {
@@ -176,6 +200,20 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
         $storageName = $container->getParameter('sylius_happy_cms.media.storage_name');
         if (is_string($storageName) || $storageName instanceof Alias) {
             $container->setAlias('happy.cms.media.storage', $storageName);
+        }
+
+        $longSlugs = $config['long_slugs'] ?? null;
+        if (null === $longSlugs) {
+            trigger_deprecation('agence-adeliom/sylius-happy-cms-plugin', '2.3.3', 'Not setting the "sylius_happy_cms.media.long_slugs" option is deprecated. It will be removed in 3.0, where a 255-character slug for medias and folders is the only behaviour. Set it to true to opt in now (see UPGRADE.md).');
+        } elseif (false === $longSlugs) {
+            trigger_deprecation('agence-adeliom/sylius-happy-cms-plugin', '2.3.3', 'Setting the "sylius_happy_cms.media.long_slugs" option to false is deprecated. It will be removed in 3.0, where a 255-character slug for medias and folders is the only behaviour. Set it to true to opt in now (see UPGRADE.md).');
+        }
+        $container->setParameter('sylius_happy_cms.media.long_slugs', true === $longSlugs);
+
+        if (true === $longSlugs) {
+            // Default mapping (100) untouched: the listener widens the slugs only for the projects that opt in.
+            $container->register(self::LONG_SLUGS_LISTENER, LongSlugsListener::class)
+                ->addTag('doctrine.event_listener', ['event' => 'loadClassMetadata']);
         }
     }
 

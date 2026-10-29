@@ -135,17 +135,79 @@ sylius_happy_cms:
 Leading and trailing `/` are removed (`/medias` and `medias` are the same). The routes are generated with `path()`, so templates and the media
 manager JavaScript follow it.
 
-### Inheritance below an entity extending a plugin model
+### Subclassing an entity that extends a plugin model
 
-`Adeliom\SyliusHappyCMSPlugin\EventListener\Doctrine\MappedSuperclassAssociationDeclaringClassListener` (Doctrine
-`loadClassMetadata` listener, priority -100) is registered by the plugin. It sets the declaring class of the
-associations that Sylius `ORMMappedSuperClassSubscriber` removes from the plugin mapped superclasses (`routes`,
-`children`, `items`…), which lets a single table or joined inheritance subclass of your entity load (it failed with
-`Property "routes" … was already declared`). Nothing to configure, no schema change: only the entities mapped with an
-inheritance are changed, and only their associations without a declaring class whose property belongs to a plugin
-class. An entity without inheritance (e.g. `App\Entity\Page extends Adeliom\SyliusHappyCMSPlugin\Entity\Page\Page`
-and nothing below it) keeps exactly the same metadata. If your project has its own listener for this, you can remove
-it.
+You can now use single table or joined inheritance below an entity that extends a plugin model, for example:
+
+    App\Entity\Pages\LandingPage extends App\Entity\Page extends Adeliom\SyliusHappyCMSPlugin\Entity\Page\Page
+
+Before, loading such a subclass failed with `Property "routes" in "…LandingPage" was already declared, but it must be declared only once`.
+
+**Why:** Sylius `ORMMappedSuperClassSubscriber` removes the to-many associations (`routes`, `children`, `items`…) 
+from the plugin models. Doctrine then loses track of which class declares them, and maps them a second time on the subclass.
+
+**Fix:** the plugin now registers `Adeliom\SyliusHappyCMSPlugin\EventListener\Doctrine\MappedSuperclassAssociationDeclaringClassListener`
+(Doctrine `loadClassMetadata` listener, priority -100). It marks these associations as declared by the plugin class, 
+so the subclass no longer redeclares them.
+
+**Impact:**
+
+- Nothing to configure, no schema change, no migration.
+- Entities without inheritance below them (e.g. `App\Entity\Page` with no subclass) keep exactly the same metadata.
+- If your project has its own listener doing the same, you can remove it.
+
+### New option: save flexible contents as a JSON list
+
+A flexible content field (`FlexibleContentField`) used to be saved with the form names as keys (`{"3": …,
+"a1b2-c3d": …}`, a JSON object) as soon as a block was moved, removed or added, with the positions written by the
+admin script (`3`, `4`, …) and a block at position `0` moved to the end (`999`). With `save_as_list`, it is saved as a
+list in display order, with positions renumbered `0`, `1`, `2`… (integers); entries without a numeric position go
+after the others and rows without `block_type` are ignored.
+
+```yaml
+sylius_happy_cms:
+    flexible_content:
+        save_as_list: true
+```
+
+Not setting the option (or setting it to `false`) keeps the legacy save and triggers a deprecation. Templates
+iterating over the content (`for block in content`) are not affected; code reading entries by key or by absolute
+`position` value is. Existing rows are rewritten on their next save only: no migration is needed. The display order
+is unchanged. In 3.0 the option is removed and flexible contents are always saved as a JSON list.
+
+Fixed without option: a content stored as a JSON list (or as an object with numeric keys) no longer raises a
+`TypeError` when its edit form is built or submitted.
+
+`BlockCollectionType` is now a service (it receives the option as a new, optional constructor argument) and
+`ResizeFormListener` takes a new, optional, last constructor argument `$saveAsList`.
+
+### New option: 255-character media and folder slugs (`media.long_slugs`)
+
+`Media::$slug` and `Folder::$slug` (mapped superclasses) are `VARCHAR(100)`, while the `name` they are derived from is
+`VARCHAR(255)`: a file or folder name longer than 100 characters cannot be saved on MySQL in strict mode. The new
+option maps both slugs at 255 characters:
+
+```yaml
+sylius_happy_cms:
+    media:
+        long_slugs: true
+```
+
+Not setting the option (or setting it to `false`) keeps the 100-character mapping and triggers a deprecation.
+When you opt in, clear the cache and generate the migration of your own media and folder tables:
+
+```bash
+bin/console doctrine:migrations:diff
+# ALTER TABLE <media table> CHANGE slug slug VARCHAR(255) NOT NULL
+# ALTER TABLE <folder table> CHANGE slug slug VARCHAR(255) NOT NULL
+```
+
+Widening a `VARCHAR` keeps the data (MySQL may rebuild the table: plan it for large media tables). A slug length your
+entity already overrides (`#[ORM\AttributeOverride]`) to another value than 100 is kept. If your database is already
+at 255 (for instance because you ran the migration of a pre-release of this change), set the option to `true` so that
+the mapping matches it.
+
+In 3.0 the option is removed and 255-character slugs are the only behaviour.
 
 ## 2.3.1
 
