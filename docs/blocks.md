@@ -637,12 +637,24 @@ sylius_happy_cms:
     # Render the entries that have no "block_published" key, e.g. content imported or migrated from another
     # system. An explicit "0", "", false or null still hides the block.
     missing_published_means_published: true
+
+    # A block that fails to render is logged (error level, with its type, position and exception) and skipped;
+    # the rest of the page is rendered. Usually enabled in production only:
+    swallow_render_errors: false
+
+when@prod:
+  sylius_happy_cms:
+    block_render:
+      swallow_render_errors: true
 ```
+
+`swallow_render_errors` accepts an environment variable (`'%env(bool:HAPPY_CMS_SWALLOW_BLOCK_ERRORS)%'`), handy to
+make broken blocks visible on a staging environment that runs in `prod`.
 
 With `inherit_context`, the Twig function calls `Helper::renderBlockInContext()` with the context of the calling
 template; without it, it calls `Helper::renderBlock()` as before (an override of `renderBlock()` in a project helper
 keeps being used). `Helper::renderBlock()` never receives a context: PHP callers pass the variables they need as the
-third argument. `missing_published_means_published` applies to both methods. Blocks whose `block_type` is not a
+third argument. `missing_published_means_published` and `swallow_render_errors` apply to both methods. Blocks whose `block_type` is not a
 registered block are skipped silently.
 
 ### Rendering assets

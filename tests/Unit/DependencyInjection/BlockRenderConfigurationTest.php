@@ -8,6 +8,7 @@ use Adeliom\SyliusHappyCMSPlugin\DependencyInjection\SyliusHappyCMSExtension;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\Helper;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Yaml\Yaml;
 
@@ -19,6 +20,7 @@ final class BlockRenderConfigurationTest extends TestCase
 
         self::assertFalse($container->getParameter('sylius_happy_cms.block_render.inherit_context'));
         self::assertFalse($container->getParameter('sylius_happy_cms.block_render.missing_published_means_published'));
+        self::assertFalse($container->getParameter('sylius_happy_cms.block_render.swallow_render_errors'));
     }
 
     public function testInheritContextReachesTheBlockHelper(): void
@@ -38,6 +40,20 @@ final class BlockRenderConfigurationTest extends TestCase
             '%sylius_happy_cms.block_render.missing_published_means_published%',
             $container->getDefinition(Helper::class)->getArgument('$missingPublishedMeansPublished'),
         );
+    }
+
+    public function testSwallowRenderErrorsReachesTheBlockHelperWithAnOptionalLogger(): void
+    {
+        $container = $this->load(['block_render' => ['swallow_render_errors' => true]]);
+        $definition = $container->getDefinition(Helper::class);
+
+        self::assertTrue($container->getParameter('sylius_happy_cms.block_render.swallow_render_errors'));
+        self::assertSame('%sylius_happy_cms.block_render.swallow_render_errors%', $definition->getArgument('$swallowRenderErrors'));
+
+        $logger = $definition->getArgument('$logger');
+        self::assertInstanceOf(Reference::class, $logger);
+        self::assertSame('logger', (string) $logger);
+        self::assertSame(ContainerInterface::IGNORE_ON_INVALID_REFERENCE, $logger->getInvalidBehavior());
     }
 
     public function testTheFirstBlockHelperArgumentsStayPositional(): void
