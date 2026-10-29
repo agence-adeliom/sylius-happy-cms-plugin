@@ -188,6 +188,31 @@ the mapping matches it.
 
 In 3.0 the option is removed and 255-character slugs are the only behaviour.
 
+### New Doctrine type `happy_cms_media_reference_type`
+
+Opt-in, nothing changes for existing mappings: `happy_cms_media_type` still reads the raw id.
+
+The new type stores the media id like `happy_cms_media_type` (same `BIGINT` column, no schema change when switching)
+but reads it back as a lazy `MediaInterface` reference, without any query until a field other than the id is read.
+See [docs/medias.md](docs/medias.md#use-the-doctrine-types-optional) for the behaviour with deleted medias
+(reference returned, `EntityNotFoundException` on access, `null` through `MediaManager::getMedia()` and the Twig
+helpers) and batch loading.
+
+To use it on a column:
+
+```php
+#[ORM\Column(type: MediaReferenceType::TYPE, nullable: true)]
+private ?MediaInterface $image = null;
+```
+
+Related changes:
+
+- `SyliusHappyCMSPlugin` now implements `boot()` / `shutdown()` (installs the reference factory of the type);
+- `MediaHelper::getMedia()` / `MediaManager::getMedia()` initialize a lazy media they are given (or that `find()`
+  returns from the unit of work) and return `null` when the media no longer exists. For an existing media the result
+  is the same object as before (a Doctrine proxy, e.g. from a `ManyToOne` to the media, is now loaded at that call
+  instead of on its first field access); for a deleted one, `null` instead of a proxy that throws on access.
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required
