@@ -2,6 +2,31 @@
 
 ## Unreleased (2.3.x)
 
+### New option: block templates receive the context of the calling template
+
+```yaml
+sylius_happy_cms:
+    block_render:
+        inherit_context: true # default: false
+```
+
+When enabled, the templates of the blocks rendered by `happy_cms_block_render()` (blocks stored as JSON) receive the
+context of the calling template (`page`, `resource`, loop variables…), overridden by the block variables (`block`,
+`blockType`, `preview`, `settings`), themselves overridden by the third argument, like the rendering functions of
+EasyEditor did. Nothing changes when the option is not set. See
+[docs/blocks.md](docs/blocks.md#blocks-stored-as-json-flexible-content-field).
+
+Related changes, without effect when the option is not set:
+
+- `happy_cms_block_render()` is now declared with `needs_context` and calls the new
+  `Helper::renderBlockInContext(array $context, array $data, bool $preview = false, array $extra = [])`. Templates
+  call it with the same arguments as before. With the option disabled, `renderBlockInContext()` calls
+  `Helper::renderBlock()`, whose signature is unchanged, so a project helper overriding `renderBlock()` keeps being
+  used. With the option enabled, override `renderBlockInContext()` instead.
+- The `Adeliom\SyliusHappyCMSPlugin\Factory\Block\Helper` constructor gets a new optional last argument,
+  `bool $inheritContext = false`. The service keeps its four positional arguments and gets `$inheritContext` by
+  name. A project that redefines the service keeps the legacy behaviour.
+
 ### SEO Twig functions typed on `SeoInterface`
 
 `seo_metas()` and `seo_title()` now accept any `Adeliom\SyliusHappyCMSPlugin\Entity\Seo\SeoInterface` (they used to
