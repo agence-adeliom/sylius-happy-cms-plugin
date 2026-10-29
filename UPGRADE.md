@@ -135,6 +135,31 @@ sylius_happy_cms:
 Leading and trailing `/` are removed (`/medias` and `medias` are the same). The routes are generated with `path()`, so templates and the media
 manager JavaScript follow it.
 
+### New option: save flexible contents as a JSON list
+
+A flexible content field (`FlexibleContentField`) used to be saved with the form names as keys (`{"3": …,
+"a1b2-c3d": …}`, a JSON object) as soon as a block was moved, removed or added, with the positions written by the
+admin script (`3`, `4`, …) and a block at position `0` moved to the end (`999`). With `save_as_list`, it is saved as a
+list in display order, with positions renumbered `0`, `1`, `2`… (integers); entries without a numeric position go
+after the others and rows without `block_type` are ignored.
+
+```yaml
+sylius_happy_cms:
+    flexible_content:
+        save_as_list: true
+```
+
+Not setting the option (or setting it to `false`) keeps the legacy save and triggers a deprecation. Templates
+iterating over the content (`for block in content`) are not affected; code reading entries by key or by absolute
+`position` value is. Existing rows are rewritten on their next save only: no migration is needed. The display order
+is unchanged. In 3.0 the option is removed and flexible contents are always saved as a JSON list.
+
+Fixed without option: a content stored as a JSON list (or as an object with numeric keys) no longer raises a
+`TypeError` when its edit form is built or submitted.
+
+`BlockCollectionType` is now a service (it receives the option as a new, optional constructor argument) and
+`ResizeFormListener` takes a new, optional, last constructor argument `$saveAsList`.
+
 ### New option: 255-character media and folder slugs (`media.long_slugs`)
 
 `Media::$slug` and `Folder::$slug` (mapped superclasses) are `VARCHAR(100)`, while the `name` they are derived from is

@@ -478,6 +478,16 @@ class Configuration implements ConfigurationInterface
             ->end()
             ->end()
 
+            ->arrayNode('flexible_content')
+            ->addDefaultsIfNotSet()
+            ->children()
+            ->booleanNode('save_as_list')
+            ->defaultNull()
+            ->info('When true, a flexible content field (FlexibleContentField) is saved as a JSON list in display order, with positions renumbered 0, 1, 2… and rows without block type ignored, instead of an object keyed by the form names with the submitted positions. Not setting it is deprecated: true becomes the only behaviour in 3.0.')
+            ->end()
+            ->end()
+            ->end()
+
             ->arrayNode('shared_block')
             ->addDefaultsIfNotSet()
             ->children()
