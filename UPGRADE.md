@@ -135,6 +135,27 @@ sylius_happy_cms:
 Leading and trailing `/` are removed (`/medias` and `medias` are the same). The routes are generated with `path()`, so templates and the media
 manager JavaScript follow it.
 
+### Subclassing an entity that extends a plugin model
+
+You can now use single table or joined inheritance below an entity that extends a plugin model, for example:
+
+    App\Entity\Pages\LandingPage extends App\Entity\Page extends Adeliom\SyliusHappyCMSPlugin\Entity\Page\Page
+
+Before, loading such a subclass failed with `Property "routes" in "…LandingPage" was already declared, but it must be declared only once`.
+
+**Why:** Sylius `ORMMappedSuperClassSubscriber` removes the to-many associations (`routes`, `children`, `items`…) 
+from the plugin models. Doctrine then loses track of which class declares them, and maps them a second time on the subclass.
+
+**Fix:** the plugin now registers `Adeliom\SyliusHappyCMSPlugin\EventListener\Doctrine\MappedSuperclassAssociationDeclaringClassListener`
+(Doctrine `loadClassMetadata` listener, priority -100). It marks these associations as declared by the plugin class, 
+so the subclass no longer redeclares them.
+
+**Impact:**
+
+- Nothing to configure, no schema change, no migration.
+- Entities without inheritance below them (e.g. `App\Entity\Page` with no subclass) keep exactly the same metadata.
+- If your project has its own listener doing the same, you can remove it.
+
 ### New option: save flexible contents as a JSON list
 
 A flexible content field (`FlexibleContentField`) used to be saved with the form names as keys (`{"3": …,
