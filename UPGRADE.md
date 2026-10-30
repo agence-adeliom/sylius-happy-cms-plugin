@@ -2,6 +2,27 @@
 
 ## Unreleased (2.3.x)
 
+### Tom Select default theme no longer auto-imported (admin dark mode)
+
+`assets/controllers.json` no longer enables the `tom-select/dist/css/tom-select.default.css` autoimport of
+`@symfony/ux-autocomplete`. That stylesheet hard-codes a white `.ts-dropdown` background and, loaded after the
+Sylius admin styles, overrode the Sylius Tom Select theme: select dropdowns (for example the shared block picker of
+the page builder) stayed white in the admin dark mode.
+
+If your application keeps its own `assets/controllers.json` (it takes precedence over the plugin one), apply the
+same change, then rebuild the assets:
+
+```diff
+ "@symfony/ux-autocomplete": {
+     "autocomplete": {
+         "autoimport": {
+-            "tom-select/dist/css/tom-select.default.css": true,
++            "tom-select/dist/css/tom-select.default.css": false,
+```
+
+If one of your own screens relies on that default theme outside the Sylius admin, keep it set to `true` and
+override `.ts-dropdown` with the theme variables in your own stylesheet.
+
 ### SEO Twig functions typed on `SeoInterface`
 
 `seo_metas()` and `seo_title()` now accept any `Adeliom\SyliusHappyCMSPlugin\Entity\Seo\SeoInterface` (they used to

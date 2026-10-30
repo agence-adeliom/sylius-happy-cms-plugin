@@ -15,11 +15,12 @@ use Webmozart\Assert\Assert;
 final class MediaCsrfContext implements Context
 {
     private Session $session;
+
     private SharedStorageInterface $sharedStorage;
 
     public function __construct(
         Session $session,
-        SharedStorageInterface $sharedStorage
+        SharedStorageInterface $sharedStorage,
     ) {
         $this->session = $session;
         $this->sharedStorage = $sharedStorage;
@@ -171,7 +172,7 @@ final class MediaCsrfContext implements Context
         Assert::contains($message, strtolower($text), sprintf(
             'Error message "%s" does not contain "%s"',
             $response['message'],
-            $text
+            $text,
         ));
     }
 
@@ -192,7 +193,7 @@ final class MediaCsrfContext implements Context
         Assert::keyExists($response, 'success', 'Response does not have success key');
         Assert::true($response['success'], sprintf(
             'Operation failed: %s',
-            \is_string($response['message'] ?? null) ? $response['message'] : 'Unknown error'
+            \is_string($response['message'] ?? null) ? $response['message'] : 'Unknown error',
         ));
     }
 
@@ -281,13 +282,13 @@ final class MediaCsrfContext implements Context
         $this->session->executeScript("
             axios.post('" . $this->getDeleteUrl() . "', {
                 _csrf_token: '" . $token . "',
-                deleted_files: [" . json_encode($media) . "]
+                deleted_files: [" . json_encode($media) . ']
             }).then(response => {
                 window.lastResponse = response.data;
             }).catch(error => {
                 window.lastResponse = error.response ? error.response.data : {success: false, message: error.message};
             });
-        ");
+        ');
 
         $this->session->wait(2000);
     }

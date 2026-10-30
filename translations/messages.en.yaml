@@ -89,7 +89,13 @@ sylius_happy_cms:
     admin:
       action:
         index: Back to list
+      channel_value_choice:
+        inherit: 'Inherit the default value'
+        yes: 'Yes'
+        no: 'No'
       field:
+        channel_value: 'Specific value for the %channel% channel'
+        channels: Channels
         key: Key
         name: Name
         description: Description
@@ -135,6 +141,7 @@ sylius_happy_cms:
   shared_block:
     admin:
       field:
+        channels: Channels
         name: Name
         key: Key
         type: Type
@@ -158,6 +165,7 @@ sylius_happy_cms:
   menu:
     admin:
       field:
+        channels: Channels
         name: Name
         code: Code
         status: Active
@@ -199,6 +207,8 @@ sylius_happy_cms:
       data:
         menu_item_root: Root item
   admin:
+    channels:
+      help: Leave empty to make this content available on all channels
     menu:
       cms: CMS
       pages: Pages

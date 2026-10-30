@@ -10,9 +10,12 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Action\Action;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Actions;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\Field;
+use Adeliom\SyliusHappyCMSPlugin\Admin\Channel\ChannelsFieldTrait;
 
 abstract class AbstractMenuAdmin extends AbstractAdmin implements MenuAdminInterface
 {
+    use ChannelsFieldTrait;
+
     public static function getSubscribedServices(): array
     {
         return [];
@@ -58,5 +61,7 @@ abstract class AbstractMenuAdmin extends AbstractAdmin implements MenuAdminInter
         yield Field::new('code', 'sylius_happy_cms.menu.admin.field.code');
 
         yield Field::new('status', 'sylius_happy_cms.menu.admin.field.status');
+
+        yield $this->createChannelsField('sylius_happy_cms.menu.admin.field.channels');
     }
 }

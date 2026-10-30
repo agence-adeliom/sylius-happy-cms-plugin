@@ -84,7 +84,7 @@ final class PageBuilderContext implements Context
         Assert::same(
             $statusCode,
             200,
-            sprintf('Expected status code 200, but got %d. Current URL: %s', $statusCode, $this->session->getCurrentUrl())
+            sprintf('Expected status code 200, but got %d. Current URL: %s', $statusCode, $this->session->getCurrentUrl()),
         );
     }
 }

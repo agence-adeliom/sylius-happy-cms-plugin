@@ -11,12 +11,19 @@ use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TabField;
 use Adeliom\SyliusEasyCrudPlugin\Admin\Field\TranslationField;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\Field;
 use Adeliom\SyliusEasyCrudPlugin\Enum\ColumnSizeEnum;
+use Adeliom\SyliusHappyCMSPlugin\Admin\Channel\ChannelsFieldTrait;
 use Adeliom\SyliusHappyCMSPlugin\DataMapperInterface\ConfigTranslatableDataMapper;
+use Adeliom\SyliusHappyCMSPlugin\Entity\Channel\ChannelAwareInterface;
+use Adeliom\SyliusHappyCMSPlugin\Entity\Config\ConfigTranslation;
 use Adeliom\SyliusHappyCMSPlugin\Enum\Config\ConfigTypeEnum;
+use Sylius\Component\Channel\Model\ChannelInterface;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Translation\TranslatableMessage;
 
 abstract class AbstractConfigAdmin extends AbstractAdmin implements ConfigAdminInterface
 {
+    use ChannelsFieldTrait;
+
     public static function getSubscribedServices(): array
     {
         return [];
@@ -49,6 +56,8 @@ abstract class AbstractConfigAdmin extends AbstractAdmin implements ConfigAdminI
 
         yield Field::new('description', 'sylius_happy_cms.config.admin.field.description');
 
+        yield $this->createChannelsField('sylius_happy_cms.config.admin.field.channels');
+
         yield ColumnField::new('sylius_happy_cms.config.admin.tab.value')
             ->setSize(ColumnSizeEnum::WIDE_6_OF_12);
 
@@ -67,12 +76,53 @@ abstract class AbstractConfigAdmin extends AbstractAdmin implements ConfigAdminI
             ->isTranslation(true)
             ->hideOnIndex();
 
+        $channels = $this->getEligibleChannels();
+
         foreach ($typeKeys as $typeKey) {
-            yield TranslationField::new(sprintf('translations_%s', $typeKey), 'sylius_happy_cms.config.admin.type.' . $typeKey)
+            $translationField = TranslationField::new(sprintf('translations_%s', $typeKey), 'sylius_happy_cms.config.admin.type.' . $typeKey)
                 ->addField(
                     ConfigTypeEnum::getAdminField($typeKey),
-                )
-                ->onlyOnForms();
+                );
+
+            // une valeur facultative par channel, du même type que la valeur par défaut (vide = pas de surcharge)
+            foreach ($channels as $channel) {
+                $translationField->addField(
+                    ConfigTypeEnum::getAdminField(
+                        $typeKey,
+                        ConfigTranslation::CHANNEL_FIELD_PREFIX . $channel->getCode(),
+                        new TranslatableMessage('sylius_happy_cms.config.admin.field.channel_value', ['%channel%' => $channel->getName() ?? $channel->getCode()]),
+                    ),
+                );
+            }
+
+            yield $translationField->onlyOnForms();
         }
+    }
+
+    /**
+     * Channels pour lesquels une valeur propre peut être saisie : ceux rattachés à la config,
+     * ou tous les channels Sylius si elle n'en a aucun (disponible partout).
+     *
+     * @return list<ChannelInterface>
+     */
+    private function getEligibleChannels(): array
+    {
+        $resource = $this->getResource();
+        if ($resource instanceof ChannelAwareInterface && !$resource->isAvailableForAllChannels()) {
+            return array_values($resource->getChannels()->toArray());
+        }
+
+        /** @var array<string, mixed> $resources */
+        $resources = $this->parameterBag->get('sylius.resources');
+        $channelClasses = is_array($resources['sylius.channel'] ?? null) ? ($resources['sylius.channel']['classes'] ?? null) : null;
+        $modelClass = is_array($channelClasses) ? ($channelClasses['model'] ?? null) : null;
+        if (!is_string($modelClass) || !class_exists($modelClass)) {
+            return [];
+        }
+
+        /** @var list<ChannelInterface> $channels */
+        $channels = $this->entityManager->getRepository($modelClass)->findBy([], ['code' => 'ASC']);
+
+        return $channels;
     }
 }

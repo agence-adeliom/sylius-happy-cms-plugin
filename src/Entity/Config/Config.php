@@ -5,17 +5,23 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\Entity\Config;
 
 use Adeliom\SyliusEasyCrudPlugin\Traits\EntityIdTrait;
+use Adeliom\SyliusHappyCMSPlugin\Entity\Channel\ChannelAwareInterface;
+use Adeliom\SyliusHappyCMSPlugin\Entity\Channel\ChannelAwareTrait;
+use Adeliom\SyliusHappyCMSPlugin\Enum\Config\ConfigTypeEnum;
 use Adeliom\SyliusHappyCMSPlugin\Repository\Config\ConfigRepository;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Sylius\Component\Channel\Model\ChannelInterface;
 use Sylius\Resource\Model\TranslatableTrait;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[UniqueEntity('key')]
 #[ORM\HasLifecycleCallbacks]
 #[ORM\MappedSuperclass(repositoryClass: ConfigRepository::class)]
-class Config implements ConfigInterface
+class Config implements ConfigInterface, ChannelAwareInterface
 {
+    use ChannelAwareTrait;
     use EntityIdTrait;
     use TranslatableTrait {
         __construct as private initializeTranslationsCollection;
@@ -31,12 +37,24 @@ class Config implements ConfigInterface
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
+    // Un type est toujours présélectionné : sans valeur au chargement, le formulaire admin n'a pas de type
+    // à partir duquel masquer les blocs de traductions des autres types.
     #[ORM\Column(type: Types::STRING, length: 255)]
-    private ?string $type = null;
+    private ?string $type = ConfigTypeEnum::TEXT;
+
+    /** @var Collection<int, ChannelInterface> */
+    #[ORM\ManyToMany(targetEntity: ChannelInterface::class)]
+    #[ORM\JoinTable(
+        name: 'sylius_happy_cms__config_channels',
+        joinColumns: [new ORM\JoinColumn(name: 'config_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
+        inverseJoinColumns: [new ORM\JoinColumn(name: 'channel_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
+    )]
+    protected Collection $channels;
 
     public function __construct()
     {
         $this->initializeTranslationsCollection();
+        $this->initializeChannels();
     }
 
     protected function createTranslation(): ConfigTranslationInterface

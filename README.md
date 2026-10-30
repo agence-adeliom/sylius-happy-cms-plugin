@@ -68,6 +68,7 @@ Pick the line matching the Sylius version of your project. Running `composer req
 ### Upgrading between versions
 
 - **Sylius 1.x → Sylius 2.0** (plugin 1.14 → 2.0, BC break): [Sylius 2 migration guide](./docs/migration/SYLIUS_2.md).
+- **Channels** (optional channel attachment for menus, shared blocks and configs, no BC break): [update note](./docs/migration/CHANNELS.md).
 - **Plugin 2.0 → 2.1** (new content model persistence and new page builder, BC break): [content block migration guide](./docs/migration/CONTENT_BLOCK.md).
 - **Plugin 2.1 → 2.3** (Sylius 2.3 / Symfony 8 support): upgrade Sylius to 2.3, then require `agence-adeliom/sylius-happy-cms-plugin:^2.3`.
 
@@ -297,6 +298,7 @@ They boot the application kernel in `dev` and, except `happy_cms_list_blocks`, r
 - **[Medias](./docs/medias.md)**
 - **[Blocks](./docs/blocks.md)**
 - **[Menu](./docs/menu.md)**
+- **[Channels](./docs/channels.md)**
 - **[AI](./docs/ai.md)**
 - **[Full plugin configuration](./docs/configuration.md)**
 - **[Contribution](./docs/contribution.md)**

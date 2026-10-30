@@ -168,3 +168,8 @@ services:
       - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addAdminMenuItems }
 
 ```
+
+## Reading configuration values
+
+Configuration values (the `config` entity above) can be read in Twig with `happy_cms_config('key')`, optionally for a given channel,
+or in PHP with `ConfigValueResolver`. A value can be overridden per Sylius channel. See [channels](./channels.md).
