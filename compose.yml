@@ -1,6 +1,10 @@
 services:
     php:
         image: ghcr.io/sylius/sylius-php:8.5-alpine
+        environment:
+            # The plugin is the root package: without a git tag Composer sees it as 1.0.0+no-version-set,
+            # which trips the "conflict" constraints declared by easy-crud (<2.3.1).
+            COMPOSER_ROOT_VERSION: ${COMPOSER_ROOT_VERSION:-2.3.1}
     mysql:
         image: mysql:8.4
         platform: linux/amd64
