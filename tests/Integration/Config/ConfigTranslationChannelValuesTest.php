@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Tests\Adeliom\SyliusHappyCMSPlugin\Integration\Config;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Config\Config;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Config\ConfigTranslation;
+use Tests\Adeliom\SyliusHappyCMSPlugin\Support\DatabaseSchema;
 
 final class ConfigTranslationChannelValuesTest extends KernelTestCase
 {
@@ -20,10 +20,7 @@ final class ConfigTranslationChannelValuesTest extends KernelTestCase
         $entityManager = self::getContainer()->get('doctrine.orm.entity_manager');
         self::assertInstanceOf(EntityManagerInterface::class, $entityManager);
         $this->entityManager = $entityManager;
-        $schemaTool = new SchemaTool($this->entityManager);
-        $metadata = $this->entityManager->getMetadataFactory()->getAllMetadata();
-        $schemaTool->dropSchema($metadata);
-        $schemaTool->createSchema($metadata);
+        DatabaseSchema::reset($this->entityManager);
     }
 
     public function testEmptyByDefault(): void

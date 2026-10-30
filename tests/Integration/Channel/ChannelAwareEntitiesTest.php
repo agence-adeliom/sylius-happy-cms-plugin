@@ -7,7 +7,6 @@ namespace Tests\Adeliom\SyliusHappyCMSPlugin\Integration\Channel;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Channel\ChannelAwareInterface;
 use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Sylius\Component\Core\Model\Channel;
 use Sylius\Component\Currency\Model\Currency;
@@ -16,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Config\Config;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Menu\Menu;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\SharedBlock\SharedBlock;
+use Tests\Adeliom\SyliusHappyCMSPlugin\Support\DatabaseSchema;
 
 final class ChannelAwareEntitiesTest extends KernelTestCase
 {
@@ -28,10 +28,7 @@ final class ChannelAwareEntitiesTest extends KernelTestCase
         self::assertInstanceOf(EntityManagerInterface::class, $entityManager);
         $this->entityManager = $entityManager;
 
-        $schemaTool = new SchemaTool($this->entityManager);
-        $metadata = $this->entityManager->getMetadataFactory()->getAllMetadata();
-        $schemaTool->dropSchema($metadata);
-        $schemaTool->createSchema($metadata);
+        DatabaseSchema::reset($this->entityManager);
 
         if ($this->entityManager->getConnection()->getDatabasePlatform() instanceof SQLitePlatform) {
             $this->entityManager->getConnection()->executeStatement('PRAGMA foreign_keys = ON');

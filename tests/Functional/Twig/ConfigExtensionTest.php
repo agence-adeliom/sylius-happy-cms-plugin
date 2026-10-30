@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Tests\Adeliom\SyliusHappyCMSPlugin\Functional\Twig;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Config\Config;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Config\ConfigTranslation;
+use Tests\Adeliom\SyliusHappyCMSPlugin\Support\DatabaseSchema;
 use Twig\Environment;
 
 final class ConfigExtensionTest extends KernelTestCase
@@ -18,10 +18,7 @@ final class ConfigExtensionTest extends KernelTestCase
         self::bootKernel();
         $entityManager = self::getContainer()->get('doctrine.orm.entity_manager');
         self::assertInstanceOf(EntityManagerInterface::class, $entityManager);
-        $schemaTool = new SchemaTool($entityManager);
-        $metadata = $entityManager->getMetadataFactory()->getAllMetadata();
-        $schemaTool->dropSchema($metadata);
-        $schemaTool->createSchema($metadata);
+        DatabaseSchema::reset($entityManager);
 
         $config = new Config();
         $config->setKey('site_title');

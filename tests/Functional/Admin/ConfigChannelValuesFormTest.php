@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Adeliom\SyliusHappyCMSPlugin\Functional\Admin;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Tools\SchemaTool;
 use Sylius\Component\Core\Model\Channel;
 use Sylius\Component\Currency\Model\Currency;
 use Sylius\Component\Locale\Model\Locale;
@@ -16,6 +15,7 @@ use Symfony\Component\Form\FormInterface;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\Config\ConfigAdmin;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Config\Config;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Config\ConfigTranslation;
+use Tests\Adeliom\SyliusHappyCMSPlugin\Support\DatabaseSchema;
 
 final class ConfigChannelValuesFormTest extends KernelTestCase
 {
@@ -28,10 +28,7 @@ final class ConfigChannelValuesFormTest extends KernelTestCase
         self::assertInstanceOf(EntityManagerInterface::class, $entityManager);
         $this->entityManager = $entityManager;
 
-        $schemaTool = new SchemaTool($this->entityManager);
-        $metadata = $this->entityManager->getMetadataFactory()->getAllMetadata();
-        $schemaTool->dropSchema($metadata);
-        $schemaTool->createSchema($metadata);
+        DatabaseSchema::reset($this->entityManager);
     }
 
     public function testNoChannelFieldWhenNoChannelExists(): void

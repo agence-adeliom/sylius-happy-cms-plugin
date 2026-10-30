@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Adeliom\SyliusHappyCMSPlugin\Functional\Admin;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Sylius\Bundle\ChannelBundle\Form\Type\ChannelChoiceType;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -18,6 +17,7 @@ use Tests\Adeliom\SyliusHappyCMSPlugin\Admin\HappyCMS\SharedBlock\SharedBlockAdm
 use Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Config\Config;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Menu\Menu;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\SharedBlock\SharedBlock;
+use Tests\Adeliom\SyliusHappyCMSPlugin\Support\DatabaseSchema;
 
 final class ChannelFieldTest extends KernelTestCase
 {
@@ -26,10 +26,7 @@ final class ChannelFieldTest extends KernelTestCase
         self::bootKernel();
         $entityManager = self::getContainer()->get('doctrine.orm.entity_manager');
         self::assertInstanceOf(EntityManagerInterface::class, $entityManager);
-        $schemaTool = new SchemaTool($entityManager);
-        $metadata = $entityManager->getMetadataFactory()->getAllMetadata();
-        $schemaTool->dropSchema($metadata);
-        $schemaTool->createSchema($metadata);
+        DatabaseSchema::reset($entityManager);
     }
 
     /**
