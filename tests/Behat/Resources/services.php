@@ -3,10 +3,9 @@
 declare(strict_types=1);
 
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Behat\Context\PageBuilderContext;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Behat\Context\Ui\Admin\MediaCsrfContext;
-
-use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return function (ContainerConfigurator $container): void {
     $services = $container->services()

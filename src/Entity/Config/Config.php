@@ -7,6 +7,7 @@ namespace Adeliom\SyliusHappyCMSPlugin\Entity\Config;
 use Adeliom\SyliusEasyCrudPlugin\Traits\EntityIdTrait;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Channel\ChannelAwareInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Channel\ChannelAwareTrait;
+use Adeliom\SyliusHappyCMSPlugin\Enum\Config\ConfigTypeEnum;
 use Adeliom\SyliusHappyCMSPlugin\Repository\Config\ConfigRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -36,8 +37,10 @@ class Config implements ConfigInterface, ChannelAwareInterface
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
+    // Un type est toujours présélectionné : sans valeur au chargement, le formulaire admin n'a pas de type
+    // à partir duquel masquer les blocs de traductions des autres types.
     #[ORM\Column(type: Types::STRING, length: 255)]
-    private ?string $type = null;
+    private ?string $type = ConfigTypeEnum::TEXT;
 
     /** @var Collection<int, ChannelInterface> */
     #[ORM\ManyToMany(targetEntity: ChannelInterface::class)]
