@@ -94,7 +94,7 @@ sylius_happy_cms:
         yes: 'Yes'
         no: 'No'
       field:
-        channel_value: 'Value for the %channel% channel'
+        channel_value: 'Specific value for the %channel% channel'
         channels: Channels
         key: Key
         name: Name
