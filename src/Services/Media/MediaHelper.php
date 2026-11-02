@@ -123,11 +123,14 @@ class MediaHelper
                      * @var ?MediaInterface $media
                      */
                     $media = $mediaRepository->find($media);
-
-                    return $media;
                 }
             }
             if ($media instanceof MediaInterface) {
+                // A lazy reference (happy_cms_media_reference_type) is loaded here, also when find() returns
+                // one from the identity map: a reference to a deleted media throws EntityNotFoundException,
+                // so it resolves to null like an unknown id.
+                $this->em->initializeObject($media);
+
                 return $media;
             }
         } catch (\Exception $e) {

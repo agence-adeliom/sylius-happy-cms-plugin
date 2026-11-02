@@ -265,34 +265,83 @@ $manager->save($entity, $flush = true);
 $manager->delete($entity, $flush = true);
 ```
 
-### Use the Doctrine type (optional)
+### Use the Doctrine types (optional)
 
-It stores a reference to a media as its id (`BIGINT` column, no foreign key).
-It is designed for places where a Doctrine association is not possible, such as `#[ORM\Embeddable]` classes (e.g. `Seo::$cover`).
+Two DBAL types store a reference to a media as its id (`BIGINT` column, no foreign key).
+They are designed for places where a Doctrine association is not possible, such as `#[ORM\Embeddable]` classes
+(e.g. `Seo::$cover`), or where a foreign key is not wanted (many media columns, ids also stored in JSON content).
+Both are registered by `@SyliusHappyCMSPlugin/config/config.yaml`.
 
-- On write, it accepts a `MediaInterface`, an int or a numeric string (the value submitted by the media form field) and persists the media id.
-- On read, the property contains the raw id, **not** a Media entity. Resolve it when rendering, e.g. with `{{ happy_cms_media(entity.file, 'sylius_small') }}`.
+On write, both accept a `MediaInterface`, an int or a numeric string (the value submitted by the media form field)
+and persist the media id. They differ on read:
 
-If you need a real Media entity on your own (non-embeddable) entity, prefer a regular `ManyToOne` association.
+| Type | Property value on read | Typical property type |
+|------|------------------------|-----------------------|
+| `happy_cms_media_type` | the raw id (int), resolve it when rendering, e.g. `{{ happy_cms_media(entity.file, 'sylius_small') }}` | `MediaInterface\|int\|null` |
+| `happy_cms_media_reference_type` | a lazy `MediaInterface` reference (`EntityManager::getReference()`), so templates can read `entity.file.name` or pass it to the Twig helpers | `?MediaInterface` |
+
+```php
+use Adeliom\SyliusHappyCMSPlugin\Doctrine\MediaReferenceType;
+use Adeliom\SyliusHappyCMSPlugin\Entity\Media\MediaInterface;
+
+class Article
+{
+    // id only
+    #[ORM\Column(type: 'happy_cms_media_type', nullable: true)]
+    private MediaInterface|int|null $file = null;
+
+    // lazy MediaInterface
+    #[ORM\Column(type: MediaReferenceType::TYPE, nullable: true)]
+    private ?MediaInterface $image = null;
+}
+```
+
+If you need a real Media entity with a foreign key on your own (non-embeddable) entity, a regular `ManyToOne`
+association remains an option.
+
+#### `happy_cms_media_reference_type`: lazy references
+
+- **No query on read.** Loading an entity creates an uninitialized reference to the configured media entity
+  (`sylius_happy_cms.media.media_entity`) holding only the id. `getId()` does not load it; the first access to another
+  field runs one `SELECT` for that media. A media already loaded in the unit of work is returned as is, and the same id
+  in two columns gives the same object. Listing entities that have several media columns therefore costs no media
+  query for the columns the page does not display (the former "one `find()` per column" pattern).
+- **Batch loading.** Each displayed media still costs one query when it is first read. To display many of them, load
+  them in one query beforehand: Doctrine initializes the references already in the unit of work.
+
+  ```php
+  $articles = $articleRepository->findLatest();
+  $mediaRepository->findBy(['id' => array_filter(array_map(fn ($a) => $a->getImage()?->getId(), $articles))]);
+  // $article->getImage()->getName() now runs no query
+  ```
+
+- **`NULL`, `0` or an empty value** read as `null`.
+- **Id of a deleted media** (no foreign key, so it can happen): the reference is still returned, since checking it
+  would need the query the type avoids. Reading one of its fields throws `Doctrine\ORM\EntityNotFoundException`.
+  `MediaManager::getMedia()` / `MediaHelper::getMedia()`, and therefore the `happy_cms_media*`, `resolve_media`,
+  `media_meta`, `media_infos` and `file_is_type` Twig helpers, resolve it to `null`, like an unknown id.
+  Prefer these helpers over direct property access (`entity.image.name`) where orphans may exist, or clean them up:
+  `UPDATE article SET image = NULL WHERE image NOT IN (SELECT id FROM media)`.
+- The reference factory is installed when the bundle boots (`SyliusHappyCMSPlugin::boot()`); outside of a booted
+  kernel, call `MediaReferenceType::setReferenceFactory()`.
+- Unchanged references are not rewritten on flush.
+
+Form: the media form field submits the media id. On a `happy_cms_media_reference_type` column, type the property
+`MediaInterface|int|null` if it is edited through that field (the id is converted on write, and read back as a
+reference on the next load).
+
+Switching every `happy_cms_media_type` column of a project (including `Seo::$cover`, typed `MediaInterface|int|null`)
+to lazy references is possible by mapping the type name to the other class in the project configuration:
 
 ```yaml
 # config/packages/doctrine.yaml
 doctrine:
     dbal:
         types:
-            happy_cms_media_type: Adeliom\SyliusHappyCMSPlugin\Doctrine\MediaType
+            happy_cms_media_type: Adeliom\SyliusHappyCMSPlugin\Doctrine\MediaReferenceType
 ```
 
-In your entity
-
-```php
-class Article
-{
-    #[ORM\Column(type: 'happy_cms_media_type', nullable: true)]
-    private MediaInterface|int|null $file;
-    
-    ...
-```
+The column definition is the same (`BIGINT`), so neither type change needs a schema migration.
 
 ### Configurations
 
