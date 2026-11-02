@@ -209,6 +209,12 @@ the mapping matches it.
 
 In 3.0 the option is removed and 255-character slugs are the only behaviour.
 
+### Media manager global search restored
+
+The `media.global_search` route pointed to `MediaController::globalSearch()`, whose body was commented out: every call
+failed. It now searches the media of every folder by name (`?search=`), whatever the repository of the media entity.
+Bug fix, no option.
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required
