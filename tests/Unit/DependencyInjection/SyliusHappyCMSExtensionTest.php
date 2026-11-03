@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Adeliom\SyliusHappyCMSPlugin\Unit\DependencyInjection;
 
 use Adeliom\SyliusHappyCMSPlugin\DependencyInjection\SyliusHappyCMSExtension;
+use Adeliom\SyliusHappyCMSPlugin\Services\Config\ConfigValueResolver;
 use Adeliom\SyliusHappyCMSPlugin\Twig\Seo\SeoExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -55,6 +56,13 @@ final class SyliusHappyCMSExtensionTest extends TestCase
 
         self::assertTrue($container->hasDefinition(SeoExtension::class), 'The service stays available to other services.');
         self::assertFalse($container->getDefinition(SeoExtension::class)->hasTag('twig.extension'));
+    }
+
+    public function testTheConfigValueResolverUsesTheConfigRepositoryAlias(): void
+    {
+        $container = $this->load([]);
+
+        self::assertSame(SyliusHappyCMSExtension::CONFIG_REPOSITORY, (string) $container->getDefinition(ConfigValueResolver::class)->getArgument(0));
     }
 
     /**
