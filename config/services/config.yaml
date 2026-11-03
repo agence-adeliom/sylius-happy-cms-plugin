@@ -12,7 +12,12 @@ services:
 
     Adeliom\SyliusHappyCMSPlugin\Twig\Config\ConfigExtension:
         public: true
+        tags:
+            - { name: twig.extension }
+
+    # Lazy: the config repository is only built on the first happy_cms_config() call.
+    Adeliom\SyliusHappyCMSPlugin\Twig\Config\ConfigRuntime:
         arguments:
             - '@Adeliom\SyliusHappyCMSPlugin\Services\Config\ConfigValueResolver'
         tags:
-            - { name: twig.extension }
+            - { name: twig.runtime }
