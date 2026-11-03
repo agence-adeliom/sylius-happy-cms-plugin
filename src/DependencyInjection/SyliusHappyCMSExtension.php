@@ -28,6 +28,13 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
 
     public const LONG_SLUGS_LISTENER = 'happy.cms.media.event_listener.long_slugs';
 
+    /**
+     * Alias of the repository service of the Sylius resource whose model is
+     * `sylius_happy_cms.config.config_model`, whatever the name of that resource in the project
+     * (`sylius_happy_cms.config`, `app.config`…). Set by ConfigRepositoryPass.
+     */
+    public const CONFIG_REPOSITORY = 'sylius_happy_cms.config.repository';
+
     /** @psalm-suppress UnusedVariable */
     public function load(array $configs, ContainerBuilder $container): void
     {
