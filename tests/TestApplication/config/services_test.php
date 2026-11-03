@@ -12,6 +12,12 @@ return function (ContainerConfigurator $container) {
         $container->import('../../../vendor/sylius/sylius/src/Sylius/Behat/Resources/config/services.php');
         $container->import('@SyliusHappyCMSPlugin/tests/Behat/Resources/services.php');
 
+        // Public, so the functional tests reach it: autowires the plugin repository interfaces.
+        $container->services()
+            ->set(\Tests\Adeliom\SyliusHappyCMSPlugin\Service\RepositoryInterfacesConsumer::class)
+                ->autowire()
+                ->public();
+
         // Define behat.mink.parameters service BEFORE importing Sylius Behat services
         // This service is normally provided by Behat\MinkExtension during Behat execution
         $container->services()

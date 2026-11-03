@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin;
 
-use Adeliom\SyliusHappyCMSPlugin\DependencyInjection\Compiler\ConfigRepositoryPass;
+use Adeliom\SyliusHappyCMSPlugin\DependencyInjection\Compiler\ResourceRepositoryPass;
 use Sylius\Bundle\CoreBundle\Application\SyliusPluginTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -17,7 +17,9 @@ final class SyliusHappyCMSPlugin extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new ConfigRepositoryPass());
+        $container->addCompilerPass(ResourceRepositoryPass::config());
+        $container->addCompilerPass(ResourceRepositoryPass::page());
+        $container->addCompilerPass(ResourceRepositoryPass::route());
     }
 
     public function getPath(): string

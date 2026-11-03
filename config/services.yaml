@@ -45,11 +45,7 @@ services:
   Adeliom\SyliusHappyCMSPlugin\Repository\Menu\MenuItemRepositoryInterface:
     alias: happy_cms_menu.menu_item.repository
 
-  Adeliom\SyliusHappyCMSPlugin\Repository\Page\PageRepositoryInterface:
-    alias: happy_cms_page.page.repository
-
-  Adeliom\SyliusHappyCMSPlugin\Repository\Cmf\RouteRepositoryInterface:
-    alias: happy_cms_page.route.repository
+  # PageRepositoryInterface and RouteRepositoryInterface: aliased by ResourceRepositoryPass.
 
   sylius.happy_cms.plugin.services.render:
     class: Adeliom\SyliusHappyCMSPlugin\Services\Cmf\RouteRenderService
