@@ -51,6 +51,9 @@ class MediaController extends AbstractController
 
     protected int $paginationAmount = 50;
 
+    /** @var array<string, list<string>> */
+    protected array $extendedMimes = [];
+
     protected FilesystemOperator $filesystem;
 
     protected ObjectManager $em;
@@ -72,6 +75,11 @@ class MediaController extends AbstractController
         }
         if (is_int($bag->get('sylius_happy_cms.media.pagination_amount'))) {
             $this->paginationAmount = $bag->get('sylius_happy_cms.media.pagination_amount');
+        }
+        if (is_array($bag->get('sylius_happy_cms.media.extended_mimes'))) {
+            /** @var array<string, list<string>> $extendedMimes */
+            $extendedMimes = $bag->get('sylius_happy_cms.media.extended_mimes');
+            $this->extendedMimes = $extendedMimes;
         }
         if (is_string($bag->get('kernel.project_dir'))) {
             $this->chunksDir = $bag->get('kernel.project_dir') . '/var/chunks_upload';

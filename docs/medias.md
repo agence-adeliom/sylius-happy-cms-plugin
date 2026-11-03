@@ -117,9 +117,46 @@ To choose the prefix or the host yourself, import `@SyliusHappyCMSPlugin/config/
 The read routes `media.get_files` and `media.get_file_info` answer a `GET` with their parameters in the query string
 (`/get-files?folder=12&search=logo`, `/get-file-info?item=42`) as well as a `POST` with a JSON body.
 
-`media.global_search` (`/global-search?search=door`) returns the media of every folder whose name contains the term
-(one query, the term is not a `LIKE` pattern, files matching `ignore_files` left out), in the format of the folder
-listing plus `dir_path`. Without `search`, every media is listed (as the EasyMedia global search did).
+### Global search
+
+`media.global_search` searches the folders and media of the whole library by name, paginated like `get-files`:
+
+```
+GET /admin/<admin_path>/global-search?q=door&type=all&folder=12&types[]=image&page=2
+```
+
+| Parameter | Description |
+|-----------|-------------|
+| `q` | Search term, at least 2 characters (after trimming). `search` is read when `q` is missing or blank. Below 2 characters, an empty page is returned. `%` and `_` are literal. |
+| `type` | `all` (default): folders then media. `media` or `folder`: only one kind. Any other value: `400`. |
+| `folder` | Optional folder id: searches its sub-folders and the media under it (the folder itself is not a result). Unknown folder: `404`, not an id: `400`. |
+| `types[]` | Optional media categories of the picker restrictions (`image`, `video`, `audio`, `pdf`, `oembed`, `compressed`, `archive`, plurals and `image/*` accepted). They filter the media only; `types[]=folder` alone keeps the folders only. |
+| `page` | Page number (`pagination_amount` items per page). |
+
+Folders and media matching `ignore_files` are left out. The response is the paginated envelope of `get-files`
+(`current_page`, `data`, `total`, `per_page`, `last_page`, `next_page_url`, `prev_page_url`…), whose page URLs keep the
+search parameters:
+
+```json
+{
+  "items": {
+    "current_page": 1, "total": 2, "per_page": 50, "last_page": 1, "next_page_url": null, "prev_page_url": null,
+    "data": [
+      { "id": 7, "name": "Doors", "type": "folder", "path": "products/doors", "storage_path": "products/doors",
+        "folder_id": 3, "dir_path": "products", "breadcrumb": [{ "id": 3, "name": "Products" }] },
+      { "id": 42, "name": "door", "type": "image/jpeg", "size": 1200, "path": "https://…/products/doors/door.jpg",
+        "download_url": "…", "storage_path": "products/doors/door.jpg", "last_modified": 1730000000,
+        "last_modified_formated": "…", "metas": {},
+        "folder_id": 7, "dir_path": "products/doors",
+        "breadcrumb": [{ "id": 3, "name": "Products" }, { "id": 7, "name": "Doors" }] }
+    ]
+  }
+}
+```
+
+Every item has the fields of the folder listing plus its parent folder: `folder_id` (`null` at the root, to open the
+folder), `dir_path` (`/` at the root) and `breadcrumb` (folder names from the root). The search runs a fixed number of
+queries whatever the number of results: matching ids are read first, then only the entities of the requested page.
 
 ## Documentation
 

@@ -31,9 +31,10 @@ final class GlobalSearchAnyRepositoryTest extends MediaManagerTestCase
         $registry->method('getManager')->willReturn($this->entityManager);
         $controller = new MediaController($this->manager, $registry, new ParameterBag($this->parameters), new EventDispatcher(), new IdentityTranslator());
 
-        $items = json_decode((string) $controller->globalSearch(new Request(['search' => 'door']))->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        $content = json_decode((string) $controller->globalSearch(new Request(['q' => 'door']))->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
-        self::assertIsArray($items);
-        self::assertSame(['products/door.jpg'], array_column($items, 'storage_path'));
+        self::assertIsArray($content);
+        self::assertIsArray($content['items']['data'] ?? null);
+        self::assertSame(['products/door.jpg'], array_column($content['items']['data'], 'storage_path'));
     }
 }
