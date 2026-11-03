@@ -31,7 +31,7 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
     /**
      * Alias of the repository service of the Sylius resource whose model is
      * `sylius_happy_cms.config.config_model`, whatever the name of that resource in the project
-     * (`sylius_happy_cms.config`, `app.config`…). Set by ConfigRepositoryPass.
+     * (`sylius_happy_cms.config`, `app.config`…). Set by ResourceRepositoryPass::config().
      */
     public const CONFIG_REPOSITORY = 'sylius_happy_cms.config.repository';
 
@@ -46,6 +46,7 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
         $this->processPageBuilderConfiguration($config['page_builder'], $container);
         $this->processSeoConfiguration($config['seo'], $container);
         $this->processConfigConfiguration($config['config'], $container);
+        $this->processRouteConfiguration($config['route'], $container);
         $this->processMenuConfiguration($config['menu'], $container);
         $this->processBlockConfiguration($config['shared_block'], $container);
         $this->processFlexibleContentConfiguration($config['flexible_content'], $container);
@@ -137,6 +138,17 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
         foreach ($config as $key => $value) {
             /** @phpstan-ignore-next-line */
             $container->setParameter('sylius_happy_cms.config.' . $key, $value);
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $config
+     */
+    private function processRouteConfiguration(array $config, ContainerBuilder $container): void
+    {
+        foreach ($config as $key => $value) {
+            /** @phpstan-ignore-next-line */
+            $container->setParameter('sylius_happy_cms.route.' . $key, $value);
         }
     }
 
