@@ -38,6 +38,8 @@ class Helper
         private readonly AssetRenderer $assetRenderer,
         /** Merge the Twig context of the calling template into the block template context */
         private readonly bool $inheritContext = false,
+        /** Render a block whose data has no `block_published` key (data written outside the block form) */
+        private readonly bool $missingPublishedMeansPublished = false,
     ) {
     }
 
@@ -86,7 +88,8 @@ class Helper
     /**
      * Renders a flex block stored as an array (`block_type`, `position`, `block_published` and the block fields).
      *
-     * Returns null when the block is not published (unless in preview) or when its type is unknown.
+     * Returns null when the block is not published (unless in preview) or when its type is unknown. A block without
+     * `block_published` key is not published, unless `missing_published_means_published` is enabled.
      *
      * @param array<string, mixed> $data
      * @param array<string, mixed> $extra variables added to the block template context
@@ -125,15 +128,25 @@ class Helper
     }
 
     /**
+     * @param array<string, mixed> $data
+     */
+    private function isPublished(array $data): bool
+    {
+        if (!array_key_exists('block_published', $data)) {
+            return $this->missingPublishedMeansPublished;
+        }
+
+        return (bool) $data['block_published'];
+    }
+
+    /**
      * @param array<string, mixed> $context
      * @param array<string, mixed> $data
      * @param array<string, mixed> $extra
      */
     private function doRenderBlock(array $context, array $data, bool $preview, array $extra): ?Markup
     {
-        $blockPublished = $data['block_published'] ?? null;
-
-        if (!$blockPublished && $preview === false) {
+        if (!$this->isPublished($data) && $preview === false) {
             return null;
         }
 
