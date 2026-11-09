@@ -136,6 +136,10 @@ class Configuration implements ConfigurationInterface
             ->defaultFalse()
             ->info('Render a block that has no "block_published" key (content written outside the block form, imported or migrated). An explicit falsy value still hides the block.')
             ->end()
+            ->booleanNode('swallow_render_errors')
+            ->defaultFalse()
+            ->info('Log a block that fails to render (error level) and skip it instead of failing the whole page. Typically enabled in production only.')
+            ->end()
             ->end()
             ->end()
 
