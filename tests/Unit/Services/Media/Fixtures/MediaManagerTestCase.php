@@ -139,7 +139,10 @@ abstract class MediaManagerTestCase extends TestCase
             $parameters,
             new IdentityTranslator(),
             new EventDispatcher(),
-            new FileValidator(),
+            new FileValidator(
+                $this->parameters['sylius_happy_cms.media.allowed_mime_types'],
+                $this->parameters['sylius_happy_cms.media.allowed_extensions'],
+            ),
             new UrlValidator(),
         );
     }

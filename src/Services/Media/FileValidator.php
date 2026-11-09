@@ -12,10 +12,11 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class FileValidator
 {
     /**
-     * Whitelist of allowed MIME types
+     * Default whitelist of allowed MIME types (detected from the file content), see the
+     * `sylius_happy_cms.media.allowed_mime_types` option.
      * Using whitelist is more secure than blacklist
      */
-    private const ALLOWED_MIME_TYPES = [
+    public const DEFAULT_ALLOWED_MIME_TYPES = [
         // Images
         'image/jpeg',
         'image/jpg',
@@ -59,9 +60,9 @@ class FileValidator
     ];
 
     /**
-     * Whitelist of allowed file extensions
+     * Default whitelist of allowed file extensions, see the `sylius_happy_cms.media.allowed_extensions` option.
      */
-    private const ALLOWED_EXTENSIONS = [
+    public const DEFAULT_ALLOWED_EXTENSIONS = [
         // Images
         'jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'tiff', 'tif',
 
@@ -107,7 +108,7 @@ class FileValidator
     ];
 
     /**
-     * Dangerous file extensions that should NEVER be allowed
+     * Dangerous file extensions that should NEVER be allowed, whatever the configured lists
      */
     private const DANGEROUS_EXTENSIONS = [
         'php', 'php3', 'php4', 'php5', 'php7', 'phtml', 'pht', 'phps', 'phar',
@@ -119,6 +120,24 @@ class FileValidator
         'pcd', 'pif', 'reg', 'scr', 'sct', 'shs', 'url', 'vbe',
         'wsc', 'wsf', 'wsh',
     ];
+
+    /** @var list<string> */
+    private array $allowedMimeTypes;
+
+    /** @var list<string> */
+    private array $allowedExtensions;
+
+    /**
+     * @param list<string> $allowedMimeTypes  MIME types detected from the file content
+     * @param list<string> $allowedExtensions extensions of the client file name (case insensitive)
+     */
+    public function __construct(
+        array $allowedMimeTypes = self::DEFAULT_ALLOWED_MIME_TYPES,
+        array $allowedExtensions = self::DEFAULT_ALLOWED_EXTENSIONS,
+    ) {
+        $this->allowedMimeTypes = array_values($allowedMimeTypes);
+        $this->allowedExtensions = array_values(array_map('strtolower', $allowedExtensions));
+    }
 
     /**
      * Validate uploaded file
@@ -143,7 +162,7 @@ class FileValidator
         }
 
         // 4. Check extension whitelist
-        if (!in_array($extension, self::ALLOWED_EXTENSIONS, true)) {
+        if (!in_array($extension, $this->allowedExtensions, true)) {
             throw new \InvalidArgumentException(
                 sprintf('File extension not allowed: %s', $extension),
             );
@@ -153,7 +172,7 @@ class FileValidator
         $realMimeType = $this->getRealMimeType($file);
 
         // 6. Check MIME type whitelist
-        if (!in_array($realMimeType, self::ALLOWED_MIME_TYPES, true)) {
+        if (!in_array($realMimeType, $this->allowedMimeTypes, true)) {
             throw new \InvalidArgumentException(
                 sprintf('MIME type not allowed: %s', $realMimeType),
             );
@@ -266,7 +285,7 @@ class FileValidator
      */
     public function isMimeTypeAllowed(string $mimeType): bool
     {
-        return in_array($mimeType, self::ALLOWED_MIME_TYPES, true);
+        return in_array($mimeType, $this->allowedMimeTypes, true);
     }
 
     /**
@@ -274,7 +293,7 @@ class FileValidator
      */
     public function isExtensionAllowed(string $extension): bool
     {
-        return in_array(strtolower($extension), self::ALLOWED_EXTENSIONS, true);
+        return in_array(strtolower($extension), $this->allowedExtensions, true);
     }
 
     /**
@@ -282,7 +301,7 @@ class FileValidator
      */
     public function getAllowedExtensions(): array
     {
-        return self::ALLOWED_EXTENSIONS;
+        return $this->allowedExtensions;
     }
 
     /**
@@ -290,7 +309,7 @@ class FileValidator
      */
     public function getAllowedMimeTypes(): array
     {
-        return self::ALLOWED_MIME_TYPES;
+        return $this->allowedMimeTypes;
     }
 
     /**
