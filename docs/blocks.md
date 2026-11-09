@@ -609,6 +609,37 @@ Full example to render blocks and assets in your page template, checking for bot
     {{ happy_cms_shared_block_assets() }}
 ```
 
+### Blocks stored as JSON (flexible content field)
+
+When the blocks are stored as an array in a JSON column (`FlexibleContentField`), each entry holds the block fields
+plus `block_type`, `position` and `block_published`. Render them in order with `happy_cms_block_render()`:
+
+```twig
+{% for block in resource.content %}
+    {{ happy_cms_block_render(block, preview|default(false), {extra_variable: 'value'}) }}
+{% endfor %}
+{{ happy_cms_block_assets() }}
+```
+
+The block template receives `block` (the raw entry), `blockType`, `preview` and `settings` (the entry without
+`block_type` and `position`, with an `attr_id` of `block-1`, `block-2`… in rendering order when the entry has none:
+use it as the anchor of the block), plus the third argument.
+
+These options change how these blocks are rendered (all disabled by default):
+
+```yaml
+sylius_happy_cms:
+  block_render:
+    # The block templates also receive the variables of the calling template (resource, page, loop...).
+    # Block variables (block, blockType, preview, settings) and the third argument take precedence.
+    inherit_context: true
+```
+
+With `inherit_context`, the Twig function calls `Helper::renderBlockInContext()` with the context of the calling
+template; without it, it calls `Helper::renderBlock()` as before (an override of `renderBlock()` in a project helper
+keeps being used). `Helper::renderBlock()` never receives a context: PHP callers pass the variables they need as the
+third argument. Blocks whose `block_type` is not a registered block are skipped silently.
+
 ### Rendering assets
 
 Those functions will render all the necessary CSS and JS assets for the blocks used on the page, including both flex and shared blocks.
