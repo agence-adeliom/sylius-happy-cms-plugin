@@ -1,7 +1,6 @@
 doctrine:
   dbal:
     types:
-      adeliom_happy_cms_flexible_content_type: Adeliom\SyliusHappyCMSPlugin\Doctrine\FlexibleContentType
       happy_cms_media_type: Adeliom\SyliusHappyCMSPlugin\Doctrine\MediaType
   orm:
     resolve_target_entities:

@@ -18,7 +18,6 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Crud;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Field\Field;
 use Adeliom\SyliusEasyCrudPlugin\Enum\ColumnSizeEnum;
 use Adeliom\SyliusEasyCrudPlugin\Enum\ThreeStateStatusEnum;
-use Adeliom\SyliusHappyCMSPlugin\Admin\Field\FlexibleContentField;
 use Adeliom\SyliusHappyCMSPlugin\Admin\Field\SEOField;
 use Sylius\Bundle\GridBundle\Builder\Filter\StringFilter;
 use Sylius\Resource\Model\ResourceInterface;
@@ -141,17 +140,6 @@ abstract class AbstractPageAdmin extends AbstractAdmin implements PageAdminInter
                         ->setFormTypeOption('constraints', [
 //                        new Length(['min' => 1])
                         ]),
-                )
-                ->hideOnIndex();
-        } elseif (str_starts_with($context, 'flexible_content:')) {
-            $locale = str_replace('flexible_content:', '', $context);
-            yield TranslationField::new('translations')
-                ->restrictToLocales([
-                    $locale,
-                ])
-                ->addField(
-                    FlexibleContentField::new('content')
-                        ->hideOnIndex(),
                 )
                 ->hideOnIndex();
         }

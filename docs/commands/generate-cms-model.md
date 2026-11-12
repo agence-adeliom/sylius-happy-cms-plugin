@@ -38,9 +38,9 @@ Taxonomy entity filename name for the scope (only used when taxonomy is enabled)
 ## Options
 
 ### `--no-flexible-content`
-Disable flexible content blocks for this model.
+Disable the page builder blocks for this model (the entity is not content-editable).
 
-**Default:** Flexible content is enabled by default
+**Default:** The page builder is enabled by default
 **Usage:** `--no-flexible-content`
 
 ### `--no-taxonomy`

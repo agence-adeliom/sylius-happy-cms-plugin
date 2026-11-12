@@ -54,12 +54,12 @@ final class MateToolsTest extends KernelTestCase
     }
 
     #[Test]
-    public function it_lists_the_blocks_allowed_in_the_flexible_content_fields_of_a_resource(): void
+    public function it_lists_the_blocks_the_page_builder_of_a_resource_offers(): void
     {
         $items = $this->items((new ListBlocks($this->host()))(self::PAGE_ALIAS));
 
         $accordion = $this->findBlock($items, AccordionBlockType::class);
-        self::assertSame(['content'], $accordion['fields']);
+        self::assertArrayNotHasKey('fields', $accordion);
         foreach ($items as $item) {
             self::assertSame('flex', $item['kind']);
         }

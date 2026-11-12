@@ -12,19 +12,6 @@ services:
   sylius.happy_cms.block_collection:
     alias: Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockCollection
 
-  Adeliom\SyliusHappyCMSPlugin\Form\Block\BlockCollectionType:
-    arguments:
-      $saveAsList: '%sylius_happy_cms.flexible_content.save_as_list%'
-    tags: [ 'form.type' ]
-
-  Adeliom\SyliusHappyCMSPlugin\Admin\Field\Configurator\FlexibleContentConfigurator:
-    public: true
-    arguments:
-      - "@sylius.happy_cms.block_collection"
-      - "@sylius.happy_cms.shared_block.block_collection"
-    tags:
-      - 'easy.fields.configurator'
-
   Adeliom\SyliusHappyCMSPlugin\Admin\Field\Configurator\SharedBlockConfigurator:
     public: true
     arguments:
@@ -32,36 +19,9 @@ services:
     tags:
       - 'easy.fields.configurator'
 
-  Adeliom\SyliusHappyCMSPlugin\Twig\Block\BlockExtension:
-    public: true
-    tags:
-      - { name: twig.extension }
-
-  sylius.happy_cms.block.twig_extension:
-    alias: Adeliom\SyliusHappyCMSPlugin\Twig\Block\BlockExtension
-
-
-  Adeliom\SyliusHappyCMSPlugin\Factory\Block\Helper:
-    public: true
-    arguments:
-      # positional arguments kept (index 0 to 3) for the projects that replace them in a compiler pass
-      0: '@twig'
-      1: '@event_dispatcher'
-      2: '@sylius.happy_cms.block_collection'
-      3: '@adeliom.sylius.asset.renderer'
-      $inheritContext: '%sylius_happy_cms.block_render.inherit_context%'
-      $missingPublishedMeansPublished: '%sylius_happy_cms.block_render.missing_published_means_published%'
-      $swallowRenderErrors: '%sylius_happy_cms.block_render.swallow_render_errors%'
-      $logger: '@?logger'
-    tags:
-      - { name: twig.runtime }
-
-  sylius.happy_cms.block_helper:
-    alias: Adeliom\SyliusHappyCMSPlugin\Factory\Block\Helper
-
   Adeliom\SyliusHappyCMSPlugin\DataCollector\Block\BlockCollector:
     arguments:
-      - "@sylius.happy_cms.block_helper"
+      - "@sylius.happy_cms.content_block_helper"
     tags:
       - name: data_collector
         template: '@SyliusHappyCMSPlugin/profiler/block/collector.html.twig'
