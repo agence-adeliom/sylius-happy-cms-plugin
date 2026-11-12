@@ -56,6 +56,7 @@ class MenuCreationListener
         $rootItem->setPosition(0);
 
         $menu->addItem($rootItem);
+        $menu->setRootItem($rootItem);
 
         foreach ($this->localeProvider->getAvailableLocalesCodes() as $locale) {
             if (class_exists($modelClass) && method_exists($modelClass, 'getTranslationClass')) {
