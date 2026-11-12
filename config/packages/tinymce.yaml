@@ -1,4 +1,4 @@
-# Deprecated since 2.3, removed in 3.0: import `@SyliusHappyCMSPlugin/config/packages/tinymce.php` instead.
+# Deprecated since 2.3, removed in 2.4: import `@SyliusHappyCMSPlugin/config/packages/tinymce.php` instead.
 # This file only imports it.
 imports:
   - { resource: "tinymce.php" }

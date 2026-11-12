@@ -1,4 +1,4 @@
-# Deprecated since 2.3, removed in 3.0: import `@SyliusHappyCMSPlugin/config/packages/cmf_routing.php` instead.
+# Deprecated since 2.3, removed in 2.4: import `@SyliusHappyCMSPlugin/config/packages/cmf_routing.php` instead.
 # This file only imports it.
 imports:
   - { resource: "cmf_routing.php" }

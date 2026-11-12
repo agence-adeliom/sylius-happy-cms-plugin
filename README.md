@@ -115,7 +115,7 @@ imports:
 ```
 
 The plugin ships its configuration and routes as PHP files. The `.yaml` files of the plugin
-(`config/config.yaml`, `config/routes.yaml`, `config/routes/admin.yaml`, ...) are deprecated and removed in 3.0:
+(`config/config.yaml`, `config/routes.yaml`, `config/routes/admin.yaml`, ...) are deprecated and removed in 2.4:
 they only import the `.php` files. Your own project files can stay in YAML and import the `.php` files, as below.
 
 ### 4. Import Routes

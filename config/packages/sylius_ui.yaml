@@ -1,4 +1,4 @@
-# Deprecated since 2.3, removed in 3.0: import `@SyliusHappyCMSPlugin/config/packages/sylius_ui.php` instead.
+# Deprecated since 2.3, removed in 2.4: import `@SyliusHappyCMSPlugin/config/packages/sylius_ui.php` instead.
 # This file only imports it.
 imports:
   - { resource: "sylius_ui.php" }

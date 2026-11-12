@@ -6,7 +6,7 @@
 
 The configuration and route files of the plugin now exist as PHP files. The YAML files keep working (each one only
 imports its PHP equivalent, so both load exactly the same configuration and routes) but are deprecated and will be
-removed in 3.0 (#97). Import the `.php` files instead; your own project files can stay in YAML:
+removed in 2.4 (#97). Import the `.php` files instead; your own project files can stay in YAML:
 
 | Deprecated | Replacement |
 |---|---|
