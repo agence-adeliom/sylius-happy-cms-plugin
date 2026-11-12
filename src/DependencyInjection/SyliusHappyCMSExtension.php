@@ -191,7 +191,7 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
             trigger_deprecation(
                 'agence-adeliom/sylius-happy-cms-plugin',
                 '2.3.3',
-                '%s the "sylius_happy_cms.flexible_content.save_as_list" option %s deprecated. It will be removed in 3.0, where flexible contents are always saved as a JSON list in display order. Set it to true to opt in now (see UPGRADE.md).',
+                '%s the "sylius_happy_cms.flexible_content.save_as_list" option %s deprecated. It will be removed in 2.4, where flexible contents are always saved as a JSON list in display order. Set it to true to opt in now (see UPGRADE.md).',
                 null === $saveAsList ? 'Not setting' : 'Setting',
                 null === $saveAsList ? 'is' : 'to false is',
             );
@@ -214,7 +214,7 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
             trigger_deprecation(
                 'agence-adeliom/sylius-happy-cms-plugin',
                 '2.3.3',
-                (null === $config['keep_data_uri_name'] ? 'Not setting the "%s" option is deprecated.' : 'Setting the "%s" option to false is deprecated.') . ' It will be removed in 3.0, where MediaManager::createMedia() keeping the name given for a data URI source is the only behaviour. Set it to true to opt in now (see UPGRADE.md).',
+                (null === $config['keep_data_uri_name'] ? 'Not setting the "%s" option is deprecated.' : 'Setting the "%s" option to false is deprecated.') . ' It will be removed in 2.4, where MediaManager::createMedia() keeping the name given for a data URI source is the only behaviour. Set it to true to opt in now (see UPGRADE.md).',
                 'sylius_happy_cms.media.keep_data_uri_name',
             );
         }
@@ -226,9 +226,9 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
 
         $longSlugs = $config['long_slugs'] ?? null;
         if (null === $longSlugs) {
-            trigger_deprecation('agence-adeliom/sylius-happy-cms-plugin', '2.3.3', 'Not setting the "sylius_happy_cms.media.long_slugs" option is deprecated. It will be removed in 3.0, where a 255-character slug for medias and folders is the only behaviour. Set it to true to opt in now (see UPGRADE.md).');
+            trigger_deprecation('agence-adeliom/sylius-happy-cms-plugin', '2.3.3', 'Not setting the "sylius_happy_cms.media.long_slugs" option is deprecated. It will be removed in 2.4, where a 255-character slug for medias and folders is the only behaviour. Set it to true to opt in now (see UPGRADE.md).');
         } elseif (false === $longSlugs) {
-            trigger_deprecation('agence-adeliom/sylius-happy-cms-plugin', '2.3.3', 'Setting the "sylius_happy_cms.media.long_slugs" option to false is deprecated. It will be removed in 3.0, where a 255-character slug for medias and folders is the only behaviour. Set it to true to opt in now (see UPGRADE.md).');
+            trigger_deprecation('agence-adeliom/sylius-happy-cms-plugin', '2.3.3', 'Setting the "sylius_happy_cms.media.long_slugs" option to false is deprecated. It will be removed in 2.4, where a 255-character slug for medias and folders is the only behaviour. Set it to true to opt in now (see UPGRADE.md).');
         }
         $container->setParameter('sylius_happy_cms.media.long_slugs', true === $longSlugs);
 
@@ -244,7 +244,7 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
             trigger_deprecation(
                 'agence-adeliom/sylius-happy-cms-plugin',
                 '2.3.3',
-                (null === $config['raw_meta_values'] ? 'Not setting the "%s" option is deprecated.' : 'Setting the "%s" option to false is deprecated.') . ' It will be removed in 3.0, where the media_meta Twig filter returning the metas as stored is the only behaviour. Set it to true to opt in now (see UPGRADE.md).',
+                (null === $config['raw_meta_values'] ? 'Not setting the "%s" option is deprecated.' : 'Setting the "%s" option to false is deprecated.') . ' It will be removed in 2.4, where the media_meta Twig filter returning the metas as stored is the only behaviour. Set it to true to opt in now (see UPGRADE.md).',
                 'sylius_happy_cms.media.raw_meta_values',
             );
         }
@@ -261,7 +261,7 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
             trigger_deprecation(
                 'agence-adeliom/sylius-happy-cms-plugin',
                 '2.3.3',
-                (null === $twigGlobalFromConfig ? 'Not setting the "%s" option is deprecated.' : 'Setting the "%s" option to false is deprecated.') . ' It will be removed in 3.0, where the "sylius_happy_cms.media" Twig global holding the media configuration of the application is the only behaviour. Set it to true to opt in now (see UPGRADE.md).',
+                (null === $twigGlobalFromConfig ? 'Not setting the "%s" option is deprecated.' : 'Setting the "%s" option to false is deprecated.') . ' It will be removed in 2.4, where the "sylius_happy_cms.media" Twig global holding the media configuration of the application is the only behaviour. Set it to true to opt in now (see UPGRADE.md).',
                 'sylius_happy_cms.media.twig_global_from_config',
             );
 

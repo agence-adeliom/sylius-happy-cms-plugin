@@ -22,7 +22,7 @@ use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\Form\Block\Fixtures\TitleBlock;
  * The flexible content collection edits a JSON list of blocks (`{block_type, block_published, position, ...fields}`).
  * The admin script writes the display order into the hidden `position` fields and names new entries with a random
  * id. With the `save_as_list` option the saved value is a list in display order; without it (legacy, the default
- * until 3.0) it keeps the form names as keys and the submitted positions.
+ * until 2.4) it keeps the form names as keys and the submitted positions.
  */
 final class BlockCollectionTypeTest extends TestCase
 {

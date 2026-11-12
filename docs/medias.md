@@ -392,7 +392,7 @@ sylius_happy_cms:
         folder_entity: App\Entity\HappyCMS\Media\Folder
         # the sylius_happy_cms.media Twig global (read by the media manager templates: base_url, hide_files_ext,
         # extended_mimes, enable_generating_alts, locales...) holds this configuration; not set or false (deprecated),
-        # it holds the plugin defaults whatever you configure. true is the only behaviour in 3.0.
+        # it holds the plugin defaults whatever you configure. true is the only behaviour in 2.4.
         twig_global_from_config: true
 
         # path of the media manager routes (media.*), below the prefix of their import
@@ -464,7 +464,7 @@ sylius_happy_cms:
                 - application/zip
         
         # createMedia() (and the media manager upload of an edited image) keeps the name given for a data URI
-        # source; not set or false (deprecated): a random name. true is the only behaviour in 3.0
+        # source; not set or false (deprecated): a random name. true is the only behaviour in 2.4
         keep_data_uri_name: true
 
         # display file last modification time as
@@ -474,7 +474,7 @@ sylius_happy_cms:
         hide_files_ext:       true
 
         # the media_meta Twig filter returns a meta as stored (array metas such as "dimensions" or "code" included);
-        # not set or false (deprecated): text metas only, null for the others. true is the only behaviour in 3.0
+        # not set or false (deprecated): text metas only, null for the others. true is the only behaviour in 2.4
         raw_meta_values: true
         
         # loaded chunk amount "pagination"
@@ -499,7 +499,7 @@ bin/console doctrine:migrations:diff
 # ALTER TABLE <folder table> CHANGE slug slug VARCHAR(255) NOT NULL
 ```
 
-Without the option, the mapping stays at 100 characters (deprecated: 255 is the only length in 3.0).
+Without the option, the mapping stays at 100 characters (deprecated: 255 is the only length in 2.4).
 
 #### Existing media library (EasyMedia)
 

@@ -228,7 +228,7 @@ sylius_happy_cms:
 Not setting the option (or setting it to `false`) keeps the legacy save and triggers a deprecation. Templates
 iterating over the content (`for block in content`) are not affected; code reading entries by key or by absolute
 `position` value is. Existing rows are rewritten on their next save only: no migration is needed. The display order
-is unchanged. In 3.0 the option is removed and flexible contents are always saved as a JSON list.
+is unchanged. In 2.4 the option is removed and flexible contents are always saved as a JSON list.
 
 Fixed without option: a content stored as a JSON list (or as an object with numeric keys) no longer raises a
 `TypeError` when its edit form is built or submitted.
@@ -262,7 +262,7 @@ entity already overrides (`#[ORM\AttributeOverride]`) to another value than 100 
 at 255 (for instance because you ran the migration of a pre-release of this change), set the option to `true` so that
 the mapping matches it.
 
-In 3.0 the option is removed and 255-character slugs are the only behaviour.
+In 2.4 the option is removed and 255-character slugs are the only behaviour.
 
 ### Media manager global search restored
 
@@ -289,7 +289,7 @@ Twig configuration; on a value only valid once resolved, e.g. an environment var
 defaults are exposed). Not setting the option, or setting it to `false`, keeps the defaults and triggers a deprecation.
 Templates of the application reading `sylius_happy_cms.media.*` get the configured values once opted in.
 
-In 3.0 the option is removed and the global holding the application configuration is the only behaviour.
+In 2.4 the option is removed and the global holding the application configuration is the only behaviour.
 
 ### New `MediaManager::createMediaFromSource()`, flag: name of a data URI source
 
@@ -314,7 +314,7 @@ sylius_happy_cms:
         keep_data_uri_name: true
 ```
 
-Not setting the option, or setting it to `false`, keeps the random name and triggers a deprecation. In 3.0 the option
+Not setting the option, or setting it to `false`, keeps the random name and triggers a deprecation. In 2.4 the option
 is removed and `createMedia()` keeping the name of a data URI is the only behaviour.
 
 ### New options: upload types, client MIME type, original extension
@@ -351,7 +351,7 @@ sylius_happy_cms:
 `media|media_meta('code')` are `null`. With `true`, the filter calls the new `MediaRuntime::mediaMetaValue()`, which
 returns the meta as stored (any type, `$default` of any type). `MediaRuntime::mediaMeta()` keeps its signature and
 behaviour. `media|media_meta` without key (every meta) is the same in both modes. Not setting the option, or setting
-it to `false`, triggers a deprecation. In 3.0 the option is removed and the filter returning the metas as stored is
+it to `false`, triggers a deprecation. In 2.4 the option is removed and the filter returning the metas as stored is
 the only behaviour.
 
 Bug fix, no option: `happy_cms_media()` of an oEmbed media rendered an empty block (the `code` meta is an array that

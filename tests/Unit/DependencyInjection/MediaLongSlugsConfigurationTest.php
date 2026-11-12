@@ -18,7 +18,7 @@ final class MediaLongSlugsConfigurationTest extends TestCase
 
         self::assertFalse($container->getParameter('sylius_happy_cms.media.long_slugs'));
         self::assertFalse($container->hasDefinition(SyliusHappyCMSExtension::LONG_SLUGS_LISTENER));
-        self::assertSame(['Since agence-adeliom/sylius-happy-cms-plugin 2.3.3: Not setting the "sylius_happy_cms.media.long_slugs" option is deprecated. It will be removed in 3.0, where a 255-character slug for medias and folders is the only behaviour. Set it to true to opt in now (see UPGRADE.md).'], $deprecations);
+        self::assertSame(['Since agence-adeliom/sylius-happy-cms-plugin 2.3.3: Not setting the "sylius_happy_cms.media.long_slugs" option is deprecated. It will be removed in 2.4, where a 255-character slug for medias and folders is the only behaviour. Set it to true to opt in now (see UPGRADE.md).'], $deprecations);
     }
 
     public function testSettingTheOptionToFalseKeepsThe100CharacterSlugsAndIsDeprecated(): void
@@ -27,7 +27,7 @@ final class MediaLongSlugsConfigurationTest extends TestCase
 
         self::assertFalse($container->getParameter('sylius_happy_cms.media.long_slugs'));
         self::assertFalse($container->hasDefinition(SyliusHappyCMSExtension::LONG_SLUGS_LISTENER));
-        self::assertSame(['Since agence-adeliom/sylius-happy-cms-plugin 2.3.3: Setting the "sylius_happy_cms.media.long_slugs" option to false is deprecated. It will be removed in 3.0, where a 255-character slug for medias and folders is the only behaviour. Set it to true to opt in now (see UPGRADE.md).'], $deprecations);
+        self::assertSame(['Since agence-adeliom/sylius-happy-cms-plugin 2.3.3: Setting the "sylius_happy_cms.media.long_slugs" option to false is deprecated. It will be removed in 2.4, where a 255-character slug for medias and folders is the only behaviour. Set it to true to opt in now (see UPGRADE.md).'], $deprecations);
     }
 
     public function testOptingInRegistersTheListenerWithoutDeprecation(): void

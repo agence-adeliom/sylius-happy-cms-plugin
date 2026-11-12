@@ -335,7 +335,7 @@ sylius_happy_cms:
 - `true`: on save, the entries are sorted by the positions written by the admin script, stored as a JSON **list**
   (never as an object keyed by form names) and their `position` is renumbered `0`, `1`, `2`… (integers). Entries
   without a numeric position go after the others, in submitted order; a submitted row without `block_type` is
-  ignored. This is the only behaviour in 3.0.
+  ignored. This is the only behaviour in 2.4.
 - Not set or `false` (deprecated): legacy save. The entries keep the form names as keys (a JSON object such as
   `{"3": …, "a1b2-c3d": …}` as soon as a block is moved, removed or added) and the positions posted by the admin
   script; a block at position `0` is moved to the end (`999`).

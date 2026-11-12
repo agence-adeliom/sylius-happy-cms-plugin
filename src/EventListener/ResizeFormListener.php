@@ -19,7 +19,7 @@ use Symfony\Component\Form\FormInterface;
  * With `$saveAsList` (option `sylius_happy_cms.flexible_content.save_as_list`), on submit the collection is sorted by
  * the submitted positions (stable, numeric), re-indexed as a list (so that it is stored as a JSON array, not as an
  * object keyed by the form names) and the positions are renumbered 0, 1, 2…; rows without block type are ignored.
- * Without it (legacy, removed in 3.0), the entries keep the form names as keys and the submitted positions, and a
+ * Without it (legacy, removed in 2.4), the entries keep the form names as keys and the submitted positions, and a
  * falsy position is replaced by 999.
  *
  * @phpstan-type BlockData array{block_type?: string|null, position: mixed}

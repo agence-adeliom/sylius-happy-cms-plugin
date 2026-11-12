@@ -18,7 +18,7 @@ final class FlexibleContentConfigurationTest extends TestCase
 
         self::assertFalse($container->getParameter('sylius_happy_cms.flexible_content.save_as_list'));
         self::assertSame(
-            ['Since agence-adeliom/sylius-happy-cms-plugin 2.3.3: Not setting the "sylius_happy_cms.flexible_content.save_as_list" option is deprecated. It will be removed in 3.0, where flexible contents are always saved as a JSON list in display order. Set it to true to opt in now (see UPGRADE.md).'],
+            ['Since agence-adeliom/sylius-happy-cms-plugin 2.3.3: Not setting the "sylius_happy_cms.flexible_content.save_as_list" option is deprecated. It will be removed in 2.4, where flexible contents are always saved as a JSON list in display order. Set it to true to opt in now (see UPGRADE.md).'],
             $deprecations,
         );
     }
