@@ -26,27 +26,27 @@ class FolderSubscriber
             return;
         }
 
-        if ($args->hasChangedField('parent')) {
-            /** @var FolderInterface|null $old */
-            $old = $args->getOldValue('parent');
-            /** @var FolderInterface|null $new */
-            $new = $args->getNewValue('parent');
-            $oldPath = ($old ? $old->getPath() : '') . \DIRECTORY_SEPARATOR . $folder->getSlug();
-            $newPath = ($new ? $new->getPath() : '') . \DIRECTORY_SEPARATOR . $folder->getSlug();
-            $this->manager->move($oldPath, $newPath);
+        $parentChanged = $args->hasChangedField('parent');
+        $slugChanged = $args->hasChangedField('slug');
+        if (!$parentChanged && !$slugChanged) {
+            return;
         }
 
-        if ($args->hasChangedField('slug')) {
-            /** @var string|null $oldSlug */
-            $oldSlug = $args->getOldValue('slug');
-            /** @var string|null $newSlug */
-            $newSlug = $args->getNewValue('slug');
-            // The folder already holds its new slug: rebuild both paths from the parent path.
-            $parent = $folder->getParent();
-            $parentPath = $parent ? $parent->getPath() . \DIRECTORY_SEPARATOR : '';
-            $oldPath = $parentPath . $oldSlug;
-            $newPath = $parentPath . $newSlug;
-            $this->manager->move($oldPath, $newPath);
-        }
+        // The folder already holds its new parent and slug: the old ones come from the change set. A single move
+        // covers a parent and a slug changed in the same flush.
+        /** @var FolderInterface|null $oldParent */
+        $oldParent = $parentChanged ? $args->getOldValue('parent') : $folder->getParent();
+        /** @var string|null $oldSlug */
+        $oldSlug = $slugChanged ? $args->getOldValue('slug') : $folder->getSlug();
+
+        $this->manager->move(
+            $this->path($oldParent, (string) $oldSlug),
+            $this->path($folder->getParent(), (string) $folder->getSlug()),
+        );
+    }
+
+    private function path(?FolderInterface $parent, string $slug): string
+    {
+        return $parent ? $parent->getPath() . \DIRECTORY_SEPARATOR . $slug : $slug;
     }
 }
