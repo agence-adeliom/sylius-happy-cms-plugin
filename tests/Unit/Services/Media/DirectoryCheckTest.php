@@ -4,53 +4,29 @@ declare(strict_types=1);
 
 namespace Tests\Adeliom\SyliusHappyCMSPlugin\Unit\Services\Media;
 
+use League\Flysystem\DirectoryListing;
+use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemOperator;
-use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\Services\Media\Fixtures\ManagedFolder;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\Services\Media\Fixtures\MediaManagerTestCase;
 
 /**
- * A media library whose public URL is absolute (CDN, front domain) or whose storage is not the local
- * public directory: folders are looked up on the storage or in the database, not on the local disk.
+ * Folders are looked up on the Flysystem storage, whatever the base_url (CDN, front domain) and the adapter.
  */
 final class DirectoryCheckTest extends MediaManagerTestCase
 {
     protected function mediaConfig(): array
     {
-        return [
-            'base_url' => 'https://cdn.example.com/media/download',
-            'directory_check' => 'storage',
-        ];
+        return ['base_url' => 'https://cdn.example.com/media/download'];
     }
 
-    public function testThePublicDirectoryCheckStaysTheDefault(): void
+    public function testDirectoryExistsAsksTheStorageAndNotTheLocalDisk(): void
     {
-        $this->createManager([]);
-
-        self::assertSame('public_dir', $this->parameters['sylius_happy_cms.media.directory_check']);
-    }
-
-    public function testThePublicDirectoryCheckLooksForTheDirectoryOnTheLocalDisk(): void
-    {
-        $manager = $this->createManager([]);
+        mkdir($this->projectDir . '/public/media/download/products/windows', 0777, true);
         $this->storage->createDirectory('products/doors');
 
-        // The storage is not looked at: only public/{base_url}/{path} on the local disk.
-        self::assertFalse($manager->directoryExists('products/doors'));
-
-        mkdir($this->projectDir . '/public/media/download/products/doors', 0777, true);
-        self::assertTrue($manager->directoryExists('products/doors'));
-        self::assertFalse($manager->directoryExists('products/windows'));
-    }
-
-    public function testThePublicDirectoryCheckMovesAFolderInOneMove(): void
-    {
-        mkdir($this->projectDir . '/public/media/download/products/doors', 0777, true);
-        $this->storage = $this->createMock(FilesystemOperator::class);
-        $this->storage->method('fileExists')->willReturn(false);
-        $this->storage->expects(self::once())->method('move')->with('products/doors', 'archives/doors');
-        $this->storage->expects(self::never())->method('listContents');
-
-        $this->createManager([])->move('products/doors', 'archives/doors');
+        self::assertTrue($this->manager->directoryExists('products/doors'));
+        self::assertTrue($this->manager->directoryExists('/products//doors/'));
+        self::assertFalse($this->manager->directoryExists('products/windows'));
     }
 
     public function testCreatingMediasInTheSameNestedPathReusesTheFolders(): void
@@ -69,13 +45,12 @@ final class DirectoryCheckTest extends MediaManagerTestCase
         $products = $this->manager->createFolder('products');
         $doors = $this->manager->createFolder('doors', 'products');
 
-        self::assertTrue($this->manager->directoryExists('products/doors'));
         self::assertSame($doors, $this->manager->folderByPath('products/doors'));
         self::assertSame($products, $this->manager->folderByPath('products'));
         self::assertFalse($this->manager->folderByPath('products/windows'));
     }
 
-    public function testMovingAFolderMovesItsFilesInTheStorage(): void
+    public function testMovingAFolderMovesItsFilesAndSubFoldersInTheStorage(): void
     {
         $this->manager->createMedia($this->pngFile('door.png'), 'products/doors');
         $this->manager->createMedia($this->pngFile('handle.png'), 'products/doors/handles');
@@ -86,26 +61,31 @@ final class DirectoryCheckTest extends MediaManagerTestCase
         self::assertTrue($this->storage->fileExists('archives/doors/handles/handle.png'));
         self::assertFalse($this->storage->fileExists('products/doors/door.png'));
         self::assertFalse($this->storage->directoryExists('products/doors'));
+        self::assertTrue($this->storage->directoryExists('products'));
     }
 
-    public function testTheDatabaseCheckLooksForTheFolderRows(): void
+    public function testMovingAFolderNeverRenamesTheDirectoryItself(): void
     {
-        $this->manager = $this->createManager([
-            'base_url' => 'https://cdn.example.com/media/download',
-            'directory_check' => 'database',
-        ]);
-        // Folder rows without any directory on the storage (prefix-only object storages).
-        $products = $this->saveFolder('products');
-        $doors = $this->saveFolder('doors', $products);
+        // S3, GCS…: move() copies one key, it cannot rename a directory.
+        $this->storage = $this->createMock(FilesystemOperator::class);
+        $this->storage->method('fileExists')->willReturn(false);
+        $this->storage->method('directoryExists')->willReturn(true);
+        $this->storage->method('listContents')->with('products/doors', true)->willReturn(new DirectoryListing([
+            new FileAttributes('products/doors/door.png'),
+        ]));
+        $this->storage->expects(self::once())->method('move')->with('products/doors/door.png', 'archives/doors/door.png');
+        $this->storage->expects(self::once())->method('deleteDirectory')->with('products/doors');
 
-        self::assertFalse($this->storage->directoryExists('products/doors'));
-        self::assertTrue($this->manager->directoryExists('products/doors'));
-        self::assertTrue($this->manager->directoryExists(''));
-        self::assertFalse($this->manager->directoryExists('products/windows'));
-        self::assertSame($doors, $this->manager->folderByPath('products/doors'));
+        $this->createManager($this->mediaConfig())->move('products/doors', 'archives/doors');
+    }
 
-        $media = $this->manager->createMedia($this->pngFile('door.png'), 'products/doors');
-        self::assertSame($doors, $media->getFolder());
-        self::assertCount(2, $this->entityManager->getRepository(ManagedFolder::class)->findAll());
+    public function testMovingAFileMovesItInOneCall(): void
+    {
+        $media = $this->manager->createMedia($this->pngFile('door.png'), 'products');
+
+        $this->manager->move((string) $media->getPath(), 'archives/door.png');
+
+        self::assertTrue($this->storage->fileExists('archives/door.png'));
+        self::assertFalse($this->storage->fileExists('products/door.png'));
     }
 }
