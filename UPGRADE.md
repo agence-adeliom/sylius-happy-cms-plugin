@@ -320,20 +320,12 @@ sylius_happy_cms:
   became `prices.txt`): set the option to `false` to keep that behaviour. Existing media are not renamed. The stored
   MIME type is still the one detected from the content, never the one sent by the browser.
 
-### Flag: `media_meta` returns the metas as stored, oEmbed rendering fixed
+### Bug fix: `media_meta` returns the metas as stored, oEmbed rendering fixed
 
-```yaml
-sylius_happy_cms:
-    media:
-        raw_meta_values: true
-```
-
-`media_meta(media, key)` calls `Media::getMeta()`, which only returns strings: `media|media_meta('dimensions')` or
-`media|media_meta('code')` are `null`. With `true`, the filter calls the new `MediaRuntime::mediaMetaValue()`, which
-returns the meta as stored (any type, `$default` of any type). `MediaRuntime::mediaMeta()` keeps its signature and
-behaviour. `media|media_meta` without key (every meta) is the same in both modes. Not setting the option, or setting
-it to `false`, triggers a deprecation. In 2.4 the option is removed and the filter returning the metas as stored is
-the only behaviour.
+`media_meta(media, key)` called `Media::getMeta()`, which only returns strings: `media|media_meta('dimensions')` or
+`media|media_meta('code')` were `null`. The filter now calls the new `MediaRuntime::mediaMetaValue()`, which returns
+the meta as stored (any type, `$default` of any type). `MediaRuntime::mediaMeta()` keeps its signature and behaviour.
+`media|media_meta` without key (every meta) is unchanged.
 
 Bug fix, no option: `happy_cms_media()` of an oEmbed media rendered an empty block (the `code` meta is an array that
 the template reads as `options.html` / `options.ratio`). The code array is now passed to the template (`html`,

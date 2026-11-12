@@ -14,7 +14,7 @@ use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
 /**
- * Metas are not only strings (dimensions, oEmbed code...): mediaMetaValue() (media_meta with raw_meta_values) and
+ * Metas are not only strings (dimensions, oEmbed code...): mediaMetaValue() (behind media_meta) and
  * happy_cms_media read them as stored.
  */
 final class MediaRuntimeMetasTest extends MediaManagerTestCase
@@ -51,11 +51,9 @@ final class MediaRuntimeMetasTest extends MediaManagerTestCase
         self::assertSame($media->getMetas(), $runtime->mediaMeta($media));
     }
 
-    public function testTheMediaMetaFilterFollowsTheFlag(): void
+    public function testTheMediaMetaFilterReturnsTheMetasAsStored(): void
     {
-        self::assertSame([MediaRuntime::class, 'mediaMeta'], $this->mediaMetaFilter(new MediaExtension($this->manager, $this->createStub(FilterManager::class))));
-        self::assertSame([MediaRuntime::class, 'mediaMeta'], $this->mediaMetaFilter(new MediaExtension($this->manager, $this->createStub(FilterManager::class), false)));
-        self::assertSame([MediaRuntime::class, 'mediaMetaValue'], $this->mediaMetaFilter(new MediaExtension($this->manager, $this->createStub(FilterManager::class), true)));
+        self::assertSame([MediaRuntime::class, 'mediaMetaValue'], $this->mediaMetaFilter(new MediaExtension($this->manager, $this->createStub(FilterManager::class))));
     }
 
     public function testAnOembedMediaRendersItsCode(): void

@@ -55,8 +55,7 @@ class MediaRuntime implements RuntimeExtensionInterface
 
     /**
      * A meta as stored (string, number, array such as "dimensions" or "code"), or all the metas without key.
-     * Behind the `media_meta` filter when `sylius_happy_cms.media.raw_meta_values` is true; mediaMeta() returns
-     * null for a meta that is not a string.
+     * Behind the `media_meta` filter; mediaMeta() returns null for a meta that is not a string.
      */
     public function mediaMetaValue(int|string|MediaInterface $media, ?string $key = null, mixed $default = null): mixed
     {

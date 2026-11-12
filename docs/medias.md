@@ -250,8 +250,7 @@ yield MediaField::new('property', "label")
 # Get media metadatas
 {{ object.media|media_meta }}
 
-# Get single media metadata: a text meta, or (with media.raw_meta_values: true) the meta as stored
-# (string, number or array such as "dimensions")
+# Get single media metadata, as stored (string, number or array such as "dimensions")
 {{ object.media|media_meta('key') }}
 {{ (object.media|media_meta('dimensions')).width }}
 
@@ -460,10 +459,6 @@ sylius_happy_cms:
         # hide file extension in files list
         hide_files_ext:       true
 
-        # the media_meta Twig filter returns a meta as stored (array metas such as "dimensions" or "code" included);
-        # not set or false (deprecated): text metas only, null for the others. true is the only behaviour in 2.4
-        raw_meta_values: true
-        
         # loaded chunk amount "pagination"
         pagination_amount:    50
 
