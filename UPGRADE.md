@@ -1,5 +1,57 @@
 # Upgrade
 
+## 2.4.0
+
+### BC break: the flexible content field is removed, the page builder is the only content editor
+
+The JSON block system (`FlexibleContentField`, blocks stored in a JSON `content` column) is removed. Contents are
+edited with the page builder only, and stored as `ContentBlock` rows.
+
+**Before upgrading**, on plugin 2.3.x, move the JSON contents to the page builder and check the front pages:
+
+```bash
+php bin/console happycms:migrate:content-to-blocks --dry-run
+php bin/console happycms:migrate:content-to-blocks
+```
+
+See the [content block migration guide](./docs/migration/CONTENT_BLOCK.md). The command itself is removed in 2.4.
+
+Removed:
+
+- `Admin\Field\FlexibleContentField` and `Admin\Field\Configurator\FlexibleContentConfigurator`;
+- `Form\Block\BlockCollectionType` (block prefix `flexible_content_collection`) and `EventListener\ResizeFormListener`;
+- the form theme `@SyliusHappyCMSPlugin/field/flexible_content/form.html.twig` and the Encore entry `flexible-content`;
+- the `flexible_content:<locale>` context of `AbstractPageAdmin::configureFields()`;
+- `PageTranslation::$content`, `getContent()` and `setContent()`;
+- the Doctrine type `adeliom_happy_cms_flexible_content_type` (`Doctrine\FlexibleContentType`): map your own columns
+  with `json` before upgrading;
+- the Twig functions `happy_cms_block_render()` and `happy_cms_block_assets()`, `Twig\Block\BlockExtension`,
+  `Factory\Block\Helper` and the services `sylius.happy_cms.block_helper` and `sylius.happy_cms.block.twig_extension`:
+  render the page builder blocks with `happy_cms_content_block_render()` and `happy_cms_content_block_assets()`;
+- the configuration nodes `sylius_happy_cms.block_render` (`inherit_context`, `missing_published_means_published`,
+  `swallow_render_errors`) and `sylius_happy_cms.flexible_content` (`save_as_list`): remove them from your
+  configuration, Symfony rejects unknown options;
+- the command `happycms:migrate:content-to-blocks` (`Command\MigrateContentToBlocksCommand`);
+- `Mate\BlockRenderer`, and `CmsReader::flexibleContentFields()`, `readContent()` and `admin()`.
+
+Changed:
+
+- `front/document/default.html.twig` and `front/document/preview.html.twig` no longer fall back to the JSON content:
+  a page without page builder blocks renders no block;
+- the block collector of the Symfony profiler lists the page builder blocks rendered by `Factory\ContentBlock\Helper`;
+- `happycms:starter:create-demo-pages` creates the homepage blocks in the page builder;
+- the Mate tool `happy_cms_content_blocks` reads the page builder only: no more `fields`, `--index` takes a block id
+  and adds its draft settings; `happy_cms_list_blocks --alias=…` lists the blocks the page builder offers, without
+  `fields`.
+
+Database: `PageTranslation` is a mapped superclass, so your application owns the table. After upgrading, generate the
+migration that drops the `content` column, check it, then run it:
+
+```bash
+php bin/console doctrine:migrations:diff
+php bin/console doctrine:migrations:migrate
+```
+
 ## Unreleased (2.3.x)
 
 ### Tom Select default theme no longer auto-imported (admin dark mode)

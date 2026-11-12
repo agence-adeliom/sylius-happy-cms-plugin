@@ -71,6 +71,14 @@ Pick the line matching the Sylius version of your project. Running `composer req
 - **Channels** (optional channel attachment for menus, shared blocks and configs, no BC break): [update note](./docs/migration/CHANNELS.md).
 - **Plugin 2.0 → 2.1** (new content model persistence and new page builder, BC break): [content block migration guide](./docs/migration/CONTENT_BLOCK.md).
 - **Plugin 2.1 → 2.3** (Sylius 2.3 / Symfony 8 support): upgrade Sylius to 2.3, then require `agence-adeliom/sylius-happy-cms-plugin:^2.3`.
+- **Plugin 2.3 → 2.4** (BC break: `FlexibleContentField` removed, the page builder is the only content editor): migrate the JSON contents with `happycms:migrate:content-to-blocks` on 2.3.x first, then follow [UPGRADE.md](./UPGRADE.md#240).
+
+> [!WARNING]
+> **Breaking change in 2.4: the flexible content field is removed.** `FlexibleContentField`, the JSON `content` column of
+> `PageTranslation`, the `happy_cms_block_render()` / `happy_cms_block_assets()` Twig functions and the
+> `block_render` and `flexible_content` configuration nodes no longer exist. Contents are edited with the page builder
+> only. Run `php bin/console happycms:migrate:content-to-blocks` on plugin 2.3.x **before** upgrading: the command is
+> removed in 2.4. Full list and database steps: [UPGRADE.md](./UPGRADE.md#240).
 
 ## Feature preview
 

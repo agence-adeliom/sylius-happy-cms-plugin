@@ -38,12 +38,10 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
 
         $this->processPageConfiguration($config['page'], $container);
         $this->processPageBuilderConfiguration($config['page_builder'], $container);
-        $this->processBlockRenderConfiguration($config['block_render'], $container);
         $this->processSeoConfiguration($config['seo'], $container);
         $this->processConfigConfiguration($config['config'], $container);
         $this->processMenuConfiguration($config['menu'], $container);
         $this->processBlockConfiguration($config['shared_block'], $container);
-        $this->processFlexibleContentConfiguration($config['flexible_content'], $container);
         $this->processMediaConfiguration($config['media'], $container);
 
         $container->registerForAutoconfiguration(BlockTypeInterface::class)
@@ -116,17 +114,6 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
     /**
      * @param array<string, mixed> $config
      */
-    private function processBlockRenderConfiguration(array $config, ContainerBuilder $container): void
-    {
-        foreach ($config as $key => $value) {
-            /** @phpstan-ignore-next-line */
-            $container->setParameter('sylius_happy_cms.block_render.' . $key, $value);
-        }
-    }
-
-    /**
-     * @param array<string, mixed> $config
-     */
     private function processSeoConfiguration(array $config, ContainerBuilder $container): void
     {
         foreach ($config as $key => $value) {
@@ -178,26 +165,6 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
             /** @phpstan-ignore-next-line */
             $container->setParameter(sprintf('sylius_happy_cms.shared_block.%s', $key), $value);
         }
-    }
-
-    /**
-     * @param array<string, mixed> $config
-     */
-    private function processFlexibleContentConfiguration(array $config, ContainerBuilder $container): void
-    {
-        $saveAsList = $config['save_as_list'] ?? null;
-
-        if (true !== $saveAsList) {
-            trigger_deprecation(
-                'agence-adeliom/sylius-happy-cms-plugin',
-                '2.3.3',
-                '%s the "sylius_happy_cms.flexible_content.save_as_list" option %s deprecated. It will be removed in 2.4, where flexible contents are always saved as a JSON list in display order. Set it to true to opt in now (see UPGRADE.md).',
-                null === $saveAsList ? 'Not setting' : 'Setting',
-                null === $saveAsList ? 'is' : 'to false is',
-            );
-        }
-
-        $container->setParameter('sylius_happy_cms.flexible_content.save_as_list', true === $saveAsList);
     }
 
     /**

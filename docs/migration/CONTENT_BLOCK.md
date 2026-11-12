@@ -2,6 +2,11 @@
 
 This document explains the migration from the JSON-based page builder system to the new ContentBlock entity system.
 
+> [!IMPORTANT]
+> Plugin 2.4 removes the JSON system: `FlexibleContentField`, the `content` column of `PageTranslation` and the
+> `happycms:migrate:content-to-blocks` command. Run the migration below on plugin 2.3.x, check the result, then upgrade
+> to 2.4 (see [UPGRADE.md](../../UPGRADE.md#240)).
+
 ## Table of Contents
 
 - [What's Changing?](#whats-changing)
@@ -283,15 +288,11 @@ $sidebarBlocks = $page->getPublishedContentBlocks('en', 'sidebar');
 $mainBlocks = $page->getPublishedContentBlocks('en', 'main');
 ```
 
-### 4. Cleanup (Optional, After Validation)
+### 4. Cleanup
 
-Once you're certain everything works correctly, you might consider:
-
-1. **Remove the old `content` field** (do this carefully)
-2. **Create a Doctrine migration** to drop the column
-3. **Update your forms** to no longer use the JSON field
-
-⚠️ **Warning**: Keep the old field for at least a few weeks/months to allow rollback if necessary.
+Plugin 2.4 drops the `content` property of `PageTranslation`: `doctrine:migrations:diff` then generates the migration
+that drops the column. Remove the `FlexibleContentField` of your own Admins, and the JSON `content` properties of your
+own entities, before upgrading.
 
 ---
 
@@ -316,9 +317,7 @@ Once you're certain everything works correctly, you might consider:
 
 ### I want to keep the old system
 
-You can continue using the old JSON system. The new system is **opt-in**:
-- Simply don't run the migration command
-- The `content` field continues to work normally
+The JSON system works up to plugin 2.3.x only. Plugin 2.4 removes it: migrate your contents before upgrading.
 
 ### I'm getting errors during migration
 

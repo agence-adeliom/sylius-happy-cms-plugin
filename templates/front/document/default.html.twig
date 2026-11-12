@@ -10,8 +10,7 @@
 {% endblock %}
 
 {% block content %}
-    {# New ContentBlock system - check if entity has contentBlocks #}
-    {% if resource.contentBlocks is defined and resource.contentBlocks|length > 0 %}
+    {% if resource.contentBlocks is defined %}
         {% if preview is defined and preview %}
             {# In preview mode, get blocks sorted by preview position with preview publish state #}
             {% set contentBlocks = resource.getContentBlocksForPreview(app.request.locale) %}
@@ -24,12 +23,6 @@
             {{ happy_cms_content_block_render(contentBlock, preview|default(false)) }}
         {% endfor %}
         {{ happy_cms_content_block_assets() }}
-    {% else %}
-        {# Legacy system - fallback to old content field in translations #}
-        {% for block in (resource.translation(app.request.locale)|default({content: []})).content %}
-            {{ happy_cms_block_render(block, preview) }}
-        {% endfor %}
-        {{ happy_cms_block_assets() }}
     {% endif %}
 
     {{ happy_cms_shared_block_assets() }}

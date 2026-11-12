@@ -73,7 +73,7 @@ final class MakeHappyCMS extends AbstractMaker
                 'no-flexible-content',
                 null,
                 InputOption::VALUE_NONE,
-                'Disable flexible content blocks for this model',
+                'Disable the page builder blocks for this model',
             )
             ->addOption(
                 'no-taxonomy',

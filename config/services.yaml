@@ -167,14 +167,6 @@ services:
     tags:
       - { name: 'console.command' }
 
-  sylius.happy_cms.command.migrate_content_to_new_block_builder:
-    class: Adeliom\SyliusHappyCMSPlugin\Command\MigrateContentToBlocksCommand
-    arguments:
-      - '@doctrine.orm.entity_manager'
-      - '@parameter_bag'
-    tags:
-      - { name: 'console.command' }
-
   sylius.happy_cms.command.create_demo_pages:
     class: Adeliom\SyliusHappyCMSPlugin\Command\Starter\CreateDemoPagesCommand
     arguments:

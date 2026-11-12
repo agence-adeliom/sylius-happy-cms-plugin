@@ -312,55 +312,6 @@ public function supports(?ContentEditableInterface $resource = null): bool
 }
 ```
 
-## Flexible content field (blocks stored as JSON)
-
-`FlexibleContentField` edits a JSON column holding a list of blocks; each entry is
-`{"block_type": "<block class>", "block_published": "1", "position": 0, ...block fields}`.
-
-```php
-FlexibleContentField::new('content')
-    // block classes allowed in this field (all registered blocks when omitted)
-    ->allowedBlocks([TextBlockType::class, GalleryBlockType::class])
-;
-```
-
-### Saved value: `flexible_content.save_as_list`
-
-```yaml
-sylius_happy_cms:
-    flexible_content:
-        save_as_list: true
-```
-
-- `true`: on save, the entries are sorted by the positions written by the admin script, stored as a JSON **list**
-  (never as an object keyed by form names) and their `position` is renumbered `0`, `1`, `2`… (integers). Entries
-  without a numeric position go after the others, in submitted order; a submitted row without `block_type` is
-  ignored. This is the only behaviour in 2.4.
-- Not set or `false` (deprecated): legacy save. The entries keep the form names as keys (a JSON object such as
-  `{"3": …, "a1b2-c3d": …}` as soon as a block is moved, removed or added) and the positions posted by the admin
-  script; a block at position `0` is moved to the end (`999`).
-
-In both modes, a content stored as a JSON list (or as an object with numeric keys) can be edited.
-
-## Flexible content prototypes
-
-By default, a block added to a `FlexibleContentField` only holds its technical fields (`block_type`,
-`block_published`, `position`) and a "please save" notice: it is filled after the first save. With
-`completePrototypes()` (form option `complete_prototypes`), the prototype of each block holds all its fields, so a new
-block can be filled and saved in one go:
-
-```php
-FlexibleContentField::new('content')
-    ->completePrototypes()
-;
-```
-
-The admin script needs no change (it replaces the prototype placeholder and runs the inline scripts of the new
-block). Check in a browser the blocks whose fields need a JavaScript initialization (WYSIWYG, media, nested
-collections) before enabling it.
-
-A stored block whose type is not in the allowed list of the field is rendered under its class name.
-
 ## Assets Management
 
 ### Frontend Assets
@@ -607,10 +558,10 @@ php bin/console cache:clear
 
 ## Display block on front-end
 
-Full example to render blocks and assets in your page template, checking for both the new content block system and the legacy content field:
+Full example to render the page builder blocks and their assets in your page template:
 
 ```twig
-    {% if resource.contentBlocks is defined and resource.contentBlocks|length > 0 %}
+    {% if resource.contentBlocks is defined %}
         {% if preview is defined and preview %}
             {# In preview mode, get blocks sorted by preview position with preview publish state #}
             {% set contentBlocks = resource.getContentBlocksForPreview(app.request.locale) %}
@@ -627,54 +578,6 @@ Full example to render blocks and assets in your page template, checking for bot
 
     {{ happy_cms_shared_block_assets() }}
 ```
-
-### Blocks stored as JSON (flexible content field)
-
-When the blocks are stored as an array in a JSON column (`FlexibleContentField`), each entry holds the block fields
-plus `block_type`, `position` and `block_published`. Render them in order with `happy_cms_block_render()`:
-
-```twig
-{% for block in resource.content %}
-    {{ happy_cms_block_render(block, preview|default(false), {extra_variable: 'value'}) }}
-{% endfor %}
-{{ happy_cms_block_assets() }}
-```
-
-The block template receives `block` (the raw entry), `blockType`, `preview` and `settings` (the entry without
-`block_type` and `position`, with an `attr_id` of `block-1`, `block-2`… in rendering order when the entry has none:
-use it as the anchor of the block), plus the third argument.
-
-These options change how these blocks are rendered (all disabled by default):
-
-```yaml
-sylius_happy_cms:
-  block_render:
-    # The block templates also receive the variables of the calling template (resource, page, loop...).
-    # Block variables (block, blockType, preview, settings) and the third argument take precedence.
-    inherit_context: true
-
-    # Render the entries that have no "block_published" key, e.g. content imported or migrated from another
-    # system. An explicit "0", "", false or null still hides the block.
-    missing_published_means_published: true
-
-    # A block that fails to render is logged (error level, with its type, position and exception) and skipped;
-    # the rest of the page is rendered. Usually enabled in production only:
-    swallow_render_errors: false
-
-when@prod:
-  sylius_happy_cms:
-    block_render:
-      swallow_render_errors: true
-```
-
-`swallow_render_errors` accepts an environment variable (`'%env(bool:HAPPY_CMS_SWALLOW_BLOCK_ERRORS)%'`), handy to
-make broken blocks visible on a staging environment that runs in `prod`.
-
-With `inherit_context`, the Twig function calls `Helper::renderBlockInContext()` with the context of the calling
-template; without it, it calls `Helper::renderBlock()` as before (an override of `renderBlock()` in a project helper
-keeps being used). `Helper::renderBlock()` never receives a context: PHP callers pass the variables they need as the
-third argument. `missing_published_means_published` and `swallow_render_errors` apply to both methods. Blocks whose `block_type` is not a
-registered block are skipped silently.
 
 ### Rendering assets
 

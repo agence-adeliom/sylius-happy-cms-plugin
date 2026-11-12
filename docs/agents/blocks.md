@@ -718,7 +718,6 @@ Plugin form types:
 
 ## Database Schema
 
-Blocks are stored as JSON in content pages:
-- `content_blocks` field in routable entities
-- JSON array of block configurations
-- Each block has: `block_type`, `block_published`, `position`, and field data
+Blocks are stored by the page builder, one `ContentBlock` row per block:
+- `contentBlocks` association of the content-editable entities (`ContentEditableInterface`)
+- Each row has: `type` (the block class), `locale`, `position`, publish state, and the block fields as `draftData` / `publishedData` (JSON)

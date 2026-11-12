@@ -27,7 +27,7 @@ final class ListBlocks
      */
     #[MateTool(
         name: 'happy_cms_list_blocks',
-        description: 'List the registered Happy CMS blocks (flex and shared): block_type (the value stored in the content JSON), name, tab, position, front template, assets, AI-generatable. With "alias" (an easy-crud resource such as app.page), only the flex blocks allowed in its flexible content fields, with the fields allowing each one. Filter by "kind" (flex, shared).',
+        description: 'List the registered Happy CMS blocks (flex and shared): block_type (the type stored on each page builder block), name, tab, position, front template, assets, AI-generatable. With "alias" (an easy-crud resource such as app.page), only the flex blocks its page builder offers. Filter by "kind" (flex, shared).',
     )]
     public function __invoke(?string $alias = null, ?string $kind = null): array
     {
@@ -65,8 +65,8 @@ final class ListBlocks
     }
 
     /**
-     * The flex blocks the flexible content fields of a resource accept, filtered as FlexibleContentConfigurator does:
-     * the block types declared by the field (every block when none), then BlockTypeInterface::supports().
+     * The flex blocks the page builder of a resource offers, filtered as the block editor does: by
+     * BlockTypeInterface::supports().
      *
      * @return array<string, mixed>
      */
@@ -77,30 +77,19 @@ final class ListBlocks
             return Envelope::empty(sprintf('"%s" is not an easy-crud resource. Call easy_crud_list_admins to find it.', $alias));
         }
 
-        $fields = $reader->flexibleContentFields($reader->admin($resource['admin']), $reader->defaultLocale());
-        if ([] === $fields) {
-            return Envelope::empty(sprintf('The Admin of "%s" has no FlexibleContentField on its update page.', $alias));
+        if (!is_a($resource['model'], ContentEditableInterface::class, true)) {
+            return Envelope::empty(sprintf('The model of "%s" is not content-editable: it has no page builder.', $alias));
         }
 
-        // supports() receives the edited resource: a new instance stands for it, as on the create page. It only takes
-        // a content-editable resource (the relational page builder).
+        // supports() receives the edited resource: a new instance stands for it, as on the create page.
         $instance = $this->newInstance($resource['model']);
 
-        $blocks = [];
-        $allowingFields = [];
-        foreach ($fields as $field) {
-            foreach ($reader->blocks()->getAllowedBlocks($field['blocks'], $instance) as $type => $block) {
-                $blocks[$type] = $block;
-                $allowingFields[$type][] = $field['property'];
-            }
-        }
-
         $items = [];
-        foreach ($blocks as $type => $block) {
-            $items[] = $this->describe('flex', $type, $block) + ['fields' => $allowingFields[$type]];
+        foreach ($reader->blocks()->getAllowedBlocks(null, $instance) as $type => $block) {
+            $items[] = $this->describe('flex', $type, $block);
         }
 
-        return Envelope::items($items, note: null === $instance ? sprintf('"%s" is not content-editable or could not be instantiated: supports() was called without the resource.', $resource['model']) : null);
+        return Envelope::items($items, note: null === $instance ? sprintf('"%s" could not be instantiated: supports() was called without the resource.', $resource['model']) : null);
     }
 
     /**

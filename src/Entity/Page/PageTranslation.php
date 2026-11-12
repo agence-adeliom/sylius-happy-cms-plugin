@@ -12,13 +12,11 @@ use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Event\PreRemoveEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\PrePersist;
 use Doctrine\ORM\Mapping\PreRemove;
 use Doctrine\ORM\Mapping\PreUpdate;
 use Sylius\Resource\Model\AbstractTranslation;
 use Symfony\Component\Serializer\Attribute\Groups;
-use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\MappedSuperclass]
 class PageTranslation extends AbstractTranslation implements PageTranslationInterface
@@ -40,31 +38,9 @@ class PageTranslation extends AbstractTranslation implements PageTranslationInte
         return $this->id;
     }
 
-    /** @var array<string, mixed>|null $content */
-    #[Groups('main')]
-    #[Column(name: 'content', type: Types::JSON, nullable: true)]
-    #[Assert\Type('array')]
-    protected ?array $content = [];
-
     public function __construct()
     {
         $this->SEOConstruct();
-    }
-
-    /**
-     * @return array<string, mixed>|null
-     */
-    public function getContent(): ?array
-    {
-        return $this->content;
-    }
-
-    /**
-     * @param array<string, mixed>|null $content
-     */
-    public function setContent(?array $content): void
-    {
-        $this->content = $content;
     }
 
     public function getTree(string $separator = '/', bool $name = false): string

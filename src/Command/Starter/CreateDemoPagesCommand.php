@@ -121,7 +121,6 @@ class CreateDemoPagesCommand extends AbstractContentCommand
         $page->setPublishState(ThreeStateStatusEnum::PUBLISHED);
         $page->setFallbackLocale($localeCode);
 
-        // Content blocks (old way)
         $image1 = $this->createMedia(
             'pages/home',
             'image-cms.png',
@@ -359,17 +358,54 @@ class CreateDemoPagesCommand extends AbstractContentCommand
                 ],
             ];
 
-            // setContent method exists in PageTranslationInterface, because it will replace by the new ContentEditableInterface
-            if (method_exists($pageTranslation, 'setContent')) {
-                $pageTranslation->setContent($flexContent);
-            }
-
             $page->addTranslation($pageTranslation);
+            $this->replaceContentBlocks($page, $localeCode, $flexContent);
         }
 
         $this->manager->persist($page);
         $this->manager->flush();
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * Replaces the page builder blocks of a locale with the given blocks, in their order.
+     *
+     * @param array<string, array<string, mixed>> $blocks the block fields, with `block_type` and `block_published`
+     */
+    private function replaceContentBlocks(PageInterface $page, string $locale, array $blocks): void
+    {
+        foreach ($page->getContentBlocks()->toArray() as $contentBlock) {
+            if ($locale === $contentBlock->getLocale()) {
+                $page->removeContentBlock($contentBlock);
+            }
+        }
+
+        $contentBlockClass = $page::getContentBlockClass();
+        $position = 0;
+        foreach ($blocks as $data) {
+            $type = $data['block_type'] ?? null;
+            if (!\is_string($type)) {
+                continue;
+            }
+
+            $published = '1' === ($data['block_published'] ?? null);
+            $state = $published ? ThreeStateStatusEnum::PUBLISHED : ThreeStateStatusEnum::UNPUBLISHED;
+            unset($data['block_type'], $data['block_published'], $data['position']);
+
+            $contentBlock = new $contentBlockClass();
+            $contentBlock->setType($type);
+            $contentBlock->setLocale($locale);
+            $contentBlock->setPosition($position);
+            $contentBlock->setPreviewPosition($position);
+            $contentBlock->setPublishState($state);
+            $contentBlock->setPreviewPublishState($state);
+            $contentBlock->setDraftData($data);
+            if ($published) {
+                $contentBlock->setPublishedData($data);
+            }
+            $page->addContentBlock($contentBlock);
+            ++$position;
+        }
     }
 }

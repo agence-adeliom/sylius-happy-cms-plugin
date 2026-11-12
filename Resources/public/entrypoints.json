@@ -1,13 +1,5 @@
 {
   "entrypoints": {
-    "flexible-content": {
-      "css": [
-        "/bundles/syliushappycmsplugin/flexible-content.48d6f615.css"
-      ],
-      "js": [
-        "/bundles/syliushappycmsplugin/flexible-content.26e202f1.js"
-      ]
-    },
     "media-form": {
       "css": [
         "/bundles/syliushappycmsplugin/media-form.3b516d59.css"
