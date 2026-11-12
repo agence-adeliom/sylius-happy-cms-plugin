@@ -10,42 +10,10 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 final class MediaTwigGlobalConfigurationTest extends TestCase
 {
-    /** @var list<string> */
-    private array $deprecations = [];
-
-    public function testTheFlagIsNullByDefault(): void
-    {
-        $container = new ContainerBuilder();
-        $container->setParameter('kernel.debug', false);
-        (new SyliusHappyCMSExtension())->load([], $container);
-
-        self::assertNull($container->getParameter('sylius_happy_cms.media.twig_global_from_config'));
-    }
-
-    public function testWithoutTheFlagTheTwigGlobalHoldsThePluginDefaultsAndADeprecationIsTriggered(): void
-    {
-        $container = $this->prepend([['media' => ['base_url' => '/media/download', 'storage_name' => 'uploads.storage']]]);
-
-        $media = $this->mediaGlobal($container);
-        self::assertSame('/', $media['base_url']);
-        self::assertSame('default.storage', $media['storage_name']);
-        self::assertCount(1, $this->deprecations);
-        self::assertStringContainsString('Not setting the "sylius_happy_cms.media.twig_global_from_config" option is deprecated.', $this->deprecations[0]);
-    }
-
-    public function testWithTheFlagSetToFalseTheTwigGlobalHoldsThePluginDefaultsAndADeprecationIsTriggered(): void
-    {
-        $container = $this->prepend([['media' => ['base_url' => '/media/download', 'twig_global_from_config' => false]]]);
-
-        self::assertSame('/', $this->mediaGlobal($container)['base_url']);
-        self::assertCount(1, $this->deprecations);
-        self::assertStringContainsString('Setting the "sylius_happy_cms.media.twig_global_from_config" option to false is deprecated.', $this->deprecations[0]);
-    }
-
-    public function testWithTheFlagTheTwigGlobalHoldsTheApplicationConfigurationWithoutDeprecation(): void
+    public function testTheTwigGlobalHoldsTheApplicationConfigurationWithoutOption(): void
     {
         $container = $this->prepend([
-            ['media' => ['twig_global_from_config' => true, 'base_url' => '/media/download', 'storage_name' => 'uploads.storage']],
+            ['media' => ['base_url' => '/media/download', 'storage_name' => 'uploads.storage']],
             ['media' => ['hide_files_ext' => false]],
         ]);
 
@@ -55,34 +23,23 @@ final class MediaTwigGlobalConfigurationTest extends TestCase
         self::assertFalse($media['hide_files_ext']);
         // Defaults stay available.
         self::assertSame(['binary/octet-stream'], $media['extended_mimes']['image']);
-        self::assertSame([], $this->deprecations);
-        // Nothing is prepended to the unknown "media" extension any more.
+        // Nothing is prepended to the unknown "media" extension.
         self::assertSame([], $container->getExtensionConfig('media'));
     }
 
     public function testTheTwigGlobalKeepsParametersForTheTwigConfigurationToResolve(): void
     {
         $container = $this->prepend([
-            ['media' => ['twig_global_from_config' => true, 'base_url' => 'https://%front_url%/media/download']],
+            ['media' => ['base_url' => 'https://%front_url%/media/download']],
         ]);
 
         self::assertSame('https://%front_url%/media/download', $this->mediaGlobal($container)['base_url']);
     }
 
-    public function testTheFlagCanBeAParameter(): void
-    {
-        $container = $this->prepend([
-            ['media' => ['twig_global_from_config' => '%media_twig_global%', 'base_url' => '/media/download']],
-        ], ['media_twig_global' => true]);
-
-        self::assertSame('/media/download', $this->mediaGlobal($container)['base_url']);
-        self::assertSame([], $this->deprecations);
-    }
-
     public function testTheTwigGlobalFallsBackToTheDefaultsOnAValueOnlyValidOnceResolved(): void
     {
         $container = $this->prepend([
-            ['media' => ['twig_global_from_config' => true, 'admin_path' => '%media_admin_path%']],
+            ['media' => ['admin_path' => '%media_admin_path%']],
         ]);
 
         self::assertSame('happy-cms-media/medias', $this->mediaGlobal($container)['admin_path']);
@@ -90,35 +47,18 @@ final class MediaTwigGlobalConfigurationTest extends TestCase
 
     /**
      * @param list<array<string, mixed>> $configs
-     * @param array<string, mixed>       $parameters
      */
-    private function prepend(array $configs, array $parameters = []): ContainerBuilder
+    private function prepend(array $configs): ContainerBuilder
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
-        foreach ($parameters as $name => $value) {
-            $container->setParameter($name, $value);
-        }
         $extension = new SyliusHappyCMSExtension();
         $container->registerExtension($extension);
         foreach ($configs as $config) {
             $container->loadFromExtension('sylius_happy_cms', $config);
         }
 
-        $this->deprecations = [];
-        set_error_handler(function (int $level, string $message): bool {
-            if (str_contains($message, 'twig_global_from_config')) {
-                $this->deprecations[] = $message;
-            }
-
-            return true;
-        }, \E_USER_DEPRECATED);
-
-        try {
-            $extension->prepend($container);
-        } finally {
-            restore_error_handler();
-        }
+        $extension->prepend($container);
 
         return $container;
     }

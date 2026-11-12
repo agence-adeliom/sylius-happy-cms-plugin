@@ -272,24 +272,15 @@ failed. It now searches the folders and media of the whole library by name, pagi
 (media categories) and `page`. Every item carries `folder_id`, `dir_path` and `breadcrumb`. See
 [the media documentation](docs/medias.md#global-search). Bug fix, no option.
 
-### Flag: `sylius_happy_cms.media` Twig global built from the application configuration
-
-```yaml
-sylius_happy_cms:
-    media:
-        twig_global_from_config: true
-```
+### `sylius_happy_cms.media` Twig global built from the application configuration
 
 The Twig global `sylius_happy_cms.media`, read by the media manager templates (`base_url`, `hide_files_ext`,
-`extended_mimes`, `enable_broadcasting`, `enable_generating_alts`, `locales`...), is built in `prepend()` from the
-configuration of a `media` extension that does not exist: it always holds the plugin defaults (`base_url: '/'`,
-`storage_name: 'default.storage'`...), whatever the application configures. With `true`, it holds the
-`sylius_happy_cms.media` configuration of the application (parameters such as `%front_url%` are resolved with the
-Twig configuration; on a value only valid once resolved, e.g. an environment variable in a constrained node, the
-defaults are exposed). Not setting the option, or setting it to `false`, keeps the defaults and triggers a deprecation.
-Templates of the application reading `sylius_happy_cms.media.*` get the configured values once opted in.
-
-In 2.4 the option is removed and the global holding the application configuration is the only behaviour.
+`extended_mimes`, `enable_broadcasting`, `enable_generating_alts`, `locales`...), was built in `prepend()` from the
+configuration of a `media` extension that does not exist: it always held the plugin defaults (`base_url: '/'`,
+`storage_name: 'default.storage'`...), whatever the application configured. It now holds the `sylius_happy_cms.media`
+configuration of the application (parameters such as `%front_url%` are resolved with the Twig configuration; on a
+value only valid once resolved, e.g. an environment variable in a constrained node, the defaults are exposed).
+Templates of the application reading `sylius_happy_cms.media.*` get the configured values. Bug fix, no option.
 
 ### New `MediaManager::createMediaFromSource()`, flag: name of a data URI source
 

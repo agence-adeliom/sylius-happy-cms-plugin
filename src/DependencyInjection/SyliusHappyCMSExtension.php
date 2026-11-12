@@ -254,60 +254,13 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
     {
         $this->prependDoctrineMigrations($container);
 
-        $twigGlobalFromConfig = $this->getMediaTwigGlobalFromConfig($container);
-        if (true === $twigGlobalFromConfig) {
-            $mediaGlobals = $this->getMediaConfiguration($container);
-        } else {
-            trigger_deprecation(
-                'agence-adeliom/sylius-happy-cms-plugin',
-                '2.3.3',
-                (null === $twigGlobalFromConfig ? 'Not setting the "%s" option is deprecated.' : 'Setting the "%s" option to false is deprecated.') . ' It will be removed in 2.4, where the "sylius_happy_cms.media" Twig global holding the media configuration of the application is the only behaviour. Set it to true to opt in now (see UPGRADE.md).',
-                'sylius_happy_cms.media.twig_global_from_config',
-            );
-
-            // Legacy: the configuration of the unknown "media" extension, i.e. the plugin defaults.
-            $configs = $container->getExtensionConfig('media');
-            $configuration = $this->getConfiguration($configs, $container);
-            /** @var array<string, array<string, mixed>> $config */
-            $config = $this->processConfiguration($configuration, $configs);
-            $config = $config['media'];
-
-            $container->prependExtensionConfig('media', $config);
-            $mediaGlobals = [];
-            foreach ($config as $k => $v) {
-                $mediaGlobals[$k] = $v;
-            }
-        }
+        $mediaGlobals = $this->getMediaConfiguration($container);
         $twigConfig = [
             'paths' => [__DIR__ . '/../../templates/media' => 'media'],
             'globals' => ['sylius_happy_cms' => ['media' => $mediaGlobals]],
         ];
 
         $container->prependExtensionConfig('twig', $twigConfig);
-    }
-
-    /**
-     * The value of `sylius_happy_cms.media.twig_global_from_config` set by the application (the last one wins), null
-     * when not set. Read before the configuration is processed, since the Twig global is prepended.
-     */
-    private function getMediaTwigGlobalFromConfig(ContainerBuilder $container): ?bool
-    {
-        $value = null;
-        foreach ($container->getExtensionConfig($this->getAlias()) as $config) {
-            if (isset($config['media']) && is_array($config['media']) && array_key_exists('twig_global_from_config', $config['media'])) {
-                $value = $config['media']['twig_global_from_config'];
-            }
-        }
-
-        if (is_string($value)) {
-            try {
-                $value = $container->getParameterBag()->resolveValue($value);
-            } catch (\Throwable) {
-                $value = null;
-            }
-        }
-
-        return null === $value ? null : filter_var($value, \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE);
     }
 
     /**
@@ -322,8 +275,6 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
         $configs = [];
         foreach ($container->getExtensionConfig($this->getAlias()) as $config) {
             if (isset($config['media']) && is_array($config['media'])) {
-                // Already read by getMediaTwigGlobalFromConfig(), possibly as a parameter.
-                unset($config['media']['twig_global_from_config']);
                 $configs[] = ['media' => $config['media']];
             }
         }
