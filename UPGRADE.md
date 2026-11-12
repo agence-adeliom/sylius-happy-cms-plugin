@@ -398,7 +398,7 @@ With `true`, repeated slashes in a computed route path are collapsed (`/en_US//a
 deprecation is triggered). Stored routes are not rewritten when you opt in: re-save the routable entities whose path
 contained `//`.
 
-In 3.0 the option is removed and collapsing the repeated slashes is the only behaviour.
+In 2.4 the option is removed and collapsing the repeated slashes is the only behaviour.
 
 ## 2.3.1
 

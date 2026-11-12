@@ -122,7 +122,7 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
 
     /**
      * Compatibility flag of the "sylius_happy_cms.routing" section: null (not set) or false keep the current behaviour
-     * and trigger a deprecation, true opts in the behaviour of 3.0.
+     * and trigger a deprecation, true opts in the behaviour of 2.4.
      */
     private function resolveRoutingFlag(mixed $value, string $option, string $newBehaviour): bool
     {
@@ -134,7 +134,7 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
             'agence-adeliom/sylius-happy-cms-plugin',
             '2.3.3',
             sprintf(
-                '%s the "sylius_happy_cms.routing.%s" option %sis deprecated. It will be removed in 3.0, where %s is the only behaviour. Set it to true to opt in now (see UPGRADE.md).',
+                '%s the "sylius_happy_cms.routing.%s" option %sis deprecated. It will be removed in 2.4, where %s is the only behaviour. Set it to true to opt in now (see UPGRADE.md).',
                 null === $value ? 'Not setting' : 'Setting',
                 $option,
                 null === $value ? '' : 'to false ',

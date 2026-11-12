@@ -697,7 +697,7 @@ class Configuration implements ConfigurationInterface
             ->end()
             ->booleanNode('collapse_slashes')
             ->defaultNull()
-            ->info('true: collapse the repeated slashes of a computed route path ("/en_US//about" becomes "/en_US/about", an empty placeholder leaves no double slash). Not set or false: the path is kept as filled (deprecated). In 3.0 the option is removed and collapsing is the only behaviour.')
+            ->info('true: collapse the repeated slashes of a computed route path ("/en_US//about" becomes "/en_US/about", an empty placeholder leaves no double slash). Not set or false: the path is kept as filled (deprecated). In 2.4 the option is removed and collapsing is the only behaviour.')
             ->end()
             ->end()
             ->end()
