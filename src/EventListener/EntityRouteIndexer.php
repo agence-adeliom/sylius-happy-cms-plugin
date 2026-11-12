@@ -7,6 +7,7 @@ namespace Adeliom\SyliusHappyCMSPlugin\EventListener;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
 use Adeliom\SyliusHappyCMSPlugin\Event\Route\CalculateRouteStaticPrefixEvent;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\PostPersistEventArgs;
@@ -18,6 +19,7 @@ use Symfony\Cmf\Bundle\RoutingBundle\Model\Route as RouteModel;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Route as SymfonyRoute;
 
 class EntityRouteIndexer
 {
@@ -43,6 +45,7 @@ class EntityRouteIndexer
         protected string $urlPattern = self::DEFAULT_URL_PATTERN,
         protected bool $collapseSlashes = false,
         protected bool $trailingSlash = false,
+        protected bool $recomputeChildRoutes = false,
     ) {
     }
 
@@ -226,8 +229,10 @@ class EntityRouteIndexer
     /**
      * If an uri is modified, ex: /mapage-1 => /ma-page-1, we need to update all other routes starting with the
      * same prefix.
-     * This method will find all routes that start with the previous static prefix and update them to use the new
-     * TODO: replace findAll() with an optimized query to avoid loading all routes
+     * With "sylius_happy_cms.routing.recompute_child_routes": the routes with exactly the previous prefix or below it
+     * ("/mapage-1/…", never a sibling sharing the first characters like "/mapage-12") are recomputed from their
+     * content (see recomputeRoutesBelowStaticPrefix()). Without it (legacy): every route starting with the previous
+     * prefix (findAll()), every occurrence of the prefix in their path is replaced.
      *
      * @param Collection<int, RouteInterface> $excludedRoutes
      */
@@ -236,6 +241,12 @@ class EntityRouteIndexer
         string $previousStaticPrefix,
         Collection $excludedRoutes,
     ): void {
+        if ($this->recomputeChildRoutes) {
+            $this->recomputeRoutesBelowStaticPrefix($staticPrefix, $previousStaticPrefix, $excludedRoutes);
+
+            return;
+        }
+
         if ($previousStaticPrefix && $previousStaticPrefix !== $staticPrefix) {
             $allRoutes = $this->manager->getRepository(RouteInterface::class)->findAll();
 
@@ -259,5 +270,131 @@ class EntityRouteIndexer
                 $this->manager->getConnection()->commit();
             }
         }
+    }
+
+    /**
+     * Public entry point to move the routes below a path that is not a CMS route, e.g. the slug of a parent of
+     * another type has changed (CmsRoutableInterface::getRouteStaticPrefix()). Call it outside of a Doctrine flush; the routes
+     * are flushed. With "sylius_happy_cms.routing.recompute_child_routes", the routes of a routable content are
+     * recomputed (the parent of another type must already have its new slug): $staticPrefix only moves the routes
+     * without routable content.
+     */
+    public function rewriteStaticPrefix(string $previousStaticPrefix, string $staticPrefix): void
+    {
+        $this->rewriteOtherStaticPrefix($staticPrefix, $previousStaticPrefix, new ArrayCollection());
+    }
+
+    /**
+     * Recomputes the stored routes whose static prefix is the previous one or starts with it followed by "/": the
+     * path of a route is computed again from its content (CmsRoutableInterface::getRouteStaticPrefix(),
+     * CalculateRouteStaticPrefixEvent), as when the content is saved. A route below the previous path that
+     * does not belong to the renamed entity (a content of another type with the same slug, and its children) keeps its
+     * path. A route without routable content (or that is not an online route) has its leading prefix replaced.
+     *
+     * The descendants are all found by the prefix query: each content is recomputed once, without rewriting the
+     * routes below its own path again.
+     *
+     * @param Collection<int, RouteInterface> $excludedRoutes
+     */
+    protected function recomputeRoutesBelowStaticPrefix(
+        string $staticPrefix,
+        string $previousStaticPrefix,
+        Collection $excludedRoutes,
+    ): void {
+        $previousBase = rtrim($previousStaticPrefix, '/');
+        // "" (new route) has no descendants; "/" is the prefix of every route
+        if ('' === $previousBase || $previousStaticPrefix === $staticPrefix) {
+            return;
+        }
+        $newBase = rtrim($staticPrefix, '/');
+
+        $routesToUpdate = $this->findRoutesUnderStaticPrefix($previousBase);
+        if ([] === $routesToUpdate) {
+            return;
+        }
+
+        $this->manager->getConnection()->beginTransaction();
+        /** @var array<int, true> $recomputedContents */
+        $recomputedContents = [];
+        foreach ($routesToUpdate as $routeToUpdate) {
+            // skip the routes of the entity
+            if ($excludedRoutes->contains($routeToUpdate) || !self::isUnderStaticPrefix($routeToUpdate->getStaticPrefix(), $previousBase)) {
+                continue;
+            }
+
+            $content = $this->findRoutableContent($routeToUpdate);
+            if (null !== $content) {
+                if (!isset($recomputedContents[spl_object_id($content)])) {
+                    $recomputedContents[spl_object_id($content)] = true;
+                    $routesChanges = [];
+                    $this->computeRoutes($routesChanges, $content, self::ROUTE_ONLINE, $this->manager);
+                }
+
+                continue;
+            }
+
+            // No routable content: move the leading prefix
+            $rewritten = $newBase . substr($routeToUpdate->getStaticPrefix(), strlen($previousBase));
+            $routeToUpdate->setStaticPrefix('' === $rewritten ? '/' : $rewritten);
+            $this->manager->persist($routeToUpdate);
+        }
+        $this->manager->flush();
+        $this->manager->getConnection()->commit();
+    }
+
+    /**
+     * The routable content of an online route computed by this indexer, null for another route (no content, content
+     * removed or not routable).
+     */
+    protected function findRoutableContent(RouteInterface $route): ?CmsRoutableInterface
+    {
+        if (!$route instanceof SymfonyRoute || !str_starts_with($route->getName(), self::ROUTE_ONLINE)) {
+            return null;
+        }
+
+        $contentId = $route->getDefault(RouteObjectInterface::CONTENT_ID);
+        if (!is_string($contentId) || '' === $contentId) {
+            return null;
+        }
+
+        $content = $this->contentRepository->findById($contentId);
+
+        return $content instanceof CmsRoutableInterface ? $content : null;
+    }
+
+    /**
+     * @return RouteInterface[] the stored routes whose static prefix is $base or starts with "$base/"
+     */
+    protected function findRoutesUnderStaticPrefix(string $base): array
+    {
+        /** @var RouteInterface[] $routes */
+        $routes = $this->manager->createQueryBuilder()
+            ->select('route')
+            ->from($this->getRouteClass(), 'route')
+            ->where('route.staticPrefix = :base')
+            ->orWhere("route.staticPrefix LIKE :descendants ESCAPE '!'")
+            ->setParameter('base', $base)
+            ->setParameter('descendants', str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $base) . '/%')
+            ->getQuery()
+            ->getResult()
+        ;
+
+        return $routes;
+    }
+
+    protected static function isUnderStaticPrefix(string $staticPrefix, string $base): bool
+    {
+        return $staticPrefix === $base || str_starts_with($staticPrefix, $base . '/');
+    }
+
+    /**
+     * @return class-string<RouteInterface>
+     */
+    protected function getRouteClass(): string
+    {
+        /** @var class-string<RouteInterface> $routeClass */
+        $routeClass = $this->parameterBag->get('cmf_routing.dynamic.persistence.orm.route_class');
+
+        return $routeClass;
     }
 }

@@ -13,8 +13,11 @@ use Sylius\Resource\Model\TranslatableInterface;
 use Sylius\Resource\Model\TranslationInterface;
 
 /**
- * A minimal routable entity: one slug per translation, no parent page.
- * $category is a parent of another type (not routable), used to compute a parent path.
+ * A minimal routable entity: one slug per translation, an optional parent page ($parent, its path prefixes the one
+ * of the page, like the parent of a Page).
+ * $category is a parent of another type (not routable), placed in the path by a CalculateRouteStaticPrefixEvent
+ * listener. $taxon is a parent of another type placed in the path by getRouteStaticPrefix() itself; $renamedTaxons
+ * renames a taxon outside of the pages (taxon => slug).
  */
 #[ORM\Entity]
 #[ORM\Table(name: 'indexed_page')]
@@ -22,6 +25,7 @@ class IndexedPage implements CmsRoutableInterface, TranslatableInterface
 {
     use EntityRouteTrait {
         EntityRouteTrait::__construct as private initializeRoutes;
+        EntityRouteTrait::getRouteStaticPrefix as private getOwnRouteStaticPrefix;
     }
 
     #[ORM\Id]
@@ -36,14 +40,36 @@ class IndexedPage implements CmsRoutableInterface, TranslatableInterface
     #[ORM\Column(nullable: true)]
     public ?string $category = null;
 
+    #[ORM\ManyToOne(targetEntity: self::class)]
+    public ?IndexedPage $parent = null;
+
+    #[ORM\Column(nullable: true)]
+    public ?string $taxon = null;
+
+    /** @var array<string, string> */
+    public static array $renamedTaxons = [];
+
     #[ORM\Column]
     public bool $isHomePage = false;
 
-    public function __construct(string $slug, string $locale = 'en_US')
+    public function __construct(?string $slug, string $locale = 'en_US', string $name = 'Page')
     {
         $this->initializeRoutes();
         $this->translations = new ArrayCollection();
-        $this->addTranslation(new IndexedPageTranslation($locale, $slug));
+        $this->addTranslation(new IndexedPageTranslation($locale, $slug, $name));
+    }
+
+    public function getRouteStaticPrefix(TranslationInterface $translation): string
+    {
+        $path = $this->getOwnRouteStaticPrefix($translation);
+        if (null !== $this->taxon) {
+            return '/' . (self::$renamedTaxons[$this->taxon] ?? $this->taxon) . $path;
+        }
+        if (null === $this->parent) {
+            return $path;
+        }
+
+        return $this->parent->getRouteStaticPrefix($this->parent->getTranslation($translation->getLocale())) . $path;
     }
 
     public function getId(): ?int

@@ -55,7 +55,11 @@ When you save a routable entity (Page, BlogPost, etc.), the plugin automatically
 
 1. Creates or updates database routes for each language
 2. Calculates URLs based on parent hierarchy
-3. Updates child routes when parent URLs change
+3. Updates child routes when parent URLs change: with `routing.recompute_child_routes: true` (the only
+   behaviour in 3.0), the routes whose path is the previous path or starts with the previous path followed by `/`
+   are recomputed from their content (renaming `/door` moves its child page `/door/wooden`, not `/doors`, nor
+   `/door/sliding` placed under a taxon `door` by its `getRouteStaticPrefix()`); without it (deprecated), every route
+   starting with the previous path is rewritten as a string
 4. Stores routes in the `..._route` database table
 
 ### URL Structure
@@ -159,6 +163,20 @@ route (`cmf_routing.orm_content_repository`). A route without a `CmsRoutableInte
 route) is redirected as soon as it matches.
 
 Existing routes are not rewritten when the option changes: re-save the entities.
+
+### Parent of another type changed
+
+The path of an entity is computed by `CmsRoutableInterface::getRouteStaticPrefix()`: an entity placed under a parent
+of another type (a taxon, a non-routable category) returns the whole path, e.g. `/doors/wooden-door`. When the slug
+of that parent changes, update the routes below its previous path from your own listener or handler, outside of a
+Doctrine flush (the routes are flushed):
+
+```php
+$this->entityRouteIndexer->rewriteStaticPrefix('/doors', '/entry-doors');
+```
+
+With `routing.recompute_child_routes: true`, the routes below `/doors` are recomputed from their content: call it once
+the parent has its new slug; the new path given only moves the routes without routable content.
 
 ### Custom Controller
 

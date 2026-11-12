@@ -416,6 +416,40 @@ routes: re-save the routable entities afterwards.
 
 `EntityRouteIndexer` takes a new optional constructor argument, `$trailingSlash` (default `false`).
 
+### Deprecated: not setting `sylius_happy_cms.routing.recompute_child_routes`
+
+```yaml
+sylius_happy_cms:
+    routing:
+        recompute_child_routes: true
+```
+
+When the path of an entity changes, the indexer updates the stored routes below its previous path. Not set or
+`false` (a deprecation is triggered), it keeps its current behaviour: it loads every route and rewrites the ones
+starting with the previous path as strings, `str_replace()`-ing every occurrence of it (renaming `/porte` also
+rewrites `/portes-d-entree` into `/portails-d-entree`, and `/porte/porte-bois` into `/portail/portail-bois`).
+
+With `true`, the routes with exactly the previous path or below it at a `/` boundary are selected by a query on the
+route class (`cmf_routing.dynamic.persistence.orm.route_class`) instead of `findAll()`, then each one is recomputed
+from its content, as when the content is saved (`CmsRoutableInterface::getRouteStaticPrefix()`,
+`CalculateRouteStaticPrefixEvent`):
+
+- `/porte/porte-bois`, a child page of `/porte`, becomes `/portail/porte-bois`;
+- `/portes-d-entree` is unchanged (not below `/porte/`);
+- `/porte/coulissante`, placed under a taxon `porte` (another type, same slug) by its `getRouteStaticPrefix()`, is
+  unchanged: its path is still computed from the taxon;
+- a route without routable content (not an online route of the indexer, content removed) has its leading prefix
+  replaced.
+
+`/` (homepage) is never used as a prefix. Each content below the path is loaded (`ContentRepository::findById()`).
+Already stored routes are not changed when you opt in; check (and fix) the routes rewritten by mistake before.
+
+`EntityRouteIndexer` takes a new optional constructor argument, `$recomputeChildRoutes` (default `false`), and a new
+public method, `rewriteStaticPrefix()`, to update the routes below the path of a parent of another type whose slug
+changed (call it outside of a Doctrine flush, once the parent has its new slug).
+
+In 3.0 the option is removed and recomputing the routes below a renamed path is the only behaviour.
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required

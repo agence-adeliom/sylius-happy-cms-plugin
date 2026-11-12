@@ -121,6 +121,11 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
             'collapse_slashes',
             'collapsing the repeated slashes of a computed route path',
         ));
+        $container->setParameter('sylius_happy_cms.routing.recompute_child_routes', $this->resolveRoutingFlag(
+            $config['recompute_child_routes'] ?? null,
+            'recompute_child_routes',
+            'recomputing the routes below a renamed path from their content',
+        ));
 
         if (true === $config['trailing_slash']) {
             $container->register(TrailingSlashRedirectListener::class, TrailingSlashRedirectListener::class)
