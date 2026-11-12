@@ -26,7 +26,7 @@ use Adeliom\SyliusHappyCMSPlugin\Attribute\BlockAttributeResolver;
  *
  * @phpstan-require-extends AbstractBlock
  *
- * @deprecated since 2.3.3, to be removed in 2.4, where AbstractBlock reads #[AsBlock] itself: only remove "use BlockAttributeMetadataTrait;" when upgrading.
+ * @deprecated since 2.3.4, to be removed in 2.4, where AbstractBlock reads #[AsBlock] itself: only remove "use BlockAttributeMetadataTrait;" when upgrading.
  */
 trait BlockAttributeMetadataTrait
 {

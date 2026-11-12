@@ -22,7 +22,7 @@ use Symfony\Component\Form\FormBuilderInterface;
  *
  * @phpstan-require-extends AbstractSharedBlockType
  *
- * @deprecated since 2.3.3, to be removed in 2.4, where AbstractSharedBlockType reads #[AsSharedBlock] itself: only remove "use SharedBlockAttributeMetadataTrait;" when upgrading.
+ * @deprecated since 2.3.4, to be removed in 2.4, where AbstractSharedBlockType reads #[AsSharedBlock] itself: only remove "use SharedBlockAttributeMetadataTrait;" when upgrading.
  */
 trait SharedBlockAttributeMetadataTrait
 {
