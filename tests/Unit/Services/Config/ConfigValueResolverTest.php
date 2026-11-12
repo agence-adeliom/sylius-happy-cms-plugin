@@ -38,11 +38,11 @@ final class ConfigValueResolverTest extends TestCase
         $localeProvider->method('getDefaultLocaleCode')->willReturn('en_US');
 
         $this->resolver = new ConfigValueResolver(
-            $this->repository,
             $this->channelContext,
             $this->localeContext,
             $localeProvider,
             new ConfigValueConverter(),
+            $this->repository,
         );
     }
 
@@ -198,6 +198,6 @@ final class ConfigValueResolverTest extends TestCase
     {
         $localeProvider = $this->createMock(TranslationLocaleProviderInterface::class);
         $localeProvider->method('getDefaultLocaleCode')->willReturn('en_US');
-        $this->resolver = new ConfigValueResolver($this->repository, $this->channelContext, $this->localeContext, $localeProvider, new ConfigValueConverter());
+        $this->resolver = new ConfigValueResolver($this->channelContext, $this->localeContext, $localeProvider, new ConfigValueConverter(), $this->repository);
     }
 }
