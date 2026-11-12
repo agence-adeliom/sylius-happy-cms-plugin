@@ -705,7 +705,7 @@ class Configuration implements ConfigurationInterface
             ->end()
             ->booleanNode('recompute_child_routes')
             ->defaultNull()
-            ->info('true: when the path of an entity changes, recompute from their content the stored routes below it at a "/" boundary ("/door" moves its child page "/door/wooden", not "/doors", nor the children of a taxon "door"). Not set or false: every route starting with the previous path is rewritten as a string (deprecated). In 3.0 the option is removed and recomputing is the only behaviour.')
+            ->info('true: when the path of an entity changes, recompute from their content the stored routes below it at a "/" boundary ("/door" moves its child page "/door/wooden", not "/doors", nor the children of a taxon "door"). Not set or false: every route starting with the previous path is rewritten as a string (deprecated). In 2.4 the option is removed and recomputing is the only behaviour.')
             ->end()
             ->end()
             ->end()

@@ -448,7 +448,7 @@ Already stored routes are not changed when you opt in; check (and fix) the route
 public method, `rewriteStaticPrefix()`, to update the routes below the path of a parent of another type whose slug
 changed (call it outside of a Doctrine flush, once the parent has its new slug).
 
-In 3.0 the option is removed and recomputing the routes below a renamed path is the only behaviour.
+In 2.4 the option is removed and recomputing the routes below a renamed path is the only behaviour.
 
 ## 2.3.1
 

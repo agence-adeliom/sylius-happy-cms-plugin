@@ -56,7 +56,7 @@ When you save a routable entity (Page, BlogPost, etc.), the plugin automatically
 1. Creates or updates database routes for each language
 2. Calculates URLs based on parent hierarchy
 3. Updates child routes when parent URLs change: with `routing.recompute_child_routes: true` (the only
-   behaviour in 3.0), the routes whose path is the previous path or starts with the previous path followed by `/`
+   behaviour in 2.4), the routes whose path is the previous path or starts with the previous path followed by `/`
    are recomputed from their content (renaming `/door` moves its child page `/door/wooden`, not `/doors`, nor
    `/door/sliding` placed under a taxon `door` by its `getRouteStaticPrefix()`); without it (deprecated), every route
    starting with the previous path is rewritten as a string

@@ -86,7 +86,7 @@ final class RoutingConfigurationTest extends TestCase
 
         self::assertFalse($container->getParameter('sylius_happy_cms.routing.recompute_child_routes'));
         self::assertSame('%sylius_happy_cms.routing.recompute_child_routes%', $container->getDefinition(self::INDEXER)->getArgument(7));
-        self::assertContains('Since agence-adeliom/sylius-happy-cms-plugin 2.3.3: Not setting the "sylius_happy_cms.routing.recompute_child_routes" option is deprecated. It will be removed in 3.0, where recomputing the routes below a renamed path from their content is the only behaviour. Set it to true to opt in now (see UPGRADE.md).', $deprecations);
+        self::assertContains('Since agence-adeliom/sylius-happy-cms-plugin 2.3.3: Not setting the "sylius_happy_cms.routing.recompute_child_routes" option is deprecated. It will be removed in 2.4, where recomputing the routes below a renamed path from their content is the only behaviour. Set it to true to opt in now (see UPGRADE.md).', $deprecations);
     }
 
     public function testDisablingTheRecomputingOfChildRoutesExplicitlyIsDeprecated(): void
@@ -94,7 +94,7 @@ final class RoutingConfigurationTest extends TestCase
         [$container, $deprecations] = $this->loadCollectingDeprecations(['routing' => ['recompute_child_routes' => false]]);
 
         self::assertFalse($container->getParameter('sylius_happy_cms.routing.recompute_child_routes'));
-        self::assertContains('Since agence-adeliom/sylius-happy-cms-plugin 2.3.3: Setting the "sylius_happy_cms.routing.recompute_child_routes" option to false is deprecated. It will be removed in 3.0, where recomputing the routes below a renamed path from their content is the only behaviour. Set it to true to opt in now (see UPGRADE.md).', $deprecations);
+        self::assertContains('Since agence-adeliom/sylius-happy-cms-plugin 2.3.3: Setting the "sylius_happy_cms.routing.recompute_child_routes" option to false is deprecated. It will be removed in 2.4, where recomputing the routes below a renamed path from their content is the only behaviour. Set it to true to opt in now (see UPGRADE.md).', $deprecations);
     }
 
     public function testRecomputingChildRoutesIsNotDeprecated(): void
