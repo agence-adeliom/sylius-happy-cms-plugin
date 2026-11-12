@@ -91,7 +91,7 @@ The attributes require `sylius_easy_crud.attributes.enabled: true`. The makers g
 that case.
 
 The traits are deprecated from the start: they only keep `AbstractBlock` / `AbstractSharedBlockType` unchanged in 2.x.
-In 3.0, the abstract classes read the attributes themselves and the traits are removed: delete the
+In 2.4, the abstract classes read the attributes themselves and the traits are removed: delete the
 `use BlockAttributeMetadataTrait;` / `use SharedBlockAttributeMetadataTrait;` lines when upgrading.
 
 ### SEO Twig functions typed on `SeoInterface`

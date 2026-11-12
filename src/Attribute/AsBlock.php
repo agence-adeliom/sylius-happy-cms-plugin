@@ -7,7 +7,7 @@ namespace Adeliom\SyliusHappyCMSPlugin\Attribute;
 /**
  * Declares the metadata of a content block on its class, instead of overriding the metadata methods.
  *
- * Read by BlockAttributeMetadataTrait (to use in the block or its base class; in 3.0, by AbstractBlock), which serves
+ * Read by BlockAttributeMetadataTrait (to use in the block or its base class; in 2.4, by AbstractBlock), which serves
  * each value as the default of the matching method: getName(), getIcon(), getFrontEndTemplatePath(), getPosition()
  * and getTab(). A block can still override any of these methods (dynamic
  * icon, metadata delegated to another block…): the method wins over the attribute.

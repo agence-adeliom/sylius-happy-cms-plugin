@@ -9,7 +9,7 @@ use Adeliom\SyliusHappyCMSPlugin\Factory\Block\AbstractBlock;
 /**
  * Declares the metadata of a shared block on its class, instead of overriding the metadata methods.
  *
- * Read by SharedBlockAttributeMetadataTrait (to use in the block or its base class; in 3.0, by
+ * Read by SharedBlockAttributeMetadataTrait (to use in the block or its base class; in 2.4, by
  * AbstractSharedBlockType), which serves each value as the default of the matching method: getName(), getIcon(),
  * getFrontEndTemplatePath(), getPosition() and getDescription(). A block can still override any of these
  * methods: the method wins over the attribute.

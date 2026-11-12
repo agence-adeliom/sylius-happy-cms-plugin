@@ -278,7 +278,7 @@ required (in the attribute or as methods).
 - **The trait**: in 2.x, `AbstractBlock` / `AbstractSharedBlockType` are unchanged, the attribute is read by the trait
   (`BlockAttributeMetadataTrait` for content blocks, `SharedBlockAttributeMetadataTrait` for shared blocks). Use it in
   each block, or once in your own base block class. The traits are a temporary 2.x solution, deprecated from the start
-  (Symfony reports it when a class using them is loaded): in 3.0 the abstract classes read the attribute themselves,
+  (Symfony reports it when a class using them is loaded): in 2.4 the abstract classes read the attribute themselves,
   the traits are removed and upgrading only means deleting the `use` lines.
 - **The method wins**: keep overriding a method when the value is not static (an icon built with
   `$this->getPackages()`, metadata delegated to another block…), the attribute serves the others.
