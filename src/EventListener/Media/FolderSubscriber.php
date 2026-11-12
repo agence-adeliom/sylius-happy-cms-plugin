@@ -41,8 +41,11 @@ class FolderSubscriber
             $oldSlug = $args->getOldValue('slug');
             /** @var string|null $newSlug */
             $newSlug = $args->getNewValue('slug');
-            $oldPath = basename($folder->getPath()) . \DIRECTORY_SEPARATOR . $oldSlug;
-            $newPath = basename($folder->getPath()) . \DIRECTORY_SEPARATOR . $newSlug;
+            // The folder already holds its new slug: rebuild both paths from the parent path.
+            $parent = $folder->getParent();
+            $parentPath = $parent ? $parent->getPath() . \DIRECTORY_SEPARATOR : '';
+            $oldPath = $parentPath . $oldSlug;
+            $newPath = $parentPath . $newSlug;
             $this->manager->move($oldPath, $newPath);
         }
     }
