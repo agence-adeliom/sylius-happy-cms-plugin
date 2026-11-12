@@ -21,11 +21,11 @@ use Sylius\Resource\Translation\Provider\TranslationLocaleProviderInterface;
 final class ConfigValueResolver
 {
     public function __construct(
-        private readonly ConfigRepositoryInterface $configRepository,
         private readonly ChannelContextInterface $channelContext,
         private readonly LocaleContextInterface $localeContext,
         private readonly TranslationLocaleProviderInterface $translationLocaleProvider,
         private readonly ConfigValueConverter $converter,
+        private readonly ConfigRepositoryInterface $configRepository,
     ) {
     }
 
