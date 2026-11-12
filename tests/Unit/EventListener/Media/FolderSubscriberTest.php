@@ -41,6 +41,23 @@ final class FolderSubscriberTest extends TestCase
         $this->assertMoves([['a/c', 'b/c']], $folder, ['parent' => [$a, $b]]);
     }
 
+    public function testMovingAndRenamingAFolderInTheSameFlushMovesItOnce(): void
+    {
+        $a = $this->folder('a');
+        $b = $this->folder('b');
+        $folder = $this->folder('d', $b);
+
+        $this->assertMoves([['a/c', 'b/d']], $folder, ['parent' => [$a, $b], 'slug' => ['c', 'd']]);
+    }
+
+    public function testMovingARootFolderUnderAParentAndRenamingItMovesItOnce(): void
+    {
+        $b = $this->folder('b');
+        $folder = $this->folder('d', $b);
+
+        $this->assertMoves([['c', 'b/d']], $folder, ['parent' => [null, $b], 'slug' => ['c', 'd']]);
+    }
+
     public function testAnotherChangeMovesNothing(): void
     {
         $this->assertMoves([], $this->folder('c'), ['name' => ['C', 'Renamed']]);
