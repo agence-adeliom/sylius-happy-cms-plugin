@@ -18,7 +18,6 @@ sylius_happy_cms:
   # Optional: rendering of blocks stored as JSON by happy_cms_block_render() (see docs/blocks.md)
   block_render:
     inherit_context: false
-    missing_published_means_published: false
     swallow_render_errors: false
 
   seo:

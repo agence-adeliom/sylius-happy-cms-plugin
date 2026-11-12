@@ -39,8 +39,6 @@ class Helper
         private readonly AssetRenderer $assetRenderer,
         /** Merge the Twig context of the calling template into the block template context */
         private readonly bool $inheritContext = false,
-        /** Render a block whose data has no `block_published` key (data written outside the block form) */
-        private readonly bool $missingPublishedMeansPublished = false,
         /** Log a block that fails to render and skip it instead of failing the whole page */
         private readonly bool $swallowRenderErrors = false,
         private readonly ?LoggerInterface $logger = null,
@@ -93,8 +91,7 @@ class Helper
      * Renders a flex block stored as an array (`block_type`, `position`, `block_published` and the block fields).
      *
      * Returns null when the block is not published (unless in preview), when its type is unknown, or when it fails
-     * to render and `swallow_render_errors` is enabled. A block without `block_published` key is not published,
-     * unless `missing_published_means_published` is enabled.
+     * to render and `swallow_render_errors` is enabled.
      *
      * @param array<string, mixed> $data
      * @param array<string, mixed> $extra variables added to the block template context
@@ -133,25 +130,15 @@ class Helper
     }
 
     /**
-     * @param array<string, mixed> $data
-     */
-    private function isPublished(array $data): bool
-    {
-        if (!array_key_exists('block_published', $data)) {
-            return $this->missingPublishedMeansPublished;
-        }
-
-        return (bool) $data['block_published'];
-    }
-
-    /**
      * @param array<string, mixed> $context
      * @param array<string, mixed> $data
      * @param array<string, mixed> $extra
      */
     private function doRenderBlock(array $context, array $data, bool $preview, array $extra): ?Markup
     {
-        if (!$this->isPublished($data) && $preview === false) {
+        $blockPublished = $data['block_published'] ?? null;
+
+        if (!$blockPublished && $preview === false) {
             return null;
         }
 
