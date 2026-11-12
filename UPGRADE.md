@@ -135,20 +135,15 @@ sylius_happy_cms:
 Leading and trailing `/` are removed (`/medias` and `medias` are the same). The routes are generated with `path()`, so templates and the media
 manager JavaScript follow it.
 
-### New option: how the media manager checks that a folder exists
+### The media manager looks folders up on the Flysystem storage
 
-```yaml
-sylius_happy_cms:
-    media:
-        # public_dir (default, current behaviour), storage or database
-        directory_check: storage
-```
+`MediaManager::directoryExists()` asked the local disk (`public/{base_url}/{path}`). With an absolute `base_url` (CDN,
+front domain) or a storage outside the public directory (S3, GCS…) it was always false: `folderByPath()` returned
+`false`, `createMedia($source, 'a/b')` created the folders again on every call and moving a folder did nothing.
 
-`MediaManager::directoryExists()` tests `public/{base_url}/{path}` on the local disk (`public_dir`). With an absolute
-`base_url` (CDN, front domain) or a storage outside the public directory it is always false: `folderByPath()` returns
-`false`, `createMedia($source, 'a/b')` creates the folders again on every call and `move()` does not move folders.
-`storage` asks the Flysystem storage, `database` looks for the folder rows (object storages without directories);
-with both, a folder is moved entry by entry on the storage. `public_dir` is unchanged (same check, same one-call move).
+It now asks the storage (`FilesystemOperator::directoryExists()`), and `move()` moves a folder entry by entry
+(`moveDirectory()`, protected): Flysystem moves files only, most adapters cannot rename a directory. Nothing to do with
+a local storage in the public directory: the answer is the same, a folder move renames its files one by one.
 
 ## 2.3.1
 
