@@ -79,6 +79,23 @@ Translated content for menu items.
    - **Status**: Enable/disable menu
 4. Save
 
+### Root Item
+
+Every new menu gets a root item, the parent of its first-level items. It is named after the
+`sylius_happy_cms.menu_item.admin.data.menu_item_root` translation in each available locale.
+
+To rename it, override this translation in the project (the project's translations take precedence over the plugin's).
+The key is only used for the root item:
+
+```yaml
+# translations/messages.fr.yaml
+sylius_happy_cms:
+    menu_item:
+        admin:
+            data:
+                menu_item_root: "Racine"
+```
+
 ### Adding Menu Items
 
 1. Open your menu
