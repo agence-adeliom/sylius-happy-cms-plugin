@@ -128,7 +128,7 @@ sylius_happy_cms:
     routing:
         # URLs without locale prefix (one locale per host, or a single locale)
         url_pattern: '{{calculated_static_prefix}}{{current_entity_path}}'
-        # collapse the repeated slashes of the computed path (only behaviour in 3.0)
+        # collapse the repeated slashes of the computed path (only behaviour in 2.4)
         collapse_slashes: true
 ```
 
