@@ -497,9 +497,7 @@ class MediaManager
 
         $file_type = image_type_to_mime_type($type);
         $ext_only = MediaHelper::mime2ext($file_type) ?: pathinfo($original, \PATHINFO_EXTENSION);
-        if (true === $this->getMediaParameter('keep_original_extension') && '' !== pathinfo($original, \PATHINFO_EXTENSION)) {
-            $ext_only = pathinfo($original, \PATHINFO_EXTENSION);
-        }
+        $ext_only = $this->getKeptOriginalExtension($original) ?? $ext_only;
 
         $final_name_slug = strtolower((new AsciiSlugger())->slug(strtolower((string) $name))->toString() . sprintf('.%s', $ext_only));
         $entity->setSlug($final_name_slug);
@@ -589,15 +587,11 @@ class MediaManager
             $name = $entity->getName() ?: pathinfo($orig_name, \PATHINFO_FILENAME);
             $ext_only = pathinfo($orig_name, \PATHINFO_EXTENSION);
 
-            // SECURITY: the allowed types were checked on the real MIME type (file content) above. The MIME type
-            // stored on the media is the real one, or the client one with mime_type_source: client.
-            $mimeType = $this->fileValidator->getRealMimeType($source);
-            if ('client' === $this->getMediaParameter('mime_type_source') && '' !== $source->getClientMimeType()) {
-                $mimeType = $source->getClientMimeType();
-            }
-            $entity->setMime($mimeType);
+            // SECURITY: Use real MIME type from file content, NOT client-provided header
+            $realMimeType = $this->fileValidator->getRealMimeType($source);
+            $entity->setMime($realMimeType);
 
-            if ($ext = MediaHelper::mime2ext($mimeType)) {
+            if ($ext = MediaHelper::mime2ext($realMimeType)) {
                 $ext_only = $ext;
             }
 
@@ -622,10 +616,7 @@ class MediaManager
             }
         }
 
-        $originalExtension = pathinfo($orig_name, \PATHINFO_EXTENSION);
-        if (true === $this->getMediaParameter('keep_original_extension') && '' !== $originalExtension) {
-            $ext_only = $originalExtension;
-        }
+        $ext_only = $this->getKeptOriginalExtension($orig_name) ?? $ext_only;
 
         $final_name_slug = strtolower((new AsciiSlugger())->slug(strtolower((string) $name))->toString() . sprintf('.%s', $ext_only));
         $entity->setSlug($final_name_slug);
@@ -723,6 +714,21 @@ class MediaManager
         }
 
         return $entity;
+    }
+
+    /**
+     * The extension of the original file name to keep in the slug (keep_original_extension), null to derive it from the
+     * MIME type. SECURITY: only an allowed extension is kept, never a dangerous one (a URL "shell.php" serving an image).
+     */
+    protected function getKeptOriginalExtension(string $originalName): ?string
+    {
+        if (false === $this->getMediaParameter('keep_original_extension')) {
+            return null;
+        }
+
+        $extension = pathinfo($originalName, \PATHINFO_EXTENSION);
+
+        return '' !== $extension && $this->fileValidator->isExtensionAllowed($extension) ? $extension : null;
     }
 
     /**

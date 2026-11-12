@@ -289,11 +289,14 @@ class FileValidator
     }
 
     /**
-     * Check if an extension is allowed
+     * Check if an extension is allowed (a dangerous extension never is, whatever the configured list)
      */
     public function isExtensionAllowed(string $extension): bool
     {
-        return in_array(strtolower($extension), $this->allowedExtensions, true);
+        $extension = strtolower($extension);
+
+        return !in_array($extension, self::DANGEROUS_EXTENSIONS, true) &&
+            in_array($extension, $this->allowedExtensions, true);
     }
 
     /**

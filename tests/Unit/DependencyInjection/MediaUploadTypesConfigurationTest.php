@@ -12,14 +12,13 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 final class MediaUploadTypesConfigurationTest extends TestCase
 {
-    public function testTheDefaultsAreTheCurrentBehaviour(): void
+    public function testTheDefaults(): void
     {
         $container = $this->load([]);
 
         self::assertSame(FileValidator::DEFAULT_ALLOWED_MIME_TYPES, $container->getParameter('sylius_happy_cms.media.allowed_mime_types'));
         self::assertSame(FileValidator::DEFAULT_ALLOWED_EXTENSIONS, $container->getParameter('sylius_happy_cms.media.allowed_extensions'));
-        self::assertSame('content', $container->getParameter('sylius_happy_cms.media.mime_type_source'));
-        self::assertFalse($container->getParameter('sylius_happy_cms.media.keep_original_extension'));
+        self::assertTrue($container->getParameter('sylius_happy_cms.media.keep_original_extension'));
     }
 
     public function testTheOptionsCanBeSet(): void
@@ -27,14 +26,12 @@ final class MediaUploadTypesConfigurationTest extends TestCase
         $container = $this->load([
             'allowed_mime_types' => ['image/avif'],
             'allowed_extensions' => ['avif'],
-            'mime_type_source' => 'client',
-            'keep_original_extension' => true,
+            'keep_original_extension' => false,
         ]);
 
         self::assertSame(['image/avif'], $container->getParameter('sylius_happy_cms.media.allowed_mime_types'));
         self::assertSame(['avif'], $container->getParameter('sylius_happy_cms.media.allowed_extensions'));
-        self::assertSame('client', $container->getParameter('sylius_happy_cms.media.mime_type_source'));
-        self::assertTrue($container->getParameter('sylius_happy_cms.media.keep_original_extension'));
+        self::assertFalse($container->getParameter('sylius_happy_cms.media.keep_original_extension'));
     }
 
     public function testTheFileValidatorReceivesTheLists(): void
@@ -45,11 +42,11 @@ final class MediaUploadTypesConfigurationTest extends TestCase
         self::assertSame('%sylius_happy_cms.media.allowed_extensions%', $definition->getArgument('$allowedExtensions'));
     }
 
-    public function testAnUnknownMimeTypeSourceIsRefused(): void
+    public function testTheMimeTypeSourceOptionNoLongerExists(): void
     {
         $this->expectException(InvalidConfigurationException::class);
 
-        $this->load(['mime_type_source' => 'extension']);
+        $this->load(['mime_type_source' => 'client']);
     }
 
     /**

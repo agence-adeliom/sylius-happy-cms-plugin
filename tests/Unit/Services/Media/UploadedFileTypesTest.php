@@ -11,7 +11,7 @@ use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\Services\Media\Fixtures\MediaManager
 
 /**
  * Uploaded files: allowed types (configurable lists) and the MIME type / extension kept on the media
- * (content detection by default, client MIME type or original extension as options).
+ * (MIME type detected from the content, original extension kept in the slug when allowed).
  */
 final class UploadedFileTypesTest extends MediaManagerTestCase
 {
@@ -19,8 +19,7 @@ final class UploadedFileTypesTest extends MediaManagerTestCase
     {
         self::assertSame(FileValidator::DEFAULT_ALLOWED_MIME_TYPES, $this->parameters['sylius_happy_cms.media.allowed_mime_types']);
         self::assertSame(FileValidator::DEFAULT_ALLOWED_EXTENSIONS, $this->parameters['sylius_happy_cms.media.allowed_extensions']);
-        self::assertSame('content', $this->parameters['sylius_happy_cms.media.mime_type_source']);
-        self::assertFalse($this->parameters['sylius_happy_cms.media.keep_original_extension']);
+        self::assertTrue($this->parameters['sylius_happy_cms.media.keep_original_extension']);
         self::assertContains('image/png', FileValidator::DEFAULT_ALLOWED_MIME_TYPES);
         self::assertNotContains('application/json', FileValidator::DEFAULT_ALLOWED_MIME_TYPES);
     }
@@ -57,31 +56,8 @@ final class UploadedFileTypesTest extends MediaManagerTestCase
         $this->manager->createMedia($this->upload('shell.php', '<?php echo 1;', 'text/plain'));
     }
 
-    public function testByDefaultTheMimeTypeAndTheExtensionComeFromTheContent(): void
+    public function testByDefaultTheOriginalExtensionIsKeptAndTheMimeTypeComesFromTheContent(): void
     {
-        $media = $this->manager->createMedia($this->upload('photo.jpg', $this->pngBytes(), 'image/jpeg'));
-
-        self::assertSame('image/png', $media->getMime());
-        self::assertSame('photo.png', $media->getSlug());
-    }
-
-    public function testTheClientMimeTypeCanBeKept(): void
-    {
-        $this->manager = $this->createManager(['mime_type_source' => 'client']);
-
-        $photo = $this->manager->createMedia($this->upload('photo.jpg', $this->pngBytes(), 'image/jpeg'));
-        $prices = $this->manager->createMedia($this->upload('prices.csv', "door,price\nfront,1200\n", 'text/csv'));
-
-        self::assertSame('image/jpeg', $photo->getMime());
-        self::assertSame('photo.jpeg', $photo->getSlug());
-        self::assertSame('text/csv', $prices->getMime());
-        self::assertSame('prices.csv', $prices->getSlug());
-    }
-
-    public function testTheOriginalExtensionCanBeKept(): void
-    {
-        $this->manager = $this->createManager(['keep_original_extension' => true]);
-
         $photo = $this->manager->createMedia($this->upload('Photo.JPG', $this->pngBytes(), 'image/jpeg'));
         $prices = $this->manager->createMedia($this->upload('prices.csv', "door,price\nfront,1200\n", 'text/csv'));
         $local = $this->manager->createMedia($this->pngFile('scan.jpg'));
@@ -89,7 +65,34 @@ final class UploadedFileTypesTest extends MediaManagerTestCase
         self::assertSame('photo.jpg', $photo->getSlug());
         self::assertSame('image/png', $photo->getMime());
         self::assertSame('prices.csv', $prices->getSlug());
+        self::assertSame('text/plain', $prices->getMime());
         self::assertSame('scan.jpg', $local->getSlug());
+    }
+
+    public function testTheClientMimeTypeIsNeverKept(): void
+    {
+        $media = $this->manager->createMedia($this->upload('photo.jpg', $this->pngBytes(), 'image/jpeg'));
+
+        self::assertSame('image/png', $media->getMime());
+    }
+
+    public function testAnExtensionThatIsNotAllowedIsNotKept(): void
+    {
+        $local = $this->manager->createMedia($this->pngFile('scan.php'));
+
+        self::assertSame('scan.png', $local->getSlug());
+    }
+
+    public function testTheExtensionCanComeFromTheContent(): void
+    {
+        $this->manager = $this->createManager(['keep_original_extension' => false]);
+
+        $photo = $this->manager->createMedia($this->upload('photo.jpg', $this->pngBytes(), 'image/jpeg'));
+        $prices = $this->manager->createMedia($this->upload('prices.csv', "door,price\nfront,1200\n", 'text/csv'));
+
+        self::assertSame('image/png', $photo->getMime());
+        self::assertSame('photo.png', $photo->getSlug());
+        self::assertSame('prices.txt', $prices->getSlug());
     }
 
     private function upload(string $clientName, string $content, string $clientMimeType): UploadedFile
