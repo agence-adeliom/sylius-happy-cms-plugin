@@ -282,7 +282,7 @@ configuration of the application (parameters such as `%front_url%` are resolved 
 value only valid once resolved, e.g. an environment variable in a constrained node, the defaults are exposed).
 Templates of the application reading `sylius_happy_cms.media.*` get the configured values. Bug fix, no option.
 
-### New `MediaManager::createMediaFromSource()`, flag: name of a data URI source
+### New `MediaManager::createMediaFromSource()`, name of a data URI source kept
 
 `MediaManager::createMediaFromSource(string|File $source, FolderInterface|string|null $folder = null, ?string $name = null, array $metas = [])`
 creates a media in a folder entity or a folder path, with metas (alternative text...) merged into the detected ones
@@ -296,17 +296,9 @@ before the save, and keeps the name given for a data URI source. `createMedia($s
 +$media = $mediaManager->createMediaFromSource($file, $folder, metas: ['alt' => 'Front door']);
 ```
 
-`createMedia()` ignores the `$name` of a data URI source (a random name is used), including for the media manager
-upload of an edited image. To keep it:
-
-```yaml
-sylius_happy_cms:
-    media:
-        keep_data_uri_name: true
-```
-
-Not setting the option, or setting it to `false`, keeps the random name and triggers a deprecation. In 2.4 the option
-is removed and `createMedia()` keeping the name of a data URI is the only behaviour.
+`createMedia()` used to ignore the `$name` of a data URI source (a random name was used), including for the media
+manager upload of an edited image. This was a bug: like every other source, a data URI given with a name now gets that
+name and slug, without configuration. Without a name, it still gets a random one.
 
 ### New options: upload types, client MIME type, original extension
 

@@ -347,8 +347,7 @@ try {
 }
 ```
 
-`createMedia($source, $path, $name)` stays available (folder path only, no metas). It ignores the name of a data URI
-source (random name) unless `media.keep_data_uri_name` is `true` (see the configuration below).
+`createMedia($source, $path, $name)` stays available (folder path only, no metas).
 
 ### Use the Doctrine type (optional)
 
@@ -458,10 +457,6 @@ sylius_happy_cms:
                 - application/x-tar
                 - application/zip
         
-        # createMedia() (and the media manager upload of an edited image) keeps the name given for a data URI
-        # source; not set or false (deprecated): a random name. true is the only behaviour in 2.4
-        keep_data_uri_name: true
-
         # display file last modification time as
         last_modified_format: Y-m-d
         

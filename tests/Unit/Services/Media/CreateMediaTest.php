@@ -94,20 +94,9 @@ final class CreateMediaTest extends MediaManagerTestCase
         self::assertStringEndsWith('.png', (string) $media->getSlug());
     }
 
-    public function testCreateMediaIgnoresTheNameOfABase64SourceWithoutTheFlag(): void
+    public function testCreateMediaKeepsTheNameOfABase64Source(): void
     {
         $media = $this->manager->createMedia(self::PNG_BASE64, 'drawings', 'Hello world');
-
-        self::assertNotSame('Hello world', $media->getName());
-        self::assertNotSame('drawings/hello-world.png', $media->getPath());
-        self::assertStringEndsWith('.png', (string) $media->getSlug());
-    }
-
-    public function testCreateMediaKeepsTheNameOfABase64SourceWithTheFlag(): void
-    {
-        $manager = $this->createManager(['keep_data_uri_name' => true]);
-
-        $media = $manager->createMedia(self::PNG_BASE64, 'drawings', 'Hello world');
 
         self::assertSame('Hello world', $media->getName());
         self::assertSame('drawings/hello-world.png', $media->getPath());

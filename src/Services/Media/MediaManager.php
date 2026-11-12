@@ -203,8 +203,7 @@ class MediaManager
 
     /**
      * Creates a media in a folder path, writes its file to the storage and saves it. See createMediaFromSource()
-     * to give the folder entity or metas. The name of a data URI source is ignored (random name) unless
-     * `sylius_happy_cms.media.keep_data_uri_name` is true.
+     * to give the folder entity or metas.
      *
      * @throws AlreadyExist
      * @throws FolderAlreadyExist
@@ -218,10 +217,7 @@ class MediaManager
      */
     public function createMedia(string|File $source, ?string $path = null, ?string $name = null): MediaInterface
     {
-        $keepDataUriName = $this->parameters->has('sylius_happy_cms.media.keep_data_uri_name') &&
-            true === $this->parameters->get('sylius_happy_cms.media.keep_data_uri_name');
-
-        return $this->doCreateMedia($source, $path, $name, [], $keepDataUriName);
+        return $this->doCreateMedia($source, $path, $name);
     }
 
     /**
@@ -252,7 +248,7 @@ class MediaManager
         ?string $name = null,
         array $metas = [],
     ): MediaInterface {
-        return $this->doCreateMedia($source, $folder, $name, $metas, true);
+        return $this->doCreateMedia($source, $folder, $name, $metas);
     }
 
     /**
@@ -272,8 +268,7 @@ class MediaManager
         string|File $source,
         FolderInterface|string|null $folder,
         ?string $name,
-        array $metas,
-        bool $keepDataUriName,
+        array $metas = [],
     ): MediaInterface {
         $class = $this->getHelper()->getMediaClassName();
         /** @var MediaInterface $entity */
@@ -294,7 +289,7 @@ class MediaManager
         $entity->setFolder($folder ?: null);
 
         if (is_string($source) && str_starts_with($source, 'data:')) {
-            $entity = $this->createFromBase64($entity, $source, $keepDataUriName);
+            $entity = $this->createFromBase64($entity, $source);
         } elseif (is_string($source) && false !== filter_var($source, \FILTER_VALIDATE_URL)) {
             if ($imageType = @exif_imagetype($source)) {
                 $entity = $this->createFromImageURL($entity, $source, $imageType);
@@ -411,7 +406,7 @@ class MediaManager
      * @throws FilesystemException
      * @throws NoFile
      */
-    private function createFromBase64(MediaInterface $entity, string $source, bool $keepName = false): MediaInterface
+    private function createFromBase64(MediaInterface $entity, string $source): MediaInterface
     {
         if (preg_match('#^data\:([a-zA-Z]+\/[a-zA-Z]+);base64\,([a-zA-Z0-9\+\/]+\=*)$#', (string) $source, $matches)) {
             $infos = [
@@ -422,7 +417,7 @@ class MediaManager
             throw new NoFile($this->translator->trans('error.no_file', [], 'SyliusHappyCMSPlugin'));
         }
 
-        if (!$keepName || empty($entity->getName())) {
+        if (empty($entity->getName())) {
             $entity->setName($this->helper->cleanName(''));
         }
         $filename = strtolower((new AsciiSlugger())->slug(strtolower((string) $entity->getName()))->toString() . '.' . MediaHelper::mime2ext($infos['mime']));
