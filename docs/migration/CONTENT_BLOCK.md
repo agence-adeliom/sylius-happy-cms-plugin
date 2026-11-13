@@ -176,6 +176,8 @@ php bin/console happycms:migrate:content-to-blocks
 
 The command will:
 - Create ContentBlock entities
+- Publish each block whose `block_published` is `'1'` or missing (the JSON content had no unpublished state before
+  the page builder); a block with any other value stays unpublished
 - Link them to parent entities
 - Persist to database
 

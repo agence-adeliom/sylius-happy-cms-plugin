@@ -288,7 +288,9 @@ class MigrateContentToBlocksCommand extends Command
     {
         $blockType = $blockData['block_type'];
         $position = $naturalPosition;
-        $published = isset($blockData['block_published']) && '1' === $blockData['block_published'];
+        // The JSON content had no notion of an unpublished block before the page builder: a block without
+        // "block_published" key was shown, so it is migrated as published.
+        $published = !array_key_exists('block_published', $blockData) || '1' === $blockData['block_published'];
 
         // Remove metadata fields from block data
         $contentData = $blockData;

@@ -2,6 +2,13 @@
 
 ## Unreleased (2.3.x)
 
+### Bug fix: `happycms:migrate:content-to-blocks` publishes the blocks without `block_published`
+
+The command created a block without `block_published` key as unpublished (`publishedData` null): a page migrated from
+such a content showed none of its blocks. The JSON content had no unpublished state before the page builder, so this
+block was shown; it is now migrated as published. A block with `block_published: '1'` is published and a block with
+any other value stays unpublished, as before.
+
 ### Tom Select default theme no longer auto-imported (admin dark mode)
 
 `assets/controllers.json` no longer enables the `tom-select/dist/css/tom-select.default.css` autoimport of
