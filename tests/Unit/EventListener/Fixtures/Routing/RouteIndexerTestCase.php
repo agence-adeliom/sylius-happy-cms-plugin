@@ -69,7 +69,7 @@ abstract class RouteIndexerTestCase extends TestCase
     }
 
     /**
-     * @param array<int, mixed> $extraArguments arguments added after the four original ones
+     * @param array<int|string, mixed> $extraArguments arguments added after the four original ones (by position or by name)
      */
     protected function registerIndexer(array $extraArguments = []): EntityRouteIndexer
     {
