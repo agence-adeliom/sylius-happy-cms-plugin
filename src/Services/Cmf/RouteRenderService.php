@@ -140,10 +140,13 @@ class RouteRenderService extends AbstractController
         $controller = $contentDocument->getRouteController();
         if (null !== $controller) {
             try {
+                // The sub-request sees the request as the visitor sent it: its routing attributes (_route,
+                // _route_params, routeDocument…) and its query string (pagination, happy_cms_preview).
                 return $this->forward($controller, [
+                    ...$request->attributes->all(),
                     'contentDocument' => $contentDocument,
                     'request' => $request,
-                ]);
+                ], $request->query->all());
             } catch (\RuntimeException $runtimeException) {
                 throw $this->createAccessDeniedException($controller . ' not exists');
             }
