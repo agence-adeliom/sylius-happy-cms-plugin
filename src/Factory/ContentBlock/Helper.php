@@ -157,8 +157,10 @@ class Helper
             unset($blockData['position']);
         }
 
-        // Use the ContentBlock database ID as the unique identifier
-        $blockData['attr_id'] = 'content-block-' . $blockId;
+        // Anchor: the one given by a render listener, else the ContentBlock database ID (as the JSON block renderer)
+        if (empty($blockData['attr_id'])) {
+            $blockData['attr_id'] = 'content-block-' . $blockId;
+        }
         $blockData['data_block_id'] = $blockId;
 
         $stats['settings'] = $blockData;

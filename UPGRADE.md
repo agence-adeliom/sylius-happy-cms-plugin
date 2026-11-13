@@ -2,6 +2,13 @@
 
 ## Unreleased (2.3.x)
 
+### Bug fix: a content block keeps the anchor given by a render listener
+
+`happy_cms_content_block_render()` always set `settings.attr_id` to `content-block-<id>`, after the
+`happy_cms_block.render_block` event: an anchor set by a listener of that event was overwritten, so the links to it
+broke. The anchor is now `content-block-<id>` only when the block has none, as the JSON block renderer already does
+with `block-<n>`.
+
 ### Bug fix: `happycms:migrate:content-to-blocks` publishes the blocks without `block_published`
 
 The command created a block without `block_published` key as unpublished (`publishedData` null): a page migrated from
