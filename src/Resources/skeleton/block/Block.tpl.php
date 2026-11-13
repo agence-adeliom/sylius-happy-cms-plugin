@@ -6,15 +6,29 @@ echo "<?php\n"; ?>
 
 namespace <?php echo $namespace; ?>;
 
+<?php if ($use_attribute ?? false) { ?>
+use Adeliom\SyliusHappyCMSPlugin\Attribute\AsBlock;
+<?php } ?>
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\AbstractBlock;
+<?php if ($use_attribute ?? false) { ?>
+use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockAttributeMetadataTrait;
+<?php } ?>
 use Symfony\Component\Form\FormBuilderInterface;
 
+<?php if ($use_attribute ?? false) { ?>
+#[AsBlock(name: '<?php echo $class_name; ?>', template: '<?php echo $template_name; ?>')]
+<?php } ?>
 class <?php echo $class_name; ?> extends AbstractBlock<?php echo "\n"; ?>
 {
+<?php if ($use_attribute ?? false) { ?>
+    use BlockAttributeMetadataTrait;
+
+<?php } ?>
     public function buildBlock(FormBuilderInterface $builder, array $options): void
     {
         // Implement with your fields
     }
+<?php if (!($use_attribute ?? false)) { ?>
 
     public function getName(): string
     {
@@ -30,6 +44,7 @@ class <?php echo $class_name; ?> extends AbstractBlock<?php echo "\n"; ?>
     {
         return "<?php echo $template_name; ?>";
     }
+<?php } ?>
 }
 
 <?php } ?>

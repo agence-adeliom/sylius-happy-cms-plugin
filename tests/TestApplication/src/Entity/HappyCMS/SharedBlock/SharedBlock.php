@@ -6,8 +6,8 @@ namespace Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\SharedBlock;
 
 use Adeliom\SyliusHappyCMSPlugin\Entity\SharedBlock\SharedBlock as BaseSharedBlock;
 use Adeliom\SyliusHappyCMSPlugin\Entity\SharedBlock\SharedBlockTranslationInterface;
-use Tests\Adeliom\SyliusHappyCMSPlugin\Repository\HappyCMS\SharedBlock\SharedBlockRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Tests\Adeliom\SyliusHappyCMSPlugin\Repository\HappyCMS\SharedBlock\SharedBlockRepository;
 
 #[ORM\Entity(repositoryClass: SharedBlockRepository::class)]
 #[ORM\Table(name: 'sylius_happy_cms__shared_block')]

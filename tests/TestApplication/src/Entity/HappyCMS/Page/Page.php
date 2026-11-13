@@ -28,7 +28,6 @@ class Page extends BasePage
         return PageContentBlock::class;
     }
 
-
     protected function createTranslation(): PageTranslationInterface
     {
         return new PageTranslation();
