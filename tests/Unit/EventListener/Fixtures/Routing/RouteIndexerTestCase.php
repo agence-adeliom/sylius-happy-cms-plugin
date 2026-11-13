@@ -12,6 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\ORM\Mapping\Driver\SimplifiedXmlDriver;
+use Doctrine\ORM\Mapping\Driver\XmlDriver;
 use Doctrine\ORM\ORMSetup;
 use Doctrine\ORM\Tools\ResolveTargetEntityListener;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -32,6 +33,11 @@ abstract class RouteIndexerTestCase extends TestCase
 
     protected EventDispatcher $dispatcher;
 
+    private EntityRouteIndexer $indexer;
+
+    /** @var array<int|string, mixed> */
+    private array $indexerArguments = [];
+
     protected function setUp(): void
     {
         if (!\extension_loaded('pdo_sqlite')) {
@@ -49,7 +55,7 @@ abstract class RouteIndexerTestCase extends TestCase
         $driver->addDriver($attributes, __NAMESPACE__);
         $driver->addDriver($attributes, 'Adeliom\SyliusHappyCMSPlugin\Entity\Cmf');
         $driver->addDriver(new SimplifiedXmlDriver([$vendor . '/symfony-cmf/routing-bundle/src/Resources/config/doctrine-model' => 'Symfony\Cmf\Bundle\RoutingBundle\Model']), 'Symfony\Cmf\Bundle\RoutingBundle\Model');
-        $driver->addDriver(new SimplifiedXmlDriver([$vendor . '/symfony-cmf/routing-bundle/src/Resources/config/doctrine-base' => 'Symfony\Component\Routing']), 'Symfony\Component\Routing');
+        $driver->addDriver(new XmlDriver($vendor . '/symfony-cmf/routing-bundle/src/Resources/config/doctrine-base', '.orm.xml'), 'Symfony\Component\Routing');
         $config->setMetadataDriverImpl($driver);
 
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true], $config);
@@ -66,6 +72,7 @@ abstract class RouteIndexerTestCase extends TestCase
         ));
 
         $this->dispatcher = new EventDispatcher();
+        IndexedPage::$renamedTaxons = [];
     }
 
     /**
@@ -85,8 +92,22 @@ abstract class RouteIndexerTestCase extends TestCase
         );
 
         $this->entityManager->getEventManager()->addEventListener(self::listenedEvents(), $indexer);
+        $this->indexer = $indexer;
+        $this->indexerArguments = $extraArguments;
 
         return $indexer;
+    }
+
+    /**
+     * Simulates a new process (request, command): empty identity map, new indexer with the same arguments. The
+     * listener indexes each entity once per process (and compares the entities already indexed loosely).
+     */
+    protected function restartProcess(): EntityRouteIndexer
+    {
+        $this->entityManager->clear();
+        $this->entityManager->getEventManager()->removeEventListener(self::listenedEvents(), $this->indexer);
+
+        return $this->registerIndexer($this->indexerArguments);
     }
 
     /**
@@ -97,10 +118,12 @@ abstract class RouteIndexerTestCase extends TestCase
         return [Events::postPersist, Events::postUpdate];
     }
 
-    protected function savePage(string $slug, ?string $category = null, string $locale = 'en_US', bool $homepage = false): IndexedPage
+    protected function savePage(string $slug, ?string $category = null, string $locale = 'en_US', bool $homepage = false, ?IndexedPage $parent = null, ?string $taxon = null): IndexedPage
     {
         $page = new IndexedPage($slug, $locale);
         $page->category = $category;
+        $page->parent = $parent;
+        $page->taxon = $taxon;
         $page->isHomePage = $homepage;
         $this->entityManager->persist($page);
         $this->entityManager->flush();
