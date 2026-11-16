@@ -8,6 +8,7 @@ use Adeliom\SyliusEasyCrudPlugin\Enum\ThreeStateStatusEnum;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuItemInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Menu\MenuItemTranslationInterface;
+use Doctrine\ORM\Mapping\MappedSuperclass;
 use Sylius\Component\Locale\Provider\LocaleProviderInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -25,27 +26,8 @@ class MenuCreationListener
     // the entity instance and the lifecycle event
     public function prePersist(MenuInterface $menu): void
     {
-        /** @var array<string, array{
-         *  classes: array{
-         *     model: class-string,
-         *     controller: class-string,
-         *     repository: class-string,
-         *     form: class-string,
-         *     factory: class-string,
-         *  }
-         * }|null> $resources */
-        $resources = $this->parameterBag->get('sylius.resources');
-        if (!is_array($resources) || !is_array($resources['sylius_happy_cms.menu_item'])) {
-            return;
-        }
-
-        if (!is_array($resources['sylius_happy_cms.menu_item']['classes'])) {
-            return;
-        }
-
-        $modelClass = $resources['sylius_happy_cms.menu_item']['classes']['model'];
-
-        if (!is_string($modelClass) || !class_exists($modelClass)) {
+        $modelClass = $this->rootItemClass();
+        if (null === $modelClass) {
             return;
         }
 
@@ -71,5 +53,32 @@ class MenuCreationListener
                 }
             }
         }
+    }
+
+    /**
+     * The class of the root item: the model of the `sylius_happy_cms.menu_item` resource, or else the
+     * `menu.menu_item.menu_item_model` setting. The plugin's default model is a mapped superclass that cannot be saved:
+     * no root item then, as without the resource before.
+     *
+     * @return class-string<MenuItemInterface>|null
+     */
+    protected function rootItemClass(): ?string
+    {
+        /** @var array<string, array{classes?: array{model?: mixed}}|null>|null $resources */
+        $resources = $this->parameterBag->has('sylius.resources') ? $this->parameterBag->get('sylius.resources') : null;
+        $modelClass = $resources['sylius_happy_cms.menu_item']['classes']['model'] ?? null;
+
+        if (null === $modelClass && $this->parameterBag->has('sylius_happy_cms.menu.menu_item.menu_item_model')) {
+            $modelClass = $this->parameterBag->get('sylius_happy_cms.menu.menu_item.menu_item_model');
+            if (is_string($modelClass) && class_exists($modelClass) && [] !== (new \ReflectionClass($modelClass))->getAttributes(MappedSuperclass::class)) {
+                return null;
+            }
+        }
+
+        if (!is_string($modelClass) || !class_exists($modelClass) || !is_a($modelClass, MenuItemInterface::class, true)) {
+            return null;
+        }
+
+        return $modelClass;
     }
 }
