@@ -2,6 +2,22 @@
 
 ## Unreleased (2.3.x)
 
+### Bug fix: the route indexer recognises the entities by identity and forgets them after the flush
+
+`EntityRouteIndexer` compared the entities it had already indexed by value (`in_array()` without `strict`). With an
+entity made by `make:happy-cms:generate-cms-model` (translations first), indexing two entities in the same flush
+failed with `Nesting level too deep - recursive dependency?`. It compares them by identity now.
+
+It also never emptied that list: in a long process (Messenger worker, console command, functional test), an entity
+saved a second time kept its old routes. The list is emptied when the flush is over, through a new `postFlush`
+listener tag on `sylius.happy_cms.plugin.listener.entity_route_indexer`. If your application redefines this service,
+add the tag:
+
+```yaml
+    tags:
+        - { name: 'doctrine.event_listener', event: 'postFlush', connection: 'default' }
+```
+
 ### Bug fix: `happycms:migrate:content-to-blocks` publishes the blocks without `block_published`
 
 The command created a block without `block_published` key as unpublished (`publishedData` null): a page migrated from

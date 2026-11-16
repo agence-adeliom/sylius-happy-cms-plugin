@@ -34,6 +34,9 @@ services:
           event: 'postUpdate'
           priority: 500
           connection: 'default'
+      -   name: 'doctrine.event_listener'
+          event: 'postFlush'
+          connection: 'default'
 
   Adeliom\SyliusHappyCMSPlugin\Services\Cmf\RouteRenderService:
     alias: sylius.happy_cms.plugin.services.render
