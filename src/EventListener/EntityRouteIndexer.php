@@ -10,6 +10,7 @@ use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PostPersistEventArgs;
 use Doctrine\ORM\Event\PostUpdateEventArgs;
 use Doctrine\Persistence\ObjectManager;
@@ -34,7 +35,14 @@ class EntityRouteIndexer
      */
     public const DEFAULT_URL_PATTERN = '/{{locale}}{{calculated_static_prefix}}{{current_entity_path}}';
 
+    /**
+     * The entities indexed during the current flush, so that the flushes the indexer runs itself do not index them
+     * again. Emptied at the end of the flush.
+     */
     public array $entitiesToManage = [];
+
+    /** Above 0 while the indexer computes routes: the flushes it runs then are its own. */
+    private int $indexingDepth = 0;
 
     public function __construct(
         protected ContentRepository $contentRepository,
@@ -58,9 +66,9 @@ class EntityRouteIndexer
             return;
         }
 
-        if (!in_array($entity, $this->entitiesToManage)) {
+        if (!in_array($entity, $this->entitiesToManage, true)) {
             $this->entitiesToManage[] = $entity;
-            $this->manageRoutes($entity, $event->getObjectManager());
+            $this->indexRoutes($entity, $event->getObjectManager());
         }
     }
 
@@ -76,9 +84,31 @@ class EntityRouteIndexer
             return;
         }
 
-        if (!in_array($entity, $this->entitiesToManage)) {
+        if (!in_array($entity, $this->entitiesToManage, true)) {
             $this->entitiesToManage[] = $entity;
-            $this->manageRoutes($entity, $event->getObjectManager());
+            $this->indexRoutes($entity, $event->getObjectManager());
+        }
+    }
+
+    /**
+     * The flush is over: an entity saved again in the same process (worker, command, test) gets its routes computed
+     * again. The flushes the indexer runs itself end while it indexes and keep the list.
+     */
+    public function postFlush(PostFlushEventArgs $event): void
+    {
+        if (0 === $this->indexingDepth) {
+            $this->entitiesToManage = [];
+        }
+    }
+
+    protected function indexRoutes(CmsRoutableInterface $entity, ObjectManager $objectManager): void
+    {
+        ++$this->indexingDepth;
+
+        try {
+            $this->manageRoutes($entity, $objectManager);
+        } finally {
+            --$this->indexingDepth;
         }
     }
 
