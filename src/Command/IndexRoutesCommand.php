@@ -18,7 +18,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Creates or updates the CMS routes of the routable entities already in the database: entities created before the
- * plugin (data migration), or after a change of the routing options (URL pattern, trailing slash).
+ * plugin (data migration), or after a change of the routing options (URL pattern).
  *
  * Only the route tables are written (routes, and the join table between the entity and its new routes): the
  * entities are not saved, so their update listeners (timestamps such as updated_at and the sitemap lastmod, search
