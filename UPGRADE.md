@@ -373,6 +373,32 @@ contained `//`.
 
 In 2.4 the option is removed and collapsing the repeated slashes is the only behaviour.
 
+### Fixed: renaming a path rewrites only the routes below it
+
+When the path of an entity changes, the indexer updates the stored routes below its previous path. It used to load
+every route and `str_replace()` the previous path in every route starting with it: renaming `/porte` also rewrote
+`/portes-d-entree` into `/portails-d-entree`, and `/porte/porte-bois` into `/portail/portail-bois`.
+
+The routes with exactly the previous path or below it at a `/` boundary are now selected by a query on the route
+class (`cmf_routing.dynamic.persistence.orm.route_class`) instead of `findAll()`, then each one is recomputed from
+its content, as when the content is saved (`CmsRoutableInterface::getRouteStaticPrefix()`,
+`CalculateRouteStaticPrefixEvent`):
+
+- `/porte/porte-bois`, a child page of `/porte`, becomes `/portail/porte-bois`;
+- `/portes-d-entree` is unchanged (not below `/porte/`);
+- `/porte/coulissante`, placed under a taxon `porte` (another type, same slug) by its `getRouteStaticPrefix()`, is
+  unchanged: its path is still computed from the taxon;
+- a route without routable content (not an online route of the indexer, content removed) has its leading prefix
+  replaced.
+
+`/` (homepage) is never used as a prefix. Each content below the path is loaded (`ContentRepository::findById()`).
+Routes already rewritten by mistake are not repaired: check them.
+
+`EntityRouteIndexer` has a new public method, `rewriteStaticPrefix()`, to update the routes below the path of a
+parent of another type whose slug changed (call it outside of a Doctrine flush, once the parent has its new slug).
+The protected `rewriteOtherStaticPrefix()` is replaced by `recomputeRoutesBelowStaticPrefix()`: a project overriding
+it must override the new method.
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required
