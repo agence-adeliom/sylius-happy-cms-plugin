@@ -41,7 +41,7 @@ final class IndexRoutesCommandTest extends RouteIndexerTestCase
         $this->savePage('about');
         $this->command([])->execute([]);
 
-        $this->command(['urlPattern' => '{{calculated_static_prefix}}{{current_entity_path}}', 'trailingSlash' => true])->execute([]);
+        $this->command(['urlPattern' => '{{calculated_static_prefix}}{{current_entity_path}}/'])->execute([]);
 
         self::assertSame(['/about/'], array_values($this->storedPrefixes()));
     }
@@ -55,7 +55,7 @@ final class IndexRoutesCommandTest extends RouteIndexerTestCase
         $tester = $this->command([]);
         $tester->execute(['--batch-size' => '1']);
         // second run: existing routes updated, links unchanged
-        $this->command(['urlPattern' => '{{calculated_static_prefix}}{{current_entity_path}}', 'trailingSlash' => true])->execute([]);
+        $this->command(['urlPattern' => '{{calculated_static_prefix}}{{current_entity_path}}/'])->execute([]);
 
         $tester->assertCommandIsSuccessful();
         self::assertNotContains(IndexedPage::class, $updated->classes, 'No update of the entities: their listeners (timestamps, search index, sitemap) do not run.');
