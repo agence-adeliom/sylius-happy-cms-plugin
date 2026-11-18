@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\DependencyInjection;
 
+use Adeliom\SyliusHappyCMSPlugin\Attribute\AsBlock;
+use Adeliom\SyliusHappyCMSPlugin\Attribute\AsSharedBlock;
+use Adeliom\SyliusHappyCMSPlugin\DependencyInjection\Compiler\CheckBlockAttributesPass;
 use Adeliom\SyliusHappyCMSPlugin\EventListener\Media\LongSlugsListener;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockTypeInterface;
 use Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock\SharedBlockTypeInterface;
@@ -14,6 +17,7 @@ use Sylius\Bundle\ResourceBundle\DependencyInjection\Extension\AbstractResourceE
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
@@ -53,6 +57,17 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
         $container->registerForAutoconfiguration(SharedBlockTypeInterface::class)
             ->addTag('sylius.happy_cms.shared_block')
         ;
+
+        // Marks the classes carrying the attributes, checked by CheckBlockAttributesPass (the blocks themselves are
+        // tagged through their interface above)
+        foreach ([AsBlock::class, AsSharedBlock::class] as $blockAttribute) {
+            $container->registerAttributeForAutoconfiguration(
+                $blockAttribute,
+                static function (ChildDefinition $definition): void {
+                    $definition->addTag(CheckBlockAttributesPass::ATTRIBUTE_TAG);
+                },
+            );
+        }
 
         $container->registerForAutoconfiguration(SitemapDumperInterface::class)
             ->addTag('sylius_happy_cms.seo.sitemap_dumpable')
