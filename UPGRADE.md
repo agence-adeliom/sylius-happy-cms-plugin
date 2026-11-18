@@ -90,7 +90,8 @@ of a content block, injected by the container.
 The attributes require `sylius_easy_crud.attributes.enabled: true`. The makers generate them (with the trait) only in
 that case.
 
-The traits are deprecated from the start: they only keep `AbstractBlock` / `AbstractSharedBlockType` unchanged in 2.x.
+The traits only keep `AbstractBlock` / `AbstractSharedBlockType` unchanged in 2.x. They are not deprecated (no
+deprecation is reported when a block using them is loaded), since they are the only way to read the attributes in 2.x.
 In 2.4, the abstract classes read the attributes themselves and the traits are removed: delete the
 `use BlockAttributeMetadataTrait;` / `use SharedBlockAttributeMetadataTrait;` lines when upgrading.
 
