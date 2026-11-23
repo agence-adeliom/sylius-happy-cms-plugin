@@ -485,6 +485,16 @@ parent of another type whose slug changed (call it outside of a Doctrine flush, 
 The protected `rewriteOtherStaticPrefix()` is replaced by `recomputeRoutesBelowStaticPrefix()`: a project overriding
 it must override the new method.
 
+### The media manager looks folders up on the Flysystem storage
+
+`MediaManager::directoryExists()` asked the local disk (`public/{base_url}/{path}`). With an absolute `base_url` (CDN,
+front domain) or a storage outside the public directory (S3, GCS…) it was always false: `folderByPath()` returned
+`false`, `createMedia($source, 'a/b')` created the folders again on every call and moving a folder did nothing.
+
+It now asks the storage (`FilesystemOperator::directoryExists()`), and `move()` moves a folder entry by entry
+(`moveDirectory()`, protected): Flysystem moves files only, most adapters cannot rename a directory. Nothing to do with
+a local storage in the public directory: the answer is the same, a folder move renames its files one by one.
+
 ## 2.3.1
 
 ### `agence-adeliom/sylius-easy-crud-plugin` ^2.3.2 is required
