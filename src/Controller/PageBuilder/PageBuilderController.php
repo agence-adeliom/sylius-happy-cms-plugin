@@ -8,6 +8,7 @@ use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Config\Asset;
 use Adeliom\SyliusEasyCrudPlugin\CrudFactory\Dto\AssetDto;
 use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentBlockInterface;
 use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentEditableInterface;
+use Adeliom\SyliusHappyCMSPlugin\Event\PageBuilder\ContentPublishedEvent;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockCollection;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock\SharedBlockCollection;
@@ -20,6 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PageBuilderController extends AbstractController
@@ -31,6 +33,8 @@ class PageBuilderController extends AbstractController
         private readonly BlockCollection $blockCollection,
         private readonly TranslatorInterface $translator,
         private readonly SharedBlockCollection $sharedBlockCollection,
+        // Optional to keep the constructor compatible; autowired by the plugin's service definition.
+        private readonly ?EventDispatcherInterface $eventDispatcher = null,
     ) {
     }
 
@@ -404,6 +408,8 @@ class PageBuilderController extends AbstractController
 
         // Flush changes to database
         $this->entityManager->flush();
+
+        $this->eventDispatcher?->dispatch(new ContentPublishedEvent($entity, array_values($locales)));
     }
 
     /**
