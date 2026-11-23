@@ -4,9 +4,13 @@
 
 {% block page_title %}{{ 'sylius_happy_cms.media.title'|trans({}, 'SyliusHappyCMSPlugin')|striptags|raw }}{% endblock %}
 
-{% block body %}
+{# With media.easy_media_manager.enabled, the page is rendered by easy-media-manager (hook
+   `sylius_admin.happy_cms.easy_media`) and the assets of the Vue media manager are not loaded. #}
+{% block body %}{% if sylius_happy_cms.media.easy_media_manager.enabled ?? false %}
+    {% hook 'sylius_admin.happy_cms.easy_media' %}
+{% else %}
     {% hook 'sylius_admin.happy_cms.medias' %}
-{% endblock %}
+{% endif %}{% endblock %}
 
 {% block metatags %}
     {{ parent() }}
@@ -14,7 +18,7 @@
     <meta name="csrf-token" content="{{ csrf_token }}">
 {% endblock %}
 
-{% block stylesheets %}
+{% block stylesheets %}{% if sylius_happy_cms.media.easy_media_manager.enabled ?? false %}{{ parent() }}{% else %}
     {{ parent() }}
 
     <link rel="stylesheet" href="{{ asset('media-form.css', 'sylius.happy.cms.assets.package') }}"/>
@@ -23,10 +27,10 @@
             padding: 0;
         }
     </style>
-{% endblock %}
+{% endif %}{% endblock %}
 
-{% block javascripts %}
+{% block javascripts %}{% if sylius_happy_cms.media.easy_media_manager.enabled ?? false %}{{ parent() }}{% else %}
     {{ parent() }}
 
     <script src="{{ asset('media-form.js', 'sylius.happy.cms.assets.package') }}"></script>
-{% endblock %}
+{% endif %}{% endblock %}

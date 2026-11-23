@@ -506,6 +506,7 @@ class Configuration implements ConfigurationInterface
             ->end()
             ->end()
             ->end()
+            ->append($this->createEasyMediaManagerNode())
             ->end()
             ->end()
 
@@ -684,5 +685,41 @@ class Configuration implements ConfigurationInterface
             ->end();
 
         return $treeBuilder;
+    }
+
+    /**
+     * `media.easy_media_manager`: the media manager page and the media field rendered by easy-media-manager
+     * (@agence-adeliom/easy-media-manager, installed by the project) instead of the bundled Vue application.
+     */
+    private function createEasyMediaManagerNode(): ArrayNodeDefinition
+    {
+        $node = (new TreeBuilder('easy_media_manager'))->getRootNode();
+
+        $node
+            ->addDefaultsIfNotSet()
+            ->children()
+            ->booleanNode('enabled')
+            ->defaultFalse()
+            ->info('true: the media manager page and the media field (MediaType) use easy-media-manager instead of the Vue application, whose media-form assets are no longer loaded. Requires the npm package and the media-manager / media-field Stimulus controllers (see docs/medias.md). Set it as a literal boolean, not an environment variable. Becomes true by default in 2.4.')
+            ->end()
+            ->variableNode('theme')
+            ->defaultValue([])
+            ->info('Passed as is to the "config.theme" option of easy-media-manager: mode, accent, neutral, danger, font, tokens (see docs/THEMING.md of the library).')
+            ->example(['accent' => 'var(--tblr-primary)', 'font' => 'var(--tblr-font-sans-serif)'])
+            ->validate()
+            ->ifTrue(static fn (mixed $value): bool => !is_array($value))
+            ->thenInvalid('The easy-media-manager theme must be a map of options (accent, font, tokens...), %s given.')
+            ->end()
+            ->end()
+            ->arrayNode('features')
+            ->info('Feature flags of easy-media-manager (enableEditor, enableUpload, enableMove, enableRename, enableMetas, enableDelete, enableBulkSelection, enableGeneratingAlts, enableSearch, enableFilter, enableSort), over the defaults of the plugin: all enabled, enableGeneratingAlts following media.enable_generating_alts. The media field restricts them further with its own options.')
+            ->normalizeKeys(false)
+            ->useAttributeAsKey('name')
+            ->booleanPrototype()->end()
+            ->end()
+            ->end()
+        ;
+
+        return $node;
     }
 }

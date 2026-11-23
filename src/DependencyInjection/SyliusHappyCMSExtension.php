@@ -34,6 +34,8 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
 
     public const LONG_SLUGS_LISTENER = 'happy.cms.media.event_listener.long_slugs';
 
+    public const EASY_MEDIA_CONFIG_HOOKABLE = 'happy_cms_easy_media_config';
+
     /** @psalm-suppress UnusedVariable */
     public function load(array $configs, ContainerBuilder $container): void
     {
@@ -282,6 +284,12 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
         }
         $container->setParameter('sylius_happy_cms.media.long_slugs', true === $longSlugs);
 
+        $easyMediaManager = $config['easy_media_manager'] ?? [];
+        $container->setParameter(
+            'sylius_happy_cms.media.easy_media_manager.enabled',
+            is_array($easyMediaManager) && true === ($easyMediaManager['enabled'] ?? false),
+        );
+
         if (true === $longSlugs) {
             // Default mapping (100) untouched: the listener widens the slugs only for the projects that opt in.
             $container->register(self::LONG_SLUGS_LISTENER, LongSlugsListener::class)
@@ -302,6 +310,33 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
         $container->prependExtensionConfig('twig', $twigConfig);
 
         $this->prependCmfRouteClass($container);
+        $this->prependEasyMediaManagerHooks($container, $mediaGlobals);
+    }
+
+    /**
+     * With `media.easy_media_manager.enabled`, renders the configuration of easy-media-manager (routes, options,
+     * CSRF token) once on every admin page, where a media field can open the media manager. Nothing is added when
+     * the option is off.
+     *
+     * @param array<string, mixed> $media
+     */
+    private function prependEasyMediaManagerHooks(ContainerBuilder $container, array $media): void
+    {
+        $easyMediaManager = $media['easy_media_manager'] ?? [];
+        if (!is_array($easyMediaManager) || true !== ($easyMediaManager['enabled'] ?? false) || !$container->hasExtension('sylius_twig_hooks')) {
+            return;
+        }
+
+        $container->prependExtensionConfig('sylius_twig_hooks', [
+            'hooks' => [
+                'sylius_admin.base#javascripts' => [
+                    self::EASY_MEDIA_CONFIG_HOOKABLE => [
+                        'template' => '@SyliusHappyCMSPlugin/media/easy_media/config.html.twig',
+                        'priority' => -100,
+                    ],
+                ],
+            ],
+        ]);
     }
 
     /**

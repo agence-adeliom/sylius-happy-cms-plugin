@@ -5,7 +5,7 @@
     </div>
 {% endblock %}
 
-{% block happy_cms_media_widget %}
+{% block happy_cms_media_widget %}{% if sylius_happy_cms.media.easy_media_manager.enabled ?? false %}{{ block('happy_cms_easy_media_widget') }}{% else %}
     {% set options = {
         baseUrl: sylius_happy_cms.media.base_url,
         hideFilesExt: sylius_happy_cms.media.hide_files_ext,
@@ -145,4 +145,52 @@
             initVueMediaWidget(vueElement);
         });
     </script>
+{% endif %}{% endblock %}
+
+{#
+ # Media field rendered by easy-media-manager (media.easy_media_manager.enabled), Stimulus controller `media-field`:
+ # the hidden input holds the id of the chosen media. A choice or a removal dispatches `easy-media-field:change`
+ # (detail: `file`, null when removed, and `input`), bubbling from the field.
+ #}
+{% block happy_cms_easy_media_widget %}
+    {% set controller = '@agence-adeliom/sylius-happy-cms-plugin/media-field' %}
+    {% set empty_label = 'sylius_happy_cms.media.no_val'|trans({}, 'SyliusHappyCMSPlugin') %}
+    <div class="easy-media-field mb-3" {{ stimulus_controller(controller, {
+        uploadTypes: form.vars.restrict.uploadTypes ?? [],
+        uploadSize: form.vars.restrict.uploadSize ?? 0,
+        path: form.vars.restrict.path ?? '',
+        features: {
+            enableEditor: form.vars.editor ?? true,
+            enableUpload: form.vars.upload ?? true,
+            enableMove: form.vars.move ?? true,
+            enableRename: form.vars.rename ?? true,
+            enableMetas: form.vars.metas ?? true,
+            enableDelete: form.vars.delete ?? true,
+            enableBulkSelection: form.vars.bulk_selection ?? true,
+        },
+        emptyLabel: empty_label,
+    }) }}>
+        <div class="d-flex align-items-center gap-3 border rounded p-2">
+            <div class="easy-media-field__preview" {{ stimulus_target(controller, 'preview') }}></div>
+            <div class="flex-fill text-truncate">
+                <div class="text-truncate" {{ stimulus_target(controller, 'name') }}>{{ empty_label }}</div>
+                <small class="text-secondary" {{ stimulus_target(controller, 'size') }}></small>
+            </div>
+            <button type="button" class="btn btn-sm" {{ stimulus_action(controller, 'pick') }}>
+                {{- 'sylius_happy_cms.media.select.file'|trans({}, 'SyliusHappyCMSPlugin') -}}
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-danger" hidden {{ stimulus_action(controller, 'clear') }} {{ stimulus_target(controller, 'clear') }}>
+                {{- 'sylius_happy_cms.media.remove'|trans({}, 'SyliusHappyCMSPlugin') -}}
+            </button>
+        </div>
+        {{ form_widget(form, {type: 'hidden', attr: stimulus_target(controller, 'input').toArray()}) }}
+
+        {% if ea.field.help ?? false %}
+            <small>{{ ea.field.help|raw }}</small>
+        {% elseif form.vars.help ?? false %}
+            <small>{{ form.vars.help|trans(form.vars.help_translation_parameters, form.vars.translation_domain)|raw }}</small>
+        {% endif %}
+
+        {{- form_errors(form) -}}
+    </div>
 {% endblock %}

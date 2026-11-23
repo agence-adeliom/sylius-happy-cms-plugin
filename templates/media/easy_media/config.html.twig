@@ -1,0 +1,52 @@
+{#
+ # Configuration of easy-media-manager (@agence-adeliom/easy-media-manager), read by assets/easy-media/easy-media.js
+ # for the media-manager and media-field Stimulus controllers: routes `media.*`, options `sylius_happy_cms.media`
+ # and CSRF token of the write routes. Rendered once on every admin page (hook `sylius_admin.base#javascripts`)
+ # when `media.easy_media_manager.enabled` is true: a media field can open the media manager on any page.
+ #}
+{% set media = sylius_happy_cms.media %}
+{% set easy_media_manager = media.easy_media_manager %}
+{% set config = {
+    hideFilesExt: [],
+    mimeTypes: media.extended_mimes,
+    generatingAlts: media.enable_generating_alts,
+} %}
+{% set config = easy_media_manager.theme is empty ? config : config|merge({theme: easy_media_manager.theme}) %}
+<script type="application/json" id="happy-cms-easy-media-config">
+    {{- {
+        locale: app.request.locale|default('en'),
+        csrfToken: happy_cms_media_csrf_token(),
+        config: config,
+        features: {
+            enableEditor: true,
+            enableUpload: true,
+            enableMove: true,
+            enableRename: true,
+            enableMetas: true,
+            enableDelete: true,
+            enableBulkSelection: true,
+            enableGeneratingAlts: media.enable_generating_alts,
+            enableSearch: true,
+            enableFilter: true,
+            enableSort: true,
+        }|merge(easy_media_manager.features),
+        routes: {
+            files: path('media.get_files'),
+            fileInfos: path('media.get_file_info'),
+            upload: path('media.upload'),
+            uploadCropped: path('media.uploadCropped'),
+            uploadLink: path('media.uploadLink'),
+            newFolder: path('media.new_folder'),
+            deleteFile: path('media.delete_file'),
+            moveFile: path('media.move_file'),
+            renameFile: path('media.rename_file'),
+            editMetas: path('media.edit_metas_file'),
+            generateAlt: path('media.generate_alt_file'),
+            generateAltGroup: path('media.generate_alt_group'),
+            generateAllAlt: path('media.generate_all_alt'),
+            globalSearch: path('media.global_search'),
+            folderDownload: path('media.folder_download'),
+            filesDownload: path('media.files_download'),
+        },
+    }|json_encode|raw -}}
+</script>

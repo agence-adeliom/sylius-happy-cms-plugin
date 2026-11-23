@@ -158,6 +158,106 @@ Every item has the fields of the folder listing plus its parent folder: `folder_
 folder), `dir_path` (`/` at the root) and `breadcrumb` (folder names from the root). The search runs a fixed number of
 queries whatever the number of results: matching ids are read first, then only the entities of the requested page.
 
+## easy-media-manager (opt-in)
+
+The media manager page and the media field (`MediaType`, `MediaField`) can be rendered by
+[easy-media-manager](https://github.com/agence-adeliom/easy-media-manager) (`@agence-adeliom/easy-media-manager`,
+React) instead of the bundled Vue application. It talks to the same `media.*` routes: the media library, the
+entities and the storage do not change. The option is off by default in 2.3; it becomes the default in 2.4, where the
+Vue application is removed.
+
+### Enable it
+
+1. Install the library (and React, its peer dependency) in the project that builds the Sylius admin assets:
+
+   ```bash
+   npm install @agence-adeliom/easy-media-manager@^0.2.0 react react-dom
+   ```
+
+2. Enable the two Stimulus controllers of the plugin in the `controllers.json` read by the admin build (they are
+   declared with `"enabled": false`, so a project without the library keeps building):
+
+   ```json
+   {
+       "controllers": {
+           "@agence-adeliom/sylius-happy-cms-plugin": {
+               "media-manager": { "enabled": true, "fetch": "lazy" },
+               "media-field": { "enabled": true, "fetch": "lazy" }
+           }
+       }
+   }
+   ```
+
+   Both are lazy: the library and its styles are loaded only on a page with the media manager or a media field.
+
+3. Enable the option, then rebuild the admin assets:
+
+   ```yaml
+   # config/packages/sylius_happy_cms.yaml
+   sylius_happy_cms:
+       media:
+           easy_media_manager:
+               enabled: true    # a literal boolean, not an environment variable
+               # Optional: "config.theme" of the library, passed as is (mode, accent, neutral, danger, font, tokens).
+               theme:
+                   accent: 'var(--tblr-primary)'
+               # Optional: feature flags over the defaults (all enabled, enableGeneratingAlts following
+               # media.enable_generating_alts).
+               features:
+                   enableDelete: false
+   ```
+
+See [THEMING.md](https://github.com/agence-adeliom/easy-media-manager/blob/main/docs/THEMING.md) for the theme
+options (any CSS color works, `var(--tblr-primary)` follows the Tabler theme of the admin).
+
+### What the option changes
+
+| | Option off (default) | Option on |
+|---|---|---|
+| Media manager page (`media/manager_view.html.twig`) | Hook `sylius_admin.happy_cms.medias`, Vue application, `media-form.js` / `.css` | Hook `sylius_admin.happy_cms.easy_media` (`media/easy_media/manager.html.twig`), controller `media-manager` |
+| Media field (form theme `media/field/media/form.html.twig`) | Block `happy_cms_media_widget`, Vue component | Block `happy_cms_easy_media_widget`, controller `media-field` |
+| Every admin page | Nothing | `media/easy_media/config.html.twig` in the hook `sylius_admin.base#javascripts`: `<script type="application/json" id="happy-cms-easy-media-config">` with the locale, the `media.*` routes, the options and the CSRF token |
+| `media-form.js` / `media-form.css` (`MediaType::configureAdminAssets()`) | The Vue application | Empty files (`AssetHappyCMSPackage`), the Vue application is not loaded |
+
+With the option off, the plugin renders exactly what it rendered in 2.3.4. The template and form theme names do not
+change, so `twig.form_themes` and the fields that call `MediaType::configureAdminFormThemes()` keep working.
+
+The styles of the library are imported without cascade layers (`style.unlayered.css`), so that the rules of the
+admin (Tabler) do not win over them. The plugin also opens the modals of the library above the admin navigation and
+the Bootstrap modals (`z-index: 2000`).
+
+### Media field options
+
+| `MediaType` option | easy-media-manager (`EasyMedia.pick()`) |
+|---|---|
+| `restrictions_uploadTypes` | `restrictions.types`, as given: categories (`image`, `pdf`…), MIME types (`application/pdf`) or wildcards (`image/*`) |
+| `restrictions_uploadSize` (MB) | `restrictions.uploadSize` (bytes) |
+| `restrictions_path` | `restrictions.path`: the picker opens in this folder and stays below it |
+| `editor`, `upload`, `move`, `rename`, `metas`, `delete`, `bulk_selection` | `features.enableEditor`, `enableUpload`, `enableMove`, `enableRename`, `enableMetas`, `enableDelete`, `enableBulkSelection` |
+| `hideExt`, `hidePath` | No equivalent: ignored with the option on |
+
+The `hide_files_ext` option (hide the extension of the displayed names) and `enable_broadcasting` have no equivalent
+either; `extended_mimes` and `enable_generating_alts` are passed to the library.
+
+### Follow a media field from JavaScript
+
+A choice or a removal in a media field dispatches `easy-media-field:change` on the field (it bubbles), with the
+chosen file (`null` when removed) and the hidden input:
+
+```js
+document.addEventListener('easy-media-field:change', (event) => {
+    const { file, input } = event.detail;
+    // file: { id, name, type, size, path, metas… } or null
+});
+```
+
+The hidden input also dispatches a native `change` event. The library itself announces each choice of a picker on
+`window` with `easy-media:pick`.
+
+### Not covered yet
+
+The CKEditor browser (`media.browse`, `media/browser.html.twig`) still renders the Vue application.
+
 ## Documentation
 
 ### Integrate with FOS CKEditor

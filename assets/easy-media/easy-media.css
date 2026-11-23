@@ -1,0 +1,29 @@
+/* easy-media-manager in the Sylius admin (Tabler). */
+
+/* The modals and the picker open above the navigation and the Bootstrap modals of the admin (z-index up to 1055).
+   The scope is repeated to win over the library rule whatever the load order (see docs/THEMING.md of the library). */
+.easy-media.easy-media [data-easy-media-overlay='overlay'] {
+  z-index: 2000;
+}
+
+/* Media field (templates/media/field/media/form.html.twig, block happy_cms_easy_media_widget). */
+.easy-media-field__preview {
+  flex: none;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 0.25rem;
+  background: var(--tblr-bg-surface-secondary, #f1f5f9);
+}
+
+.easy-media-field__preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+/* Media manager page (templates/media/easy_media/manager.html.twig): height of the window below the navigation. */
+.happy-cms-easy-media-page {
+  height: calc(100vh - 10rem);
+  min-height: 30rem;
+}
