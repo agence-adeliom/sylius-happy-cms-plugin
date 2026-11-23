@@ -20,6 +20,20 @@ public function __invoke(ContentPublishedEvent $event): void
 `PageBuilderController` takes an optional `EventDispatcherInterface` as its last constructor argument, autowired by
 the plugin's service definition. Nothing listens by default.
 
+### Bug fix: a content block keeps the anchor given by a render listener
+
+`happy_cms_content_block_render()` always set `settings.attr_id` to `content-block-<id>`, after the
+`happy_cms_block.render_block` event: an anchor set by a listener of that event was overwritten, so the links to it
+broke. The anchor is now `content-block-<id>` only when the block has none, as the JSON block renderer already does
+with `block-<n>`.
+
+### Bug fix: the route controller of a content document receives the whole request
+
+A content document with a route controller (`CmsRoutableInterface::getRouteController()`) is rendered by that
+controller through a sub-request. The sub-request only carried `contentDocument` and `request`: the query string
+(`?page=2`, `?happy_cms_preview=1`) and the routing attributes (`_route`, `_route_params`, `routeDocument`) were lost.
+It now carries the attributes and the query string of the request, plus `contentDocument` and `request` as before.
+
 ### Bug fix: `happycms:migrate:content-to-blocks` publishes the blocks without `block_published`
 
 The command created a block without `block_published` key as unpublished (`publishedData` null): a page migrated from
@@ -88,6 +102,23 @@ Related changes, without effect when the option is not set:
 - The `Adeliom\SyliusHappyCMSPlugin\Factory\Block\Helper` constructor gets a new optional last argument,
   `bool $inheritContext = false`. The service keeps its four positional arguments and gets `$inheritContext` by
   name. A project that redefines the service keeps the legacy behaviour.
+
+### New: block metadata declared with `#[AsBlock]` / `#[AsSharedBlock]`
+
+Optional, nothing changes for existing blocks: `AbstractBlock` and `AbstractSharedBlockType` are unchanged. A block
+can declare its metadata with the new `#[AsBlock]` / `#[AsSharedBlock]` attributes instead of the metadata methods,
+read by `BlockAttributeMetadataTrait` / `SharedBlockAttributeMetadataTrait` (to use in the block or in your base block
+class), see [docs/blocks.md](docs/blocks.md#declaring-the-metadata-with-asblock--assharedblock).
+`#[AsSharedBlock(block: ContentBlock::class)]` makes a shared block take the metadata and the form (`buildBlock()`)
+of a content block, injected by the container.
+
+The attributes require `sylius_easy_crud.attributes.enabled: true`. The makers generate them (with the trait) only in
+that case.
+
+The traits only keep `AbstractBlock` / `AbstractSharedBlockType` unchanged in 2.x. They are not deprecated (no
+deprecation is reported when a block using them is loaded), since they are the only way to read the attributes in 2.x.
+In 2.4, the abstract classes read the attributes themselves and the traits are removed: delete the
+`use BlockAttributeMetadataTrait;` / `use SharedBlockAttributeMetadataTrait;` lines when upgrading.
 
 ### SEO Twig functions typed on `SeoInterface`
 
@@ -351,6 +382,38 @@ default prototypes are unchanged (technical fields and a "please save" notice).
 Fixed without option: the flexible content form theme no longer fails ("Impossible to access an attribute "name" on a
 null variable") on a stored block whose type is not in the allowed list of the field; the block is rendered under its
 class name.
+
+### New option: URL pattern of the CMS routes
+
+```yaml
+sylius_happy_cms:
+    routing:
+        # default, the current routes
+        url_pattern: '/{{locale}}{{calculated_static_prefix}}{{current_entity_path}}'
+```
+
+The pattern must contain `{{current_entity_path}}`. Remove `{{locale}}` for URLs without locale prefix. Changing it
+does not rewrite the stored routes: re-save the routable entities afterwards.
+
+`EntityRouteIndexer`: `manageRoutes()`, `computeRoutes()` and `rewriteOtherStaticPrefix()` are now `protected` (were
+`private`); the constructor takes two new optional arguments (`$urlPattern`, `$collapseSlashes`): a service definition
+overriding the indexer with the four original arguments keeps the current behaviour.
+
+### Deprecated: not setting `sylius_happy_cms.routing.collapse_slashes`
+
+```yaml
+sylius_happy_cms:
+    routing:
+        collapse_slashes: true
+```
+
+With `true`, repeated slashes in a computed route path are collapsed (`/en_US//about` becomes `/en_US/about`, when a
+`CalculateRouteStaticPrefixEvent` listener returns a path ending with `/`), so an empty placeholder never leaves a
+`//` and the homepage of a pattern without `{{locale}}` is `/`. Not set or `false`, the path is kept as filled (a
+deprecation is triggered). Stored routes are not rewritten when you opt in: re-save the routable entities whose path
+contained `//`.
+
+In 2.4 the option is removed and collapsing the repeated slashes is the only behaviour.
 
 ## 2.3.1
 

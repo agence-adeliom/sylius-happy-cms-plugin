@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Adeliom\SyliusHappyCMSPlugin\DependencyInjection;
 
+use Adeliom\SyliusHappyCMSPlugin\Attribute\AsBlock;
+use Adeliom\SyliusHappyCMSPlugin\Attribute\AsSharedBlock;
+use Adeliom\SyliusHappyCMSPlugin\DependencyInjection\Compiler\CheckBlockAttributesPass;
 use Adeliom\SyliusHappyCMSPlugin\EventListener\Media\LongSlugsListener;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockTypeInterface;
 use Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock\SharedBlockTypeInterface;
@@ -14,6 +17,7 @@ use Sylius\Bundle\ResourceBundle\DependencyInjection\Extension\AbstractResourceE
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
@@ -37,6 +41,7 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
         $config = $this->processConfiguration($configuration, $configs);
 
         $this->processPageConfiguration($config['page'], $container);
+        $this->processRoutingConfiguration($config['routing'], $container);
         $this->processPageBuilderConfiguration($config['page_builder'], $container);
         $this->processBlockRenderConfiguration($config['block_render'], $container);
         $this->processSeoConfiguration($config['seo'], $container);
@@ -53,6 +58,17 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
         $container->registerForAutoconfiguration(SharedBlockTypeInterface::class)
             ->addTag('sylius.happy_cms.shared_block')
         ;
+
+        // Marks the classes carrying the attributes, checked by CheckBlockAttributesPass (the blocks themselves are
+        // tagged through their interface above)
+        foreach ([AsBlock::class, AsSharedBlock::class] as $blockAttribute) {
+            $container->registerAttributeForAutoconfiguration(
+                $blockAttribute,
+                static function (ChildDefinition $definition): void {
+                    $definition->addTag(CheckBlockAttributesPass::ATTRIBUTE_TAG);
+                },
+            );
+        }
 
         $container->registerForAutoconfiguration(SitemapDumperInterface::class)
             ->addTag('sylius_happy_cms.seo.sitemap_dumpable')
@@ -100,6 +116,48 @@ final class SyliusHappyCMSExtension extends AbstractResourceExtension implements
             /** @phpstan-ignore-next-line */
             $container->setParameter('sylius_happy_cms.page.' . $key, $value);
         }
+    }
+
+    /**
+     * @param array<string, mixed> $config
+     */
+    private function processRoutingConfiguration(array $config, ContainerBuilder $container): void
+    {
+        foreach ($config as $key => $value) {
+            /** @phpstan-ignore-next-line */
+            $container->setParameter('sylius_happy_cms.routing.' . $key, $value);
+        }
+
+        $container->setParameter('sylius_happy_cms.routing.collapse_slashes', $this->resolveRoutingFlag(
+            $config['collapse_slashes'] ?? null,
+            'collapse_slashes',
+            'collapsing the repeated slashes of a computed route path',
+        ));
+    }
+
+    /**
+     * Compatibility flag of the "sylius_happy_cms.routing" section: null (not set) or false keep the current behaviour
+     * and trigger a deprecation, true opts in the behaviour of 2.4.
+     */
+    private function resolveRoutingFlag(mixed $value, string $option, string $newBehaviour): bool
+    {
+        if (true === $value) {
+            return true;
+        }
+
+        trigger_deprecation(
+            'agence-adeliom/sylius-happy-cms-plugin',
+            '2.3.3',
+            sprintf(
+                '%s the "sylius_happy_cms.routing.%s" option %sis deprecated. It will be removed in 2.4, where %s is the only behaviour. Set it to true to opt in now (see UPGRADE.md).',
+                null === $value ? 'Not setting' : 'Setting',
+                $option,
+                null === $value ? '' : 'to false ',
+                $newBehaviour,
+            ),
+        );
+
+        return false;
     }
 
     /**
