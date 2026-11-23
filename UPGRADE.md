@@ -2,6 +2,24 @@
 
 ## Unreleased (2.3.x)
 
+### New event: `ContentPublishedEvent` when the page builder publishes content
+
+Publishing in the page builder (`?publish=1&locales[]=…`) copied the drafts of the blocks to their published data
+and saved them, without telling anyone: a project could not purge the HTTP cache of the page or reindex it. The page
+builder now dispatches `Adeliom\SyliusHappyCMSPlugin\Event\PageBuilder\ContentPublishedEvent` after saving, with
+the entity (`getEntity()`) and the published locales (`getLocales()`).
+
+```php
+#[AsEventListener]
+public function __invoke(ContentPublishedEvent $event): void
+{
+    // purge the cache of $event->getEntity()'s page
+}
+```
+
+`PageBuilderController` takes an optional `EventDispatcherInterface` as its last constructor argument, autowired by
+the plugin's service definition. Nothing listens by default.
+
 ### Bug fix: a content block keeps the anchor given by a render listener
 
 `happy_cms_content_block_render()` always set `settings.attr_id` to `content-block-<id>`, after the
