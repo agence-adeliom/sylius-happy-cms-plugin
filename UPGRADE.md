@@ -2,6 +2,23 @@
 
 ## Unreleased (2.3.x)
 
+### Bug fix: a new menu gets its root item without a `sylius_happy_cms.menu_item` resource
+
+`MenuCreationListener` read the menu item class only from the `sylius_happy_cms.menu_item` resource. An application
+that declares its menu items under another resource name got an `Undefined array key` warning on each new menu (an
+exception in the debug and test environments), and no root item.
+
+The listener now falls back to the `menu.menu_item.menu_item_model` setting. Set it to your menu item entity:
+
+```yaml
+sylius_happy_cms:
+    menu:
+        menu_item:
+            menu_item_model: App\Entity\Menu\MenuItem
+```
+
+The resource still comes first. The plugin's default model is a mapped superclass: when the setting keeps it, a new
+menu has no root item, as before, but without the warning.
 ### New event: `ContentPublishedEvent` when the page builder publishes content
 
 Publishing in the page builder (`?publish=1&locales[]=…`) copied the drafts of the blocks to their published data
