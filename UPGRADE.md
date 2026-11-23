@@ -1,5 +1,55 @@
 # Upgrade
 
+## 2.3.5
+
+### New option: easy-media-manager for the media manager and the media field (opt-in)
+
+The media manager page and the media field (`MediaType`) can be rendered by
+[easy-media-manager](https://github.com/agence-adeliom/easy-media-manager) instead of the bundled Vue application.
+Nothing changes for a project that does not enable it: the templates render what they rendered in 2.3.4.
+
+To opt in, install the library, enable the two Stimulus controllers and the option (see
+[docs/medias.md](docs/medias.md#easy-media-manager-opt-in)):
+
+```bash
+npm install @agence-adeliom/easy-media-manager@^0.2.0 react react-dom
+```
+
+```json
+"@agence-adeliom/sylius-happy-cms-plugin": {
+    "media-manager": { "enabled": true, "fetch": "lazy" },
+    "media-field": { "enabled": true, "fetch": "lazy" }
+}
+```
+
+```yaml
+sylius_happy_cms:
+    media:
+        easy_media_manager:
+            enabled: true
+            theme:                       # optional, "config.theme" of the library
+                accent: 'var(--tblr-primary)'
+```
+
+With the option on:
+
+- `media/manager_view.html.twig` renders the hook `sylius_admin.happy_cms.easy_media` (mount point
+  `media/easy_media/manager.html.twig`) instead of `sylius_admin.happy_cms.medias`, without the `media-form` assets.
+- The form theme `media/field/media/form.html.twig` renders the block `happy_cms_easy_media_widget`. The options
+  `hideExt` and `hidePath` of `MediaType` have no equivalent in the library and are ignored.
+- Every admin page gets the configuration of the library (`media/easy_media/config.html.twig`, hook
+  `sylius_admin.base#javascripts`).
+- `media-form.js` and `media-form.css` of `AssetHappyCMSPackage` point to empty files: the fields and blocks that
+  declare them through `MediaType::configureAdminAssets()` no longer load the Vue application. `AssetHappyCMSPackage`
+  takes an optional `$easyMediaManager` constructor argument (false by default) for this.
+- A choice in a media field dispatches `easy-media-field:change` (detail `file`, `input`). The JavaScript events of
+  the Vue application (`file_selected`…) are no longer dispatched.
+
+A project that overrides `media/manager_view.html.twig` or `media/field/media/form.html.twig` to plug its own media
+manager can remove these overrides once it enables the option.
+
+In 2.4, the option becomes `true` by default and the Vue application is removed.
+
 ## 2.3.4
 
 ### Bug fix: a new menu gets its root item without a `sylius_happy_cms.menu_item` resource

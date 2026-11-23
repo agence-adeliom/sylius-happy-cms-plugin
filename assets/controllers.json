@@ -20,6 +20,14 @@
       "builder-block-editor": {
         "enabled": true,
         "fetch": "lazy"
+      },
+      "media-manager": {
+        "enabled": false,
+        "fetch": "lazy"
+      },
+      "media-field": {
+        "enabled": false,
+        "fetch": "lazy"
       }
     },
     "@symfony/ux-autocomplete": {

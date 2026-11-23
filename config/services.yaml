@@ -76,6 +76,8 @@ services:
     public: true
 
   Adeliom\SyliusHappyCMSPlugin\Asset\AssetHappyCMSPackage:
+    arguments:
+      $easyMediaManager: '%sylius_happy_cms.media.easy_media_manager.enabled%'
     tags:
       -   assets.package: { package: 'sylius.happy.cms.assets.package' }
 

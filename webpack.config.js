@@ -24,6 +24,12 @@ Encore
         to: 'dist/[path][name].[ext]',
     })
 
+    // Empty files served instead of media-form.js / media-form.css with easy-media-manager (AssetHappyCMSPackage)
+    .copyFiles({
+        from: './assets/easy-media/public',
+        to: 'easy-media/[name].[ext]',
+    })
+
     .addEntry('flexible-content', './assets/flexible-content/flexible-content.js')
     .addEntry('media-form', './assets/media/js/app.js')
     .addEntry('seo-block-type', './assets/blocks/seo-block-type.js')

@@ -38,11 +38,29 @@
         "webpackMode": "lazy",
         "fetch": "lazy",
         "enabled": true
+      },
+      "media-manager": {
+        "main": "controllers/MediaManagerController.js",
+        "webpackMode": "lazy",
+        "fetch": "lazy",
+        "enabled": false
+      },
+      "media-field": {
+        "main": "controllers/MediaFieldController.js",
+        "webpackMode": "lazy",
+        "fetch": "lazy",
+        "enabled": false
       }
     }
   },
   "peerDependencies": {
-    "@hotwired/stimulus": "^3.0.0"
+    "@hotwired/stimulus": "^3.0.0",
+    "@agence-adeliom/easy-media-manager": "^0.2.0"
+  },
+  "peerDependenciesMeta": {
+    "@agence-adeliom/easy-media-manager": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@hotwired/stimulus": "^3.0.0"
