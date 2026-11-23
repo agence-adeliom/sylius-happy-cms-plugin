@@ -2,6 +2,13 @@
 
 ## Unreleased (2.3.x)
 
+### Bug fix: the route controller of a content document receives the whole request
+
+A content document with a route controller (`CmsRoutableInterface::getRouteController()`) is rendered by that
+controller through a sub-request. The sub-request only carried `contentDocument` and `request`: the query string
+(`?page=2`, `?happy_cms_preview=1`) and the routing attributes (`_route`, `_route_params`, `routeDocument`) were lost.
+It now carries the attributes and the query string of the request, plus `contentDocument` and `request` as before.
+
 ### Bug fix: `happycms:migrate:content-to-blocks` publishes the blocks without `block_published`
 
 The command created a block without `block_published` key as unpublished (`publishedData` null): a page migrated from

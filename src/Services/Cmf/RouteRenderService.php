@@ -141,9 +141,10 @@ class RouteRenderService extends AbstractController
         if (null !== $controller) {
             try {
                 return $this->forward($controller, [
+                    ...$request->attributes->all(),
                     'contentDocument' => $contentDocument,
                     'request' => $request,
-                ]);
+                ], $request->query->all());
             } catch (\RuntimeException $runtimeException) {
                 throw $this->createAccessDeniedException($controller . ' not exists');
             }
