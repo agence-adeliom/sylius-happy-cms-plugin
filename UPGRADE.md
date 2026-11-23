@@ -2,6 +2,24 @@
 
 ## Unreleased (2.3.x)
 
+### New event: `ContentPublishedEvent` when the page builder publishes content
+
+Publishing in the page builder (`?publish=1&locales[]=…`) copied the drafts of the blocks to their published data
+and saved them, without telling anyone: a project could not purge the HTTP cache of the page or reindex it. The page
+builder now dispatches `Adeliom\SyliusHappyCMSPlugin\Event\PageBuilder\ContentPublishedEvent` after saving, with
+the entity (`getEntity()`) and the published locales (`getLocales()`).
+
+```php
+#[AsEventListener]
+public function __invoke(ContentPublishedEvent $event): void
+{
+    // purge the cache of $event->getEntity()'s page
+}
+```
+
+`PageBuilderController` takes an optional `EventDispatcherInterface` as its last constructor argument, autowired by
+the plugin's service definition. Nothing listens by default.
+
 ### Bug fix: a content block keeps the anchor given by a render listener
 
 `happy_cms_content_block_render()` always set `settings.attr_id` to `content-block-<id>`, after the
@@ -407,6 +425,32 @@ The plugin no longer sets the parameter `cmf_routing.dynamic.persistence.orm.rou
 - Without `route_model` (before `make:happy-cms:install`), the dynamic router is left out of the chain router: unknown
   URLs answer 404 instead of a 500 (`MappingException`).
 - A route class that does not exist now fails the container build instead of answering 500 on every unknown URL.
+
+### Fixed: renaming a path rewrites only the routes below it
+
+When the path of an entity changes, the indexer updates the stored routes below its previous path. It used to load
+every route and `str_replace()` the previous path in every route starting with it: renaming `/porte` also rewrote
+`/portes-d-entree` into `/portails-d-entree`, and `/porte/porte-bois` into `/portail/portail-bois`.
+
+The routes with exactly the previous path or below it at a `/` boundary are now selected by a query on the route
+class (`cmf_routing.dynamic.persistence.orm.route_class`) instead of `findAll()`, then each one is recomputed from
+its content, as when the content is saved (`CmsRoutableInterface::getRouteStaticPrefix()`,
+`CalculateRouteStaticPrefixEvent`):
+
+- `/porte/porte-bois`, a child page of `/porte`, becomes `/portail/porte-bois`;
+- `/portes-d-entree` is unchanged (not below `/porte/`);
+- `/porte/coulissante`, placed under a taxon `porte` (another type, same slug) by its `getRouteStaticPrefix()`, is
+  unchanged: its path is still computed from the taxon;
+- a route without routable content (not an online route of the indexer, content removed) has its leading prefix
+  replaced.
+
+`/` (homepage) is never used as a prefix. Each content below the path is loaded (`ContentRepository::findById()`).
+Routes already rewritten by mistake are not repaired: check them.
+
+`EntityRouteIndexer` has a new public method, `rewriteStaticPrefix()`, to update the routes below the path of a
+parent of another type whose slug changed (call it outside of a Doctrine flush, once the parent has its new slug).
+The protected `rewriteOtherStaticPrefix()` is replaced by `recomputeRoutesBelowStaticPrefix()`: a project overriding
+it must override the new method.
 
 ## 2.3.1
 
