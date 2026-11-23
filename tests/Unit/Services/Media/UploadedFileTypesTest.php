@@ -59,7 +59,7 @@ final class UploadedFileTypesTest extends MediaManagerTestCase
     public function testByDefaultTheOriginalExtensionIsKeptAndTheMimeTypeComesFromTheContent(): void
     {
         $photo = $this->manager->createMedia($this->upload('Photo.JPG', $this->pngBytes(), 'image/jpeg'));
-        $prices = $this->manager->createMedia($this->upload('prices.csv', "door,price\nfront,1200\n", 'text/csv'));
+        $prices = $this->manager->createMedia($this->upload('prices.csv', "Front door: 1200 euros.\nBack door: 900 euros.\n", 'text/csv'));
         $local = $this->manager->createMedia($this->pngFile('scan.jpg'));
 
         self::assertSame('photo.jpg', $photo->getSlug());
@@ -88,7 +88,7 @@ final class UploadedFileTypesTest extends MediaManagerTestCase
         $this->manager = $this->createManager(['keep_original_extension' => false]);
 
         $photo = $this->manager->createMedia($this->upload('photo.jpg', $this->pngBytes(), 'image/jpeg'));
-        $prices = $this->manager->createMedia($this->upload('prices.csv', "door,price\nfront,1200\n", 'text/csv'));
+        $prices = $this->manager->createMedia($this->upload('prices.csv', "Front door: 1200 euros.\nBack door: 900 euros.\n", 'text/csv'));
 
         self::assertSame('image/png', $photo->getMime());
         self::assertSame('photo.png', $photo->getSlug());
