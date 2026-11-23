@@ -89,7 +89,7 @@ When you save a routable entity:
 URLs are built hierarchically:
 
 ```
-/{{locale}}{{other_entity_path}}{{current_entity_path}}{{variable_pattern}}
+/{{locale}}{{calculated_static_prefix}}{{current_entity_path}}{{variable_pattern}}
 ```
 
 **Example hierarchy**:
