@@ -4,7 +4,7 @@ services:
     class: Adeliom\SyliusHappyCMSPlugin\Maker\Block\MakeBlock
     public: false
     arguments:
-      - '@maker.file_manager'
+      - '@parameter_bag'
     tags:
       - { name: maker.command }
 
@@ -29,6 +29,6 @@ services:
     class: Adeliom\SyliusHappyCMSPlugin\Maker\SharedBlock\MakeSharedBlock
     public: false
     arguments:
-      - '@maker.file_manager'
+      - '@parameter_bag'
     tags:
       - { name: maker.command }
