@@ -6,6 +6,8 @@ namespace Tests\Adeliom\SyliusHappyCMSPlugin\Unit\EventListener;
 
 use Adeliom\SyliusHappyCMSPlugin\Event\Route\CalculateRouteStaticPrefixEvent;
 use Adeliom\SyliusHappyCMSPlugin\EventListener\EntityRouteIndexer;
+use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\EventListener\Fixtures\Routing\IndexedPage;
+use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\EventListener\Fixtures\Routing\IndexedRoute;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Unit\EventListener\Fixtures\Routing\RouteIndexerTestCase;
 
 final class EntityRouteIndexerTest extends RouteIndexerTestCase
@@ -63,5 +65,77 @@ final class EntityRouteIndexerTest extends RouteIndexerTestCase
         $this->savePage('about', category: 'company');
 
         self::assertSame(['/en_US/company/about'], array_values($this->storedPrefixes()));
+    }
+
+    public function testRenamingAPageRecomputesItsDescendantRoutesOnly(): void
+    {
+        // a page "porte" and a taxon "porte" (another type, same slug): "/porte/coulissante" is a child of the taxon,
+        // not of the page; "/portes-d-entree" only shares the first characters
+        $this->registerIndexer(['urlPattern' => '{{calculated_static_prefix}}{{current_entity_path}}']);
+        $door = $this->savePage('porte');
+        $this->savePage('portes-d-entree');
+        $wooden = $this->savePage('porte-bois', parent: $door);
+        $this->savePage('vitree', parent: $wooden);
+        $this->savePage('coulissante', taxon: 'porte');
+        $id = $door->getId();
+        $this->restartProcess();
+
+        $door = $this->entityManager->find(IndexedPage::class, $id);
+        self::assertInstanceOf(IndexedPage::class, $door);
+        $door->getTranslation()->setSlug('portail');
+        $this->entityManager->flush();
+
+        self::assertSame(['/portail', '/portes-d-entree', '/portail/porte-bois', '/portail/porte-bois/vitree', '/porte/coulissante'], array_values($this->storedPrefixes()));
+    }
+
+    public function testRenamingAPageWithAPatternEndingWithASlashRecomputesItsDescendantRoutesOnly(): void
+    {
+        $this->registerIndexer(['urlPattern' => '{{calculated_static_prefix}}{{current_entity_path}}/']);
+        $door = $this->savePage('porte');
+        $this->savePage('portes-d-entree');
+        $this->savePage('porte-bois', parent: $door);
+        $this->savePage('coulissante', taxon: 'porte');
+        $id = $door->getId();
+        $this->restartProcess();
+
+        $door = $this->entityManager->find(IndexedPage::class, $id);
+        self::assertInstanceOf(IndexedPage::class, $door);
+        $door->getTranslation()->setSlug('portail');
+        $this->entityManager->flush();
+
+        self::assertSame(['/portail/', '/portes-d-entree/', '/portail/porte-bois/', '/porte/coulissante/'], array_values($this->storedPrefixes()));
+    }
+
+    public function testTheRoutesBelowARenamedPathOfAnotherTypeAreRecomputedExplicitly(): void
+    {
+        $indexer = $this->registerIndexer(['urlPattern' => '{{calculated_static_prefix}}{{current_entity_path}}']);
+        $this->savePage('porte-bois', taxon: 'porte');
+        $this->savePage('portes-d-entree');
+
+        // the taxon (not routable) has its new slug, its pages are recomputed
+        IndexedPage::$renamedTaxons['porte'] = 'portail';
+        $indexer->rewriteStaticPrefix('/porte', '/portail');
+
+        self::assertSame(['/portail/porte-bois', '/portes-d-entree'], array_values($this->storedPrefixes()));
+    }
+
+    public function testARouteWithoutRoutableContentBelowARenamedPathIsMoved(): void
+    {
+        $this->registerIndexer(['urlPattern' => '{{calculated_static_prefix}}{{current_entity_path}}']);
+        $door = $this->savePage('porte');
+        $manual = new IndexedRoute();
+        $manual->setName('manual');
+        $manual->setStaticPrefix('/porte/manuelle');
+        $this->entityManager->persist($manual);
+        $this->entityManager->flush();
+        $id = $door->getId();
+        $this->restartProcess();
+
+        $door = $this->entityManager->find(IndexedPage::class, $id);
+        self::assertInstanceOf(IndexedPage::class, $door);
+        $door->getTranslation()->setSlug('portail');
+        $this->entityManager->flush();
+
+        self::assertSame(['/portail', '/portail/manuelle'], array_values($this->storedPrefixes()));
     }
 }
