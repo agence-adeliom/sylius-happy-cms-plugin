@@ -11,6 +11,7 @@
   flex: none;
   width: 3.5rem;
   height: 3.5rem;
+  overflow: hidden; /* keeps the alt text of an image that fails to load inside the thumbnail */
   border-radius: 0.25rem;
   background: var(--tblr-bg-surface-secondary, #f1f5f9);
 }
@@ -20,6 +21,8 @@
   height: 100%;
   object-fit: cover;
   border-radius: inherit;
+  font-size: 0.625rem;
+  line-height: 1.2;
 }
 
 /* Media manager page (templates/media/easy_media/manager.html.twig): height of the window below the navigation. */
