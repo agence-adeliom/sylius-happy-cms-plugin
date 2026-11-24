@@ -704,7 +704,7 @@ class Configuration implements ConfigurationInterface
             ->end()
             ->variableNode('theme')
             ->defaultValue([])
-            ->info('Passed as is to the "config.theme" option of easy-media-manager: mode, accent, neutral, danger, font, tokens (see docs/THEMING.md of the library).')
+            ->info('Passed as is to the "config.theme" option of easy-media-manager: mode, accent, neutral, danger, font, tokens (see docs/THEMING.md of the library). Without a mode, the manager follows the light/dark theme of the admin.')
             ->example(['accent' => 'var(--tblr-primary)', 'font' => 'var(--tblr-font-sans-serif)'])
             ->validate()
             ->ifTrue(static fn (mixed $value): bool => !is_array($value))
