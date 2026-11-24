@@ -210,6 +210,10 @@ Vue application is removed.
 See [THEMING.md](https://github.com/agence-adeliom/easy-media-manager/blob/main/docs/THEMING.md) for the theme
 options (any CSS color works, `var(--tblr-primary)` follows the Tabler theme of the admin).
 
+Without a `mode` in `theme`, the manager follows the light/dark theme of the admin (`data-bs-theme` on `<html>`). With
+easy-media-manager 0.3 or later, it also switches live with the theme switcher of the admin; with 0.2, it takes the
+theme of the page load. Set `mode: light`, `dark` or `auto` (the system setting) to override it.
+
 ### What the option changes
 
 | | Option off (default) | Option on |

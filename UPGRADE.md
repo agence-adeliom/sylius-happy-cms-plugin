@@ -31,6 +31,9 @@ sylius_happy_cms:
                 accent: 'var(--tblr-primary)'
 ```
 
+Without a `mode` in `theme`, the manager follows the light/dark theme of the admin, live with easy-media-manager 0.3+
+(`EasyMedia.setTheme()`), at page load with 0.2.
+
 With the option on:
 
 - `media/manager_view.html.twig` renders the hook `sylius_admin.happy_cms.easy_media` (mount point
