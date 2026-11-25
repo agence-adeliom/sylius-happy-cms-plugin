@@ -75,7 +75,8 @@ export default class extends Controller {
     const { blockId } = event.detail;
 
     console.log('Reloading iframe to show updated content');
-    document.querySelector('[data-page-builder-target="iframe"]').contentWindow.location.reload();
+    // The preview may be served on another origin: the page builder asks the preview bridge to reload
+    document.dispatchEvent(new CustomEvent('page-builder:reload-preview'));
 
     // Dispatch custom event for other parts of the page to listen
     this.dispatch('blockSaved', { detail: { blockId } });
@@ -90,7 +91,8 @@ export default class extends Controller {
     const { blockId } = event.detail;
 
     console.log('Reloading iframe to show updated content');
-    document.querySelector('[data-page-builder-target="iframe"]').contentWindow.location.reload();
+    // The preview may be served on another origin: the page builder asks the preview bridge to reload
+    document.dispatchEvent(new CustomEvent('page-builder:reload-preview'));
 
     // Dispatch custom event for other parts of the page to listen
     this.dispatch('blockSaved', { detail: { blockId } });

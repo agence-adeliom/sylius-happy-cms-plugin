@@ -39,7 +39,12 @@
         "/bundles/syliushappycmsplugin/page-builder.d433d83a.css"
       ],
       "js": [
-        "/bundles/syliushappycmsplugin/page-builder.d3152c67.js"
+        "/bundles/syliushappycmsplugin/page-builder.cd7266b3.js"
+      ]
+    },
+    "page-builder-preview-bridge": {
+      "js": [
+        "/bundles/syliushappycmsplugin/page-builder-preview-bridge.030b057f.js"
       ]
     }
   }

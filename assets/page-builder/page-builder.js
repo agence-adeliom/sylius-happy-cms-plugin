@@ -71,31 +71,33 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Load the preview URL in the iframe
+  // Preview iframe. The page builder never reads the preview document: the preview may be served on another origin
+  // than the admin (a dedicated shop host), where the browser forbids it. Every exchange goes through postMessage
+  // with the preview bridge (preview-bridge.js), injected in the preview page by PageBuilderPreviewBridgeListener.
   const iframe = document.querySelector('[data-page-builder-target="iframe"]');
-  let initialIframeUrl = null; // Store the initial URL to protect against navigation
-  let iframeEventsInitialized = false; // Track if events are currently initialized
+  const previewUrl = iframeUri ? new URL(iframeUri, window.location.href) : null;
+  const previewOrigin = previewUrl ? previewUrl.origin : null;
+  // The bridge reports the path of every loaded document: blocks are editable on the edited page only
+  let previewIsValid = false;
 
   // Editor panel elements (used by editBlock function)
   const editorPanel = document.querySelector('[data-page-builder-target="editorPanel"]');
   const editorToggle = document.querySelector('[data-page-builder-target="editorToggle"]');
-  const editorContent = document.querySelector('[data-page-builder-target="editorContent"]');
 
   /**
-   * Check if the current iframe URL matches the initial URL
-   * Returns true if valid, false otherwise
+   * Send a message to the preview bridge, on the preview origin only
    */
-  function isCurrentIframeUrlValid() {
-    if (!initialIframeUrl) return true; // Allow during first load
-
-    try {
-      const currentUrl = new URL(iframe.contentWindow.location.href);
-      const currentPath = currentUrl.origin + currentUrl.pathname;
-      return currentPath === initialIframeUrl;
-    } catch (error) {
-      console.error('Cannot check iframe URL:', error);
-      return false;
+  function sendToPreview(type, payload) {
+    if (iframe && iframe.contentWindow && previewOrigin) {
+      iframe.contentWindow.postMessage(Object.assign({ type: type }, payload || {}), previewOrigin);
     }
+  }
+
+  /**
+   * Reload the preview (after a block is saved, moved, published or deleted)
+   */
+  function reloadPreview() {
+    sendToPreview('hcms:reload');
   }
 
   /**
@@ -103,11 +105,9 @@ document.addEventListener('DOMContentLoaded', function() {
    * Accessible globally for all buttons (sidebar, iframe, add block)
    */
   function editBlock(blockId) {
-    console.log('Edit block:', blockId);
-
-    // Security check: only allow editing if iframe URL hasn't changed (skip for create mode)
-    if (blockId !== null && !isCurrentIframeUrlValid()) {
-      console.error('Cannot edit block - iframe URL has changed');
+    // Security check: only allow editing on the edited page (skip for create mode)
+    if (blockId !== null && !previewIsValid) {
+      console.error('Cannot edit block - the preview left the edited page');
       alert('The page has changed. Please reload the page builder to continue editing.');
       return;
     }
@@ -127,8 +127,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Open the overlay panel
     editorPanel.classList.add('is-open');
-
-    console.log('Panel opened for block:', blockId);
   }
 
   /**
@@ -136,8 +134,6 @@ document.addEventListener('DOMContentLoaded', function() {
    * Resets the form and closes the panel
    */
   function closeBlock() {
-    console.log('Close block editor');
-
     if (!editorPanel) return;
 
     // Dispatch custom event to the BlockEditor Stimulus controller
@@ -148,34 +144,25 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
       console.warn('Page builder element not found');
     }
-
-    console.log('Block editor closed');
   }
 
   // Theme tokens forwarded to the shop preview iframe, which knows nothing about the admin theme variables
   const PREVIEW_THEME_TOKENS = ['--hcms-accent', '--hcms-accent-hover', '--hcms-warning', '--hcms-danger'];
 
   /**
-   * Declare the resolved admin theme tokens in the preview document.
-   * Empty values are skipped so the inline fallbacks of the overlays still apply.
+   * Resolved admin theme tokens. Empty values are skipped so the inline fallbacks of the overlays still apply.
    */
-  function applyPreviewTheme(iframeDocument) {
-    if (!iframeDocument || !iframeDocument.head) return;
-
+  function previewThemeTokens() {
     const rootStyles = getComputedStyle(document.documentElement);
-    const declarations = PREVIEW_THEME_TOKENS
-      .map(token => [token, rootStyles.getPropertyValue(token).trim()])
-      .filter(([, value]) => value !== '')
-      .map(([token, value]) => `${token}: ${value};`)
-      .join(' ');
+    const tokens = {};
+    PREVIEW_THEME_TOKENS.forEach(token => {
+      const value = rootStyles.getPropertyValue(token).trim();
+      if (value !== '') {
+        tokens[token] = value;
+      }
+    });
 
-    let style = iframeDocument.getElementById('page-builder-theme');
-    if (!style) {
-      style = iframeDocument.createElement('style');
-      style.id = 'page-builder-theme';
-      iframeDocument.head.appendChild(style);
-    }
-    style.textContent = `:root { ${declarations} }`;
+    return tokens;
   }
 
   /**
@@ -196,14 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
 
-    const previewIframe = document.querySelector('[data-page-builder-target="iframe"]');
-    try {
-      if (previewIframe && isCurrentIframeUrlValid()) {
-        applyPreviewTheme(previewIframe.contentDocument);
-      }
-    } catch (error) {
-      // Preview not accessible (cross-origin or navigating)
-    }
+    sendToPreview('hcms:theme', { tokens: previewThemeTokens() });
   }
 
   // Sylius theme switcher only toggles data-bs-theme on <html>
@@ -221,342 +201,106 @@ document.addEventListener('DOMContentLoaded', function() {
     }, true);
   }
 
-  if (iframe) {
+  const blockHandlesContainer = document.querySelector('[data-page-builder-target="blockHandles"]');
 
-    // Prevent navigation in iframe and re-initialize events on reload
-    iframe.addEventListener('load', function() {
-      console.log('Iframe loaded. URL:', iframe.src);
-      console.log('Iframe location:', iframe.contentWindow?.location?.href);
+  function blockHandle(blockId) {
+    return document.querySelector(`.page-builder__block-handle[data-block-id="${CSS.escape(String(blockId))}"]`);
+  }
 
-      try {
-        const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-        const iframeWindow = iframe.contentWindow;
+  /**
+   * Align the sidebar handles on the blocks, from the positions sent by the preview bridge
+   */
+  function updateBlockHandlesPositions(blocks, viewportHeight) {
+    if (!blockHandlesContainer) return;
 
-        // Store initial URL on first load (without query params and hash for comparison)
-        if (!initialIframeUrl) {
-          const url = new URL(iframeWindow.location.href);
-          // Store pathname only (ignore query params and hash)
-          initialIframeUrl = url.origin + url.pathname;
-          console.log('Initial iframe URL stored:', initialIframeUrl);
+    // Get the offset of the handles container to compensate for the add block button
+    const addBlockButton = document.querySelector('[data-page-builder-target="addBlock"]');
+    let offset = 0;
+    if (addBlockButton) {
+      const addBlockMarginBottom = parseFloat(window.getComputedStyle(addBlockButton).marginBottom);
+      const handlesContainerMarginTop = parseFloat(window.getComputedStyle(blockHandlesContainer).marginTop);
+      offset = addBlockButton.offsetHeight + addBlockMarginBottom + handlesContainerMarginTop;
+    }
+
+    blocks.forEach(block => {
+      const handle = blockHandle(block.id);
+      if (!handle) return;
+
+      handle.style.transform = `translateY(${block.top - offset}px)`;
+      handle.style.height = block.height + 'px';
+
+      // A block is visible if any part of it is in the viewport
+      handle.classList.toggle('is-active', block.top < viewportHeight && block.top + block.height > 0);
+    });
+  }
+
+  if (iframe && previewOrigin) {
+    // Messages from the preview bridge, on the preview origin only
+    window.addEventListener('message', function(event) {
+      if (event.source !== iframe.contentWindow || event.origin !== previewOrigin) {
+        return;
+      }
+
+      const data = event.data || {};
+
+      switch (data.type) {
+        case 'hcms:ready':
+          previewIsValid = data.path === previewUrl.pathname;
+          if (!previewIsValid) {
+            console.warn('Preview left the edited page:', data.path);
+          }
+          sendToPreview('hcms:theme', { tokens: previewThemeTokens() });
+          break;
+
+        case 'hcms:edit-block':
+          editBlock(String(data.blockId));
+          break;
+
+        case 'hcms:block-hover': {
+          const handle = previewIsValid ? blockHandle(data.blockId) : null;
+          const handleButton = handle ? handle.querySelector('.page-builder__block-handle-button') : null;
+          if (handleButton) {
+            handleButton.classList.toggle('is-hovered', data.hovered === true);
+          }
+          break;
         }
 
-        // Check if the loaded URL is the authorized one
-        if (!isCurrentIframeUrlValid()) {
-          console.warn('Iframe loaded with unauthorized URL, skipping event initialization');
-          iframeEventsInitialized = false;
-          return;
-        }
-
-        console.log('Successfully accessed iframe document - initializing events');
-
-        /**
-         * Initialize events on elements INSIDE the iframe
-         * This function can be called multiple times when returning to the authorized URL
-         */
-        function initIframeBlockEvents() {
-          if (!iframeDocument) return;
-
-          console.log('Initializing iframe block events...');
-
-          // Intercept all link clicks
-          iframeDocument.addEventListener('click', function(e) {
-            const target = e.target.closest('a');
-            if (target && target.href) {
-              e.preventDefault();
-              console.log('Navigation blocked in preview:', target.href);
-              return false;
-            }
-          }, true);
-
-          // Intercept form submissions
-          iframeDocument.addEventListener('submit', function(e) {
-            e.preventDefault();
-            console.log('Form submission blocked in preview');
-            return false;
-          }, true);
-
-          // Forward the admin theme tokens (accent, warning, danger) to the preview
-          applyPreviewTheme(iframeDocument);
-
-          // Inject CSS for hover effect in iframe (only if not already present)
-          if (!iframeDocument.getElementById('page-builder-styles')) {
-            const style = iframeDocument.createElement('style');
-            style.id = 'page-builder-styles';
-            style.textContent = `
-              /* Minimal height for blocks (some are blank) */
-              .content-block-wrapper {
-                min-height: 150px;
-              }
-
-              /* Show outline and shadow on hover */
-              .content-block-wrapper.is-hovered {
-                outline: 3px solid var(--hcms-accent, #22b99a) !important;
-                outline-offset: -3px !important;
-                box-shadow: 0 0 0 3px color-mix(in srgb, var(--hcms-accent, #22b99a) 20%, transparent) !important;
-                z-index: 100 !important;
-              }
-
-              /* Show hover overlay when hovering */
-              .content-block-wrapper.is-hovered .content-block-hover-overlay {
-                display: flex !important;
-              }
-
-              /* Hide hover overlay for unpublished blocks (they have their own overlay) */
-              .content-block-wrapper[data-published="false"] .content-block-hover-overlay {
-                display: none !important;
-              }
-
-              /* Hide hover overlay for deleted blocks (they have their own overlay) */
-              .content-block-wrapper[data-deleted="true"] .content-block-hover-overlay {
-                display: none !important;
-              }
-
-              /* Button hover effect */
-              .content-block-edit-button:hover {
-                background: var(--hcms-accent-hover, #1d9d83) !important;
-                transform: translateY(-2px) !important;
-                box-shadow: 0 6px 16px color-mix(in srgb, var(--hcms-accent, #22b99a) 50%, transparent) !important;
-              }
-            `;
-            iframeDocument.head.appendChild(style);
+        case 'hcms:blocks-layout':
+          if (previewIsValid && Array.isArray(data.blocks)) {
+            updateBlockHandlesPositions(data.blocks, data.viewportHeight);
           }
-
-          // Add hover effect on blocks in iframe to highlight handles in sidebar (reverse)
-          const contentBlocks = iframeDocument.querySelectorAll('.content-block-wrapper[data-block-id]');
-          contentBlocks.forEach(block => {
-            block.addEventListener('mouseenter', function() {
-              // Security check: only apply hover if iframe URL hasn't changed
-              if (!isIframeUrlValid()) {
-                return;
-              }
-
-              const blockId = this.dataset.blockId;
-              const handle = document.querySelector(`.page-builder__block-handle[data-block-id="${blockId}"]`);
-              if (handle) {
-                const handleButton = handle.querySelector('.page-builder__block-handle-button');
-                if (handleButton) {
-                  handleButton.classList.add('is-hovered');
-                }
-                // Also highlight the block itself
-                this.classList.add('is-hovered');
-              }
-            });
-
-            block.addEventListener('mouseleave', function() {
-              // Security check: only apply hover if iframe URL hasn't changed
-              if (!isIframeUrlValid()) {
-                return;
-              }
-
-              const blockId = this.dataset.blockId;
-              const handle = document.querySelector(`.page-builder__block-handle[data-block-id="${blockId}"]`);
-              if (handle) {
-                const handleButton = handle.querySelector('.page-builder__block-handle-button');
-                if (handleButton) {
-                  handleButton.classList.remove('is-hovered');
-                }
-                // Remove highlight from block
-                this.classList.remove('is-hovered');
-              }
-            });
-          });
-
-          // Add click handler for edit buttons in iframe (both hover overlay and unpublished overlay)
-          const editButtons = iframeDocument.querySelectorAll('.content-block-edit-button');
-          editButtons.forEach(button => {
-            button.addEventListener('click', function(e) {
-              e.preventDefault();
-              e.stopPropagation();
-              const blockId = this.dataset.blockId;
-              editBlock(blockId);
-            });
-          });
-
-          // Remove Symfony toolbar inside iframe
-          if (iframeDocument.querySelector('.sf-toolbar')) {
-            iframeDocument.querySelector('.sf-toolbar').remove();
-          }
-
-          iframeEventsInitialized = true;
-          console.log('Iframe block events initialized');
-        }
-
-        // Initialize iframe events for the first time
-        initIframeBlockEvents();
-
-        // Synchronize block handles positions with iframe scroll
-        const blockHandles = document.querySelectorAll('.page-builder__block-handle');
-        const blockHandlesContainer = document.querySelector('[data-page-builder-target="blockHandles"]');
-        const sidebar = document.querySelector('[data-page-builder-target="sidebar"]');
-
-        /**
-         * Check if the iframe URL has changed from the initial URL
-         * Returns true if the URL is still the same (safe to operate), false otherwise
-         */
-        function isIframeUrlValid() {
-          if (!initialIframeUrl) return true; // Allow during initialization
-
-          try {
-            const currentUrl = new URL(iframe.contentWindow.location.href);
-            const currentPath = currentUrl.origin + currentUrl.pathname;
-
-            if (currentPath !== initialIframeUrl) {
-              console.warn('Iframe URL has changed! Expected:', initialIframeUrl, 'Got:', currentPath);
-              return false;
-            }
-            return true;
-          } catch (error) {
-            // Cannot access URL (cross-origin), assume it's invalid
-            console.error('Cannot check iframe URL:', error);
-            return false;
-          }
-        }
-
-        function updateBlockHandlesPositions() {
-          // Security check: only update if iframe URL hasn't changed
-          if (!isIframeUrlValid()) {
-            console.warn('Skipping block handles update - iframe URL has changed');
-            return;
-          }
-          if (!blockHandlesContainer) return;
-
-          // Get all content blocks in the iframe
-          const contentBlocks = iframeDocument.querySelectorAll('.content-block-wrapper[data-block-id]');
-
-          if (contentBlocks.length === 0) return;
-
-          const viewportHeight = iframeWindow.innerHeight;
-
-          // Get the offset of the handles container to compensate for the add block button
-          const addBlockButton = document.querySelector('[data-page-builder-target="addBlock"]');
-          let offset = 0;
-          if (addBlockButton) {
-            // Calculate total height including margins
-            const addBlockStyles = window.getComputedStyle(addBlockButton);
-            const addBlockHeight = addBlockButton.offsetHeight;
-            const addBlockMarginBottom = parseFloat(addBlockStyles.marginBottom);
-            const handlesContainerMarginTop = parseFloat(window.getComputedStyle(blockHandlesContainer).marginTop);
-            offset = addBlockHeight + addBlockMarginBottom + handlesContainerMarginTop;
-          }
-
-          // Position each handle based on its corresponding block in the iframe
-          contentBlocks.forEach(contentBlock => {
-            const blockId = contentBlock.dataset.blockId;
-            const handle = document.querySelector(`.page-builder__block-handle[data-block-id="${blockId}"]`);
-
-            if (handle) {
-              // Get block position and dimensions in iframe (relative to viewport)
-              const blockRect = contentBlock.getBoundingClientRect();
-
-              // Use the position relative to the iframe viewport, compensating for the offset
-              const blockTop = blockRect.top - offset;
-              const blockHeight = blockRect.height;
-
-              // Set handle position and height
-              handle.style.transform = `translateY(${blockTop}px)`;
-              handle.style.height = blockHeight + 'px';
-
-              // Check if block is visible in viewport
-              // A block is considered visible if any part of it is in the viewport
-              const isVisible = blockRect.top < viewportHeight && blockRect.bottom > 0;
-
-              // Add/remove active class
-              if (isVisible) {
-                handle.classList.add('is-active');
-              } else {
-                handle.classList.remove('is-active');
-              }
-            }
-          });
-        }
-
-        // Update positions on iframe scroll
-        iframeWindow.addEventListener('scroll', updateBlockHandlesPositions);
-
-        // Update positions on iframe resize
-        iframeWindow.addEventListener('resize', updateBlockHandlesPositions);
-
-        // Initial positioning
-        setTimeout(updateBlockHandlesPositions, 100);
-
-        // Add hover effect on handles to highlight blocks in iframe
-        blockHandles.forEach(handle => {
-          const handleButton = handle.querySelector('.page-builder__block-handle-button');
-          if (!handleButton) return;
-
-          handleButton.addEventListener('mouseenter', function() {
-            // Security check: only apply hover if iframe URL hasn't changed
-            if (!isIframeUrlValid()) {
-              return;
-            }
-
-            const blockId = handle.dataset.blockId;
-            const block = iframeDocument.querySelector(`.content-block-wrapper[data-block-id="${blockId}"]`);
-            if (block) {
-              block.classList.add('is-hovered');
-            }
-          });
-
-          handleButton.addEventListener('mouseleave', function() {
-            // Security check: only apply hover if iframe URL hasn't changed
-            if (!isIframeUrlValid()) {
-              return;
-            }
-
-            const blockId = handle.dataset.blockId;
-            const block = iframeDocument.querySelector(`.content-block-wrapper[data-block-id="${blockId}"]`);
-            if (block) {
-              block.classList.remove('is-hovered');
-            }
-          });
-
-          // Add click handler for sidebar buttons
-          handleButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            const blockId = handle.dataset.blockId;
-            editBlock(blockId);
-          });
-        });
-
-        // Note: Events on blocks INSIDE iframe (hover, click on edit buttons) are handled by initIframeBlockEvents()
-
-      } catch (error) {
-        console.error('Cannot access iframe:', error);
-        console.log('Iframe src:', iframe.src);
-        // Cross-origin restrictions prevent access
-        console.log('Cannot access iframe content (cross-origin restriction)');
+          break;
       }
     });
 
-    // Monitor iframe URL changes and re-initialize events when returning to authorized URL
-    let lastKnownUrl = null;
-    let urlCheckInterval = setInterval(function() {
-      try {
-        const currentUrl = iframe.contentWindow.location.href;
+    // Handshake on every load (first load, reload, navigation): the bridge then answers hcms:ready
+    iframe.addEventListener('load', function() {
+      previewIsValid = false;
+      sendToPreview('hcms:connect');
+    });
 
-        // Check if URL has changed
-        if (currentUrl !== lastKnownUrl) {
-          console.log('Iframe URL changed from', lastKnownUrl, 'to', currentUrl);
-          lastKnownUrl = currentUrl;
+    // Sidebar handles: hover highlights the block in the preview, click edits it
+    document.querySelectorAll('.page-builder__block-handle').forEach(handle => {
+      const handleButton = handle.querySelector('.page-builder__block-handle-button');
+      if (!handleButton) return;
 
-          // Check if we're back on the authorized URL
-          const url = new URL(currentUrl);
-          const currentPath = url.origin + url.pathname;
+      handleButton.addEventListener('mouseenter', function() {
+        sendToPreview('hcms:highlight-block', { blockId: handle.dataset.blockId, highlighted: true });
+      });
 
-          if (currentPath === initialIframeUrl && !iframeEventsInitialized) {
-            console.log('Returned to authorized URL - triggering re-initialization');
-            // Manually trigger the load event handler
-            iframe.dispatchEvent(new Event('load'));
-          } else if (currentPath !== initialIframeUrl && iframeEventsInitialized) {
-            console.log('Navigated away from authorized URL - events will be disabled');
-            iframeEventsInitialized = false;
-          }
-        }
-      } catch (error) {
-        // Cross-origin error - ignore
-      }
-    }, 500); // Check every 500ms
+      handleButton.addEventListener('mouseleave', function() {
+        sendToPreview('hcms:highlight-block', { blockId: handle.dataset.blockId, highlighted: false });
+      });
+
+      handleButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        editBlock(handle.dataset.blockId);
+      });
+    });
+
+    // Reload requested by the BlockEditor controller (block saved from the toolbar or the form)
+    document.addEventListener('page-builder:reload-preview', reloadPreview);
 
     // Load the preview URL with locale
     iframe.src = iframeUri;
@@ -623,23 +367,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Listen for postMessage from block edit iframe
+  // Listen for postMessage from the block edit iframe, served by the admin itself
   window.addEventListener('message', function(event) {
-    // Security: verify origin if needed
-    // if (event.origin !== window.location.origin) return;
+    if (event.origin !== window.location.origin) return;
 
     const data = event.data;
 
-    // Handle block:saved message from the form iframe
+    // Handle block:saved message from the form iframe: reload the preview to show the updated block
     if (data && data.type === 'block:saved') {
-      console.log('Block saved with ID:', data.blockId);
-
-      // Reload the preview iframe to show the updated block
-      const previewIframe = document.querySelector('[data-page-builder-target="iframe"]');
-      if (previewIframe) {
-        console.log('Reloading preview iframe to show updated block');
-        previewIframe.contentWindow.location.reload();
-      }
+      reloadPreview();
     }
   });
 

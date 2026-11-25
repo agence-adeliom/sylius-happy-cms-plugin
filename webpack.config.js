@@ -36,6 +36,7 @@ Encore
     .addEntry('accordion-block-type', './assets/blocks/accordion-block-type.js')
     .addEntry('tiny-mce', './assets/tinymce/field.js')
     .addEntry('page-builder', './assets/page-builder/entrypoint.js')
+    .addEntry('page-builder-preview-bridge', './assets/page-builder/preview-bridge.js')
 ;
 
 const webpackConfig = Encore.getWebpackConfig();

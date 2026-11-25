@@ -2,6 +2,25 @@
 
 ## 2.3.5
 
+### Page builder: the preview talks to the builder through postMessage
+
+The preview iframe may now be served on another origin than the admin (a dedicated shop host): blocks stay
+editable. The page builder no longer reads the preview document; a bridge loaded in the preview
+(`page-builder-preview-bridge.js`) handles hover, edit buttons, blocked navigation and block positions, and talks to
+the builder through `postMessage`.
+
+Nothing to do for a project that renders its pages through the CMS render: `PageBuilderPreviewBridgeListener` injects
+the bridge before `</body>` of a `?happy_cms_preview=1` page granted by the render, or of a page that contains
+preview blocks.
+
+Check your custom code:
+
+- To reload the preview, dispatch `page-builder:reload-preview` on `document` instead of calling
+  `contentWindow.location.reload()` on the preview iframe (forbidden across origins).
+- An override of `admin/page_builder/index.html.twig` keeps working as long as it loads `page-builder.js`.
+- Serving the preview on another origin still requires the preview request to be authorized there (the admin session
+  cookie is not sent to another host): this is up to the project.
+
 ### New option: easy-media-manager for the media manager and the media field (opt-in)
 
 The media manager page and the media field (`MediaType`) can be rendered by

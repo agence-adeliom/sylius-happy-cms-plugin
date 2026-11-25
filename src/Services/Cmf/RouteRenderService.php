@@ -7,6 +7,7 @@ namespace Adeliom\SyliusHappyCMSPlugin\Services\Cmf;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\Route as OrmRoute;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Cmf\RouteInterface;
 use Adeliom\SyliusHappyCMSPlugin\Event\Route\RouteRenderServiceEvent;
+use Adeliom\SyliusHappyCMSPlugin\EventListener\PageBuilderPreviewBridgeListener;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Adeliom\SyliusHappyCMSPlugin\Security\ContentDocumentVoter;
 use Adeliom\SyliusHappyCMSPlugin\Services\Seo\BreadcrumbCollection;
@@ -86,6 +87,9 @@ class RouteRenderService extends AbstractController
             } catch (AccessDeniedException $e) {
                 throw new \Exception('Access Denied to preview content document');
             }
+
+            // The page builder preview bridge is injected in this page (PageBuilderPreviewBridgeListener)
+            $request->attributes->set(PageBuilderPreviewBridgeListener::REQUEST_ATTRIBUTE, true);
         }
 
         if (!$contentDocument->isOnline() && !$preview) {
