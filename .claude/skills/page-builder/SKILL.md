@@ -16,7 +16,7 @@ description: Use when working on the HappyCMS page builder in this plugin - prev
 - Empty blocks are detected in the browser (rendered height under 4px), never in PHP (`strip_tags()` misses present but invisible content).
 - `PreviewOverlayRenderer::wrap()` keeps its 5 original parameters in 2.x; new ones are optional and appended. `Helper` keeps its 4 original constructor arguments.
 - Preview texts and block names are translated in the admin locale carried by the signed URL (`_hcms_admin_locale`), never in the page locale when that one is known.
-- The editor panel width lives in `--hcms-editor-width` (handle on its left edge, 360 px to viewport - 120 px, default 820 px), remembered per browser in `localStorage`; never stored server-side.
+- The editor panel width lives in `--hcms-editor-width` (handle on its left edge, 360 px minimum, stops 60 px right of the preview content, default 820 px), remembered per browser in `localStorage`; never stored server-side.
 - After an Encore build: `assets:install`; the test application is rebuilt with `yarn install --force`.
 
 ## References

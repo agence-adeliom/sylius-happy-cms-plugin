@@ -23,7 +23,7 @@
 - Content measured = child nodes of the wrapper except comments, whitespace-only text and the reserved overlays (`RESERVED_CLASSES`) - `preview-empty-block.js::contentNodesOf()`.
 - Under `EMPTY_HEIGHT_THRESHOLD` (4px), NaN included, the block is empty - `isEmptyHeight()`. A change of `is-empty` triggers `scheduleGeometry()` (message `geometry`).
 - Not detected: content hidden with `visibility: hidden` or `opacity: 0` (it keeps its height).
-- Editor panel width clamped between `MIN_WIDTH` (360) and `innerWidth - VIEWPORT_GUTTER` (120); when that maximum is below 360, the width is 360 - `clampWidth()` in `editor-resize.js`.
+- Editor panel width clamped between `MIN_WIDTH` (360) and `innerWidth - previewLeft - PREVIEW_VISIBLE` (60), `previewLeft` being the left edge of `.page-builder__preview-inner` plus its padding (where the iframe starts in desktop mode); when that maximum is below 360, the width is 360 - `maxWidth()`, `clampWidth()` in `editor-resize.js`.
 - Stored width: digits only and greater than 0, otherwise default 820; storage exceptions (private mode, blocked storage) are swallowed - `readStoredWidth()`, `storeWidth()`.
 - The width is stored on pointer release and after each keyboard action, never on each move; a window resize re-clamps the stored width without rewriting it.
 - Handle keys: ArrowLeft +20 px, ArrowRight -20 px, Home = minimum, End = maximum, Enter or double-click = 820 px; `aria-valuenow/min/max` follow.

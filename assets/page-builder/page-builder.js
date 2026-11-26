@@ -338,6 +338,7 @@ document.addEventListener('DOMContentLoaded', function() {
       document.querySelector('.page-builder'),
       editorPanel,
       document.querySelector('[data-page-builder-target="editorResizeHandle"]'),
+      document.querySelector('.page-builder__preview-inner'),
     );
   }
 

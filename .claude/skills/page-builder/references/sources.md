@@ -19,4 +19,4 @@ Archived on the `feat/page-builder-empty-block-placeholder` branch before its me
 | `docs/superpowers/specs/2026-11-26-page-builder-resizable-editor-panel-design.md` | `cd4f7f1ee74cd07edccaaabb5f3f517654613a2e` | `git show cd4f7f1ee74cd07edccaaabb5f3f517654613a2e:docs/superpowers/specs/2026-11-26-page-builder-resizable-editor-panel-design.md` |
 | `docs/superpowers/plans/2026-11-26-page-builder-resizable-editor-panel.md` | `cd4f7f1ee74cd07edccaaabb5f3f517654613a2e` | `git show cd4f7f1ee74cd07edccaaabb5f3f517654613a2e:docs/superpowers/plans/2026-11-26-page-builder-resizable-editor-panel.md` |
 
-Archived before its merge, at the developer's request: the SHA is the one of the `feat/page-builder-resizable-editor-panel` branch. After a squash merge, read it through the PR head ref (`git fetch origin pull/<number>/head`).
+Archived before its merge, at the developer's request: the SHA is the one of the `feat/page-builder-resizable-editor-panel` branch. After a squash merge, read it through the PR head ref (`git fetch origin pull/182/head`).

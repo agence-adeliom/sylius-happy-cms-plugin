@@ -2,18 +2,19 @@
 
 export const DEFAULT_WIDTH = 820;
 export const MIN_WIDTH = 360;
-export const VIEWPORT_GUTTER = 120;
+export const PREVIEW_VISIBLE = 60;
 export const KEYBOARD_STEP = 20;
 export const STORAGE_KEY = 'happy-cms.page-builder.editor-width';
 
 const WIDTH_VARIABLE = '--hcms-editor-width';
 
-function maxWidth(viewportWidth) {
-  return Math.max(MIN_WIDTH, viewportWidth - VIEWPORT_GUTTER);
+// The panel stops PREVIEW_VISIBLE px to the right of the left edge of the preview content
+export function maxWidth(viewportWidth, previewLeft) {
+  return Math.max(MIN_WIDTH, Math.floor(viewportWidth - previewLeft - PREVIEW_VISIBLE));
 }
 
-export function clampWidth(width, viewportWidth) {
-  return Math.min(Math.max(width, MIN_WIDTH), maxWidth(viewportWidth));
+export function clampWidth(width, max) {
+  return Math.min(Math.max(width, MIN_WIDTH), max);
 }
 
 export function readStoredWidth(storage = globalThis.localStorage) {
@@ -37,17 +38,28 @@ export function storeWidth(width, storage = globalThis.localStorage) {
   }
 }
 
-export function initEditorResize(root, panel, handle) {
+// Left edge of the preview content (inside the padding of the preview area), in viewport pixels
+function contentLeft(preview) {
+  if (!preview) return 0;
+
+  return preview.getBoundingClientRect().left + (parseFloat(getComputedStyle(preview).paddingLeft) || 0);
+}
+
+export function initEditorResize(root, panel, handle, preview) {
   if (!root || !panel || !handle) return;
+
+  const currentMax = () => maxWidth(window.innerWidth, contentLeft(preview));
 
   let currentWidth = DEFAULT_WIDTH;
 
   function apply(width) {
-    currentWidth = clampWidth(width, window.innerWidth);
+    const max = currentMax();
+
+    currentWidth = clampWidth(width, max);
     panel.style.setProperty(WIDTH_VARIABLE, `${currentWidth}px`);
     handle.setAttribute('aria-valuenow', String(currentWidth));
     handle.setAttribute('aria-valuemin', String(MIN_WIDTH));
-    handle.setAttribute('aria-valuemax', String(maxWidth(window.innerWidth)));
+    handle.setAttribute('aria-valuemax', String(max));
   }
 
   function applyAndStore(width) {
@@ -92,7 +104,7 @@ export function initEditorResize(root, panel, handle) {
       case 'ArrowLeft': width = currentWidth + KEYBOARD_STEP; break;
       case 'ArrowRight': width = currentWidth - KEYBOARD_STEP; break;
       case 'Home': width = MIN_WIDTH; break;
-      case 'End': width = maxWidth(window.innerWidth); break;
+      case 'End': width = currentMax(); break;
       case 'Enter': width = DEFAULT_WIDTH; break;
       default: return;
     }

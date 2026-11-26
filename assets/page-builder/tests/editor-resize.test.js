@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { STORAGE_KEY, clampWidth, readStoredWidth, storeWidth } from '../editor-resize.js';
+import { STORAGE_KEY, clampWidth, maxWidth, readStoredWidth, storeWidth } from '../editor-resize.js';
 
 function storageWith(value) {
   return { getItem: (key) => (key === STORAGE_KEY ? value : null) };
@@ -16,20 +16,33 @@ const throwingStorage = {
   },
 };
 
+test('maxWidth keeps 60 px of preview visible on the left of the panel', () => {
+  // Preview content starts at 80 px: the panel stops at 140 px
+  assert.equal(maxWidth(1400, 80), 1260);
+});
+
+test('maxWidth follows the position of the preview', () => {
+  assert.equal(maxWidth(1400, 330), 1010);
+});
+
+test('maxWidth rounds down a fractional preview position', () => {
+  assert.equal(maxWidth(1400, 80.5), 1259);
+});
+
+test('maxWidth returns the minimum when the viewport is too narrow', () => {
+  assert.equal(maxWidth(400, 80), 360);
+});
+
 test('clampWidth keeps a width inside the range', () => {
-  assert.equal(clampWidth(640, 1400), 640);
+  assert.equal(clampWidth(640, 1260), 640);
 });
 
 test('clampWidth raises a width below the minimum', () => {
-  assert.equal(clampWidth(100, 1400), 360);
+  assert.equal(clampWidth(100, 1260), 360);
 });
 
-test('clampWidth lowers a width above the viewport minus the gutter', () => {
-  assert.equal(clampWidth(5000, 1400), 1280);
-});
-
-test('clampWidth returns the minimum when the viewport is too narrow', () => {
-  assert.equal(clampWidth(700, 400), 360);
+test('clampWidth lowers a width above the maximum', () => {
+  assert.equal(clampWidth(5000, 1260), 1260);
 });
 
 test('readStoredWidth returns null when nothing is stored', () => {
