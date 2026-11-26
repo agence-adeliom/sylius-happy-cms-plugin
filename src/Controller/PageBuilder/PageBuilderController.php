@@ -12,11 +12,14 @@ use Adeliom\SyliusHappyCMSPlugin\Event\PageBuilder\ContentPublishedEvent;
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockCollection;
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
 use Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock\SharedBlockCollection;
+use Adeliom\SyliusHappyCMSPlugin\Security\Preview\PreviewSigningDeniedException;
+use Adeliom\SyliusHappyCMSPlugin\Security\Preview\PreviewUrlGeneratorInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Sylius\Component\Locale\Provider\LocaleProviderInterface;
 use Sylius\Resource\Model\ResourceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -35,6 +38,8 @@ class PageBuilderController extends AbstractController
         private readonly SharedBlockCollection $sharedBlockCollection,
         // Optional to keep the constructor compatible; autowired by the plugin's service definition.
         private readonly ?EventDispatcherInterface $eventDispatcher = null,
+        // Optional to keep the constructor compatible; autowired by the plugin's service definition.
+        private readonly ?PreviewUrlGeneratorInterface $previewUrlGenerator = null,
     ) {
     }
 
@@ -65,21 +70,8 @@ class PageBuilderController extends AbstractController
             }
         }
 
-        // Get the current locale from query parameter or use default locale
-        $locale = $request->query->get('locale', $request->getLocale());
-
-        // Ensure the locale is a string
-        if (!is_string($locale)) {
-            $locale = $this->localeProvider->getDefaultLocaleCode();
-        }
-
-        // Get available locales
+        $locale = $this->resolveLocale($request);
         $availableLocales = $this->localeProvider->getAvailableLocalesCodes();
-
-        // Validate that the selected locale is available
-        if (!in_array($locale, $availableLocales, true)) {
-            $locale = $request->getLocale();
-        }
 
         // Get all content blocks for the entity (already validated as ContentEditableInterface)
         // In preview mode, we show all blocks (published and unpublished) for the given locale
@@ -96,6 +88,48 @@ class PageBuilderController extends AbstractController
             'availableLocales' => $availableLocales,
             'backRoute' => $backRoute,
         ]);
+    }
+
+    /**
+     * Returns a freshly signed preview URL: the page builder asks for one before each reload of the preview.
+     */
+    public function previewUrlAction(Request $request, string $resource, int $id): JsonResponse
+    {
+        $entity = $this->loadEntity($this->resolveEntityClass($resource), $id);
+
+        if (!$entity instanceof CmsRoutableInterface) {
+            throw new NotFoundHttpException(sprintf('Entity of resource "%s" must implement CmsRoutableInterface', $resource));
+        }
+
+        if (null === $this->previewUrlGenerator) {
+            throw new \LogicException(sprintf('The %s service must be injected to sign preview URLs.', PreviewUrlGeneratorInterface::class));
+        }
+
+        try {
+            $url = $this->previewUrlGenerator->generate($entity, $resource, $this->resolveLocale($request));
+        } catch (PreviewSigningDeniedException) {
+            return new JsonResponse(['error' => 'Access Denied to preview content document'], Response::HTTP_FORBIDDEN);
+        }
+
+        return new JsonResponse(['url' => $url]);
+    }
+
+    /**
+     * Locale from the "locale" query parameter, when it is available; the request locale otherwise.
+     */
+    private function resolveLocale(Request $request): string
+    {
+        $locale = $request->query->get('locale', $request->getLocale());
+
+        if (!is_string($locale)) {
+            $locale = $this->localeProvider->getDefaultLocaleCode();
+        }
+
+        if (!in_array($locale, $this->localeProvider->getAvailableLocalesCodes(), true)) {
+            $locale = $request->getLocale();
+        }
+
+        return $locale;
     }
 
     /**

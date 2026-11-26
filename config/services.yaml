@@ -111,6 +111,19 @@ services:
 
   Adeliom\SyliusHappyCMSPlugin\Security\Preview\SignedPreviewRequestValidatorInterface: '@Adeliom\SyliusHappyCMSPlugin\Security\Preview\SignedPreviewRequestValidator'
 
+  Adeliom\SyliusHappyCMSPlugin\Security\Preview\PreviewUrlGenerator:
+    arguments:
+      - '@router'
+      - '@Adeliom\SyliusHappyCMSPlugin\Security\Preview\PreviewUrlSignerInterface'
+
+  Adeliom\SyliusHappyCMSPlugin\Security\Preview\PreviewUrlGeneratorInterface: '@Adeliom\SyliusHappyCMSPlugin\Security\Preview\PreviewUrlGenerator'
+
+  Adeliom\SyliusHappyCMSPlugin\Twig\PreviewUrlExtension:
+    arguments:
+      - '@Adeliom\SyliusHappyCMSPlugin\Security\Preview\PreviewUrlGeneratorInterface'
+    tags:
+      - { name: twig.extension }
+
   Adeliom\SyliusHappyCMSPlugin\Security\SignedPreviewVoter:
     arguments:
       - '@request_stack'
