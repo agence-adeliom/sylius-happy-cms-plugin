@@ -84,6 +84,7 @@ services:
       - '@event_dispatcher'
       - '@sylius.happy_cms.block_collection'
       - '@adeliom.sylius.asset.renderer'
+      - '@Adeliom\SyliusHappyCMSPlugin\Factory\ContentBlock\PreviewLabelsProviderInterface'
     tags:
       - { name: twig.runtime }
 

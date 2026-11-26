@@ -40,6 +40,7 @@ class Helper
         private EventDispatcherInterface $eventDispatcher,
         private readonly BlockCollection $collection,
         private readonly AssetRenderer $assetRenderer,
+        private readonly ?PreviewLabelsProviderInterface $previewLabelsProvider = null,
     ) {
         $this->previewOverlayRenderer = new PreviewOverlayRenderer();
     }
@@ -191,6 +192,9 @@ class Helper
                 $contentBlock->getLayer(),
                 $isPreviewPublished,
                 $contentBlock->isDeleted(),
+                $this->previewLabelsProvider?->blockName($block) ?? $block->getName(),
+                $block->getIcon(),
+                $this->previewLabelsProvider?->labels(),
             ), 'UTF-8');
         }
 

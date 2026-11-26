@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Adeliom\SyliusHappyCMSPlugin\Functional\Controller\PageBuilder;
 
+use Adeliom\SyliusHappyCMSPlugin\Block\TextCtaBlockType;
 use Adeliom\SyliusHappyCMSPlugin\Entity\Page\Page;
 use Adeliom\SyliusHappyCMSPlugin\Security\Preview\PreviewUrlGeneratorInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -113,10 +114,25 @@ final class SignedPreviewTest extends WebTestCase
         self::assertStringContainsString('page-builder-preview', (string) $this->client->getResponse()->getContent());
     }
 
+    public function testTheOverlayIsInTheAdminLocale(): void
+    {
+        $page = $this->factory->pageWithBlock('my-page', 'en_US', TextCtaBlockType::class);
+
+        // The admin edits in French, the page is in English
+        $this->client->request('GET', $this->signedUrl($page, 'en_US', 'fr_FR'));
+
+        self::assertResponseIsSuccessful();
+        $content = (string) $this->client->getResponse()->getContent();
+        self::assertStringContainsString('Éditer le bloc', $content);
+        self::assertStringNotContainsString('Edit Block', $content);
+        self::assertStringContainsString('data-block-name="', $content);
+        self::assertStringContainsString('content-block-empty-placeholder', $content);
+    }
+
     /**
      * Signs as an admin would in the page builder, then forgets the admin: the preview request carries no session.
      */
-    private function signedUrl(Page $page): string
+    private function signedUrl(Page $page, string $locale = 'fr_FR', string $adminLocale = 'fr_FR'): string
     {
         $container = self::getContainer();
         $admin = $this->admin ??= $this->factory->admin();
@@ -128,6 +144,7 @@ final class SignedPreviewTest extends WebTestCase
         $requestStack = $container->get('request_stack');
         self::assertInstanceOf(RequestStack::class, $requestStack);
         $adminRequest = Request::create(self::ADMIN_ORIGIN . '/admin/');
+        $adminRequest->setLocale($adminLocale);
         $requestStack->push($adminRequest);
 
         // As in a real admin request, the router generates URLs from the admin host
@@ -139,7 +156,7 @@ final class SignedPreviewTest extends WebTestCase
         try {
             $generator = $container->get(PreviewUrlGeneratorInterface::class);
             self::assertInstanceOf(PreviewUrlGeneratorInterface::class, $generator);
-            $url = $generator->generate($page, 'sylius_happy_cms.page', 'fr_FR');
+            $url = $generator->generate($page, 'sylius_happy_cms.page', $locale);
         } finally {
             $requestStack->pop();
             $router->setContext($previousContext);

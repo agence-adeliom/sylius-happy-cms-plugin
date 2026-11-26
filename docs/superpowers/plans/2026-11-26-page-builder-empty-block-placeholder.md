@@ -170,18 +170,18 @@ Webpack Encore.
 - Consumes: `PreviewLabelsProviderInterface` (Task 2), nouveau `wrap()` (Task 3).
 - Produces: `Helper::__construct(Environment $twig, EventDispatcherInterface $eventDispatcher, BlockCollection $collection, AssetRenderer $assetRenderer, ?PreviewLabelsProviderInterface $previewLabelsProvider = null)`.
 
-- [ ] **Step 1: Ecrire le test qui echoue** `testTheOverlayIsInTheAdminLocale` : page `en_US` avec un bloc, URL signee
+- [x] **Step 1: Ecrire le test qui echoue** `testTheOverlayIsInTheAdminLocale` : page `en_US` avec un bloc, URL signee
   dont la requete d'admin est en `fr_FR`. La reponse contient `Éditer le bloc`, `data-block-name="` et
   `content-block-empty-placeholder`. Si `PreviewPageFactory` ne cree pas de bloc, lui ajouter une methode
   `pageWithBlock(string $slug, string $locale, string $blockType)`.
-- [ ] **Step 2: Lancer le test, verifier qu'il echoue**
+- [x] **Step 2: Lancer le test, verifier qu'il echoue**
   Run: `vendor/bin/phpunit tests/Functional/Controller/PageBuilder/SignedPreviewTest.php` - Expected: FAIL.
-- [ ] **Step 3: Implementer** : en mode preview, `Helper::renderContentBlock()` passe a `wrap()`
+- [x] **Step 3: Implementer** : en mode preview, `Helper::renderContentBlock()` passe a `wrap()`
   `$this->previewLabelsProvider?->blockName($block) ?? $block->getName()`, `$block->getIcon()` et
   `$this->previewLabelsProvider?->labels()`. Ajouter l'argument `'@...PreviewLabelsProviderInterface'` au service.
-- [ ] **Step 4: Lancer les tests, verifier qu'ils passent**
+- [x] **Step 4: Lancer les tests, verifier qu'ils passent**
   Run: `vendor/bin/phpunit tests/Functional tests/Unit` - Expected: PASS.
-- [ ] **Step 5: Proposer le commit** `feat(page-builder): pass the block name, icon and labels to the preview wrapper`
+- [x] **Step 5: Proposer le commit** `feat(page-builder): pass the block name, icon and labels to the preview wrapper`
 
 ### Task 5: Hauteur minimale et detection du vide dans l'agent
 
