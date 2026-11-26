@@ -347,6 +347,7 @@ sylius_happy_cms:
     add_content: Ajouter du contenu
     preview: Aperçu
     toggle_panel: Afficher/masquer le panneau
+    resize_panel: Redimensionner le panneau
     close_panel: Fermer
     menu: Menu
     select_block: Select a block

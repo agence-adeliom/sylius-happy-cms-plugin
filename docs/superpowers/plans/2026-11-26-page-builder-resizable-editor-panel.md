@@ -45,7 +45,7 @@ Pas de lanceur de tests JS dans le projet : ces cas se vérifient à la main (Ta
 - Produces : élément `data-page-builder-target="editorResizeHandle"`, classe `page-builder__editor-resize-handle`, attributs `role="separator"`, `aria-orientation="vertical"`, `tabindex="0"`, `aria-label` et `title` = clé `sylius_happy_cms.page_builder.resize_panel`. Les attributs `aria-valuenow`, `aria-valuemin`, `aria-valuemax` sont posés par le JS (Task 2).
 - Produces : classe `is-resizing` posée par le JS sur l'élément `.page-builder` racine pendant un glissement.
 
-- [ ] **Step 1: Écrire le scénario Behat qui échoue**
+- [x] **Step 1: Écrire le scénario Behat qui échoue**
 
 Dans `features/admin/page_builder.feature`, ajouter au scénario existant (ou à un nouveau scénario `@no-api @ui` avec le même `Given`/`When`) :
 
@@ -64,12 +64,12 @@ Assert::same($handle->getAttribute('tabindex'), '0');
 Assert::notEmpty($handle->getAttribute('aria-label'));
 ```
 
-- [ ] **Step 2: Lancer le scénario et constater l'échec**
+- [x] **Step 2: Lancer le scénario et constater l'échec**
 
 Run: `make behat` (ou `vendor/bin/behat --strict --tags="@admin_page_builder&&~@javascript"`)
 Expected: FAIL avec « The editor panel resize handle is missing ».
 
-- [ ] **Step 3: Ajouter la poignée, les traductions et le CSS**
+- [x] **Step 3: Ajouter la poignée, les traductions et le CSS**
 
 - Twig : la poignée est le premier enfant de `.page-builder__editor-panel`, avant `.page-builder__editor-header`, avec les attributs listés dans Interfaces.
 - Traductions : `resize_panel: Redimensionner le panneau` (fr) et `resize_panel: Resize panel` (en).
@@ -77,7 +77,7 @@ Expected: FAIL avec « The editor panel resize handle is missing ».
 - CSS de la poignée : `position: absolute; top: 0; bottom: 0; left: -4px; width: 8px; cursor: col-resize; z-index: 1;` ; trait visible de 2 px centré, en `--hcms-accent` au survol, au `:focus-visible` et pendant `.page-builder.is-resizing`.
 - CSS du glissement : sous `.page-builder.is-resizing`, `iframe { pointer-events: none; }`, `user-select: none; cursor: col-resize;` et `.page-builder__editor-panel { transition: none; }`.
 
-- [ ] **Step 4: Relancer le scénario**
+- [x] **Step 4: Relancer le scénario**
 
 Run: `make behat`
 Expected: PASS, aucun autre scénario cassé.
@@ -85,7 +85,7 @@ Expected: PASS, aucun autre scénario cassé.
 Run: `make ecs` et `yarn lint-style` (ou `npx stylelint "./assets/**/*.css"` sans `--fix` pour vérifier)
 Expected: aucune erreur.
 
-- [ ] **Step 5: Proposer le commit**
+- [x] **Step 5: Proposer le commit**
 
 `feat(page-builder): add a resize handle on the editor panel`
 

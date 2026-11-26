@@ -87,4 +87,16 @@ final class PageBuilderContext implements Context
             sprintf('Expected status code 200, but got %d. Current URL: %s', $statusCode, $this->session->getCurrentUrl()),
         );
     }
+
+    #[Then('the editor panel should have a resize handle')]
+    public function theEditorPanelShouldHaveAResizeHandle(): void
+    {
+        $handle = $this->session->getPage()->find('css', '.page-builder__editor-panel [data-page-builder-target="editorResizeHandle"]');
+
+        Assert::notNull($handle, 'The editor panel resize handle is missing');
+        Assert::same($handle->getAttribute('role'), 'separator');
+        Assert::same($handle->getAttribute('aria-orientation'), 'vertical');
+        Assert::same($handle->getAttribute('tabindex'), '0');
+        Assert::notEmpty($handle->getAttribute('aria-label'));
+    }
 }
