@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\Factory\ContentBlock;
 
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockTypeInterface;
+use Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock\SharedBlockTypeInterface;
 
 interface PreviewLabelsProviderInterface
 {
@@ -17,5 +18,5 @@ interface PreviewLabelsProviderInterface
     /**
      * The name of a block type (a translation key), translated in the same language.
      */
-    public function blockName(BlockTypeInterface $block): string;
+    public function blockName(BlockTypeInterface|SharedBlockTypeInterface $block): string;
 }

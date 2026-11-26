@@ -100,6 +100,38 @@ What changes for a project:
 
 See [docs/usage/preview.md](docs/usage/preview.md#signed-preview-of-the-page-builder).
 
+### Page builder preview: empty block placeholder, minimal height and translated labels
+
+In the page builder preview, every block stays identifiable and editable. No action is required, but a project that
+customised the preview may need to adapt:
+
+- **The fixed `min-height: 150px` of `.content-block-wrapper` is replaced by CSS variables** set on the wrapper by the
+  preview agent: `--hcms-block-min-height` (edit button height plus a gap above and below) and
+  `--hcms-block-state-min-height` (state badge, button and gaps, for unpublished and deleted blocks). They rely on
+  `--hcms-block-gap`, `--hcms-edit-button-height` and `--hcms-state-badge-height`. Override them with
+  a selector more specific than `.content-block-wrapper` (for example `body .content-block-wrapper`) to change the
+  heights. The edit button and the state badge now have a fixed height, so they
+  are never cut.
+- **New placeholder for a block that renders nothing visible.** `PreviewOverlayRenderer::wrap()` adds a hidden
+  `.content-block-empty-placeholder` (icon, name of the block type and a short notice) after the block content. The
+  preview agent measures the rendered content in the browser and adds the class `is-empty` to the wrapper to show it.
+  The wrapper also gets a `data-block-name` attribute. A block that is empty and unpublished or deleted shows its
+  badge and its button on the right, so the name stays readable.
+- **`PreviewOverlayRenderer::wrap()` has three new optional parameters** after the five existing ones: `$blockName`,
+  `$blockIcon` and `?PreviewLabels $labels`. Existing calls keep working. A project that decorates or overrides
+  `wrap()` should accept them and forward them. A project that overrides the `Helper` service gets a new optional
+  fifth constructor argument, `?PreviewLabelsProviderInterface`.
+- **The preview texts are translated in the language of the admin**, from the first render. The signed URL carries the
+  admin locale in the new `_hcms_admin_locale` parameter (optional: an older URL falls back on the language of the
+  request). The keys are `sylius_happy_cms.page_builder.edit_block` and
+  `sylius_happy_cms.page_builder.preview_overlay.unpublished_block`, `.deleted_block` and `.empty_block`, in the
+  `messages` domain: override them in your translations. The name of the block type (`getName()`) is translated in the
+  same language. The service `PreviewLabelsProviderInterface` can be overridden.
+- A project whose block templates rely on the 150px minimal height, or that styles `.content-block-wrapper` itself,
+  should check the preview of its blocks.
+
+See [docs/usage/preview.md](docs/usage/preview.md#empty-blocks-and-minimal-height).
+
 ## 2.3.4
 
 ### Bug fix: a new menu gets its root item without a `sylius_happy_cms.menu_item` resource

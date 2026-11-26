@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\Factory\ContentBlock;
 
 use Adeliom\SyliusHappyCMSPlugin\Factory\Block\BlockTypeInterface;
+use Adeliom\SyliusHappyCMSPlugin\Factory\SharedBlock\SharedBlockTypeInterface;
 use Adeliom\SyliusHappyCMSPlugin\Security\Preview\SignedPreviewRequestValidatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -37,7 +38,7 @@ final class PreviewLabelsProvider implements PreviewLabelsProviderInterface
         return $this->resolved[$request]['labels'] ??= $this->buildLabels($this->resolved[$request]['locale']);
     }
 
-    public function blockName(BlockTypeInterface $block): string
+    public function blockName(BlockTypeInterface|SharedBlockTypeInterface $block): string
     {
         $request = $this->requestStack->getMainRequest();
         $locale = null === $request ? null : $this->resolve($request);

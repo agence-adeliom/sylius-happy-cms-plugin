@@ -45,7 +45,32 @@ hosts: the preview does not rely on the admin session.
    `GET /happy-cms-builder/{resource}/{id}/preview-url?locale=xx`, protected by the admin firewall.
 
 Signed parameters: `happy_cms_preview=1`, `_hcms_resource`, `_hcms_id`, `_hcms_locale`, `_hcms_admin_host` (origin of
-the admin, `scheme://host[:port]`), `_expiration` and `_hash`.
+the admin, `scheme://host[:port]`), `_hcms_admin_locale` (optional, language of the admin), `_expiration` and `_hash`.
+
+### Empty blocks and minimal height
+
+Each block is wrapped in `.content-block-wrapper`. The preview agent sets its minimal height from the edit button, so
+the button is never cut, and flags the blocks that render nothing visible.
+
+- `--hcms-block-min-height` is the minimal height of a block: the height of the edit button plus
+  `--hcms-block-gap` above and below (76px by default).
+- `--hcms-block-state-min-height` applies to unpublished and deleted blocks: state badge, button and gaps (about 130px).
+- A block whose content is under 4px high gets the class `is-empty`. Its `.content-block-empty-placeholder` shows the
+  icon and the name of the block type, with the notice "No visible output in the preview". The class is removed when
+  the content appears later (script, image).
+- A block hidden with `visibility: hidden` or `opacity: 0` keeps its height: it is not flagged.
+
+Override the variables in a stylesheet loaded by the front, with a selector more specific than the one of the agent:
+
+```css
+body .content-block-wrapper {
+    --hcms-block-gap: 24px;
+}
+```
+
+The preview texts (edit button, "Unpublished block", "Deleted block", notice of the placeholder) and the name of the
+block type are translated in the language of the admin carried by the signed URL. The keys are
+`sylius_happy_cms.page_builder.edit_block` and `sylius_happy_cms.page_builder.preview_overlay.*`.
 
 ### Configuration
 

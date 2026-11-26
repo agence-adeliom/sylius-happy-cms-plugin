@@ -235,7 +235,7 @@ Webpack Encore.
 - Modify: `UPGRADE.md` (section `## 2.3.5`), `CHANGELOG.md` (section `# v2.3.5`), `docs/usage/preview.md`
 - Modify: `Resources/public/*` (rebuild)
 
-- [ ] **Step 1: Documenter**
+- [x] **Step 1: Documenter**
   - `UPGRADE.md` 2.3.5 : `min-height: 150px` remplace par `--hcms-block-min-height` et
     `--hcms-block-state-min-height` ; nouvel encart `.content-block-empty-placeholder`, classe `is-empty`, attribut
     `data-block-name` ; libelles traduits (cles `sylius_happy_cms.page_builder.preview_overlay.*` et `edit_block`) dans
@@ -243,14 +243,15 @@ Webpack Encore.
     decore `PreviewOverlayRenderer::wrap()`.
   - `CHANGELOG.md` : une ligne sous v2.3.5.
   - `docs/usage/preview.md` : section courte sur les variables CSS et l'encart.
-- [ ] **Step 2: Reconstruire les assets** dans `make node-shell` : `npm run build`. Expected : `Resources/public/`
+- [x] **Step 2: Reconstruire les assets** dans `make node-shell` : `npm run build`. Expected : `Resources/public/`
   contient un nouveau `page-builder-preview.*.js`, `entrypoints.json` et `manifest.json` a jour.
 - [ ] **Step 3: Verification manuelle** (admin en francais, page anglaise, `http://localhost:8099`) avec 3 blocs :
+  À faire par l'utilisateur (non réalisable par un agent sans navigateur).
   - un bloc vide : encart avec icone, nom et "Aucun rendu visible dans l'aperçu" ; au survol, bouton a droite, nom lisible ;
   - un bloc de 20px : bouton entier, rien ne deborde ;
   - un bloc normal : rendu inchange.
   - Un bloc vide non publie : badge et bouton a droite, nom lisible.
   - Un bloc rempli apres coup par JS (ou image lente) : l'encart disparait, les poignees du constructeur suivent.
-- [ ] **Step 4: Lancer la suite** : `make phpunit`, `make phpstan`, `make ecs`, `node --test assets/page-builder/tests/`.
+- [x] **Step 4: Lancer la suite** : `make phpunit`, `make phpstan`, `make ecs`, `node --test assets/page-builder/tests/`.
   Expected : tout vert.
-- [ ] **Step 5: Proposer le commit** `docs(page-builder): document the empty block placeholder and rebuild assets`
+- [x] **Step 5: Proposer le commit** `docs(page-builder): document the empty block placeholder and rebuild assets`
