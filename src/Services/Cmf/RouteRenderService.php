@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -83,8 +84,9 @@ class RouteRenderService extends AbstractController
         if ($preview) {
             try {
                 $this->denyAccessUnlessGranted(ContentDocumentVoter::PAGE_BUILDER, $contentDocument);
-            } catch (AccessDeniedException $e) {
-                throw new \Exception('Access Denied to preview content document');
+            } catch (AccessDeniedException) {
+                // A plain 403, without the AccessDeniedException as previous: the firewall would start the shop login
+                throw new AccessDeniedHttpException('Access Denied to preview content document');
             }
         }
 

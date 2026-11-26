@@ -94,6 +94,53 @@ services:
 
   Adeliom\SyliusHappyCMSPlugin\Security\PreviewRequestMatcher: '@sylius.happy_cms.plugin.security.preview_request_matcher'
 
+  Adeliom\SyliusHappyCMSPlugin\Security\Preview\PreviewUrlSigner:
+    arguments:
+      - '@security.authorization_checker'
+      - '@uri_signer'
+      - '@request_stack'
+      - '@clock'
+      - '%sylius_happy_cms.page_builder.preview_url_ttl%'
+
+  Adeliom\SyliusHappyCMSPlugin\Security\Preview\PreviewUrlSignerInterface: '@Adeliom\SyliusHappyCMSPlugin\Security\Preview\PreviewUrlSigner'
+
+  Adeliom\SyliusHappyCMSPlugin\Security\Preview\SignedPreviewRequestValidator:
+    arguments:
+      - '@sylius.happy_cms.plugin.security.preview_request_matcher'
+      - '@uri_signer'
+
+  Adeliom\SyliusHappyCMSPlugin\Security\Preview\SignedPreviewRequestValidatorInterface: '@Adeliom\SyliusHappyCMSPlugin\Security\Preview\SignedPreviewRequestValidator'
+
+  Adeliom\SyliusHappyCMSPlugin\Security\Preview\PreviewUrlGenerator:
+    arguments:
+      - '@router'
+      - '@Adeliom\SyliusHappyCMSPlugin\Security\Preview\PreviewUrlSignerInterface'
+
+  Adeliom\SyliusHappyCMSPlugin\Security\Preview\PreviewUrlGeneratorInterface: '@Adeliom\SyliusHappyCMSPlugin\Security\Preview\PreviewUrlGenerator'
+
+  Adeliom\SyliusHappyCMSPlugin\Twig\PreviewUrlExtension:
+    arguments:
+      - '@Adeliom\SyliusHappyCMSPlugin\Security\Preview\PreviewUrlGeneratorInterface'
+    tags:
+      - { name: twig.extension }
+
+  Adeliom\SyliusHappyCMSPlugin\EventListener\PreviewResponseListener:
+    arguments:
+      - '@sylius.happy_cms.plugin.security.preview_request_matcher'
+      - '@Adeliom\SyliusHappyCMSPlugin\Security\Preview\SignedPreviewRequestValidatorInterface'
+      - '@assets.packages'
+    tags:
+      # After Symfony's ResponseListener (Content-Type) and Sylius' XFrameOptionsSubscriber (priority 0)
+      - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse, priority: -128 }
+
+  Adeliom\SyliusHappyCMSPlugin\Security\SignedPreviewVoter:
+    arguments:
+      - '@request_stack'
+      - '@Adeliom\SyliusHappyCMSPlugin\Security\Preview\SignedPreviewRequestValidatorInterface'
+      - '%sylius.resources%'
+    tags:
+      - "security.voter"
+
 
   # pages
   # ===============================

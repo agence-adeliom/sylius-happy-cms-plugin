@@ -8,10 +8,11 @@
   "accordion-block-type.js": "/bundles/syliushappycmsplugin/accordion-block-type.961856ec.js",
   "tiny-mce.js": "/bundles/syliushappycmsplugin/tiny-mce.e934b23c.js",
   "page-builder.css": "/bundles/syliushappycmsplugin/page-builder.d433d83a.css",
-  "page-builder.js": "/bundles/syliushappycmsplugin/page-builder.d3152c67.js",
+  "page-builder.js": "/bundles/syliushappycmsplugin/page-builder.33e30adf.js",
+  "page-builder-preview.js": "/bundles/syliushappycmsplugin/page-builder-preview.834ff2c3.js",
   "db.js": "/bundles/syliushappycmsplugin/workers/db.js",
   "audio.js": "/bundles/syliushappycmsplugin/workers/audio.js",
-  "15.d2d6b2ad.js": "/bundles/syliushappycmsplugin/15.d2d6b2ad.js",
+  "15.aa0db036.js": "/bundles/syliushappycmsplugin/15.aa0db036.js",
   "dist/lottie/world.json": "/bundles/syliushappycmsplugin/dist/lottie/world.json",
   "dist/patterns/gif/5b98026bab87a.gif": "/bundles/syliushappycmsplugin/dist/patterns/gif/5b98026bab87a.gif",
   "dist/lottie/avalanche.json": "/bundles/syliushappycmsplugin/dist/lottie/avalanche.json",
@@ -25,5 +26,7 @@
   "images/baseline-add_alert-24px.svg": "/bundles/syliushappycmsplugin/images/baseline-add_alert-24px.a5cc8f27.svg",
   "images/baseline-power_settings_new-24px.svg": "/bundles/syliushappycmsplugin/images/baseline-power_settings_new-24px.9d34b10d.svg",
   "images/baseline-check_circle-24px.svg": "/bundles/syliushappycmsplugin/images/baseline-check_circle-24px.08fbaa47.svg",
-  "images/baseline-error-24px.svg": "/bundles/syliushappycmsplugin/images/baseline-error-24px.b7e19771.svg"
+  "images/baseline-error-24px.svg": "/bundles/syliushappycmsplugin/images/baseline-error-24px.b7e19771.svg",
+  "easy-media/empty.css": "/bundles/syliushappycmsplugin/easy-media/empty.css",
+  "easy-media/empty.js": "/bundles/syliushappycmsplugin/easy-media/empty.js"
 }

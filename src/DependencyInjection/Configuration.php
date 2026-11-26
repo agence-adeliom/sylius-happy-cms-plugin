@@ -123,6 +123,11 @@ class Configuration implements ConfigurationInterface
             ->defaultValue(null)
             ->info('Custom system prompt for AI content generation. If not set, a default prompt will be used.')
             ->end()
+            ->integerNode('preview_url_ttl')
+            ->defaultValue(300)
+            ->min(1)
+            ->info('Lifetime in seconds of the signed URL that loads the page builder preview. It only has to cover the loading of the preview, the page builder asks for a new URL before each reload.')
+            ->end()
             ->end()
             ->end()
 

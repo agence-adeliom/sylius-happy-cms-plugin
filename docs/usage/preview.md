@@ -28,9 +28,67 @@ The legacy system uses a separate preview route with `-preview` suffix.
 https://yoursite.com/my-page-preview
 ```
 
+## Signed preview of the page builder
+
+The page builder shows the page in an iframe that points to the front. The admin and the front may use different
+hosts: the preview does not rely on the admin session.
+
+1. The page builder template renders the iframe URL with `happy_cms_signed_preview_url(entity, resource, locale)`.
+   The URL is built from the route of the content (so from the hostname of its channel), then signed with the Symfony
+   `UriSigner` (kernel secret) and an expiration.
+2. On the front, `SignedPreviewVoter` grants `page_builder` to a request whose signature is intact, not expired, and
+   made for this content, this resource and this locale. A URL signed for a page gives no access to another page or
+   another locale.
+3. `PreviewResponseListener` lets the admin origin frame the response and injects `page-builder-preview.js`, which
+   talks to the page builder with `postMessage`. Both sides check the origin and the source window of every message.
+4. Before each reload of the preview (block saved, moved, published...), the page builder asks a new signed URL to
+   `GET /happy-cms-builder/{resource}/{id}/preview-url?locale=xx`, protected by the admin firewall.
+
+Signed parameters: `happy_cms_preview=1`, `_hcms_resource`, `_hcms_id`, `_hcms_locale`, `_hcms_admin_host` (origin of
+the admin, `scheme://host[:port]`), `_expiration` and `_hash`.
+
+### Configuration
+
+```yaml
+sylius_happy_cms:
+    page_builder:
+        preview_url_ttl: 300 # lifetime of the signed URL, in seconds
+```
+
+The signature only has to cover the loading of the preview: keep the value short.
+
+When the admin is served from its own host:
+
+- give a `hostname` to every channel whose pages are edited in the page builder;
+- behind a proxy that terminates TLS, configure `framework.trusted_proxies` (and `trusted_headers`), as Symfony already
+  requires to generate correct URLs.
+
+### Troubleshooting the signed preview
+
+**"The preview did not answer" after 10 seconds.** The preview script did not announce itself. Check, in this order:
+
+- the channel of the page has a `hostname` (without it, the iframe targets the admin host);
+- the iframe URL opens in a private window (status 200). A 403 means a refused signature: see the proxy point below;
+- the page template outputs a `</body>` tag, where the script is injected.
+
+**The preview stays blank and the console reports `frame-ancestors`.** The response already sends a
+`Content-Security-Policy` with a `frame-ancestors` directive: the plugin leaves it untouched. Add the admin origin to it
+for the preview responses.
+
+**"Your admin session has expired".** The page builder could not get a new signed URL: the admin session expired or the
+user lost the `page_builder` right. Reload the page builder and log in again.
+
+**Every signed preview is refused (403) behind a proxy.** The front sees `http` or an internal host while the URL was
+signed with `https` and the public host. Configure `trusted_proxies`.
+
+**A front script fails in the preview with a cross-origin error.** Reading `window.top` or `window.parent` is forbidden
+across origins. Read `window.location` instead.
+
 ## Troubleshooting: "Access Denied to preview content document"
 
-The preview is rendered on the shop side, so the admin session must be available there. Check that:
+This section is about the session-based preview links (`happy_cms_path(page, true)`). The page builder uses a signed
+URL (see above) and does not need the admin session on the shop. The refusal is a 403 response. For a session-based
+link, the admin session must be available on the shop side. Check that:
 
 - the `admin_happy_cms_content_builder` firewall is declared in `security.yaml` **before** the `shop` firewall (see the README, step 5);
 - `role_hierarchy` contains `ROLE_ADMINISTRATION_ACCESS: [ ROLE_HAPPY_CMS_CONTENT_BUILDER ]`;

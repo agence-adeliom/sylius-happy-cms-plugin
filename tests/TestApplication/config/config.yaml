@@ -8,6 +8,7 @@ imports:
     - { resource: "packages/ai.yaml" }
     - { resource: "packages/maker.yaml" }
     - { resource: "packages/admin_host.php" }
+    - { resource: "packages/security.yaml" }
     - { resource: "services.yaml" }
     - { resource: "services_test.php" }
 
