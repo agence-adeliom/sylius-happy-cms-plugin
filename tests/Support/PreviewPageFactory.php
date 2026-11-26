@@ -13,6 +13,7 @@ use Sylius\Component\Locale\Model\LocaleInterface;
 use Sylius\Resource\Factory\FactoryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Page\Page;
+use Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Page\PageContentBlock;
 use Tests\Adeliom\SyliusHappyCMSPlugin\Entity\HappyCMS\Page\PageTranslation;
 
 /**
@@ -82,6 +83,30 @@ final class PreviewPageFactory
         $page->addTranslation($translation);
 
         $this->entityManager->persist($page);
+        $this->entityManager->flush();
+
+        return $page;
+    }
+
+    /**
+     * A published page with one content block of the given block type (class name), published in the preview.
+     */
+    public function pageWithBlock(string $slug, string $locale, string $blockType): Page
+    {
+        $page = $this->page($slug, $locale);
+
+        $block = new PageContentBlock();
+        $block->setType($blockType);
+        $block->setLocale($locale);
+        $block->setPosition(0);
+        $block->setPreviewPosition(0);
+        $block->setDraftData([]);
+        $block->setPublishedData([]);
+        $block->setPreviewPublishState(ThreeStateStatusEnum::PUBLISHED);
+        $block->setContentOwner($page);
+        $page->addContentBlock($block);
+
+        $this->entityManager->persist($block);
         $this->entityManager->flush();
 
         return $page;

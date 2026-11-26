@@ -58,6 +58,7 @@ final class PreviewUrlSigner implements PreviewUrlSignerInterface
         $query[SignedPreviewParameters::ID] = (string) $id;
         $query[SignedPreviewParameters::LOCALE] = $locale;
         $query[SignedPreviewParameters::ADMIN_HOST] = $request->getSchemeAndHttpHost();
+        $query[SignedPreviewParameters::ADMIN_LOCALE] = $request->getLocale();
 
         $url = $path . '?' . http_build_query($query, '', '&') . (null !== $fragment ? '#' . $fragment : '');
 

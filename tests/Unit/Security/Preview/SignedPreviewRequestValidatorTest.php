@@ -36,7 +36,7 @@ final class SignedPreviewRequestValidatorTest extends TestCase
     {
         $context = $this->validator->validate(Request::create($this->signedUrl()));
 
-        self::assertEquals(new SignedPreviewContext('sylius_happy_cms.page', 42, 'fr_FR', 'http://admin.localhost:8099'), $context);
+        self::assertEquals(new SignedPreviewContext('sylius_happy_cms.page', 42, 'fr_FR', 'http://admin.localhost:8099', 'fr_FR'), $context);
     }
 
     public function testItAcceptsAnAdminOriginWithAPort(): void
@@ -44,6 +44,42 @@ final class SignedPreviewRequestValidatorTest extends TestCase
         $context = $this->validator->validate(Request::create($this->signedUrl()));
 
         self::assertSame('http://admin.localhost:8099', $context?->adminOrigin);
+    }
+
+    public function testItReadsTheAdminLocale(): void
+    {
+        $context = $this->validator->validate(Request::create($this->signedUrl()));
+
+        self::assertSame('fr_FR', $context?->adminLocale);
+    }
+
+    public function testItAcceptsARequestWithoutAdminLocale(): void
+    {
+        $context = $this->validator->validate(Request::create($this->signedUrlWithAdminLocale(null)));
+
+        self::assertNotNull($context);
+        self::assertNull($context->adminLocale);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function malformedAdminLocales(): iterable
+    {
+        yield 'script' => ['fr<script>'];
+        yield 'path' => ['../fr'];
+        yield 'uppercase language' => ['FR'];
+        yield 'lowercase region' => ['fr_fr'];
+        yield 'empty' => [''];
+    }
+
+    #[DataProvider('malformedAdminLocales')]
+    public function testItIgnoresAMalformedAdminLocale(string $adminLocale): void
+    {
+        $context = $this->validator->validate(Request::create($this->signedUrlWithAdminLocale($adminLocale)));
+
+        self::assertNotNull($context);
+        self::assertNull($context->adminLocale);
     }
 
     public function testItRejectsAnExpiredUrl(): void
@@ -62,6 +98,7 @@ final class SignedPreviewRequestValidatorTest extends TestCase
         yield 'resource' => ['_hcms_resource=sylius_happy_cms.page', '_hcms_resource=app.post'];
         yield 'id' => ['_hcms_id=42', '_hcms_id=43'];
         yield 'locale' => ['_hcms_locale=fr_FR', '_hcms_locale=en_US'];
+        yield 'admin locale' => ['_hcms_admin_locale=fr_FR', '_hcms_admin_locale=en_US'];
         yield 'admin host' => ['_hcms_admin_host=http%3A%2F%2Fadmin.localhost%3A8099', '_hcms_admin_host=https%3A%2F%2Fevil.test'];
         yield 'expiration' => ['_expiration=1795687500', '_expiration=1895687500'];
         yield 'path' => ['/ma-page?', '/une-autre-page?'];
@@ -146,13 +183,31 @@ final class SignedPreviewRequestValidatorTest extends TestCase
         self::assertSame($first, $this->validator->validate($request));
     }
 
+    private function signedUrlWithAdminLocale(?string $adminLocale): string
+    {
+        $query = [
+            'happy_cms_preview' => '1',
+            '_hcms_resource' => 'sylius_happy_cms.page',
+            '_hcms_id' => '42',
+            '_hcms_locale' => 'fr_FR',
+            '_hcms_admin_host' => 'http://admin.localhost:8099',
+        ];
+        if (null !== $adminLocale) {
+            $query['_hcms_admin_locale'] = $adminLocale;
+        }
+
+        return $this->uriSigner->sign('http://localhost:8099/ma-page?' . http_build_query($query), new \DateInterval('PT300S'));
+    }
+
     private function signedUrl(): string
     {
         $checker = $this->createStub(AuthorizationCheckerInterface::class);
         $checker->method('isGranted')->willReturn(true);
 
         $requestStack = new RequestStack();
-        $requestStack->push(Request::create('http://admin.localhost:8099/admin/pages'));
+        $adminRequest = Request::create('http://admin.localhost:8099/admin/pages');
+        $adminRequest->setLocale('fr_FR');
+        $requestStack->push($adminRequest);
 
         $page = new Page();
         (new \ReflectionProperty($page, 'id'))->setValue($page, 42);

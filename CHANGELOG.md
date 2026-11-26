@@ -7,6 +7,11 @@ served from its own host. New option `sylius_happy_cms.page_builder.preview_url_
 
 See [UPGRADE.md](./UPGRADE.md) (2.3.5) and [docs/usage/preview.md](./docs/usage/preview.md).
 
+## Page builder preview: empty block placeholder and translated labels
+
+A block that renders nothing visible shows its icon and name, the edit button is never cut, and the preview texts are
+translated in the language of the admin. See [UPGRADE.md](./UPGRADE.md) (2.3.5).
+
 # v2.3.0
 
 ## New block system and brand new content builder

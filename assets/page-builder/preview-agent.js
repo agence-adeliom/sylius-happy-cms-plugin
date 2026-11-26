@@ -4,6 +4,7 @@
  * postMessage only: the admin never reads or writes this document.
  */
 import { MessageType, isAcceptedMessage, postToWindow } from './preview-protocol.js';
+import { RESERVED_CLASSES, contentNodesOf, isEmptyHeight } from './preview-empty-block.js';
 
 // Read synchronously: document.currentScript is null once the script has run.
 const adminOrigin = document.currentScript?.dataset.adminOrigin || '';
@@ -13,9 +14,46 @@ const EDIT_BUTTON_SELECTOR = '.content-block-edit-button';
 const THEME_VARIABLE = /^--hcms-[a-z0-9-]+$/;
 
 const STYLES = `
-  /* Minimal height for blocks (some are blank) */
+  /*
+   * Minimal height of a block: the edit button (or the state badge and the button) plus a gap above and below,
+   * so no button is ever cut. A project can override these variables on .content-block-wrapper.
+   */
   .content-block-wrapper {
-    min-height: 150px;
+    --hcms-block-gap: 16px;
+    --hcms-edit-button-height: 44px;
+    --hcms-state-badge-height: 40px;
+    --hcms-block-min-height: calc(var(--hcms-edit-button-height) + 2 * var(--hcms-block-gap));
+    --hcms-block-state-min-height: calc(var(--hcms-state-badge-height) + 12px + var(--hcms-edit-button-height) + 2 * var(--hcms-block-gap));
+    min-height: var(--hcms-block-min-height);
+  }
+
+  .content-block-wrapper[data-published="false"],
+  .content-block-wrapper[data-deleted="true"] {
+    min-height: var(--hcms-block-state-min-height);
+  }
+
+  /* A block that renders nothing visible shows its name, icon and a short notice */
+  .content-block-wrapper.is-empty .content-block-empty-placeholder {
+    display: flex !important;
+  }
+
+  .content-block-empty-placeholder-icon img,
+  .content-block-empty-placeholder-icon svg {
+    max-height: 40px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  /* On an empty block the name stays readable on the left: the button moves to the right */
+  .content-block-wrapper.is-empty .content-block-hover-overlay {
+    justify-content: flex-end !important;
+    padding: 0 var(--hcms-block-gap) !important;
+  }
+
+  .content-block-wrapper.is-empty .content-block-state-overlay {
+    flex-direction: row !important;
+    justify-content: flex-end !important;
+    padding: 0 var(--hcms-block-gap) !important;
   }
 
   /* Show outline and shadow on hover */
@@ -86,6 +124,81 @@ function scheduleGeometry() {
   });
 }
 
+// Height of the content of a block (without the overlays and the placeholder), from its first to its last node
+function contentHeight(wrapper) {
+  const nodes = contentNodesOf(wrapper);
+  if (nodes.length === 0) return 0;
+
+  const range = document.createRange();
+  range.setStartBefore(nodes[0]);
+  range.setEndAfter(nodes[nodes.length - 1]);
+
+  return range.getBoundingClientRect().height;
+}
+
+const resizeObserver = 'ResizeObserver' in window ? new ResizeObserver(scheduleMeasure) : null;
+const observedContent = new WeakSet();
+
+function observeContent(wrapper) {
+  if (!resizeObserver) return;
+
+  contentNodesOf(wrapper).forEach(node => {
+    if (node.nodeType === Node.ELEMENT_NODE && !observedContent.has(node)) {
+      observedContent.add(node);
+      resizeObserver.observe(node);
+    }
+  });
+}
+
+// Flags the blocks that render nothing visible; the builder is told when a flag changes
+function measureBlocks() {
+  let changed = false;
+
+  document.querySelectorAll(BLOCK_SELECTOR).forEach(wrapper => {
+    const isEmpty = isEmptyHeight(contentHeight(wrapper));
+    if (wrapper.classList.contains('is-empty') !== isEmpty) {
+      wrapper.classList.toggle('is-empty', isEmpty);
+      changed = true;
+    }
+  });
+
+  if (changed) scheduleGeometry();
+}
+
+// Measures at most once per frame
+let measureFrame = null;
+function scheduleMeasure() {
+  if (measureFrame !== null) return;
+
+  measureFrame = window.requestAnimationFrame(() => {
+    measureFrame = null;
+    measureBlocks();
+  });
+}
+
+function isInReservedElement(node, wrapper) {
+  let element = node instanceof Element ? node : node.parentElement;
+
+  while (element && element !== wrapper) {
+    if (RESERVED_CLASSES.some(name => element.classList.contains(name))) return true;
+    element = element.parentElement;
+  }
+
+  return false;
+}
+
+// A block filled later by a script (mount point), or emptied, changes the content without any resize
+function watchContent(wrapper) {
+  observeContent(wrapper);
+
+  new MutationObserver(records => {
+    if (records.every(record => isInReservedElement(record.target, wrapper))) return;
+
+    observeContent(wrapper);
+    scheduleMeasure();
+  }).observe(wrapper, { childList: true, subtree: true, characterData: true });
+}
+
 function injectStyles() {
   if (document.getElementById('page-builder-styles')) return;
 
@@ -129,6 +242,10 @@ function bindDocument() {
 
   window.addEventListener('scroll', scheduleGeometry, { passive: true });
   window.addEventListener('resize', scheduleGeometry);
+
+  // A block hidden at some screen sizes becomes empty or not on resize
+  window.addEventListener('resize', scheduleMeasure);
+  document.querySelectorAll(BLOCK_SELECTOR).forEach(watchContent);
 
   // Late images and fonts move the blocks without any scroll or resize
   if ('ResizeObserver' in window) {
@@ -175,8 +292,13 @@ function start() {
   injectStyles();
   bindDocument();
   window.addEventListener('message', onMessage);
+  measureBlocks();
 
-  const sendReady = () => send(MessageType.READY, geometry());
+  const sendReady = () => {
+    // Images and fonts are loaded: measure again before the first positions are sent
+    measureBlocks();
+    send(MessageType.READY, geometry());
+  };
   if (document.readyState === 'complete') {
     sendReady();
   } else {
