@@ -115,21 +115,25 @@ class PageBuilderController extends AbstractController
     }
 
     /**
-     * Locale from the "locale" query parameter, when it is available; the request locale otherwise.
+     * Locale of the edited content: the "locale" query parameter, else the request locale, when it is available;
+     * the default locale otherwise, else the first available one. The request locale is the admin one ("en", "fr"),
+     * which is often not a channel locale ("en_US", "fr_FR").
      */
     private function resolveLocale(Request $request): string
     {
+        $availableLocales = $this->localeProvider->getAvailableLocalesCodes();
         $locale = $request->query->get('locale', $request->getLocale());
 
-        if (!is_string($locale)) {
-            $locale = $this->localeProvider->getDefaultLocaleCode();
+        if (is_string($locale) && in_array($locale, $availableLocales, true)) {
+            return $locale;
         }
 
-        if (!in_array($locale, $this->localeProvider->getAvailableLocalesCodes(), true)) {
-            $locale = $request->getLocale();
+        $defaultLocale = $this->localeProvider->getDefaultLocaleCode();
+        if (in_array($defaultLocale, $availableLocales, true) || [] === $availableLocales) {
+            return $defaultLocale;
         }
 
-        return $locale;
+        return reset($availableLocales);
     }
 
     /**

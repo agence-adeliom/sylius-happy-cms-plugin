@@ -90,7 +90,7 @@ final class PreviewPageFactory
     /**
      * @param list<string> $roles
      */
-    public function admin(array $roles = ['ROLE_ADMINISTRATION_ACCESS']): AdminUserInterface
+    public function admin(array $roles = ['ROLE_ADMINISTRATION_ACCESS'], string $localeCode = 'fr_FR'): AdminUserInterface
     {
         /** @var AdminUserInterface $admin */
         $admin = $this->factory('sylius.factory.admin_user')->createNew();
@@ -98,7 +98,7 @@ final class PreviewPageFactory
         $admin->setEmail('builder@example.test');
         $admin->setPlainPassword('builder');
         $admin->setEnabled(true);
-        $admin->setLocaleCode('fr_FR');
+        $admin->setLocaleCode($localeCode);
         foreach ($roles as $role) {
             $admin->addRole($role);
         }

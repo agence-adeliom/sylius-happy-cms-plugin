@@ -49,6 +49,29 @@ final class PreviewUrlActionTest extends WebTestCase
         self::assertStringContainsString('_hcms_locale=fr_FR', $url);
     }
 
+    public function testItFallsBackOnTheDefaultLocaleWhenTheAdminLocaleIsNotAChannelLocale(): void
+    {
+        // The admin interface offers "en" or "fr" while channels use "en_US" or "fr_FR"
+        $page = $this->factory->page('ma-page');
+        $this->client->loginUser($this->factory->admin(localeCode: 'en'), 'admin');
+
+        $this->client->request('GET', sprintf('/admin/happy-cms-builder/sylius_happy_cms.page/%d/preview-url', $page->getId()), server: $this->adminServer());
+
+        self::assertResponseIsSuccessful();
+        self::assertStringContainsString('_hcms_locale=fr_FR', $this->url());
+    }
+
+    public function testTheBuilderOpensOnTheDefaultLocaleWhenTheAdminLocaleIsNotAChannelLocale(): void
+    {
+        $page = $this->factory->page('ma-page');
+        $this->client->loginUser($this->factory->admin(localeCode: 'en'), 'admin');
+
+        $crawler = $this->client->request('GET', sprintf('/admin/happy-cms-builder/sylius_happy_cms.page/%d', $page->getId()), server: $this->adminServer());
+
+        self::assertResponseIsSuccessful();
+        self::assertStringContainsString('_hcms_locale=fr_FR', (string) $crawler->filter('[data-iframe-url]')->attr('data-iframe-url'));
+    }
+
     public function testItReturns403WhenTheSignerRefuses(): void
     {
         $page = $this->factory->page('ma-page');
