@@ -74,8 +74,8 @@ export default class extends Controller {
 
     const { blockId } = event.detail;
 
-    console.log('Reloading iframe to show updated content');
-    document.querySelector('[data-page-builder-target="iframe"]').contentWindow.location.reload();
+    // The page builder reloads the preview with a freshly signed URL (it may be served from another host)
+    document.dispatchEvent(new CustomEvent('happy-cms:preview-reload'));
 
     // Dispatch custom event for other parts of the page to listen
     this.dispatch('blockSaved', { detail: { blockId } });
@@ -89,8 +89,8 @@ export default class extends Controller {
 
     const { blockId } = event.detail;
 
-    console.log('Reloading iframe to show updated content');
-    document.querySelector('[data-page-builder-target="iframe"]').contentWindow.location.reload();
+    // The page builder reloads the preview with a freshly signed URL (it may be served from another host)
+    document.dispatchEvent(new CustomEvent('happy-cms:preview-reload'));
 
     // Dispatch custom event for other parts of the page to listen
     this.dispatch('blockSaved', { detail: { blockId } });

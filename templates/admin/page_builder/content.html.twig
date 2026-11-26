@@ -149,6 +149,8 @@
         {# Preview iframe #}
         <div class="page-builder__preview" data-page-builder-target="preview">
             <div class="page-builder__preview-inner">
+                {# Live region filled by page-builder.js when the preview cannot be loaded #}
+                <div role="alert" data-page-builder-target="previewMessage"></div>
                 <div class="page-builder__iframe-wrapper resolution-desktop" data-page-builder-target="iframeWrapper">
                     <iframe
                         class="page-builder__iframe"
