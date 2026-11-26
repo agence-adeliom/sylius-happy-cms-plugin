@@ -19,6 +19,8 @@ final class SignedPreviewParameters
 
     public const ADMIN_HOST = '_hcms_admin_host';
 
+    public const ADMIN_LOCALE = '_hcms_admin_locale';
+
     public const HASH = '_hash';
 
     public const EXPIRATION = '_expiration';

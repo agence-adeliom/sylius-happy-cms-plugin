@@ -88,6 +88,17 @@ final class PreviewUrlSignerTest extends TestCase
         self::assertSame(1, substr_count($url, 'happy_cms_preview='));
     }
 
+    public function testItAddsTheAdminLocale(): void
+    {
+        $url = $this->signer()->sign('/ma-page', self::page(), 'sylius_happy_cms.page', 'en_US');
+
+        parse_str((string) parse_url($url, \PHP_URL_QUERY), $query);
+
+        // The admin request is in French, the previewed page in English.
+        self::assertSame('fr_FR', $query['_hcms_admin_locale']);
+        self::assertTrue($this->uriSigner->check($url));
+    }
+
     public function testItExpiresAfterTheConfiguredTtl(): void
     {
         $url = $this->signer()->sign('/ma-page', self::page(), 'sylius_happy_cms.page', 'fr_FR');
@@ -112,8 +123,11 @@ final class PreviewUrlSignerTest extends TestCase
 
     private static function requestStack(string $adminUrl): RequestStack
     {
+        $request = Request::create($adminUrl);
+        $request->setLocale('fr_FR');
+
         $requestStack = new RequestStack();
-        $requestStack->push(Request::create($adminUrl));
+        $requestStack->push($request);
 
         return $requestStack;
     }

@@ -54,7 +54,7 @@ Webpack Encore.
   `SignedPreviewContext::__construct(string $resource, int $id, string $locale, string $adminOrigin, ?string $adminLocale = null)`
   avec `public ?string $adminLocale`.
 
-- [ ] **Step 1: Ecrire les tests qui echouent**
+- [x] **Step 1: Ecrire les tests qui echouent**
   - `PreviewUrlSignerTest::testItAddsTheAdminLocale` : la requete d'admin a la langue `fr_FR`, l'URL signee contient
     `_hcms_admin_locale=fr_FR`.
   - `SignedPreviewRequestValidatorTest::testItReadsTheAdminLocale` : URL signee avec `_hcms_admin_locale=fr_FR`,
@@ -63,15 +63,15 @@ Webpack Encore.
   - `testItIgnoresAMalformedAdminLocale` (data provider : `fr<script>`, `../fr`, `FR`, `fr_fr`, chaine vide) : URL
     signee avec la valeur, contexte non nul, `adminLocale === null`.
   - Ajouter `_hcms_admin_locale=fr_FR` -> `_hcms_admin_locale=en_US` aux `alterations()` : la requete est refusee.
-- [ ] **Step 2: Lancer les tests, verifier qu'ils echouent**
+- [x] **Step 2: Lancer les tests, verifier qu'ils echouent**
   Run: `vendor/bin/phpunit tests/Unit/Security/Preview` - Expected: FAIL sur les nouveaux tests.
-- [ ] **Step 3: Implementer**
+- [x] **Step 3: Implementer**
   - `PreviewUrlSigner::sign()` : `$query[SignedPreviewParameters::ADMIN_LOCALE] = $request->getLocale();`.
   - Le validator ne met pas `ADMIN_LOCALE` dans la liste des parametres obligatoires. Il le lit apres la verification
     de signature et le garde seulement s'il respecte `/^[a-z]{2,3}(_[A-Z]{2})?$/`, sinon `null`.
-- [ ] **Step 4: Lancer les tests, verifier qu'ils passent**
+- [x] **Step 4: Lancer les tests, verifier qu'ils passent**
   Run: `vendor/bin/phpunit tests/Unit/Security tests/Functional/Controller/PageBuilder` - Expected: PASS.
-- [ ] **Step 5: Proposer le commit** `feat(page-builder): carry the admin locale in the signed preview URL`
+- [x] **Step 5: Proposer le commit** `feat(page-builder): carry the admin locale in the signed preview URL`
 
 ### Task 2: Libelles de l'apercu traduits dans la langue de l'admin
 

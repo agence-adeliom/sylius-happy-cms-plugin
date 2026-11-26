@@ -6,6 +6,7 @@ namespace Adeliom\SyliusHappyCMSPlugin\Security\Preview;
 
 /**
  * What a valid signed preview request allows: one resource, one id, one locale, framed by one admin origin.
+ * The admin locale (optional) is the language of the person editing, used to translate the preview labels.
  */
 final readonly class SignedPreviewContext
 {
@@ -14,6 +15,7 @@ final readonly class SignedPreviewContext
         public int $id,
         public string $locale,
         public string $adminOrigin,
+        public ?string $adminLocale = null,
     ) {
     }
 }

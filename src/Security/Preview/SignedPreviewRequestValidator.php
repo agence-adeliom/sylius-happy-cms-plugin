@@ -72,7 +72,21 @@ final class SignedPreviewRequestValidator implements SignedPreviewRequestValidat
             (int) $id,
             $query->getString(SignedPreviewParameters::LOCALE),
             $adminOrigin,
+            self::adminLocale($query->all()[SignedPreviewParameters::ADMIN_LOCALE] ?? null),
         );
+    }
+
+    /**
+     * The admin locale is optional (an older signed URL does not carry it) and is never trusted blindly:
+     * anything that does not look like a locale code is dropped.
+     */
+    private static function adminLocale(mixed $value): ?string
+    {
+        if (is_string($value) && 1 === preg_match('/^[a-z]{2,3}(_[A-Z]{2})?$/', $value)) {
+            return $value;
+        }
+
+        return null;
     }
 
     private static function isOrigin(string $origin): bool
