@@ -328,14 +328,11 @@
     outline: none;
 }
 
-/* While dragging: iframes must not swallow pointer events */
+/* While dragging. The handle keeps the pointer through setPointerCapture(): never set pointer-events: none on the iframes,
+ * Chrome then stops scrolling the block form iframe after the drag. */
 .page-builder.is-resizing {
     user-select: none;
     cursor: col-resize;
-}
-
-.page-builder.is-resizing iframe {
-    pointer-events: none;
 }
 
 .page-builder.is-resizing .page-builder__editor-panel {
