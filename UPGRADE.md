@@ -53,6 +53,53 @@ manager can remove these overrides once it enables the option.
 
 In 2.4, the option becomes `true` by default and the Vue application is removed.
 
+### Page builder preview on a front host different from the admin host
+
+The page builder now works when the admin is served from its own host (for example `admin.example.com` for the
+admin and `www.example.com` for the shop). The preview no longer needs the admin session on the front:
+
+- the iframe loads a signed URL, valid for a short time (`happy_cms_signed_preview_url()`). The signature is bound to
+  the content, its resource, its locale and the admin origin. `SignedPreviewVoter` grants `page_builder` to such a
+  request, without any session;
+- the page builder talks to the preview with `postMessage` only. A script, `page-builder-preview.js`, is injected
+  before `</body>` of the signed preview responses (`PreviewResponseListener`), like the Symfony debug toolbar;
+- before each reload of the preview, the page builder asks a new signed URL to
+  `sylius_happy_cms_admin_page_builder_preview_url` (`GET /happy-cms-builder/{resource}/{id}/preview-url`).
+
+The behaviour is the same when the admin and the front share their host. Every new service is declared with an alias
+per interface (`PreviewUrlSignerInterface`, `PreviewUrlGeneratorInterface`, `SignedPreviewRequestValidatorInterface`)
+and can be overridden.
+
+New option, lifetime of the signed URL in seconds (default `300`, minimum `1`). The URL only has to cover the loading
+of the preview:
+
+```yaml
+sylius_happy_cms:
+    page_builder:
+        preview_url_ttl: 300
+```
+
+What changes for a project:
+
+- **Signed preview responses can be framed by the admin.** `X-Frame-Options` is removed and
+  `Content-Security-Policy: frame-ancestors <admin origin>` is added. A policy that already defines `frame-ancestors`
+  is left untouched: add the admin origin to it yourself. Every preview response (signed or not) gets
+  `Cache-Control: private` and `X-Robots-Tag: noindex`.
+- **A refused preview is a 403**, no longer a 500: `RouteRenderService` throws an `AccessDeniedHttpException` with the
+  same message (`Access Denied to preview content document`). This also applies to the session-based preview.
+- **The channel needs a `hostname` when the admin has its own host.** The preview URL is built from the route of the
+  content, whose host comes from its channel. Without a hostname, the URL targets the admin host and the page builder
+  shows "the preview did not answer" after 10 seconds.
+- **Behind a proxy that terminates TLS, configure `trusted_proxies`.** The signature covers the scheme and the host of
+  the URL, and the admin origin is read from the admin request. Without this setting, every signature is refused, or
+  the preview targets the wrong origin.
+- **A front script that reads `window.top` or `window.parent`** throws a cross-origin error in the preview when the
+  hosts differ. Read `window.location` instead.
+- The `admin_happy_cms_content_builder` firewall is no longer needed by the page builder. Keep it for the
+  session-based preview links (`happy_cms_path(page, true)`).
+
+See [docs/usage/preview.md](docs/usage/preview.md#signed-preview-of-the-page-builder).
+
 ## 2.3.4
 
 ### Bug fix: a new menu gets its root item without a `sylius_happy_cms.menu_item` resource

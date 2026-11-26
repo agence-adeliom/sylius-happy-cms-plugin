@@ -1,3 +1,12 @@
+# v2.3.5
+
+## Page builder preview on a front host different from the admin host
+
+The page builder preview is authorized by a signed, expiring URL and driven through `postMessage`: the admin can be
+served from its own host. New option `sylius_happy_cms.page_builder.preview_url_ttl`. A refused preview is now a 403.
+
+See [UPGRADE.md](./UPGRADE.md) (2.3.5) and [docs/usage/preview.md](./docs/usage/preview.md).
+
 # v2.3.0
 
 ## New block system and brand new content builder
