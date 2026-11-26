@@ -51,7 +51,7 @@ final class PreviewLabelsProvider implements PreviewLabelsProviderInterface
             $context = $this->validator->validate($request);
 
             // The language of the person editing, else the one of the request. The request itself is left untouched.
-            $this->resolved[$request] = ['locale' => $context?->adminLocale ?? $request->getLocale(), 'labels' => null];
+            $this->resolved[$request] = ['locale' => $context->adminLocale ?? $request->getLocale(), 'labels' => null];
         }
 
         return $this->resolved[$request]['locale'];

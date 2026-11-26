@@ -128,7 +128,7 @@ Webpack Encore.
   enfants dans l'ordre `contenu`, `.content-block-empty-placeholder`, surcouche d'etat eventuelle,
   `.content-block-hover-overlay`.
 
-- [ ] **Step 1: Ecrire les tests qui echouent**
+- [x] **Step 1: Ecrire les tests qui echouent**
   - `it_sets_the_block_name_attribute` : `wrap('', 1, null, true, false, 'Hero')` contient `data-block-name="Hero"`.
   - `it_escapes_the_block_name` : nom `'A "B" <C> & D'` -> attribut et encart contiennent
     `A &quot;B&quot; &lt;C&gt; &amp; D`, jamais `<C>`.
@@ -142,9 +142,9 @@ Webpack Encore.
     sur un bloc non publie -> les 4 textes sont presents (bouton, badge, encart), aucun libelle anglais.
   - `it_keeps_the_english_labels_by_default` : appel a 5 arguments -> `Edit Block` present (tests existants verts).
   - `it_gives_the_edit_button_a_fixed_height` : le style du bouton contient `height: 44px` et `box-sizing: border-box`.
-- [ ] **Step 2: Lancer les tests, verifier qu'ils echouent**
+- [x] **Step 2: Lancer les tests, verifier qu'ils echouent**
   Run: `vendor/bin/phpunit tests/Unit/Factory/ContentBlock/PreviewOverlayRendererTest.php` - Expected: FAIL.
-- [ ] **Step 3: Implementer**
+- [x] **Step 3: Implementer**
   - Bouton : `height: 44px; box-sizing: border-box; line-height: 20px; padding: 0 24px; white-space: nowrap;`.
   - Badge d'etat : `height: 40px; box-sizing: border-box; line-height: 20px; padding: 0 20px; white-space: nowrap;`.
   - Encart : `position: absolute; inset: 0; z-index: 5; display: none; align-items: center; gap: 12px;
@@ -155,9 +155,9 @@ Webpack Encore.
     overflow: hidden;` avec `img, svg { max-height: 40px; width: auto; object-fit: contain }` pose par l'agent (Task 5).
     Nom en `<strong>` couleur `var(--hcms-text, #182433)`, mention dessous.
   - Libelles : `$labels ?? new PreviewLabels()`, chaque texte echappe avec `htmlspecialchars(..., ENT_QUOTES, 'UTF-8')`.
-- [ ] **Step 4: Lancer les tests, verifier qu'ils passent**
+- [x] **Step 4: Lancer les tests, verifier qu'ils passent**
   Run: `vendor/bin/phpunit tests/Unit/Factory/ContentBlock` - Expected: PASS.
-- [ ] **Step 5: Proposer le commit** `feat(page-builder): render an empty block placeholder in the preview wrapper`
+- [x] **Step 5: Proposer le commit** `feat(page-builder): render an empty block placeholder in the preview wrapper`
 
 ### Task 4: Brancher Helper sur les libelles
 
