@@ -10,10 +10,10 @@
     },
     "media-form": {
       "css": [
-        "/bundles/syliushappycmsplugin/media-form.3b516d59.css"
+        "/bundles/syliushappycmsplugin/media-form.76090fe8.css"
       ],
       "js": [
-        "/bundles/syliushappycmsplugin/media-form.90314678.js"
+        "/bundles/syliushappycmsplugin/media-form.2708f8af.js"
       ]
     },
     "seo-block-type": {
@@ -36,10 +36,10 @@
     },
     "page-builder": {
       "css": [
-        "/bundles/syliushappycmsplugin/page-builder.d433d83a.css"
+        "/bundles/syliushappycmsplugin/page-builder.71f47f3a.css"
       ],
       "js": [
-        "/bundles/syliushappycmsplugin/page-builder.33e30adf.js"
+        "/bundles/syliushappycmsplugin/page-builder.2c015d65.js"
       ]
     },
     "page-builder-preview": {
