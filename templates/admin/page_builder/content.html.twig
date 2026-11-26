@@ -84,22 +84,28 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>{% trans %}sylius_happy_cms.page_builder.publish_description{% endtrans %}</p>
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" id="selectAllLocales" checked>
-                        <label class="form-check-label fw-bold" for="selectAllLocales">
-                            {% trans %}sylius_happy_cms.page_builder.select_all_locales{% endtrans %}
-                        </label>
-                    </div>
-                    <hr class="my-3">
-                    {% for availableLocale in availableLocales %}
-                        <div class="form-check">
-                            <input class="form-check-input locale-checkbox" type="checkbox" value="{{ availableLocale }}" id="locale_{{ availableLocale }}" name="locales[]" checked>
-                            <label class="form-check-label" for="locale_{{ availableLocale }}">
-                                {{ locale(availableLocale) }}
+                    {% if availableLocales|length == 1 %}
+                        {# A single locale: nothing to choose, the admin only confirms. The page builder script reads the locale from the checked .locale-checkbox. #}
+                        <p class="mb-0">{% trans %}sylius_happy_cms.page_builder.publish_description_single_locale{% endtrans %}</p>
+                        <input class="locale-checkbox" type="checkbox" value="{{ availableLocales|first }}" name="locales[]" checked hidden>
+                    {% else %}
+                        <p>{% trans %}sylius_happy_cms.page_builder.publish_description{% endtrans %}</p>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="selectAllLocales" checked>
+                            <label class="form-check-label fw-bold" for="selectAllLocales">
+                                {% trans %}sylius_happy_cms.page_builder.select_all_locales{% endtrans %}
                             </label>
                         </div>
-                    {% endfor %}
+                        <hr class="my-3">
+                        {% for availableLocale in availableLocales %}
+                            <div class="form-check">
+                                <input class="form-check-input locale-checkbox" type="checkbox" value="{{ availableLocale }}" id="locale_{{ availableLocale }}" name="locales[]" checked>
+                                <label class="form-check-label" for="locale_{{ availableLocale }}">
+                                    {{ locale(availableLocale) }}
+                                </label>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans %}sylius_happy_cms.page_builder.cancel{% endtrans %}</button>

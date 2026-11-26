@@ -22,9 +22,13 @@ final class PreviewPageFactory
 {
     private ?ChannelInterface $channel = null;
 
+    /**
+     * @param non-empty-list<string> $localeCodes locales of the channel, the first one is its default locale
+     */
     public function __construct(
         private readonly ContainerInterface $container,
         private readonly EntityManagerInterface $entityManager,
+        private readonly array $localeCodes = ['fr_FR', 'en_US'],
     ) {
     }
 
@@ -40,7 +44,7 @@ final class PreviewPageFactory
         $this->entityManager->persist($currency);
 
         $locales = [];
-        foreach (['fr_FR', 'en_US'] as $code) {
+        foreach ($this->localeCodes as $code) {
             /** @var LocaleInterface $locale */
             $locale = $this->factory('sylius.factory.locale')->createNew();
             $locale->setCode($code);

@@ -400,6 +400,7 @@ sylius_happy_cms:
     ai_loading: 'Génération en cours ...'
     publish_title: 'Publier le contenu'
     publish_description: 'Sélectionnez les langues pour lesquelles vous souhaitez publier le contenu. Les modifications en brouillon seront publiées.'
+    publish_description_single_locale: 'Voulez-vous publier le contenu ? Les modifications en brouillon seront publiées.'
     select_all_locales: 'Sélectionner toutes les langues'
     confirm_publish: 'Publier'
     select_at_least_one_locale: 'Veuillez sélectionner au moins une langue'
