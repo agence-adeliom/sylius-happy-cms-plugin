@@ -16,7 +16,7 @@ Archived on the `feat/page-builder-empty-block-placeholder` branch before its me
 
 | Original | SHA | Read again |
 |---|---|---|
-| `docs/superpowers/specs/2026-11-26-page-builder-resizable-editor-panel-design.md` | `cd4f7f1ee74cd07edccaaabb5f3f517654613a2e` | `git show cd4f7f1ee74cd07edccaaabb5f3f517654613a2e:docs/superpowers/specs/2026-11-26-page-builder-resizable-editor-panel-design.md` |
-| `docs/superpowers/plans/2026-11-26-page-builder-resizable-editor-panel.md` | `cd4f7f1ee74cd07edccaaabb5f3f517654613a2e` | `git show cd4f7f1ee74cd07edccaaabb5f3f517654613a2e:docs/superpowers/plans/2026-11-26-page-builder-resizable-editor-panel.md` |
+| `docs/superpowers/specs/2026-11-26-page-builder-resizable-editor-panel-design.md` | `781785f3a6fbccaf9e271cc06749ff3d02bb5867` | `git show 781785f3a6fbccaf9e271cc06749ff3d02bb5867:docs/superpowers/specs/2026-11-26-page-builder-resizable-editor-panel-design.md` |
+| `docs/superpowers/plans/2026-11-26-page-builder-resizable-editor-panel.md` | `781785f3a6fbccaf9e271cc06749ff3d02bb5867` | `git show 781785f3a6fbccaf9e271cc06749ff3d02bb5867:docs/superpowers/plans/2026-11-26-page-builder-resizable-editor-panel.md` |
 
 Archived before its merge, at the developer's request: the SHA is the one of the `feat/page-builder-resizable-editor-panel` branch. After a squash merge, read it through the PR head ref (`git fetch origin pull/182/head`).
