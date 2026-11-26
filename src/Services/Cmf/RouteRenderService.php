@@ -84,8 +84,9 @@ class RouteRenderService extends AbstractController
         if ($preview) {
             try {
                 $this->denyAccessUnlessGranted(ContentDocumentVoter::PAGE_BUILDER, $contentDocument);
-            } catch (AccessDeniedException $e) {
-                throw new AccessDeniedHttpException('Access Denied to preview content document', $e);
+            } catch (AccessDeniedException) {
+                // A plain 403, without the AccessDeniedException as previous: the firewall would start the shop login
+                throw new AccessDeniedHttpException('Access Denied to preview content document');
             }
         }
 

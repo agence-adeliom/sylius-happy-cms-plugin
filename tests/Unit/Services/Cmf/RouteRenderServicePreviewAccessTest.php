@@ -54,6 +54,9 @@ final class RouteRenderServicePreviewAccessTest extends TestCase
         } catch (AccessDeniedHttpException $exception) {
             self::assertSame(403, $exception->getStatusCode());
             self::assertSame('Access Denied to preview content document', $exception->getMessage());
+            // The security ExceptionListener walks the previous exceptions: an AccessDeniedException there would
+            // start the shop login instead of answering 403.
+            self::assertNull($exception->getPrevious());
         }
     }
 }
