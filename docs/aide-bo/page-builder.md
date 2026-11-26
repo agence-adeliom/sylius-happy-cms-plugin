@@ -40,6 +40,13 @@ If the frame stays after saving, check the block on another screen size (desktop
 
 ### Why are the preview buttons in my language while the page is in another one? {#preview-language}
 The edit button, the block states and the block names follow the language of your administration, not the language of the page. The content of the page itself stays in its own language.
+### How do I make the editing panel wider or narrower? {#resize-panel}
+Drag the left edge of the editing panel: to the right to see more of the page, to the left to give the form more room. The width is remembered by your browser, also after a reload.
+1. Hover the left edge of the panel until the cursor becomes a double arrow.
+2. Drag it, then release.
+3. Double-click the edge to go back to the default width.
+
+With the keyboard, move the focus to the edge, then use the left and right arrows. On another computer or browser, the panel opens at its default width.
 
 ## Parcours
 
@@ -58,3 +65,4 @@ flowchart LR
 
 - 2026-11-26 : the page builder works when the administration has its own address; the preview reloads at the same position after each save, and a message explains an unreachable preview or an expired session.
 - 2026-11-26 : a block that shows nothing in the preview now displays a frame with its icon and name; edit buttons are never cut; the preview texts follow the language of the administration.
+- 2026-11-26 : the block editing panel can be resized by dragging its left edge, and the browser remembers its width.

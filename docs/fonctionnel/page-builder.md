@@ -18,12 +18,14 @@ The page builder shows the page as visitors will see it, and lets editors change
 - The texts of the preview (edit button, block states, empty block notice, block names) are shown in the language of the administration, even when the page is in another language.
 - Every block keeps enough height for its edit button to stay whole, even a very low block.
 - A block that shows nothing in the preview displays a dashed frame with its icon, its name and the notice "No visible output in the preview", so the editor can still find and edit it.
+- The editor can widen or narrow the block editing panel by dragging its left edge, or with the keyboard. The browser remembers this width, even after a reload.
 
 ## Special cases
 - Preview link expired, altered or used on another page → access refused.
 - Preview not answering within 10 seconds → a message asks to check the address of the page channel.
 - Administration session expired while editing → a message asks to reload the builder.
 - Preview showing another page than the one being edited → an alert asks to reload the builder, and editing is suspended.
+- Window narrower than the remembered width → the panel shrinks to fit, then gets its width back when the window grows again.
 - Editor without the editing right → the builder opens, but the preview stays empty with the "preview unreachable" message.
 - Block whose content appears a moment later (late image, content loaded by the page) → the empty block frame disappears by itself.
 - Empty block that is also unpublished or deleted → its state label and edit button move to the right so the block name stays readable.
