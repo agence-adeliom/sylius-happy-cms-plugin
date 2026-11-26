@@ -199,15 +199,15 @@ Webpack Encore.
     `RESERVED_CLASSES`, hors commentaires et hors noeuds texte vides (espaces seuls).
   - `export function isEmptyHeight(height: number): boolean` : `!(height >= EMPTY_HEIGHT_THRESHOLD)` (NaN compte vide).
 
-- [ ] **Step 1: Ecrire les tests qui echouent** (faux noeuds `{ nodeType, textContent, classList: { contains } }`)
+- [x] **Step 1: Ecrire les tests qui echouent** (faux noeuds `{ nodeType, textContent, classList: { contains } }`)
   - `contentNodesOf` exclut encart, surcouche d'etat et surcouche de survol.
   - `contentNodesOf` garde un noeud texte non vide (`nodeType 3`, `'Bonjour'`) et ecarte `'\n  '` et un commentaire
     (`nodeType 8`).
   - `isEmptyHeight(0)`, `isEmptyHeight(3.9)`, `isEmptyHeight(NaN)` -> `true` ; `isEmptyHeight(4)`, `isEmptyHeight(20)`
     -> `false`.
-- [ ] **Step 2: Lancer les tests, verifier qu'ils echouent**
+- [x] **Step 2: Lancer les tests, verifier qu'ils echouent**
   Run: `node --test assets/page-builder/tests/` - Expected: FAIL (module absent).
-- [ ] **Step 3: Implementer le module**, puis l'agent :
+- [x] **Step 3: Implementer le module**, puis l'agent :
   - `STYLES` : retirer `min-height: 150px`. Ajouter sur `.content-block-wrapper` les variables `--hcms-block-gap: 16px`,
     `--hcms-edit-button-height: 44px`, `--hcms-state-badge-height: 40px`,
     `--hcms-block-min-height: calc(var(--hcms-edit-button-height) + 2 * var(--hcms-block-gap))`,
@@ -225,9 +225,9 @@ Webpack Encore.
     chaque wrapper qui ignore les mutations dans les elements reserves. Apres une mutation, reobserver les nouveaux
     elements de contenu.
   - Quand `is-empty` change sur au moins un bloc, appeler `scheduleGeometry()`.
-- [ ] **Step 4: Lancer les tests, verifier qu'ils passent**
+- [x] **Step 4: Lancer les tests, verifier qu'ils passent**
   Run: `node --test assets/page-builder/tests/` - Expected: PASS (tests existants compris).
-- [ ] **Step 5: Proposer le commit** `feat(page-builder): size preview blocks from the edit button and flag empty ones`
+- [x] **Step 5: Proposer le commit** `feat(page-builder): size preview blocks from the edit button and flag empty ones`
 
 ### Task 6: Documentation, assets et verification manuelle
 
