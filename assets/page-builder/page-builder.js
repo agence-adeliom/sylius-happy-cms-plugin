@@ -1,5 +1,6 @@
 import { MessageType } from './preview-protocol.js';
 import { PreviewBridge } from './preview-bridge.js';
+import { initEditorResize } from './editor-resize.js';
 
 // Shown when the preview leaves the signed page (it is no longer safe to edit through it)
 const UNEXPECTED_PAGE_MESSAGE = 'The page has changed. Please reload the page builder to continue editing.';
@@ -331,6 +332,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Editor panel toggle functionality - Overlay behavior for all screen sizes
   const addBlockButton = document.querySelector('[data-page-builder-target="addBlock"]');
+
+  if (editorPanel) {
+    initEditorResize(
+      document.querySelector('.page-builder'),
+      editorPanel,
+      document.querySelector('[data-page-builder-target="editorResizeHandle"]'),
+      document.querySelector('.page-builder__preview-inner'),
+    );
+  }
 
   if (editorPanel && editorToggle) {
     // Toggle button click handler - close panel and reset form

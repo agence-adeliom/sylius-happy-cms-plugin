@@ -18,6 +18,7 @@ return function (ContainerConfigurator $container): void {
             service('doctrine.orm.entity_manager'),
             service('sylius.happy_cms.command.create_demo_pages'),
             service('router'),
+            service('behat.mink.parameters'),
         ]);
 
     $services->set('tests.adeliom_sylius_happy_cms_plugin.behat.context.ui.admin.media_csrf', MediaCsrfContext::class)

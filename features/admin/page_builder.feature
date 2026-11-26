@@ -13,3 +13,4 @@ Feature: Accessing the page builder interface
         Given there is a page with template "homepage"
         When I go to the page builder
         Then I should be on the page builder page
+        And the editor panel should have a resize handle

@@ -21,11 +21,15 @@ final class PageBuilderContext implements Context
 {
     private ?PageInterface $lastPage = null;
 
+    private ?string $builderPath = null;
+
     public function __construct(
         private readonly Session $session,
         private readonly EntityManagerInterface $entityManager,
         private readonly CreateDemoPagesCommand $createDemoPagesCommand,
         private readonly RouterInterface $router,
+        /** @var \ArrayAccess<string, mixed> */
+        private readonly \ArrayAccess $minkParameters,
     ) {
     }
 
@@ -72,6 +76,14 @@ final class PageBuilderContext implements Context
             'resource' => 'sylius_happy_cms.page',
             'id' => $actualId,
         ]);
+        $this->builderPath = (string) parse_url($url, \PHP_URL_PATH);
+
+        // The admin session cookie is set for the host of base_url: a relative path would go to "localhost" without it
+        if (!str_contains($url, '://')) {
+            $baseUrl = $this->minkParameters['base_url'];
+            Assert::string($baseUrl);
+            $url = rtrim($baseUrl, '/') . $url;
+        }
 
         $this->session->visit($url);
     }
@@ -86,5 +98,24 @@ final class PageBuilderContext implements Context
             200,
             sprintf('Expected status code 200, but got %d. Current URL: %s', $statusCode, $this->session->getCurrentUrl()),
         );
+
+        // The admin login page also answers 200: check that no redirection happened
+        Assert::same(
+            parse_url($this->session->getCurrentUrl(), \PHP_URL_PATH),
+            $this->builderPath,
+            sprintf('Expected the page builder, but landed on %s', $this->session->getCurrentUrl()),
+        );
+    }
+
+    #[Then('the editor panel should have a resize handle')]
+    public function theEditorPanelShouldHaveAResizeHandle(): void
+    {
+        $handle = $this->session->getPage()->find('css', '.page-builder__editor-panel [data-page-builder-target="editorResizeHandle"]');
+
+        Assert::notNull($handle, 'The editor panel resize handle is missing');
+        Assert::same($handle->getAttribute('role'), 'separator');
+        Assert::same($handle->getAttribute('aria-orientation'), 'vertical');
+        Assert::same($handle->getAttribute('tabindex'), '0');
+        Assert::notEmpty($handle->getAttribute('aria-label'));
     }
 }

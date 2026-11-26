@@ -75,3 +75,9 @@
 - **Decision:** an empty shared block shows "Shared block" like any other type name, not the name of the referenced shared block.
 - **Why:** avoids loading the referenced entity in `Helper` (developer's choice).
 - **Date:** 2026-11-26 (page-builder-empty-block-placeholder)
+## Editor panel width set by the editor
+- **Decision:** a handle on the left edge of the editor panel (`role="separator"`, mouse and keyboard) sets `--hcms-editor-width`, from 360 px up to 60 px right of the left edge of the preview content, default 820 px. One value per browser, in `localStorage` (`happy-cms.page-builder.editor-width`).
+- **Why:** editors want to see more of the preview while thinking about what to fill in a block, then widen the form again.
+- **Rejected:** CSS `resize` (bottom-right corner only); a panel that pushes the preview (the preview width and its responsive breakpoints would change, the block rendering would no longer be faithful); a width per block type or stored server-side (out of scope).
+- **Date:** 2026-11-26 (page-builder-resizable-editor-panel)
+- **Maximum:** first `viewport - 120 px`; changed after the browser check (PR #182) because the panel then covered the start of the preview. The bound is measured on the preview area, not on the iframe wrapper, so it does not move with the tablet or mobile resolution.

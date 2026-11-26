@@ -19,13 +19,15 @@
 | `config/services.yaml` | Preview services and aliases per interface |
 | `config/routes/admin.yaml` | `sylius_happy_cms_admin_page_builder_preview_url` route |
 | `templates/admin/page_builder/index.html.twig` | `data-iframe-url`, `data-preview-url-endpoint`, translated messages |
-| `templates/admin/page_builder/content.html.twig` | Preview iframe and `role="alert"` message region |
+| `templates/admin/page_builder/content.html.twig` | Preview iframe, `role="alert"` message region, editor panel resize handle |
+| `assets/page-builder/page-builder.css` | Builder styles; panel width `var(--hcms-editor-width, 820px)`, `.page-builder.is-resizing` |
 | `assets/page-builder/preview-protocol.js` | Envelope, filter (`isAcceptedMessage`), sending (`postToWindow`) |
 | `assets/page-builder/preview-agent.js` | Front-side agent (Encore entry `page-builder-preview`) |
 | `assets/page-builder/preview-bridge.js` | Admin-side bridge (`PreviewBridge`: load, reload, send) |
 | `assets/page-builder/page-builder.js` | Builder: handles, hover, edit, theme through the bridge |
 | `assets/controllers/BlockEditor.js` | Dispatches `happy-cms:preview-reload` after a save |
-| `assets/page-builder/tests/` | `node --test` tests of the protocol and the bridge |
+| `assets/page-builder/editor-resize.js` | Editor panel resize: bounds, `localStorage`, pointer and keyboard (`initEditorResize`) |
+| `assets/page-builder/tests/` | `node --test` tests of the protocol, the bridge and the panel resize |
 | `src/Asset/AssetHappyCMSPackage.php` | Asset package `sylius.happy.cms.assets.package` (manifest of `Resources/public`) |
 | `tests/Support/PreviewPageFactory.php` | Channel, published pages and admin for the functional tests |
 | `tests/Functional/Controller/PageBuilder/` | End-to-end tests of the signed preview and the renewal route |

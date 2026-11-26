@@ -285,7 +285,8 @@
     position: fixed;
     right: 0;
     bottom: 0;
-    width: 820px;
+    width: var(--hcms-editor-width, 820px);
+    min-width: 360px;
     max-width: calc(100vw - 120px);
     box-shadow: var(--hcms-shadow-lg);
     transform: translateX(100%);
@@ -293,6 +294,49 @@
 
 .page-builder__editor-panel.is-open {
     transform: translateX(0);
+}
+
+/* Resize handle on the left edge of the panel */
+.page-builder__editor-resize-handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -4px;
+    width: 8px;
+    cursor: col-resize;
+    z-index: 1;
+    touch-action: none;
+}
+
+.page-builder__editor-resize-handle::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 3px;
+    width: 2px;
+    background: transparent;
+}
+
+.page-builder__editor-resize-handle:hover::before,
+.page-builder__editor-resize-handle:focus-visible::before,
+.page-builder.is-resizing .page-builder__editor-resize-handle::before {
+    background: var(--hcms-accent);
+}
+
+.page-builder__editor-resize-handle:focus-visible {
+    outline: none;
+}
+
+/* While dragging. The handle keeps the pointer through setPointerCapture(): never set pointer-events: none on the iframes,
+ * Chrome then stops scrolling the block form iframe after the drag. */
+.page-builder.is-resizing {
+    user-select: none;
+    cursor: col-resize;
+}
+
+.page-builder.is-resizing .page-builder__editor-panel {
+    transition: none;
 }
 
 /* Adjust top position based on header height */
