@@ -24,6 +24,8 @@ make php-shell
 make node-shell
 ```
 
+The app runs on http://localhost:8099 (MySQL on 3337, Mailhog on 8045), clear of the ports DDEV uses. Override them with `HTTP_PORT`, `MYSQL_PORT` and `MAILHOG_PORT` in a git-ignored `.env` at the project root.
+
 ### Traditional Development
 ```bash
 # Frontend setup

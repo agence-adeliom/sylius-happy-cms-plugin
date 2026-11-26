@@ -10,6 +10,8 @@
 /behat.yml
 /phpunit.xml
 /compose.override.yml
+# Local host ports (HTTP_PORT, MYSQL_PORT, MAILHOG_PORT) read by docker compose
+/.env
 .phpunit.result.cache
 
 # Symfony CLI https://symfony.com/doc/current/setup/symfony_server.html#different-php-settings-per-project

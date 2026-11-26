@@ -7,7 +7,7 @@ services:
                 condition: service_healthy
         environment:
             # You can move these environment variables to your .env.local file
-            APP_ENV: ${ENV:-prod}
+            APP_ENV: ${ENV:-dev}
             APP_SECRET: EDITME
             DATABASE_URL: "mysql://root@mysql/sylius_%kernel.environment%"
             MAILER_DSN: smtp://mailhog:1025
@@ -40,7 +40,9 @@ services:
         volumes:
             - mysql-data:/var/lib/mysql:rw
         ports:
-            - "3306:3306"
+            # Host ports stay clear of the ones DDEV uses (80, 443, 8025, 8080...).
+            # Override them in a .env file at the project root (MYSQL_PORT=3338).
+            - "127.0.0.1:${MYSQL_PORT:-3337}:3306"
     nginx:
         environment:
             WORKING_DIR: /srv/sylius/vendor/sylius/test-application
@@ -49,7 +51,7 @@ services:
             # if you develop on Linux, you may use a bind-mounted host directory instead
         #            - ./public/media:/srv/sylius/public/media:ro
         ports:
-            - "80:80"
+            - "127.0.0.1:${HTTP_PORT:-8099}:80"
     nodejs:
         image: node:${NODE_VERSION:-22}-alpine
         user: ${DOCKER_USER:-1000:1000}
@@ -65,7 +67,7 @@ services:
             - ./public:/srv/sylius/public:rw,delegated
     mailhog:
         ports:
-            - "8025:8025"
+            - "127.0.0.1:${MAILHOG_PORT:-8045}:8025"
 
 volumes:
     mysql-data:

@@ -16,7 +16,7 @@ install:
 	@make configure-preview-mode
 	@make install-database
 	@make frontend-clear
-	echo "Setup completed! You can now access the application at http://localhost"
+	@echo "Setup completed! You can now access the application at http://localhost:$$($(DOCKER_COMPOSE) port nginx 80 | cut -d: -f2)"
 
 install-database:
 	@make database-init
@@ -33,7 +33,6 @@ publish:
 
 init:
 	@make -s docker-compose-check
-	@make -s ddev-check
 	@if [ ! -e compose.override.yml ]; then \
 		cp compose.override.dist.yml compose.override.yml; \
 	fi
@@ -70,7 +69,6 @@ debug:
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) -f compose.yml -f compose.override.yml -f compose.debug.yml up -d
 
 up:
-	@make -s ddev-check
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) up -d
 
 down:
@@ -92,9 +90,6 @@ docker-compose-check:
 	@$(DOCKER_COMPOSE) version >/dev/null 2>&1 || (echo "Please install docker compose binary or set DOCKER_COMPOSE=\"docker-compose\" for legacy binary" && exit 1)
 	@echo "You are using \"$(DOCKER_COMPOSE)\" binary"
 	@echo "Current version is \"$$($(DOCKER_COMPOSE) version)\""
-
-ddev-check:
-	@$(DDEV) poweroff >/dev/null 2>&1 && echo "You are using ddev, we need to stop it to free needed ports" || (echo "DDEV is not installed, no port conflicts detected")
 
 database-init:
 	@ENV=$(ENV) DOCKER_USER=$(DOCKER_USER) $(DOCKER_COMPOSE) run --rm php vendor/bin/console doctrine:database:drop -n --force --if-exists
