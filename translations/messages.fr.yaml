@@ -372,6 +372,10 @@ sylius_happy_cms:
     copy_from_locale: "Copier depuis %locale%"
     or_add_new_block: Ou ajouter un nouveau bloc à partir de zéro
     edit_block: 'Éditer le bloc'
+    preview_overlay:
+      unpublished_block: 'Bloc non publié'
+      deleted_block: 'Bloc supprimé'
+      empty_block: 'Aucun rendu visible dans l''aperçu'
     block_saved: 'Bloc enregistré'
     block_saved_successfully: 'Bloc enregistré avec succès'
     form_contain_errors: 'Le formulaire contient des erreurs'

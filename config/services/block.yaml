@@ -90,6 +90,15 @@ services:
   sylius.happy_cms.content_block_helper:
     alias: Adeliom\SyliusHappyCMSPlugin\Factory\ContentBlock\Helper
 
+  Adeliom\SyliusHappyCMSPlugin\Factory\ContentBlock\PreviewLabelsProvider:
+    arguments:
+      - '@translator'
+      - '@request_stack'
+      - '@Adeliom\SyliusHappyCMSPlugin\Security\Preview\SignedPreviewRequestValidatorInterface'
+
+  Adeliom\SyliusHappyCMSPlugin\Factory\ContentBlock\PreviewLabelsProviderInterface:
+    alias: Adeliom\SyliusHappyCMSPlugin\Factory\ContentBlock\PreviewLabelsProvider
+
 
   # shared block
 

@@ -90,14 +90,14 @@ Webpack Encore.
   - `interface PreviewLabelsProviderInterface` : `labels(): PreviewLabels` ; `blockName(BlockTypeInterface $block): string`.
   - `final class PreviewLabelsProvider` : `__construct(TranslatorInterface $translator, RequestStack $requestStack, SignedPreviewRequestValidatorInterface $validator)`. Service aliase sur l'interface.
 
-- [ ] **Step 1: Ajouter les cles de traduction** sous `sylius_happy_cms.page_builder` (pas sous `page_builder.preview`,
+- [x] **Step 1: Ajouter les cles de traduction** sous `sylius_happy_cms.page_builder` (pas sous `page_builder.preview`,
   qui est deja une valeur) :
   - en : `preview_overlay.unpublished_block: 'Unpublished block'`, `preview_overlay.deleted_block: 'Deleted block'`,
     `preview_overlay.empty_block: 'No visible output in the preview'`.
   - fr : `preview_overlay.unpublished_block: 'Bloc non publié'`, `preview_overlay.deleted_block: 'Bloc supprimé'`,
     `preview_overlay.empty_block: 'Aucun rendu visible dans l''aperçu'`.
   - Bouton : reutiliser `sylius_happy_cms.page_builder.edit_block` (existe deja en fr et en).
-- [ ] **Step 2: Ecrire les tests qui echouent** (`Translator` reel avec `ArrayLoader`, cles en `fr_FR` et `en_US`)
+- [x] **Step 2: Ecrire les tests qui echouent** (`Translator` reel avec `ArrayLoader`, cles en `fr_FR` et `en_US`)
   - `testItTranslatesInTheAdminLocaleOfTheSignedPreview` : requete en `en_US`, contexte signe `adminLocale = 'fr_FR'`,
     `labels()->editBlock === 'Éditer le bloc'`, `labels()->emptyBlock === "Aucun rendu visible dans l'aperçu"`.
   - `testItFallsBackOnTheRequestLocale` : validator renvoie `null`, requete en `en_US`, `editBlock === 'Edit Block'`.
@@ -105,15 +105,15 @@ Webpack Encore.
     traduction fr ; un nom sans traduction (`'Shared block'`) revient tel quel.
   - `testItResolvesTheLocaleOncePerRequest` : `validate()` appele une seule fois pour 2 appels a `labels()` et 1 a
     `blockName()`.
-- [ ] **Step 3: Lancer les tests, verifier qu'ils echouent**
+- [x] **Step 3: Lancer les tests, verifier qu'ils echouent**
   Run: `vendor/bin/phpunit tests/Unit/Factory/ContentBlock/PreviewLabelsProviderTest.php` - Expected: FAIL (classe absente).
-- [ ] **Step 4: Implementer** `PreviewLabels`, l'interface et `PreviewLabelsProvider`. Langue = `adminLocale` du contexte
+- [x] **Step 4: Implementer** `PreviewLabels`, l'interface et `PreviewLabelsProvider`. Langue = `adminLocale` du contexte
   signe de la requete principale, sinon `$request->getLocale()`, sinon `null` (langue par defaut du traducteur). Les
   traductions passent la langue en 4e argument de `trans()`, sans changer la langue de la requete. `labels()` est
   memorise par requete.
-- [ ] **Step 5: Lancer les tests, verifier qu'ils passent**
+- [x] **Step 5: Lancer les tests, verifier qu'ils passent**
   Run: `vendor/bin/phpunit tests/Unit/Factory/ContentBlock` - Expected: PASS.
-- [ ] **Step 6: Proposer le commit** `feat(page-builder): translate the preview labels in the admin locale`
+- [x] **Step 6: Proposer le commit** `feat(page-builder): translate the preview labels in the admin locale`
 
 ### Task 3: Encart de bloc vide et hauteurs fixes dans le renderer
 
