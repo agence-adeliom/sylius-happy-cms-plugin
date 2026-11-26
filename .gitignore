@@ -26,6 +26,8 @@ composer.lock
 
 .idea/*
 .claude/*
+# Domain skills of the plugin, shared with the team (/developer:archive-spec)
+!.claude/skills/
 .ddev/*
 php.ini
 .php-version
