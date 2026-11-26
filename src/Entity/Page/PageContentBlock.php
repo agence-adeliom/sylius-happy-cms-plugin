@@ -8,9 +8,13 @@ use Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock\ContentBlock;
 use Doctrine\ORM\Mapping as ORM;
 use Sylius\Resource\Model\ResourceInterface;
 
+/**
+ * @extends ContentBlock<PageInterface>
+ */
 #[ORM\MappedSuperclass]
 class PageContentBlock extends ContentBlock implements PageContentBlockInterface
 {
+    /** @var PageInterface|null */
     #[ORM\ManyToOne(targetEntity: PageInterface::class, inversedBy: 'contentBlocks')]
     #[ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id', nullable: true, onDelete: 'set null')]
     protected ?ResourceInterface $contentOwner = null;

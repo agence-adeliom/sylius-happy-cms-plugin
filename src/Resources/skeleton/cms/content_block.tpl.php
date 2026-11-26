@@ -21,12 +21,16 @@ use <?= $parentClassNameDetail->getFullName() ?>Interface;
 use Doctrine\ORM\Mapping as ORM;
 use Sylius\Resource\Model\ResourceInterface;
 
+/**
+ * @extends ContentBlock<<?= $parentClassNameDetail->getShortName() ?>Interface>
+ */
 #[ORM\Entity]
 #[ORM\Table(name: 'happy_cms_<?= mb_strtolower($scope) ?>__<?= Str::asSnakeCase($parentClassNameDetail->getShortName()) ?>_content_block')]
 #[ORM\Index(columns: ['<?= Str::asSnakeCase($parentClassNameDetail->getShortName()) ?>_id', 'locale', 'position'], name: 'idx_<?= Str::asSnakeCase($parentClassNameDetail->getShortName()) ?>_locale_position')]
 #[ORM\Index(columns: ['<?= Str::asSnakeCase($parentClassNameDetail->getShortName()) ?>_id', 'locale', 'publishState'], name: 'idx_<?= Str::asSnakeCase($parentClassNameDetail->getShortName()) ?>_locale_published')]
 class <?= $classNameDetail->getShortName() ?> extends ContentBlock implements ContentBlockInterface
 {
+    /** @var <?= $parentClassNameDetail->getShortName() ?>Interface|null */
     #[ORM\ManyToOne(targetEntity: <?= $parentClassNameDetail->getShortName() ?>Interface::class, inversedBy: 'contentBlocks')]
     #[ORM\JoinColumn(name: '<?= Str::asSnakeCase($parentClassNameDetail->getShortName()) ?>_id', referencedColumnName: 'id', nullable: true, onDelete: 'set null')]
     protected ?ResourceInterface $contentOwner = null;

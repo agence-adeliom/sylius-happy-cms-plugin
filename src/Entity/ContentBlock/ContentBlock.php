@@ -10,8 +10,13 @@ use Adeliom\SyliusEasyCrudPlugin\Traits\EntityPublishableTrait;
 use Adeliom\SyliusEasyCrudPlugin\Traits\EntityTimestampableTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Sylius\Resource\Model\ResourceInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * @template TOwner of ResourceInterface = ResourceInterface
+ * @implements ContentBlockInterface<TOwner>
+ */
 #[ORM\MappedSuperclass]
 abstract class ContentBlock implements ContentBlockInterface
 {

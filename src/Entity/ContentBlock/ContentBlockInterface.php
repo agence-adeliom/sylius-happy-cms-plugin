@@ -6,12 +6,21 @@ namespace Adeliom\SyliusHappyCMSPlugin\Entity\ContentBlock;
 
 use Sylius\Resource\Model\ResourceInterface;
 
+/**
+ * @template TOwner of ResourceInterface = ResourceInterface
+ */
 interface ContentBlockInterface
 {
     public function getId(): ?int;
 
+    /**
+     * @param TOwner|null $contentOwner
+     */
     public function setContentOwner(?ResourceInterface $contentOwner): void;
 
+    /**
+     * @return TOwner|null
+     */
     public function getContentOwner(): ?ResourceInterface;
 
     public function getType(): ?string;
