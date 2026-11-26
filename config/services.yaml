@@ -111,6 +111,14 @@ services:
 
   Adeliom\SyliusHappyCMSPlugin\Security\Preview\SignedPreviewRequestValidatorInterface: '@Adeliom\SyliusHappyCMSPlugin\Security\Preview\SignedPreviewRequestValidator'
 
+  Adeliom\SyliusHappyCMSPlugin\Security\SignedPreviewVoter:
+    arguments:
+      - '@request_stack'
+      - '@Adeliom\SyliusHappyCMSPlugin\Security\Preview\SignedPreviewRequestValidatorInterface'
+      - '%sylius.resources%'
+    tags:
+      - "security.voter"
+
 
   # pages
   # ===============================
