@@ -106,7 +106,7 @@ Expected: aucune erreur.
   - `export function storeWidth(width: number): void` : écrit l'entier arrondi ; ignore silencieusement une exception.
   - `export function initEditorResize(root: HTMLElement, panel: HTMLElement, handle: HTMLElement | null): void` : ne fait rien si `handle` est `null`.
 
-- [ ] **Step 1: Écrire `editor-resize.js`**
+- [x] **Step 1: Écrire `editor-resize.js`**
 
 `initEditorResize` :
 - Applique `clampWidth(readStoredWidth() ?? DEFAULT_WIDTH, window.innerWidth)` via `panel.style.setProperty('--hcms-editor-width', `${w}px`)` et met à jour `aria-valuenow`, `aria-valuemin`, `aria-valuemax` de la poignée.
@@ -115,11 +115,11 @@ Expected: aucune erreur.
 - `keydown` : touches de Global Constraints, `preventDefault()`, puis `storeWidth`.
 - `resize` de la fenêtre : réapplique `clampWidth(readStoredWidth() ?? DEFAULT_WIDTH, window.innerWidth)`, sans `storeWidth`.
 
-- [ ] **Step 2: Brancher le module**
+- [x] **Step 2: Brancher le module**
 
 Dans `page-builder.js`, importer `initEditorResize` et l'appeler une fois, dans le `DOMContentLoaded`, avec `document.querySelector('.page-builder')`, `editorPanel` et `document.querySelector('[data-page-builder-target="editorResizeHandle"]')`, à l'intérieur du `if (editorPanel)` existant.
 
-- [ ] **Step 3: Compiler**
+- [x] **Step 3: Compiler**
 
 Run: `(cd vendor/sylius/test-application && yarn build)` puis `vendor/bin/console assets:install` (dans Docker, depuis `make node-shell` et `make php-shell`).
 Expected: build sans erreur.
@@ -136,7 +136,7 @@ Cocher chaque point :
 - Ouvrir le navigateur de blocs et le générateur IA : ils suivent la largeur.
 - Thème sombre : la poignée reste visible au survol et au focus.
 
-- [ ] **Step 5: Relancer la QA et proposer le commit**
+- [x] **Step 5: Relancer la QA et proposer le commit**
 
 Run: `make behat`, `make phpstan`, `make ecs`
 Expected: verts.
