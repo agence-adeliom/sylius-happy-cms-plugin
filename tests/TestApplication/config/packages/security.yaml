@@ -1,0 +1,4 @@
+# The page builder voter grants access through this role, see docs/usage/preview.md
+security:
+    role_hierarchy:
+        ROLE_ADMINISTRATION_ACCESS: [ ROLE_HAPPY_CMS_CONTENT_BUILDER ]
