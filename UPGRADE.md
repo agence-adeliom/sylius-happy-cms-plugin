@@ -132,6 +132,29 @@ customised the preview may need to adapt:
 
 See [docs/usage/preview.md](docs/usage/preview.md#empty-blocks-and-minimal-height).
 
+### Page builder: resizable editor panel
+
+The editor panel of the page builder can be resized by dragging its left edge, or with the keyboard (arrows, Home,
+End, Enter). The width stays between 360px and 60px to the right of the start of the preview, and each browser keeps it
+in `localStorage` (key `happy-cms.page-builder.editor-width`). No action is required, but:
+
+- **Run `assets:install`** after the update: the compiled assets of `Resources/public` changed.
+- **A project that overrides `templates/admin/page_builder/content.html.twig`** keeps a fixed 820px panel until it
+  adds the handle as the first child of `.page-builder__editor-panel`:
+
+  ```twig
+  <div class="page-builder__editor-resize-handle"
+       data-page-builder-target="editorResizeHandle"
+       role="separator"
+       aria-orientation="vertical"
+       tabindex="0"
+       aria-label="{% trans %}sylius_happy_cms.page_builder.resize_panel{% endtrans %}"
+       title="{% trans %}sylius_happy_cms.page_builder.resize_panel{% endtrans %}"></div>
+  ```
+
+- **The panel width is now the CSS variable `--hcms-editor-width`** (default `820px`, `min-width: 360px`). A project
+  that set the width of `.page-builder__editor-panel` in its own CSS should set this variable instead.
+
 ## 2.3.4
 
 ### Bug fix: a new menu gets its root item without a `sylius_happy_cms.menu_item` resource
