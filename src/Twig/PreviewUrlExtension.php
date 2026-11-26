@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Adeliom\SyliusHappyCMSPlugin\Twig;
 
 use Adeliom\SyliusHappyCMSPlugin\Factory\CMS\CmsRoutableInterface;
+use Adeliom\SyliusHappyCMSPlugin\Security\Preview\PreviewSigningDeniedException;
 use Adeliom\SyliusHappyCMSPlugin\Security\Preview\PreviewUrlGeneratorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -25,6 +26,11 @@ final class PreviewUrlExtension extends AbstractExtension
 
     public function getSignedPreviewUrl(CmsRoutableInterface $entity, string $resource, string $locale): string
     {
-        return $this->previewUrlGenerator->generate($entity, $resource, $locale);
+        try {
+            return $this->previewUrlGenerator->generate($entity, $resource, $locale);
+        } catch (PreviewSigningDeniedException) {
+            // The page builder still opens: it reports the preview as unreachable instead of failing the whole page
+            return '';
+        }
     }
 }
