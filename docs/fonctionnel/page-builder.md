@@ -15,6 +15,9 @@ The page builder shows the page as visitors will see it, and lets editors change
 - In the preview, the links and forms of the page are disabled: the editor stays on the page being edited.
 - Preview pages are neither publicly cached nor indexed by search engines.
 - The light or dark theme of the administration applies to the markers of the preview.
+- The texts of the preview (edit button, block states, empty block notice, block names) are shown in the language of the administration, even when the page is in another language.
+- Every block keeps enough height for its edit button to stay whole, even a very low block.
+- A block that shows nothing in the preview displays a dashed frame with its icon, its name and the notice "No visible output in the preview", so the editor can still find and edit it.
 
 ## Special cases
 - Preview link expired, altered or used on another page → access refused.
@@ -22,6 +25,10 @@ The page builder shows the page as visitors will see it, and lets editors change
 - Administration session expired while editing → a message asks to reload the builder.
 - Preview showing another page than the one being edited → an alert asks to reload the builder, and editing is suspended.
 - Editor without the editing right → the builder opens, but the preview stays empty with the "preview unreachable" message.
+- Block whose content appears a moment later (late image, content loaded by the page) → the empty block frame disappears by itself.
+- Empty block that is also unpublished or deleted → its state label and edit button move to the right so the block name stays readable.
+- Empty shared block → the frame shows "Shared block", not the name of the shared content it points to.
+- Content hidden on purpose but still taking space (for example made transparent) → not seen as empty, no frame.
 
 ## Still to decide
 - A website that enforces a strict security policy on its scripts can block the preview: the procedure is still to be documented.

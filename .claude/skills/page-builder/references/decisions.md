@@ -48,3 +48,30 @@
 - **Decision:** signer and voter read the subject id through `ResourceInterface`; without an id, the signer refuses and the voter abstains.
 - **Why:** `CmsRoutableInterface` has no `getId()`.
 - **Date:** 2026-11-26 (page-builder-cross-host-preview, implementation choice)
+
+## Preview labels in the admin locale, carried by the signed URL
+- **Decision:** `PreviewUrlSigner` adds `_hcms_admin_locale` (locale of the admin request); `PreviewLabelsProvider` translates the preview labels and the block type name in that locale (4th argument of `trans()`, request locale untouched), falling back on the request locale.
+- **Why:** an editor working in French on an English page must read French labels, right from the first render.
+- **Rejected:** page locale (editor reads another language); labels sent by `postMessage` after load (text flashes, the agent would need a map of every block type name).
+- **Date:** 2026-11-26 (page-builder-empty-block-placeholder)
+
+## Empty block detected in the browser
+- **Decision:** the preview agent measures the content nodes of each wrapper with a `Range` (`getBoundingClientRect().height`), sets `is-empty` under 4px, measures again through `ResizeObserver` (content elements), `MutationObserver` (wrapper subtree) and `resize`.
+- **Why:** blocks can be present but invisible (empty JS mount point, element hidden at this breakpoint, popin, tracking script).
+- **Rejected:** `strip_tags()` in PHP (misses present but invisible content).
+- **Date:** 2026-11-26 (page-builder-empty-block-placeholder)
+
+## Placeholder absolutely positioned, hidden by default
+- **Decision:** `wrap()` renders `.content-block-empty-placeholder` (`position: absolute; inset: 0; display: none`) after the content and before the overlays; the agent shows it with `is-empty`. When empty, the hover and state overlays align their button to the right so the name stays readable.
+- **Why:** an in-flow placeholder would change the measured height and loop.
+- **Date:** 2026-11-26 (page-builder-empty-block-placeholder)
+
+## Minimal height from the edit button
+- **Decision:** `min-height: 150px` replaced by `--hcms-block-min-height` (button 44px + 2 x 16px gap) and `--hcms-block-state-min-height` (badge 40px + 12px + button + gaps) for unpublished and deleted blocks; button and badge get a fixed inline height.
+- **Why:** a block lower than the button cut it; 150px left large white rectangles.
+- **Date:** 2026-11-26 (page-builder-empty-block-placeholder)
+
+## Shared block placeholder shows the type name
+- **Decision:** an empty shared block shows "Shared block" like any other type name, not the name of the referenced shared block.
+- **Why:** avoids loading the referenced entity in `Helper` (developer's choice).
+- **Date:** 2026-11-26 (page-builder-empty-block-placeholder)

@@ -16,3 +16,10 @@
 - The preview agent does nothing outside an iframe or without `data-admin-origin`; it blocks links and forms, hides `.sf-toolbar`, only applies `--hcms-*` variables.
 - Messages: preview -> admin `ready`, `geometry` (once per frame), `hover`, `edit`; admin -> preview `theme`, `highlight`, `scroll-to-block`, `restore-scroll`. Unknown type or missing `source`: ignored.
 - The `block:saved` message (block form iframe) is only accepted from `window.location.origin`.
+- `_hcms_admin_locale` is optional and signed: absent or not matching `/^[a-z]{2,3}(_[A-Z]{2})?$/`, the request stays valid and `SignedPreviewContext::$adminLocale` is `null` - `SignedPreviewRequestValidator::adminLocale()`.
+- Preview labels: keys `sylius_happy_cms.page_builder.edit_block` and `page_builder.preview_overlay.{unpublished,deleted,empty}_block` (`messages` domain); an untranslated key falls back on the English default of `PreviewLabels` - `PreviewLabelsProvider::translate()`.
+- The admin locale is resolved once per main request (`WeakMap`) - `PreviewLabelsProvider::resolve()`.
+- Block name: translated, escaped in `data-block-name` and in the placeholder; omitted when empty. Block icon: raw HTML of the developer, the first one when `getIcon()` returns an array, inside a 40px high box - `PreviewOverlayRenderer::renderEmptyPlaceholder()`.
+- Content measured = child nodes of the wrapper except comments, whitespace-only text and the reserved overlays (`RESERVED_CLASSES`) - `preview-empty-block.js::contentNodesOf()`.
+- Under `EMPTY_HEIGHT_THRESHOLD` (4px), NaN included, the block is empty - `isEmptyHeight()`. A change of `is-empty` triggers `scheduleGeometry()` (message `geometry`).
+- Not detected: content hidden with `visibility: hidden` or `opacity: 0` (it keeps its height).

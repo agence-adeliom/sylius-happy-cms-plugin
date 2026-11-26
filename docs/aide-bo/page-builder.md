@@ -31,6 +31,16 @@ The preview shows another page than the one being edited. For safety, block edit
 ### Why does the preview address stop working after a few minutes? {#preview-link-expired}
 The preview opens through a temporary address, valid for a few minutes and for one page and one language only. Once expired, it shows an access refusal. It is not a link to share: to show a page, use "View published page" or open the builder again.
 
+### Why does a block show "No visible output in the preview"? {#empty-block}
+The block exists but shows nothing at this screen size: missing content, a part that only appears on another device, a pop-up or an invisible tool. The dashed frame gives its icon and name so you can still find it.
+1. Hover the frame and click the edit button on the right.
+2. Fill in the missing content, then save.
+
+If the frame stays after saving, check the block on another screen size (desktop, tablet, mobile buttons).
+
+### Why are the preview buttons in my language while the page is in another one? {#preview-language}
+The edit button, the block states and the block names follow the language of your administration, not the language of the page. The content of the page itself stays in its own language.
+
 ## Parcours
 
 ```mermaid
@@ -47,3 +57,4 @@ flowchart LR
 ## Nouveautés
 
 - 2026-11-26 : the page builder works when the administration has its own address; the preview reloads at the same position after each save, and a message explains an unreachable preview or an expired session.
+- 2026-11-26 : a block that shows nothing in the preview now displays a frame with its icon and name; edit buttons are never cut; the preview texts follow the language of the administration.

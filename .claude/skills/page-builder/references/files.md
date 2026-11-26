@@ -29,3 +29,10 @@
 | `src/Asset/AssetHappyCMSPackage.php` | Asset package `sylius.happy.cms.assets.package` (manifest of `Resources/public`) |
 | `tests/Support/PreviewPageFactory.php` | Channel, published pages and admin for the functional tests |
 | `tests/Functional/Controller/PageBuilder/` | End-to-end tests of the signed preview and the renewal route |
+| `src/Factory/ContentBlock/PreviewOverlayRenderer.php` | Preview wrapper: state and hover overlays, edit button, empty block placeholder, `data-block-name` |
+| `src/Factory/ContentBlock/PreviewLabels.php` | Read-only preview texts with English defaults |
+| `src/Factory/ContentBlock/PreviewLabelsProvider.php` | Translates labels and block names in the admin locale (interface `PreviewLabelsProviderInterface`) |
+| `src/Factory/ContentBlock/Helper.php` | `renderContentBlock()` wraps the block in preview mode with name, icon and labels |
+| `config/services/block.yaml` | `Helper` arguments and `PreviewLabelsProvider` service |
+| `assets/page-builder/preview-empty-block.js` | Pure functions: `contentNodesOf()`, `isEmptyHeight()`, `RESERVED_CLASSES` |
+| `translations/messages.{en,fr}.yaml` | `sylius_happy_cms.page_builder.preview_overlay.*` keys |
