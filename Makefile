@@ -16,7 +16,14 @@ install:
 	@make configure-preview-mode
 	@make install-database
 	@make frontend-clear
-	@echo "Setup completed! You can now access the application at http://localhost:$$($(DOCKER_COMPOSE) port nginx 80 | cut -d: -f2)"
+	@make -s setup-completed
+
+# End-of-install message with a rainbow URL; run `make setup-completed` to see it without reinstalling
+setup-completed:
+	@printf "Setup completed! You can now access the application at "
+	@echo "http://localhost:$$($(DOCKER_COMPOSE) port nginx 80 2>/dev/null | cut -d: -f2)" \
+		| awk 'BEGIN { n = split("196 202 208 214 220 226 190 118 46 48 51 45 39 33 63 129 165 201 199", c, " ") } \
+			{ for (i = 1; i <= length($$0); i++) printf "\033[1;38;5;%sm%s", c[(i - 1) % n + 1], substr($$0, i, 1); printf "\033[0m\n" }'
 
 install-database:
 	@make database-init
