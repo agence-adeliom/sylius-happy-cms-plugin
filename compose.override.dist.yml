@@ -19,6 +19,8 @@ services:
             SYLIUS_MESSENGER_TRANSPORT_PAYMENT_REQUEST_DSN: sync://
             SYLIUS_MESSENGER_TRANSPORT_PAYMENT_REQUEST_FAILED_DSN: sync://
             PHP_DATE_TIMEZONE: ${PHP_DATE_TIMEZONE:-UTC}
+            # Serves the admin on its own host (ADMIN_HOST=admin.localhost in the root .env), empty for any host
+            ADMIN_HOST: ${ADMIN_HOST:-}
             XDEBUG_MODE: debug
             XDEBUG_CONFIG: >-
                 client_host=host.docker.internal

@@ -25,6 +25,7 @@ make node-shell
 ```
 
 The app runs on http://localhost:8099 (MySQL on 3337, Mailhog on 8045), clear of the ports DDEV uses. Override them with `HTTP_PORT`, `MYSQL_PORT` and `MAILHOG_PORT` in a git-ignored `.env` at the project root.
+Set `ADMIN_HOST=admin.localhost` in the same file (then `make down && make up`) to serve the admin from its own host, see `docs/contribution.md`.
 
 ### Traditional Development
 ```bash

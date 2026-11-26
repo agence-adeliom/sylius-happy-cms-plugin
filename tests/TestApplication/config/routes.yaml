@@ -1,8 +1,37 @@
-sylius_easy_crud:
-    resource: "@SyliusEasyCrudPlugin/config/routes.yaml"
+# The admin can be served from its own host (ADMIN_HOST in the root .env, see docs/contribution.md).
+# Every admin route takes `host: '%admin_host%'`: an empty value leaves the routes open to any host.
+# The plugins are imported through their prefix-less files, as documented for projects whose admin has its own host.
 
-sylius_happy_cms:
-    resource: "@SyliusHappyCMSPlugin/config/routes.yaml"
+# Re-imports the Sylius admin routes (already imported by sylius/test-application) to add the host.
+# Routes keep their names, so these definitions replace the first ones.
+sylius_admin:
+    resource: "@SyliusAdminBundle/Resources/config/routing.yml"
+    prefix: '/%sylius_admin.path_name%'
+    host: '%admin_host%'
+
+sylius_easy_crud_admin:
+    resource: "@SyliusEasyCrudPlugin/config/routes/admin.yaml"
+    prefix: '/%sylius_admin.path_name%'
+    host: '%admin_host%'
+
+sylius_easy_crud_attributes:
+    resource: 'Adeliom\SyliusEasyCrudPlugin\Routing\EasyCrudAttributesRoutesLoader'
+    type: service
+    prefix: '/%sylius_admin.path_name%'
+    host: '%admin_host%'
+
+sylius_happy_cms_admin:
+    resource: "@SyliusHappyCMSPlugin/config/routes/admin.yaml"
+    prefix: '/%sylius_admin.path_name%'
+    host: '%admin_host%'
+
+sylius_happy_cms_media_admin:
+    resource: "@SyliusHappyCMSPlugin/config/routes/media_admin.php"
+    prefix: '/%sylius_admin.path_name%'
+    host: '%admin_host%'
+
+sylius_happy_cms_media_public:
+    resource: "@SyliusHappyCMSPlugin/config/routes/media_public.php"
 
 sylius_shop_homepage:
     path: /{_locale}
@@ -56,6 +85,7 @@ sylius_happy_cms_page_admin:
                         id: $id
     type: sylius.resource
     prefix: '/%sylius_admin.path_name%'
+    host: '%admin_host%'
 
 sylius_happy_cms_config_admin:
     resource: |
@@ -104,6 +134,7 @@ sylius_happy_cms_config_admin:
                         id: $id
     type: sylius.resource
     prefix: '/%sylius_admin.path_name%'
+    host: '%admin_host%'
 
 sylius_happy_cms_menu_admin:
     resource: |
@@ -152,6 +183,7 @@ sylius_happy_cms_menu_admin:
                         id: $id
     type: sylius.resource
     prefix: '/%sylius_admin.path_name%'
+    host: '%admin_host%'
 
 sylius_happy_cms_menu_item_admin:
     resource: |
@@ -204,6 +236,7 @@ sylius_happy_cms_menu_item_admin:
                         id: $id
     type: sylius.resource
     prefix: '/%sylius_admin.path_name%'
+    host: '%admin_host%'
 
 sylius_happy_cms_shared_block_admin:
     resource: |
@@ -252,6 +285,7 @@ sylius_happy_cms_shared_block_admin:
                         id: $id
     type: sylius.resource
     prefix: '/%sylius_admin.path_name%'
+    host: '%admin_host%'
 
 sylius_happy_cms_route_admin:
     resource: |
@@ -301,6 +335,7 @@ sylius_happy_cms_route_admin:
                         id: $id
     type: sylius.resource
     prefix: '/%sylius_admin.path_name%'
+    host: '%admin_host%'
 
 sylius_happy_cms_redirect_route_admin:
     resource: |
@@ -349,3 +384,4 @@ sylius_happy_cms_redirect_route_admin:
                         id: $id
     type: sylius.resource
     prefix: '/%sylius_admin.path_name%'
+    host: '%admin_host%'
